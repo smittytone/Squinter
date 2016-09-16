@@ -1,0 +1,37 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "40C6139070B0B09B301771416B7325892601003F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "B2C78D8D0B7F3573DBB9878F443675C614EA8362" : 9223372036854775807,
+    "40C6139070B0B09B301771416B7325892601003F" : 9223372036854775807,
+    "51BC99BA5DE28FB6315D4AAD677E6175581173BA" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "EDF9A754-F22E-4DF2-950E-033C7D092565",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "B2C78D8D0B7F3573DBB9878F443675C614EA8362" : "..\/..\/..\/Documents\/GitHub\/PDKeychainBindingsController",
+    "40C6139070B0B09B301771416B7325892601003F" : "Squinter\/",
+    "51BC99BA5DE28FB6315D4AAD677E6175581173BA" : "..\/..\/..\/Documents\/GitHub\/BuildAPIAccess"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Squinter",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Squinter.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/smittytone\/Squinter.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "40C6139070B0B09B301771416B7325892601003F"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/smittytone\/BuildAPIAccess.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "51BC99BA5DE28FB6315D4AAD677E6175581173BA"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/carlbrown\/PDKeychainBindingsController.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "B2C78D8D0B7F3573DBB9878F443675C614EA8362"
+    }
+  ]
+}
