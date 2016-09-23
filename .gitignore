@@ -1,0 +1,8 @@
+Art/*
+Art-Source/*
+SquinterHelp/*
+Third-Party-Code/*
+SquinterTests/*
+Podfile.lock
+Podfile
+Pods/*
