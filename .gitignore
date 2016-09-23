@@ -6,3 +6,6 @@ SquinterTests/*
 Podfile.lock
 Podfile
 Pods/*
+Squinter.xcodeproj/*
+Squinter.xcworkspace/*
+
