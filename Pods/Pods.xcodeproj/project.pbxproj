@@ -1,0 +1,624 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1C6F07C65AE9433ADB50BCE7AFD65700 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 720EE7D93D7A13DAAEAEB63D0AE02D87 /* Security.framework */; };
+		253C70FE871154AFEA4AAAF0C6815D15 /* Pods-SquinterTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B95BC3D3079646DFBBFC1B83AEE2A /* Pods-SquinterTests-dummy.m */; };
+		31FE3C8998C1A9486F3576EB630B588C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA098AB3FC6624B7D041FDF6C1ED4C9 /* Cocoa.framework */; };
+		393DDE7E8DF9BBB2E586AE10C3238E30 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA098AB3FC6624B7D041FDF6C1ED4C9 /* Cocoa.framework */; };
+		5704A1A041193C4CAAA600B9AC0D30F2 /* PDKeychainBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = 34710E4B08A107A8F95A5BC0BAA0F8CC /* PDKeychainBindings.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		617239C866E6A1B6CFF6C5E9E8AC9CB6 /* PDKeychainBindingsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DE943A18BDEA2826DCC09FF4B6E7DE /* PDKeychainBindingsController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B88F533FE999C15037A9D1BA79F39922 /* Pods-Squinter-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = C1CEE76B8AE780B35791594FCCACE66E /* Pods-Squinter-dummy.m */; };
+		D912D5CDEF4A44CDCFBDABF6DA05B29F /* PDKeychainBindingsController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9BA6A20DAA17EB85270762CED7CA82 /* PDKeychainBindingsController-dummy.m */; };
+		E9E0C1AEACD91C95D3241118D672A7B5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA098AB3FC6624B7D041FDF6C1ED4C9 /* Cocoa.framework */; };
+		EF3E80E157F97454648BA04C08BC5069 /* PDKeychainBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = B3A637F9F391519A18CD3370D68844E5 /* PDKeychainBindings.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		EFF07F5D7EF7869980A6736E3B353D5F /* PDKeychainBindingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA2BBC940AC5744C2AE5F140E3731E3 /* PDKeychainBindingsController.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9C9EA46674EB0B18FD3AE9F6999852CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 596E20A9EED4170AC7FE01DA7A4AC0A6;
+			remoteInfo = PDKeychainBindingsController;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		007F876A1E76E727F5C3D783883B09BF /* PDKeychainBindingsController.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PDKeychainBindingsController.xcconfig; sourceTree = "<group>"; };
+		0698EB30C4509EF99FA07AE616A4792E /* libPods-SquinterTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SquinterTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		130866E30F55090E14B74424A90D6A16 /* Pods-SquinterTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SquinterTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		1F7B3D340B8C4DCF7EA1F2A83C11F6D0 /* Pods-SquinterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SquinterTests.debug.xcconfig"; sourceTree = "<group>"; };
+		22DE943A18BDEA2826DCC09FF4B6E7DE /* PDKeychainBindingsController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindingsController.h; path = PDKeychainBindingsController/PDKeychainBindingsController.h; sourceTree = "<group>"; };
+		2DFD3EA16BF267A5023C76F02040F878 /* Pods-SquinterTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SquinterTests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		3268B25550719C561A6778423B975EA5 /* Pods-SquinterTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SquinterTests-resources.sh"; sourceTree = "<group>"; };
+		34710E4B08A107A8F95A5BC0BAA0F8CC /* PDKeychainBindings.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindings.h; path = PDKeychainBindingsController/PDKeychainBindings.h; sourceTree = "<group>"; };
+		3DE490C0E85C0FFD7B56190D7F456854 /* Pods-SquinterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SquinterTests.release.xcconfig"; sourceTree = "<group>"; };
+		4913E2CADD3188B5CCD5C79126890916 /* libPDKeychainBindingsController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPDKeychainBindingsController.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E3583912B13ADB15BE3807D653B9A02 /* PDKeychainBindingsController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PDKeychainBindingsController-prefix.pch"; sourceTree = "<group>"; };
+		5CA2BBC940AC5744C2AE5F140E3731E3 /* PDKeychainBindingsController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindingsController.m; path = PDKeychainBindingsController/PDKeychainBindingsController.m; sourceTree = "<group>"; };
+		5F406057988DF772A45C9EFAD2A73123 /* Pods-SquinterTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SquinterTests-frameworks.sh"; sourceTree = "<group>"; };
+		614B0D86EE02FCB838BCFD43C084CBE4 /* Pods-Squinter-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Squinter-acknowledgements.markdown"; sourceTree = "<group>"; };
+		652FFE43C184EAE5C493B4717BA62BA1 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		720EE7D93D7A13DAAEAEB63D0AE02D87 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
+		7572CCB82BEFF2925BE320AC2E035626 /* Pods-Squinter-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-frameworks.sh"; sourceTree = "<group>"; };
+		7C5B95BC3D3079646DFBBFC1B83AEE2A /* Pods-SquinterTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SquinterTests-dummy.m"; sourceTree = "<group>"; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		AB007371B0829A5A2BC8A570E027F7BD /* Pods-Squinter-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-resources.sh"; sourceTree = "<group>"; };
+		AD408F8FE28BE6A7EAB06834B5EA564D /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
+		B3A637F9F391519A18CD3370D68844E5 /* PDKeychainBindings.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindings.m; path = PDKeychainBindingsController/PDKeychainBindings.m; sourceTree = "<group>"; };
+		BC416834462D9C3B167478D8AA2B3D44 /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
+		C1CEE76B8AE780B35791594FCCACE66E /* Pods-Squinter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Squinter-dummy.m"; sourceTree = "<group>"; };
+		DC9BA6A20DAA17EB85270762CED7CA82 /* PDKeychainBindingsController-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PDKeychainBindingsController-dummy.m"; sourceTree = "<group>"; };
+		E7077F2259CB75AC22CB189BD41617A9 /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E81860D64429BD352A5B6D20AA91517C /* Pods-Squinter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Squinter-acknowledgements.plist"; sourceTree = "<group>"; };
+		EBA098AB3FC6624B7D041FDF6C1ED4C9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D117ED7B5AFBCA32B103C9F14EE1AFCC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31FE3C8998C1A9486F3576EB630B588C /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E866D1245B3022E40A9D0A8E244E9F00 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				393DDE7E8DF9BBB2E586AE10C3238E30 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1C295B3434EC3F5C0AF26C7D18FF66F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9E0C1AEACD91C95D3241118D672A7B5 /* Cocoa.framework in Frameworks */,
+				1C6F07C65AE9433ADB50BCE7AFD65700 /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		595E9A264403E93A833B42753EA8AA69 /* Sparkle */ = {
+			isa = PBXGroup;
+			children = (
+				B957969C808A785DB367DE0C74766E68 /* Frameworks */,
+			);
+			path = Sparkle;
+			sourceTree = "<group>";
+		};
+		61DB3684E489CBC26B4718F4499D2764 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				007F876A1E76E727F5C3D783883B09BF /* PDKeychainBindingsController.xcconfig */,
+				DC9BA6A20DAA17EB85270762CED7CA82 /* PDKeychainBindingsController-dummy.m */,
+				4E3583912B13ADB15BE3807D653B9A02 /* PDKeychainBindingsController-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/PDKeychainBindingsController";
+			sourceTree = "<group>";
+		};
+		7DB346D0F39D3F0E887471402A8071AB = {
+			isa = PBXGroup;
+			children = (
+				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
+				D648CE86F139C7CCFD55D5B8A03BE74B /* Frameworks */,
+				9E977F9626963656BE72F077DD1E9757 /* Pods */,
+				886EA335A311C32677FC8BB381FFAFD6 /* Products */,
+				AB75A0083DAD605EBDF1B860C8C1A6A1 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		886EA335A311C32677FC8BB381FFAFD6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4913E2CADD3188B5CCD5C79126890916 /* libPDKeychainBindingsController.a */,
+				E7077F2259CB75AC22CB189BD41617A9 /* libPods-Squinter.a */,
+				0698EB30C4509EF99FA07AE616A4792E /* libPods-SquinterTests.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9E977F9626963656BE72F077DD1E9757 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				CC25F3FD6A6D6A0AF7BEA598381AD5DE /* PDKeychainBindingsController */,
+				595E9A264403E93A833B42753EA8AA69 /* Sparkle */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		A082CC5FCFB06E8144CB5B0D7326A357 /* Pods-Squinter */ = {
+			isa = PBXGroup;
+			children = (
+				614B0D86EE02FCB838BCFD43C084CBE4 /* Pods-Squinter-acknowledgements.markdown */,
+				E81860D64429BD352A5B6D20AA91517C /* Pods-Squinter-acknowledgements.plist */,
+				C1CEE76B8AE780B35791594FCCACE66E /* Pods-Squinter-dummy.m */,
+				7572CCB82BEFF2925BE320AC2E035626 /* Pods-Squinter-frameworks.sh */,
+				AB007371B0829A5A2BC8A570E027F7BD /* Pods-Squinter-resources.sh */,
+				BC416834462D9C3B167478D8AA2B3D44 /* Pods-Squinter.debug.xcconfig */,
+				AD408F8FE28BE6A7EAB06834B5EA564D /* Pods-Squinter.release.xcconfig */,
+			);
+			name = "Pods-Squinter";
+			path = "Target Support Files/Pods-Squinter";
+			sourceTree = "<group>";
+		};
+		A7CE03E3177CA1C8FE3F4B5FA2B73C6F /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				EBA098AB3FC6624B7D041FDF6C1ED4C9 /* Cocoa.framework */,
+				720EE7D93D7A13DAAEAEB63D0AE02D87 /* Security.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		AB75A0083DAD605EBDF1B860C8C1A6A1 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				A082CC5FCFB06E8144CB5B0D7326A357 /* Pods-Squinter */,
+				BD243F51AD4D7078E17452BA32C5E1E3 /* Pods-SquinterTests */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		B957969C808A785DB367DE0C74766E68 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				652FFE43C184EAE5C493B4717BA62BA1 /* Sparkle.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BD243F51AD4D7078E17452BA32C5E1E3 /* Pods-SquinterTests */ = {
+			isa = PBXGroup;
+			children = (
+				2DFD3EA16BF267A5023C76F02040F878 /* Pods-SquinterTests-acknowledgements.markdown */,
+				130866E30F55090E14B74424A90D6A16 /* Pods-SquinterTests-acknowledgements.plist */,
+				7C5B95BC3D3079646DFBBFC1B83AEE2A /* Pods-SquinterTests-dummy.m */,
+				5F406057988DF772A45C9EFAD2A73123 /* Pods-SquinterTests-frameworks.sh */,
+				3268B25550719C561A6778423B975EA5 /* Pods-SquinterTests-resources.sh */,
+				1F7B3D340B8C4DCF7EA1F2A83C11F6D0 /* Pods-SquinterTests.debug.xcconfig */,
+				3DE490C0E85C0FFD7B56190D7F456854 /* Pods-SquinterTests.release.xcconfig */,
+			);
+			name = "Pods-SquinterTests";
+			path = "Target Support Files/Pods-SquinterTests";
+			sourceTree = "<group>";
+		};
+		CC25F3FD6A6D6A0AF7BEA598381AD5DE /* PDKeychainBindingsController */ = {
+			isa = PBXGroup;
+			children = (
+				34710E4B08A107A8F95A5BC0BAA0F8CC /* PDKeychainBindings.h */,
+				B3A637F9F391519A18CD3370D68844E5 /* PDKeychainBindings.m */,
+				22DE943A18BDEA2826DCC09FF4B6E7DE /* PDKeychainBindingsController.h */,
+				5CA2BBC940AC5744C2AE5F140E3731E3 /* PDKeychainBindingsController.m */,
+				61DB3684E489CBC26B4718F4499D2764 /* Support Files */,
+			);
+			path = PDKeychainBindingsController;
+			sourceTree = "<group>";
+		};
+		D648CE86F139C7CCFD55D5B8A03BE74B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A7CE03E3177CA1C8FE3F4B5FA2B73C6F /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		CB1599BBA7EB0BA2BDF89C024FF27158 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5704A1A041193C4CAAA600B9AC0D30F2 /* PDKeychainBindings.h in Headers */,
+				617239C866E6A1B6CFF6C5E9E8AC9CB6 /* PDKeychainBindingsController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		596E20A9EED4170AC7FE01DA7A4AC0A6 /* PDKeychainBindingsController */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 322227FF4C72AD5CDC44BFA6C942DB98 /* Build configuration list for PBXNativeTarget "PDKeychainBindingsController" */;
+			buildPhases = (
+				313084B172563A03D72E449E6174CA2A /* Sources */,
+				F1C295B3434EC3F5C0AF26C7D18FF66F /* Frameworks */,
+				CB1599BBA7EB0BA2BDF89C024FF27158 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PDKeychainBindingsController;
+			productName = PDKeychainBindingsController;
+			productReference = 4913E2CADD3188B5CCD5C79126890916 /* libPDKeychainBindingsController.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		73F8692BA8EB98AE57991A5FB1DF29A2 /* Pods-SquinterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1733D0A894485F924956719D252F1A11 /* Build configuration list for PBXNativeTarget "Pods-SquinterTests" */;
+			buildPhases = (
+				99F28F0DBF00CDBAE57A57217F94A09B /* Sources */,
+				D117ED7B5AFBCA32B103C9F14EE1AFCC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-SquinterTests";
+			productName = "Pods-SquinterTests";
+			productReference = 0698EB30C4509EF99FA07AE616A4792E /* libPods-SquinterTests.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		F26BA249949782712C93B5457DF3C246 /* Pods-Squinter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A356ABCEB818938846FC3381444E67A /* Build configuration list for PBXNativeTarget "Pods-Squinter" */;
+			buildPhases = (
+				AB997CD331532F160EA60B093B539180 /* Sources */,
+				E866D1245B3022E40A9D0A8E244E9F00 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D97CBDAD6483592CFE59E90B943500BA /* PBXTargetDependency */,
+			);
+			name = "Pods-Squinter";
+			productName = "Pods-Squinter";
+			productReference = E7077F2259CB75AC22CB189BD41617A9 /* libPods-Squinter.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0700;
+			};
+			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
+			productRefGroup = 886EA335A311C32677FC8BB381FFAFD6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				596E20A9EED4170AC7FE01DA7A4AC0A6 /* PDKeychainBindingsController */,
+				F26BA249949782712C93B5457DF3C246 /* Pods-Squinter */,
+				73F8692BA8EB98AE57991A5FB1DF29A2 /* Pods-SquinterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		313084B172563A03D72E449E6174CA2A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF3E80E157F97454648BA04C08BC5069 /* PDKeychainBindings.m in Sources */,
+				D912D5CDEF4A44CDCFBDABF6DA05B29F /* PDKeychainBindingsController-dummy.m in Sources */,
+				EFF07F5D7EF7869980A6736E3B353D5F /* PDKeychainBindingsController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		99F28F0DBF00CDBAE57A57217F94A09B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				253C70FE871154AFEA4AAAF0C6815D15 /* Pods-SquinterTests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB997CD331532F160EA60B093B539180 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B88F533FE999C15037A9D1BA79F39922 /* Pods-Squinter-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D97CBDAD6483592CFE59E90B943500BA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PDKeychainBindingsController;
+			target = 596E20A9EED4170AC7FE01DA7A4AC0A6 /* PDKeychainBindingsController */;
+			targetProxy = 9C9EA46674EB0B18FD3AE9F6999852CC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3571AA7F855C0874C53A4989D4E5736C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DE490C0E85C0FFD7B56190D7F456854 /* Pods-SquinterTests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		4ECF5F3A7DCBE32E59B23B0C7F362504 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		895E86794D24D4E4817EE3D99921EF4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AD408F8FE28BE6A7EAB06834B5EA564D /* Pods-Squinter.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		920B0B38E40E609F9EDF82ECB18AED2C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BC416834462D9C3B167478D8AA2B3D44 /* Pods-Squinter.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		A8681CD2C41E64C181083AF0DAB45630 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1F7B3D340B8C4DCF7EA1F2A83C11F6D0 /* Pods-SquinterTests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		A938A009B3CDD19C2BBA30D42124A08C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 007F876A1E76E727F5C3D783883B09BF /* PDKeychainBindingsController.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/PDKeychainBindingsController/PDKeychainBindingsController-prefix.pch";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		C269F16C69C874215FB299057455A930 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		CBEB6546763D4D1403622FF248C8A0BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 007F876A1E76E727F5C3D783883B09BF /* PDKeychainBindingsController.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/PDKeychainBindingsController/PDKeychainBindingsController-prefix.pch";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1733D0A894485F924956719D252F1A11 /* Build configuration list for PBXNativeTarget "Pods-SquinterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8681CD2C41E64C181083AF0DAB45630 /* Debug */,
+				3571AA7F855C0874C53A4989D4E5736C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C269F16C69C874215FB299057455A930 /* Debug */,
+				4ECF5F3A7DCBE32E59B23B0C7F362504 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		322227FF4C72AD5CDC44BFA6C942DB98 /* Build configuration list for PBXNativeTarget "PDKeychainBindingsController" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A938A009B3CDD19C2BBA30D42124A08C /* Debug */,
+				CBEB6546763D4D1403622FF248C8A0BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A356ABCEB818938846FC3381444E67A /* Build configuration list for PBXNativeTarget "Pods-Squinter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				920B0B38E40E609F9EDF82ECB18AED2C /* Debug */,
+				895E86794D24D4E4817EE3D99921EF4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+}

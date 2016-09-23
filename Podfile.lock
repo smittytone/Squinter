@@ -1,0 +1,15 @@
+PODS:
+  - PDKeychainBindingsController (0.0.1)
+  - Sparkle (1.14.0)
+
+DEPENDENCIES:
+  - PDKeychainBindingsController (~> 0.0)
+  - Sparkle (~> 1.14)
+
+SPEC CHECKSUMS:
+  PDKeychainBindingsController: fa8cb3cf99f2ea9240d61066ed0549f34e2cec3c
+  Sparkle: ccd95233b12a3e3d4eeb55ff01dd4c8bb8188b07
+
+PODFILE CHECKSUM: dd6ab4764b0746adad429cfae109a24df1a1329d
+
+COCOAPODS: 1.1.0.rc.2

@@ -3,9 +3,9 @@ Art-Source/*
 SquinterHelp/*
 Third-Party-Code/*
 SquinterTests/*
-Podfile.lock
-Podfile
-Pods/*
-Squinter.xcodeproj/*
-Squinter.xcworkspace/*
+#Podfile.lock
+#Podfile
+#Pods/*
+#Squinter.xcodeproj/*
+#Squinter.xcworkspace/*
 

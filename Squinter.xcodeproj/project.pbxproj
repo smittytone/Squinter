@@ -56,9 +56,9 @@
 		3B05B2581D05C91F00AA89F4 /* StreamToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StreamToolbarItem.h; sourceTree = "<group>"; };
 		3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StreamToolbarItem.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
-		3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccess.h; path = ../../../../../Documents/GitHub/BuildAPIAccess/BuildAPIAccess.h; sourceTree = "<group>"; };
-		3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BuildAPIAccess.m; path = ../../../../../Documents/GitHub/BuildAPIAccess/BuildAPIAccess.m; sourceTree = "<group>"; };
-		3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccessConstants.h; path = ../../../../../Documents/GitHub/BuildAPIAccess/BuildAPIAccessConstants.h; sourceTree = "<group>"; };
+		3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccess.h; path = ../../BuildAPIAccess/BuildAPIAccess.h; sourceTree = "<group>"; };
+		3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BuildAPIAccess.m; path = ../../BuildAPIAccess/BuildAPIAccess.m; sourceTree = "<group>"; };
+		3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccessConstants.h; path = ../../BuildAPIAccess/BuildAPIAccessConstants.h; sourceTree = "<group>"; };
 		3B36D1BF1970A0990029CEC0 /* Squinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Squinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B36D1C21970A0990029CEC0 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		3B36D1C51970A0990029CEC0 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -77,8 +77,8 @@
 		3B36D1EC1970A0990029CEC0 /* SquinterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SquinterTests.m; sourceTree = "<group>"; };
 		3B6AF0D9197127B10083744C /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Project.h; sourceTree = "<group>"; };
 		3B6AF0DA197127B10083744C /* Project.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Project.m; sourceTree = "<group>"; };
-		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Connexion.h; path = ../../../../../Documents/GitHub/BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
-		3B7ACF801CFF0A980080C3DB /* Connexion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Connexion.m; path = ../../../../Documents/GitHub/BuildAPIAccess/Connexion.m; sourceTree = SOURCE_ROOT; };
+		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Connexion.h; path = ../../BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
+		3B7ACF801CFF0A980080C3DB /* Connexion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Connexion.m; path = ../BuildAPIAccess/Connexion.m; sourceTree = SOURCE_ROOT; };
 		3B82AA0D1CB663EA0098A959 /* SquinterHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SquinterHelp; sourceTree = SOURCE_ROOT; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusLight.h; sourceTree = "<group>"; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusLight.m; sourceTree = "<group>"; };
@@ -536,7 +536,6 @@
 				DEVELOPMENT_TEAM = Y5J3K52DNA;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Sparkle-1.14.0",
 					"$(PROJECT_DIR)/Squinter",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -561,7 +560,6 @@
 				DEVELOPMENT_TEAM = Y5J3K52DNA;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Sparkle-1.14.0",
 					"$(PROJECT_DIR)/Squinter",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
