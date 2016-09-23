@@ -3,6 +3,7 @@ Art-Source/*
 SquinterHelp/*
 Third-Party-Code/*
 SquinterTests/*
+Squinter/*.pem
 #Podfile.lock
 #Podfile
 #Pods/*
