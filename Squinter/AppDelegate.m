@@ -2082,6 +2082,8 @@
 		{
 			[self writeToLog:[NSString stringWithFormat:@"%lu Electric Imp libraries inlcuded.", (long)currentProject.projectImpLibs.count] :YES];
 		}
+
+		// [self checkElectricImpLibraries];
 	}
 	else
 	{
@@ -7537,6 +7539,63 @@
 	// Update the Project Menu in case the 'projectSquinted' value has changed
 	
 	[self setProjectMenu];
+}
+
+
+- (void)checkElectricImpLibs
+{
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
+	[request setHTTPMethod:@"GET"];
+	listData = [NSMutableData dataWithCapacity:0];
+	NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+	listTask = [session dataTaskWithRequest:request];
+	[listTask resume];
+}
+
+
+- (void)URLSession:(NSURLSession *)session
+		  dataTask:(NSURLSessionDataTask *)dataTask
+didReceiveResponse:(NSURLResponse *)response
+ completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler
+{
+	// This delegate method is called when the server responds to the connection request
+	// Use it to trap certain status codes
+
+	NSHTTPURLResponse *rps = (NSHTTPURLResponse *)response;
+	completionHandler(NSURLSessionResponseAllow);
+}
+
+
+
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
+{
+	// This delegate method is called when the server sends some data back
+	// Add the data to the correct connexion object
+
+	[listData appendData:data];
+}
+
+
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+
+	// All the data has been supplied by the server in response to a connection - or an error has been encountered
+	// Parse the data and, according to the connection activity - update device, create model etc – apply the results
+
+	if (error)
+	{
+		// React to a passed client-side error - most likely a timeout or inability to resolve the URL
+		// ie. the client is not connected to the Internet
+
+		// 'error.code' will equal NSURLErrorCancelled when we kill all connections
+
+		if (error.code == NSURLErrorCancelled) return;
+
+		[listTask cancel];
+		return;
+	}
+
+	// The connection has come to a conclusion without error
 }
 
 

@@ -7,24 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9470FB833A59D9C952E82 /* libPods-Squinter.a */; };
 		3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */; };
 		3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */; };
-		3B315B341B4595AB0095D924 /* PDKeychainBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B315B311B4595AB0095D924 /* PDKeychainBindings.m */; };
-		3B315B381B45983D0095D924 /* PDKeychainBindingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B315B371B45983D0095D924 /* PDKeychainBindingsController.m */; };
 		3B36D1C31970A0990029CEC0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B36D1C21970A0990029CEC0 /* Cocoa.framework */; };
 		3B36D1CD1970A0990029CEC0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1CB1970A0990029CEC0 /* InfoPlist.strings */; };
 		3B36D1CF1970A0990029CEC0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B36D1CE1970A0990029CEC0 /* main.m */; };
 		3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B36D1D51970A0990029CEC0 /* AppDelegate.m */; };
 		3B36D1D91970A0990029CEC0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1D71970A0990029CEC0 /* MainMenu.xib */; };
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
-		3B36D1E31970A0990029CEC0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B36D1C21970A0990029CEC0 /* Cocoa.framework */; };
-		3B36D1EB1970A0990029CEC0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1E91970A0990029CEC0 /* InfoPlist.strings */; };
-		3B36D1ED1970A0990029CEC0 /* SquinterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B36D1EC1970A0990029CEC0 /* SquinterTests.m */; };
 		3B6AF0DB197127B10083744C /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6AF0DA197127B10083744C /* Project.m */; };
 		3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7ACF801CFF0A980080C3DB /* Connexion.m */; };
 		3B82AA0E1CB663EA0098A959 /* SquinterHelp in Resources */ = {isa = PBXBuildFile; fileRef = 3B82AA0D1CB663EA0098A959 /* SquinterHelp */; };
-		3BB1A3FD1D4BC8250016CB00 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BB1A3FC1D4BC8250016CB00 /* Sparkle.framework */; };
-		3BB1A3FE1D4BC8A70016CB00 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BB1A3FC1D4BC8250016CB00 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BD74E461D423D6A00565B0E /* SourceCodePro-Regular.otf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -33,16 +27,6 @@
 		3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE897541B0608F100645092 /* SquinterToolbarItem.m */; };
 		3BF464121CF87C720094EF59 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 3BF464111CF87C720094EF59 /* dsa_pub.pem */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		3B36D1E41970A0990029CEC0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3B36D1B71970A0990029CEC0 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3B36D1BE1970A0990029CEC0;
-			remoteInfo = Squinter;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		3BD74E451D423D6200565B0E /* CopyFiles */ = {
@@ -61,23 +45,20 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3BB1A3FE1D4BC8A70016CB00 /* Sparkle.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		08A885A53D3FD2441B2836EF /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Squinter.release.xcconfig"; path = "Pods/Target Support Files/Pods-Squinter/Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
+		29F9470FB833A59D9C952E82 /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B05B2581D05C91F00AA89F4 /* StreamToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StreamToolbarItem.h; sourceTree = "<group>"; };
 		3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StreamToolbarItem.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
 		3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccess.h; path = ../../../../../Documents/GitHub/BuildAPIAccess/BuildAPIAccess.h; sourceTree = "<group>"; };
 		3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BuildAPIAccess.m; path = ../../../../../Documents/GitHub/BuildAPIAccess/BuildAPIAccess.m; sourceTree = "<group>"; };
 		3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccessConstants.h; path = ../../../../../Documents/GitHub/BuildAPIAccess/BuildAPIAccessConstants.h; sourceTree = "<group>"; };
-		3B315B301B4595AB0095D924 /* PDKeychainBindings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDKeychainBindings.h; sourceTree = "<group>"; };
-		3B315B311B4595AB0095D924 /* PDKeychainBindings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDKeychainBindings.m; sourceTree = "<group>"; };
-		3B315B361B45983D0095D924 /* PDKeychainBindingsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDKeychainBindingsController.h; sourceTree = "<group>"; };
-		3B315B371B45983D0095D924 /* PDKeychainBindingsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDKeychainBindingsController.m; sourceTree = "<group>"; };
 		3B36D1BF1970A0990029CEC0 /* Squinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Squinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B36D1C21970A0990029CEC0 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		3B36D1C51970A0990029CEC0 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -91,7 +72,6 @@
 		3B36D1D51970A0990029CEC0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3B36D1D81970A0990029CEC0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		3B36D1DA1970A0990029CEC0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		3B36D1E01970A0990029CEC0 /* SquinterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SquinterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B36D1E81970A0990029CEC0 /* SquinterTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SquinterTests-Info.plist"; sourceTree = "<group>"; };
 		3B36D1EA1970A0990029CEC0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3B36D1EC1970A0990029CEC0 /* SquinterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SquinterTests.m; sourceTree = "<group>"; };
@@ -100,7 +80,6 @@
 		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Connexion.h; path = ../../../../../Documents/GitHub/BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
 		3B7ACF801CFF0A980080C3DB /* Connexion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Connexion.m; path = ../../../../Documents/GitHub/BuildAPIAccess/Connexion.m; sourceTree = SOURCE_ROOT; };
 		3B82AA0D1CB663EA0098A959 /* SquinterHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SquinterHelp; sourceTree = SOURCE_ROOT; };
-		3BB1A3FC1D4BC8250016CB00 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Squinter/Sparkle.framework; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusLight.h; sourceTree = "<group>"; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusLight.m; sourceTree = "<group>"; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -111,6 +90,10 @@
 		3BE897531B0608F100645092 /* SquinterToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquinterToolbarItem.h; sourceTree = "<group>"; };
 		3BE897541B0608F100645092 /* SquinterToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquinterToolbarItem.m; sourceTree = "<group>"; };
 		3BF464111CF87C720094EF59 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
+		72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Squinter.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Squinter/Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
+		8E33BEB63E05FCF7A4BBAEDA /* libPods-SquinterTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SquinterTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5C032FB364E5FA2602FF8D9 /* Pods-SquinterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SquinterTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SquinterTests/Pods-SquinterTests.release.xcconfig"; sourceTree = "<group>"; };
+		A8E6F869989F78D5B34535E6 /* Pods-SquinterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SquinterTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SquinterTests/Pods-SquinterTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,17 +101,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BB1A3FD1D4BC8250016CB00 /* Sparkle.framework in Frameworks */,
 				3BE6C4DD19B76AA200D228AF /* Security.framework in Frameworks */,
 				3B36D1C31970A0990029CEC0 /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3B36D1DD1970A0990029CEC0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3B36D1E31970A0990029CEC0 /* Cocoa.framework in Frameworks */,
+				195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,10 +127,6 @@
 			children = (
 				3BC577241A717F120014F78E /* VDKQueue.h */,
 				3BC577251A717F120014F78E /* VDKQueue.m */,
-				3B315B301B4595AB0095D924 /* PDKeychainBindings.h */,
-				3B315B311B4595AB0095D924 /* PDKeychainBindings.m */,
-				3B315B361B45983D0095D924 /* PDKeychainBindingsController.h */,
-				3B315B371B45983D0095D924 /* PDKeychainBindingsController.m */,
 			);
 			name = "Third-Party";
 			sourceTree = "<group>";
@@ -166,6 +137,8 @@
 				3B36D1C81970A0990029CEC0 /* Squinter */,
 				3B36D1E61970A0990029CEC0 /* SquinterTests */,
 				3B36D1C01970A0990029CEC0 /* Products */,
+				AA37379CAA499F6C763B7D77 /* Pods */,
+				9D21E7CE86082310D04E5080 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 			usesTabs = 1;
@@ -174,7 +147,6 @@
 			isa = PBXGroup;
 			children = (
 				3B36D1BF1970A0990029CEC0 /* Squinter.app */,
-				3B36D1E01970A0990029CEC0 /* SquinterTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -182,7 +154,6 @@
 		3B36D1C11970A0990029CEC0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3BB1A3FC1D4BC8250016CB00 /* Sparkle.framework */,
 				3BE6C4DC19B76AA200D228AF /* Security.framework */,
 				3B36D1C21970A0990029CEC0 /* Cocoa.framework */,
 				3B36D1C41970A0990029CEC0 /* Other Frameworks */,
@@ -282,6 +253,26 @@
 			name = "Bundled Entities";
 			sourceTree = "<group>";
 		};
+		9D21E7CE86082310D04E5080 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29F9470FB833A59D9C952E82 /* libPods-Squinter.a */,
+				8E33BEB63E05FCF7A4BBAEDA /* libPods-SquinterTests.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AA37379CAA499F6C763B7D77 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */,
+				08A885A53D3FD2441B2836EF /* Pods-Squinter.release.xcconfig */,
+				A8E6F869989F78D5B34535E6 /* Pods-SquinterTests.debug.xcconfig */,
+				A5C032FB364E5FA2602FF8D9 /* Pods-SquinterTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -289,11 +280,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B36D1F01970A0990029CEC0 /* Build configuration list for PBXNativeTarget "Squinter" */;
 			buildPhases = (
+				C83F9CF4AD6FBA83DF807D0E /* [CP] Check Pods Manifest.lock */,
 				3B36D1BB1970A0990029CEC0 /* Sources */,
 				3B36D1BC1970A0990029CEC0 /* Frameworks */,
 				3B36D1BD1970A0990029CEC0 /* Resources */,
 				3BF4640F1CF875A50094EF59 /* CopyFiles */,
 				3BD74E451D423D6200565B0E /* CopyFiles */,
+				D1E3EA12F37DFE2BD4939FF8 /* [CP] Embed Pods Frameworks */,
+				F03F0E5BE74C9BF90D9B8C00 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -303,24 +297,6 @@
 			productName = Squinter;
 			productReference = 3B36D1BF1970A0990029CEC0 /* Squinter.app */;
 			productType = "com.apple.product-type.application";
-		};
-		3B36D1DF1970A0990029CEC0 /* SquinterTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 3B36D1F31970A0990029CEC0 /* Build configuration list for PBXNativeTarget "SquinterTests" */;
-			buildPhases = (
-				3B36D1DC1970A0990029CEC0 /* Sources */,
-				3B36D1DD1970A0990029CEC0 /* Frameworks */,
-				3B36D1DE1970A0990029CEC0 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				3B36D1E51970A0990029CEC0 /* PBXTargetDependency */,
-			);
-			name = SquinterTests;
-			productName = SquinterTests;
-			productReference = 3B36D1E01970A0990029CEC0 /* SquinterTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -334,9 +310,6 @@
 					3B36D1BE1970A0990029CEC0 = {
 						DevelopmentTeam = Y5J3K52DNA;
 						ProvisioningStyle = Automatic;
-					};
-					3B36D1DF1970A0990029CEC0 = {
-						TestTargetID = 3B36D1BE1970A0990029CEC0;
 					};
 				};
 			};
@@ -354,7 +327,6 @@
 			projectRoot = "";
 			targets = (
 				3B36D1BE1970A0990029CEC0 /* Squinter */,
-				3B36D1DF1970A0990029CEC0 /* SquinterTests */,
 			);
 		};
 /* End PBXProject section */
@@ -373,15 +345,55 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3B36D1DE1970A0990029CEC0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C83F9CF4AD6FBA83DF807D0E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3B36D1EB1970A0990029CEC0 /* InfoPlist.strings in Resources */,
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
 		};
-/* End PBXResourcesBuildPhase section */
+		D1E3EA12F37DFE2BD4939FF8 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Squinter/Pods-Squinter-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F03F0E5BE74C9BF90D9B8C00 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Squinter/Pods-Squinter-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3B36D1BB1970A0990029CEC0 /* Sources */ = {
@@ -391,34 +403,16 @@
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
 				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
 				3B6AF0DB197127B10083744C /* Project.m in Sources */,
-				3B315B381B45983D0095D924 /* PDKeychainBindingsController.m in Sources */,
 				3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */,
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
-				3B315B341B4595AB0095D924 /* PDKeychainBindings.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3B36D1DC1970A0990029CEC0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3B36D1ED1970A0990029CEC0 /* SquinterTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		3B36D1E51970A0990029CEC0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3B36D1BE1970A0990029CEC0 /* Squinter */;
-			targetProxy = 3B36D1E41970A0990029CEC0 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		3B36D1CB1970A0990029CEC0 /* InfoPlist.strings */ = {
@@ -486,6 +480,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -524,6 +519,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 			};
@@ -531,6 +527,7 @@
 		};
 		3B36D1F11970A0990029CEC0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Mac Developer";
@@ -555,6 +552,7 @@
 		};
 		3B36D1F21970A0990029CEC0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 08A885A53D3FD2441B2836EF /* Pods-Squinter.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Mac Developer";
@@ -577,48 +575,6 @@
 			};
 			name = Release;
 		};
-		3B36D1F41970A0990029CEC0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Squinter.app/Contents/MacOS/Squinter";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Squinter/Squinter-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "SquinterTests/SquinterTests-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "bps.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		3B36D1F51970A0990029CEC0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Squinter.app/Contents/MacOS/Squinter";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Squinter/Squinter-Prefix.pch";
-				INFOPLIST_FILE = "SquinterTests/SquinterTests-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "bps.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -636,15 +592,6 @@
 			buildConfigurations = (
 				3B36D1F11970A0990029CEC0 /* Debug */,
 				3B36D1F21970A0990029CEC0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		3B36D1F31970A0990029CEC0 /* Build configuration list for PBXNativeTarget "SquinterTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3B36D1F41970A0990029CEC0 /* Debug */,
-				3B36D1F51970A0990029CEC0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

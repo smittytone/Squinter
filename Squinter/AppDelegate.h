@@ -19,8 +19,7 @@
 #import "PDKeychainBindings.h"
 
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSOpenSavePanelDelegate, NSFileManagerDelegate, VDKQueueDelegate, NSToolbarDelegate>
-
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSOpenSavePanelDelegate, NSFileManagerDelegate, VDKQueueDelegate, NSToolbarDelegate, NSURLSessionDataDelegate, NSURLSessionTaskDelegate>
 {
     // Main UI element outlets
     
@@ -233,6 +232,9 @@
 	NSString *listString;
 
 	NSDictionary *cDevice, *cModel;
+
+	NSURLSessionTask *listTask;
+	NSMutableData *listData;
 }
 
 
