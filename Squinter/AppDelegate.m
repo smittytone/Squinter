@@ -2083,7 +2083,7 @@
 			[self writeToLog:[NSString stringWithFormat:@"%lu Electric Imp libraries inlcuded.", (long)currentProject.projectImpLibs.count] :YES];
 		}
 
-		// [self checkElectricImpLibraries];
+		[self checkElectricImpLibs];
 	}
 	else
 	{
@@ -7542,14 +7542,22 @@
 }
 
 
+#pragma mark - Check EI Libs Methods
+
 - (void)checkElectricImpLibs
 {
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
-	[request setHTTPMethod:@"GET"];
-	listData = [NSMutableData dataWithCapacity:0];
-	NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-	listTask = [session dataTaskWithRequest:request];
-	[listTask resume];
+	// Initiate a read of the current Electric Imp library versions
+	// Only do this if the project contains EI libraries
+
+	if (currentProject.projectImpLibs.count > 0)
+	{
+		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
+		[request setHTTPMethod:@"GET"];
+		listData = [NSMutableData dataWithCapacity:0];
+		NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+		listTask = [session dataTaskWithRequest:request];
+		[listTask resume];
+	}
 }
 
 
@@ -7562,6 +7570,14 @@ didReceiveResponse:(NSURLResponse *)response
 	// Use it to trap certain status codes
 
 	NSHTTPURLResponse *rps = (NSHTTPURLResponse *)response;
+	if (rps.statusCode != 200)
+	{
+		NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
+		[self writeToLog:errString :YES];
+		completionHandler(NSURLSessionResponseCancel);
+		return;
+	}
+
 	completionHandler(NSURLSessionResponseAllow);
 }
 
@@ -7577,25 +7593,75 @@ didReceiveResponse:(NSURLResponse *)response
 
 
 
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+{
 	// All the data has been supplied by the server in response to a connection - or an error has been encountered
 	// Parse the data and, according to the connection activity - update device, create model etc – apply the results
 
-	if (error)
+	if (task == listTask)
 	{
-		// React to a passed client-side error - most likely a timeout or inability to resolve the URL
-		// ie. the client is not connected to the Internet
+		if (error)
+		{
+			// React to a passed client-side error - most likely a timeout or inability to resolve the URL
+			// ie. the client is not connected to the Internet
 
-		// 'error.code' will equal NSURLErrorCancelled when we kill all connections
+			// 'error.code' will equal NSURLErrorCancelled when we kill all connections
 
-		if (error.code == NSURLErrorCancelled) return;
+			if (error.code == NSURLErrorCancelled) return;
 
-		[listTask cancel];
-		return;
+			[task cancel];
+			return;
+		}
+
+		// The connection has come to a conclusion without error
+
+		NSString *parsedData;
+		if (listData != nil && listData.length > 0)
+		{
+			// If we have data, attempt to decode it assuming that it is JSON (if it's not, 'error' will not equal nil
+
+			parsedData = [[NSString alloc] initWithData:listData encoding:NSASCIIStringEncoding];
+		}
+		else
+		{
+			[self writeToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
+			return;
+		}
+
+		if (parsedData != nil)
+		{
+			// 'parsedData' should contain the csv data
+
+			NSArray *libraryList = [parsedData componentsSeparatedByString:@"\n"];
+			for (NSString *library in libraryList)
+			{
+				NSArray *libParts = [library componentsSeparatedByString:@","];
+				NSString *libName = [libParts objectAtIndex:0];
+				NSString *libVer = [libParts objectAtIndex:1];
+
+				for (NSString *eiLib in currentProject.projectImpLibs)
+				{
+					NSArray *eiLibParts = [eiLib componentsSeparatedByString:@":"];
+					NSString *eiLibName = [eiLibParts objectAtIndex:0];
+					NSString *eiLibVer = [eiLibParts objectAtIndex:1];
+
+					if ([eiLibName compare:libName] == NSOrderedSame)
+					{
+						// Local EI lib record and download lib record match - check versions
+
+						if ([eiLibVer compare:libVer] != NSOrderedSame)
+						{
+							// Library versions are not the same, so report
+							NSString *mString = [NSString stringWithFormat:@"Electric Imp reports library \"%@\" is at version %@ - you have version %@", libName, libVer, eiLibVer];
+							[self writeToLog:mString :YES];
+						}
+
+						break;
+					}
+				}
+			}
+		}
 	}
-
-	// The connection has come to a conclusion without error
 }
 
 
