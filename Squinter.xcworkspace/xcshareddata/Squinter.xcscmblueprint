@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "66497A4820BAB87E10892B95E9EADC8747D9FBAC",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "66497A4820BAB87E10892B95E9EADC8747D9FBAC" : 9223372036854775807,
+    "51BC99BA5DE28FB6315D4AAD677E6175581173BA" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "BF12086A-8B1A-4E0B-98AF-4D9713C867E0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "66497A4820BAB87E10892B95E9EADC8747D9FBAC" : "Squinter\/",
+    "51BC99BA5DE28FB6315D4AAD677E6175581173BA" : "BuildAPIAccess\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Squinter",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Squinter.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/smittytone\/BuildAPIAccess.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "51BC99BA5DE28FB6315D4AAD677E6175581173BA"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/smittytone\/Squinter.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "66497A4820BAB87E10892B95E9EADC8747D9FBAC"
+    }
+  ]
+}
