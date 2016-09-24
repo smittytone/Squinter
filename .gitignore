@@ -2,7 +2,7 @@
 
 Art/*
 Art-Source/*
-SquinterHelp/*
+#SquinterHelp/*
 Third-Party-Code/*
 SquinterTests/*
 Squinter/*.pem
