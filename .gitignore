@@ -6,6 +6,8 @@ Art-Source/*
 Third-Party-Code/*
 SquinterTests/*
 Squinter/*.pem
+Squinter/Images.xcassets/*
+Squinter/*.icns
 
 #Podfile.lock
 #Podfile
