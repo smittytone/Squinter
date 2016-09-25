@@ -40,6 +40,9 @@
 	unassignDeviceFlag = NO;
 	requiresAllowedAnywhereFlag = NO;
 	checkModelsFlag = NO;
+	eiLibListData = nil;
+	eiLibListTask = nil;
+	eiLibListTime = nil;
 
     // Initialize colours
 
@@ -7547,16 +7550,59 @@
 - (void)checkElectricImpLibs
 {
 	// Initiate a read of the current Electric Imp library versions
-	// Only do this if the project contains EI libraries
+	// Only do this if the project contains EI libraries and 1 hour has
+	// passed since the last look-up
+
+	BOOL performCheck = NO;
 
 	if (currentProject.projectImpLibs.count > 0)
 	{
+		if (eiLibListTime)
+		{
+			NSDate *now = [NSDate date];
+			NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
+			if (interval < -3600 )
+			{
+				// Last check was more than 1 hour earlier
+				performCheck = YES;
+				eiLibListTime = now;
+			}
+			else
+			{
+				// Last check was less than 1 hour earlier, so use
+				// existing list
+				if (eiLibListData)
+				{
+					[self compareElectricImpLibs];
+					return;
+				}
+				else
+				{
+					performCheck = YES;
+				}
+			}
+		}
+		else
+		{
+			performCheck = YES;
+		}
+	}
+
+	if (performCheck)
+	{
+		if (connectionIndicator.hidden == YES)
+		{
+			// Start the connection indicator
+			connectionIndicator.hidden = NO;
+			[connectionIndicator startAnimation:self];
+		}
+
 		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
 		[request setHTTPMethod:@"GET"];
-		listData = [NSMutableData dataWithCapacity:0];
+		eiLibListData = [NSMutableData dataWithCapacity:0];
 		NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-		listTask = [session dataTaskWithRequest:request];
-		[listTask resume];
+		eiLibListTask = [session dataTaskWithRequest:request];
+		[eiLibListTask resume];
 	}
 }
 
@@ -7574,6 +7620,7 @@ didReceiveResponse:(NSURLResponse *)response
 	{
 		NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
 		[self writeToLog:errString :YES];
+
 		completionHandler(NSURLSessionResponseCancel);
 		return;
 	}
@@ -7588,7 +7635,7 @@ didReceiveResponse:(NSURLResponse *)response
 	// This delegate method is called when the server sends some data back
 	// Add the data to the correct connexion object
 
-	[listData appendData:data];
+	[eiLibListData appendData:data];
 }
 
 
@@ -7598,8 +7645,16 @@ didReceiveResponse:(NSURLResponse *)response
 	// All the data has been supplied by the server in response to a connection - or an error has been encountered
 	// Parse the data and, according to the connection activity - update device, create model etc – apply the results
 
-	if (task == listTask)
+	if (task == eiLibListTask)
 	{
+		if ([ide getConnectionCount] < 1)
+		{
+			// Only hide the connection indicator if 'ide' has no live connections
+
+			[connectionIndicator stopAnimation:self];
+			connectionIndicator.hidden = YES;
+		}
+		
 		if (error)
 		{
 			// React to a passed client-side error - most likely a timeout or inability to resolve the URL
@@ -7615,55 +7670,82 @@ didReceiveResponse:(NSURLResponse *)response
 
 		// The connection has come to a conclusion without error
 
-		NSString *parsedData;
-		if (listData != nil && listData.length > 0)
-		{
-			// If we have data, attempt to decode it assuming that it is JSON (if it's not, 'error' will not equal nil
+		[task cancel];
+		[self compareElectricImpLibs];
+	}
+}
 
-			parsedData = [[NSString alloc] initWithData:listData encoding:NSASCIIStringEncoding];
-		}
-		else
-		{
-			[self writeToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
-			return;
-		}
 
-		if (parsedData != nil)
-		{
-			// 'parsedData' should contain the csv data
 
-			NSArray *libraryList = [parsedData componentsSeparatedByString:@"\n"];
-			for (NSString *library in libraryList)
+- (void)compareElectricImpLibs
+{
+	NSString *parsedData;
+
+	if (eiLibListData != nil && eiLibListData.length > 0)
+	{
+		// If we have data, attempt to decode it assuming that it is JSON (if it's not, 'error' will not equal nil
+
+		parsedData = [[NSString alloc] initWithData:eiLibListData encoding:NSASCIIStringEncoding];
+	}
+	else
+	{
+		[self writeToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
+		eiLibListData = nil;
+		return;
+	}
+
+	if (parsedData != nil)
+	{
+		// 'parsedData' should contain the csv data
+
+		BOOL allOKFlag = YES;
+		NSArray *libraryList = [parsedData componentsSeparatedByString:@"\n"];
+		for (NSString *library in libraryList)
+		{
+			// Watch out for single carriage-returns in .csv file
+
+			if (library.length > 2)
 			{
 				NSArray *libParts = [library componentsSeparatedByString:@","];
-				NSString *libName = [libParts objectAtIndex:0];
+				NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
 				NSString *libVer = [libParts objectAtIndex:1];
 
-				for (NSString *eiLib in currentProject.projectImpLibs)
+				for (NSArray *eiLib in currentProject.projectImpLibs)
 				{
-					NSArray *eiLibParts = [eiLib componentsSeparatedByString:@":"];
-					NSString *eiLibName = [eiLibParts objectAtIndex:0];
-					NSString *eiLibVer = [eiLibParts objectAtIndex:1];
+					NSString *eiLibName = [[eiLib objectAtIndex:0] lowercaseString];
+					NSString *eiLibVer = [eiLib objectAtIndex:1];
 
 					if ([eiLibName compare:libName] == NSOrderedSame)
 					{
-						// Local EI lib record and download lib record match - check versions
-
-						if ([eiLibVer compare:libVer] != NSOrderedSame)
+						// Local EI lib record and download lib record match
+						// First check for deprecation
+						if ([libVer compare:@"dep"] == NSOrderedSame)
 						{
-							// Library versions are not the same, so report
-							NSString *mString = [NSString stringWithFormat:@"Electric Imp reports library \"%@\" is at version %@ - you have version %@", libName, libVer, eiLibVer];
-							[self writeToLog:mString :YES];
-						}
+							// Library is marked as deprecated
 
-						break;
+							NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
+							[self writeToLog:mString :YES];
+							allOKFlag = NO;
+						}
+						else if ([eiLibVer compare:libVer] != NSOrderedSame)
+						{
+							// Library versions are not the same, so report the discrepancy
+
+							NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLibVer];
+							[self writeToLog:mString :YES];
+							allOKFlag = NO;
+						}
 					}
 				}
 			}
 		}
+
+		if (allOKFlag)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in project \"%@\" are up to date.", currentProject.projectName] :YES];
+		}
 	}
 }
-
 
 /*
 

@@ -233,8 +233,9 @@
 
 	NSDictionary *cDevice, *cModel;
 
-	NSURLSessionTask *listTask;
-	NSMutableData *listData;
+	NSURLSessionTask *eiLibListTask;
+	NSMutableData *eiLibListData;
+	NSDate *eiLibListTime;
 }
 
 
@@ -419,6 +420,9 @@
 - (void)setLoggingColours;
 - (void)setColours;
 - (NSInteger)perceivedBrightness:(NSColor *)colour;
+
+- (void)checkElectricImpLibs;
+- (void)compareElectricImpLibs;
 
 
 @end
