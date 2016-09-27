@@ -2083,7 +2083,7 @@
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"%lu Electric Imp libraries inlcuded.", (long)currentProject.projectImpLibs.count] :YES];
+			[self writeToLog:[NSString stringWithFormat:@"%lu Electric Imp libraries included.", (long)currentProject.projectImpLibs.count] :YES];
 		}
 
 		[self checkElectricImpLibs];
@@ -7561,16 +7561,17 @@
 		{
 			NSDate *now = [NSDate date];
 			NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
-			if (interval < -3600 )
+
+			if (interval < kEILibCheckInterval)
 			{
 				// Last check was more than 1 hour earlier
+
 				performCheck = YES;
-				eiLibListTime = now;
 			}
 			else
 			{
-				// Last check was less than 1 hour earlier, so use
-				// existing list
+				// Last check was less than 1 hour earlier, so use existing list if it exists
+
 				if (eiLibListData)
 				{
 					[self compareElectricImpLibs];
@@ -7586,23 +7587,28 @@
 		{
 			performCheck = YES;
 		}
-	}
 
-	if (performCheck)
-	{
-		if (connectionIndicator.hidden == YES)
+
+		if (performCheck)
 		{
-			// Start the connection indicator
-			connectionIndicator.hidden = NO;
-			[connectionIndicator startAnimation:self];
-		}
+			// Set/reset the time of the most recent check
 
-		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
-		[request setHTTPMethod:@"GET"];
-		eiLibListData = [NSMutableData dataWithCapacity:0];
-		NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-		eiLibListTask = [session dataTaskWithRequest:request];
-		[eiLibListTask resume];
+			eiLibListTime = [NSDate date];
+
+			if (connectionIndicator.hidden == YES)
+			{
+				// Start the connection indicator
+				connectionIndicator.hidden = NO;
+				[connectionIndicator startAnimation:self];
+			}
+
+			NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
+			[request setHTTPMethod:@"GET"];
+			eiLibListData = [NSMutableData dataWithCapacity:0];
+			NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+			eiLibListTask = [session dataTaskWithRequest:request];
+			[eiLibListTask resume];
+		}
 	}
 }
 
