@@ -15,7 +15,7 @@
 @synthesize projectDeviceFiles, projectAgentFiles;
 @synthesize projectDeviceCode, projectAgentCode, projectVersion;
 @synthesize projectSquinted, projectHasChanged, projectModelID, projectImpLibs;
-@synthesize projectAgentCodeBookmark, projectDeviceCodeBookmark;
+@synthesize projectAgentCodeBookmark, projectDeviceCodeBookmark, projectBookmark;
 
 
 - (instancetype)init
@@ -24,9 +24,8 @@
     {
         projectSquinted = 0;
         projectHasChanged = NO;
-        projectVersion = @"2.0";
+        projectVersion = @"2.1";
 		projectModelID = nil;
-
     }
 
     return self;
@@ -40,7 +39,8 @@
 	{
         projectVersion = [aDecoder decodeObjectForKey:@"project_version"];
         if (projectVersion == nil) projectVersion = @"1.0";
-        projectName = [aDecoder decodeObjectForKey:@"project_name"];
+
+		projectName = [aDecoder decodeObjectForKey:@"project_name"];
         projectAgentCodePath = [aDecoder decodeObjectForKey:@"project_agent_path"];
         projectDeviceCodePath = [aDecoder decodeObjectForKey:@"project_device_path"];
         projectDeviceLibraries = [aDecoder decodeObjectForKey:@"project_device_libraries"];

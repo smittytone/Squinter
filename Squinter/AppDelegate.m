@@ -685,7 +685,7 @@
 		[self updateMenus];
         [self setToolbar];
 		
-		// Clear the external libraries menu - the new project (by defenition has none)
+		// Clear the external libraries menu - the new project by defenition has none
 		
         [externalLibsMenu removeAllItems];
 
@@ -694,8 +694,10 @@
         [saveLight setLight:YES];
 		[saveLight setFull:NO];
 
+		// User wants to view the auto-generated agent and device code files, so make sure they're generated
+
 		if (newProjectAccessoryViewFilesCheckbox.state == YES) saveProjectSubFilesFlag = YES;
-			
+
 		if (newProjectAccessoryViewAssociateCheckbox.state == YES)
 		{
             // If the 'associate new project with current model' is checked
@@ -779,7 +781,6 @@
             // the one we want to make current
             
             itemNumber = i;
-            
             currentProject = project;
             currentDeviceLibCount = 0;
             currentAgentLibCount = 0;
@@ -813,7 +814,7 @@
 
 			[saveLight setFull:!currentProject.projectHasChanged];
 
-			// Is the project associated with a model?
+			// Is the project associated with a model? If so, select it
 			
 			if (ide.models.count != 0)
 			{
@@ -852,12 +853,12 @@
         }
     }
 
-	// Update the popup
+	// Update the Project list popup
 
 	NSUInteger index = [projectsPopUp indexOfItemWithTitle:currentProject.projectName];
 	[projectsPopUp selectItemAtIndex:index];
 
-	// Update the Menus and the Toolbar
+	// Update the Menus and the Toolbar (left until now in case models etc are selected)
 
     [self updateMenus];
 	[self setToolbar];
@@ -983,7 +984,9 @@
 
 - (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType
 {
-    Project *newProject;
+	// This is where we open/add all files
+
+	Project *newProject;
 	NSString *projectName, *fileName, *filePath;
 	NSUInteger count;
 	BOOL gotFlag;
@@ -1019,6 +1022,7 @@
 							if ([project.projectPath compare:[filePath stringByDeletingLastPathComponent]] == NSOrderedSame)
 							{
 								// Projects' paths match too, so they are almost certainly the same
+								// TODO check for bookmark match?
 								
 								[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project \"%@\" is already open.", newProject.projectName] :YES];
 								gotFlag = YES;
@@ -1040,13 +1044,19 @@
 				
 				if (!gotFlag)
 				{	
-					// Set the newly opened project to be the current one
+					// Set the newly opened project to be the current one as it's not loaded already
 					
 					currentProject = newProject;
+					Float32 currentProjectVersion = currentProject.projectVersion.floatValue;
 					
 					// Update the project's path property which is not saved in case the user moves the file
 					
 					currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
+
+					if (currentProjectVersion > 2.0)
+					{
+						currentProject.projectBookmark = [self bookmarkForURL:[NSURL URLWithString:filePath]];
+					}
 					
 					// Has the user changed the name of the file?
 					
@@ -1055,6 +1065,7 @@
 					if ([aName compare:currentProject.projectName] != NSOrderedSame)
 					{
 						// The file name has changed so rename the project
+						// TODO this is user-optional so should be deprecated
 						
 						[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" has been renamed \"%@\" to match its filename.", currentProject.projectName, aName] :YES];
 						currentProject.projectName = aName;
@@ -1075,6 +1086,21 @@
 					
 					NSFileManager *fm = [NSFileManager defaultManager];
 					
+					if (currentProjectVersion > 2.0)
+					{
+						if (currentProject.projectAgentCodeBookmark)
+						{
+							NSURL *agentCodeURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
+							currentProject.projectAgentCode = agentCodeURL.absoluteString;
+						}
+
+						if (currentProject.projectDeviceCodeBookmark)
+						{
+							NSURL *deviceCodeURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
+							currentProject.projectDeviceCode = deviceCodeURL.absoluteString;
+						}
+					}
+
 					if (currentProject.projectAgentCodePath != nil)
 					{
 						// Does the project's recorded agent code path point to a real file?
@@ -1117,7 +1143,7 @@
 							currentProject.projectHasChanged = YES;
 						}
 					}
-					
+				
 					if (currentProject.projectDeviceCodePath != nil)
 					{
 						// As above per the agent code file, this time for the device code file
@@ -1184,8 +1210,7 @@
 							NSString *mID = [model objectForKey:@"id"];
 							if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
 							{
-								// Select the linked model: this *may* also cause a device to be selected
-								// ie. to halt log streaming if it is
+								// Select the linked model
 
                                 selectDeviceFlag = YES;
 								[self chooseModel:[modelsMenu itemAtIndex:count]];
@@ -1579,8 +1604,17 @@
 		NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
 		NSString *dPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", dFileName];
 		savingProject.projectDeviceCodePath = dPathName;
+
+		if (savingProject.projectVersion.floatValue > 2.0)
+		{
+			NSData *acbm = [self bookmarkForURL:[NSURL URLWithString:savingProject.projectAgentCodePath]];
+			if (acbm != nil) savingProject.projectAgentCodeBookmark = acbm;
+
+			NSData *dcbm = [self bookmarkForURL:[NSURL URLWithString:savingProject.projectDeviceCodePath]];
+			if (dcbm != nil) savingProject.projectDeviceCodeBookmark = dcbm;
+		}
 	}
-    
+
     if ([fm fileExistsAtPath:savePath])
     {
         // The file already exists. We can safely overwrite it because that's what the user intended:
@@ -1603,7 +1637,7 @@
                                    options:NSFileManagerItemReplacementUsingNewMetadataOnly
                           resultingItemURL:&url
                                      error:&error];
-        }
+		}
     }
     else
     {
@@ -1617,6 +1651,12 @@
 		// The new file was successfully written
 		
 		savingProject.projectPath = [savePath stringByDeletingLastPathComponent];
+
+		if (savingProject.projectVersion.floatValue > 2.0)
+		{
+			NSData *pbm = [self bookmarkForURL:[NSURL URLWithString:savePath]];
+			if (pbm != nil) savingProject.projectBookmark = pbm;
+		}
 		
 		if (savingProject == currentProject) 
 		{
@@ -1688,12 +1728,6 @@
                     externalOpenBothItem.enabled = YES;
                     externalOpenAgentItem.enabled = YES;
                 }
-
-				if (savingProject.projectVersion.floatValue > 2.0)
-				{
-					NSURL *url = [NSURL URLWithString:savingProject.projectAgentCodePath];
-					savingProject.projectAgentCodeBookmark = [self bookmarkForURL:url];
-				}
 			}
 			
 			if (dSuccess == NO)
@@ -1708,12 +1742,6 @@
                     externalOpenBothItem.enabled = YES;
                     externalOpenDeviceItem.enabled = YES;
                 }
-
-				if (savingProject.projectVersion.floatValue > 2.0)
-				{
-					NSURL *url = [NSURL URLWithString:savingProject.projectDeviceCodePath];
-					savingProject.projectDeviceCodeBookmark = [self bookmarkForURL:url];
-				}
 			}
 			
 			// If the 'open files' checkbox is ticked, open the files we've just created
@@ -1964,56 +1992,114 @@
 
     // Process 'agent.nut' then 'device.nut' if either or both exist
 
-    if (currentProject.projectAgentCodePath != nil)
-    {
-        [self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", currentProject.projectAgentCodePath.lastPathComponent] :YES];
-        output = [self processSource:currentProject.projectAgentCodePath :kCodeTypeAgent :YES];
-		if (output == nil)
+	if (currentProject.projectVersion.floatValue > 2.0)
+	{
+		if (currentProject.projectAgentCodeBookmark != nil)
 		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
-		}
-		
-		output = [self processDefines:output :kCodeTypeAgent];
-		if (output == nil)
-		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
-		}
-		
-		currentProject.projectAgentCode = output;
-        doneFlag = YES;
-    }
+			NSURL *agentCodeURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
 
-    if (currentProject.projectDeviceCodePath != nil)
-    {
-        [self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", currentProject.projectDeviceCodePath.lastPathComponent] :YES];
-        output = [self processSource:currentProject.projectDeviceCodePath :kCodeTypeDevice :YES];
-		if (output == nil)
-		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
+			[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", agentCodeURL.absoluteString.lastPathComponent] :YES];
+			output = [self processSource:agentCodeURL.absoluteString :kCodeTypeAgent :YES];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+
+			output = [self processDefines:output :kCodeTypeAgent];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+
+			currentProject.projectAgentCode = output;
+			doneFlag = YES;
 		}
-		
-		output = [self processDefines:output :kCodeTypeDevice];
-		if (output == nil)
+
+		if (currentProject.projectDeviceCodeBookmark != nil)
 		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
+			NSURL *deviceCodeURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
+
+			[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", deviceCodeURL.absoluteString.lastPathComponent] :YES];
+			output = [self processSource:deviceCodeURL.absoluteString :kCodeTypeDevice :YES];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+
+			output = [self processDefines:output :kCodeTypeDevice];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+
+			currentProject.projectDeviceCode = output;
+			doneFlag = YES;
 		}
-		
-		currentProject.projectDeviceCode = output;
-		doneFlag = YES;
-    }
-	
+	}
+	else
+	{
+		if (currentProject.projectAgentCodePath != nil)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", currentProject.projectAgentCodePath.lastPathComponent] :YES];
+			output = [self processSource:currentProject.projectAgentCodePath :kCodeTypeAgent :YES];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+			
+			output = [self processDefines:output :kCodeTypeAgent];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+			
+			currentProject.projectAgentCode = output;
+			doneFlag = YES;
+		}
+
+		if (currentProject.projectDeviceCodePath != nil)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", currentProject.projectDeviceCodePath.lastPathComponent] :YES];
+			output = [self processSource:currentProject.projectDeviceCodePath :kCodeTypeDevice :YES];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+			
+			output = [self processDefines:output :kCodeTypeDevice];
+			if (output == nil)
+			{
+				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+				currentProject.projectSquinted = 0;
+				[self setProjectMenu];
+				return;
+			}
+			
+			currentProject.projectDeviceCode = output;
+			doneFlag = YES;
+		}
+	}
 	if (doneFlag)
 	{
 		// Activate compilation-related UI items
@@ -2032,9 +2118,9 @@
 	
 	NSString *resultString = @"";
 	
-	if (currentProject.projectAgentCodePath != nil)
+	if (currentProject.projectAgentCode != nil)
     {
-        if (currentProject.projectDeviceCodePath != nil)
+        if (currentProject.projectDeviceCode != nil)
         {
             // Project has Device *and* Agent code
 
@@ -2051,7 +2137,7 @@
     }
     else
     {
-        if (currentProject.projectDeviceCodePath != nil)
+        if (currentProject.projectDeviceCode != nil)
         {
             // Project has only Device code
 
@@ -2072,8 +2158,8 @@
 	
 	[self updateLibraryMenu];
 	[self updateFilesMenu];
-	[saveLight setFull:!currentProject.projectHasChanged];
 	[self setProjectMenu];
+	[saveLight setFull:!currentProject.projectHasChanged];
 }
 
 
@@ -7548,12 +7634,16 @@
 }
 
 
+
+#pragma mark - File Watching Methods
+
+
 - (NSData *)bookmarkForURL:(NSURL *)url
 {
 	NSError *error = nil;
 	NSData *bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationSuitableForBookmarkFile
 					 includingResourceValuesForKeys:nil
-									  relativeToURL:nil
+									  relativeToURL:[NSURL URLWithString:@"~"]
 											  error:&error];
 	if (error || (bookmark == nil))
 	{
@@ -7571,25 +7661,26 @@
 	NSError *error = nil;
 	NSURL *bookmarkURL = [NSURL URLByResolvingBookmarkData:bookmark
 												   options:NSURLBookmarkResolutionWithoutUI
-											 relativeToURL:nil
+											 relativeToURL:[NSURL URLWithString:@"~"]
 									   bookmarkDataIsStale:&bookmarkIsStale
 													 error:&error];
 
 	if (error != nil)
 	{
 		// Report error
+		return nil;
 	}
 
 	if (bookmarkIsStale) {
-		// Need to refresh the bookmark from the URL eg.
-		currentProject.projectAgentCodeBookmark = [self bookmarkForURL:bookmarkURL];
+		// Need to refresh the bookmark from the URL
+		// Question is, what makes a bookmark stale?
+
+		bookmark = [self bookmarkForURL:bookmarkURL];
 	}
 
 	return bookmarkURL;
 }
 
-
-#pragma mark - File Watching Methods
 
 
 -(void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
