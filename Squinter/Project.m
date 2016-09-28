@@ -15,7 +15,7 @@
 @synthesize projectDeviceFiles, projectAgentFiles;
 @synthesize projectDeviceCode, projectAgentCode, projectVersion;
 @synthesize projectSquinted, projectHasChanged, projectModelID, projectImpLibs;
-
+@synthesize projectAgentCodeBookmark, projectDeviceCodeBookmark;
 
 
 - (instancetype)init
@@ -24,7 +24,7 @@
     {
         projectSquinted = 0;
         projectHasChanged = NO;
-        projectVersion = @"2.0.1";
+        projectVersion = @"2.0";
 		projectModelID = nil;
 
     }
@@ -39,7 +39,7 @@
     if (self = [super init])
 	{
         projectVersion = [aDecoder decodeObjectForKey:@"project_version"];
-        if (projectVersion == nil) projectVersion = @"1.0.0";
+        if (projectVersion == nil) projectVersion = @"1.0";
         projectName = [aDecoder decodeObjectForKey:@"project_name"];
         projectAgentCodePath = [aDecoder decodeObjectForKey:@"project_agent_path"];
         projectDeviceCodePath = [aDecoder decodeObjectForKey:@"project_device_path"];
@@ -49,6 +49,17 @@
 		projectAgentFiles = [aDecoder decodeObjectForKey:@"project_agent_files"];
 		projectModelID = [aDecoder decodeObjectForKey:@"project_model_number"];
         projectImpLibs = [aDecoder decodeObjectForKey:@"project_imp_libraries"];
+
+		// Add Version 2.1+ entities
+
+		if (projectVersion.floatValue > 2.0)
+		{
+			projectDeviceCodeBookmark = [aDecoder decodeObjectForKey:@"project_device_bookmark"];
+			projectAgentCodeBookmark = [aDecoder decodeObjectForKey:@"project_agent_bookmark"];
+		}
+
+		// Set up other, unsaved properties
+		
 		projectSquinted = 0;
         projectDeviceCode = nil;
         projectAgentCode = nil;
@@ -72,6 +83,14 @@
 	[aCoder encodeObject:projectAgentFiles forKey:@"project_agent_files"];
 	[aCoder encodeObject:projectModelID forKey:@"project_model_number"];
 	[aCoder encodeObject:projectImpLibs forKey:@"project_imp_libraries"];
+
+	// Add Version 2.1+ entities
+
+	if (projectVersion.floatValue > 2.0)
+	{
+		[aCoder encodeObject:projectDeviceCodeBookmark forKey:@"project_device_bookmark"];
+		[aCoder encodeObject:projectAgentCodeBookmark forKey:@"project_agent_bookmark"];
+	}
 }
 
 
@@ -95,6 +114,14 @@
     projectCopy.projectSquinted = self.projectSquinted;
     projectCopy.projectHasChanged = self.projectHasChanged;
 	projectCopy.projectModelID = self.projectModelID;
+
+	// Add Version 2.1+ entities
+	
+	if (projectVersion.floatValue > 2.0)
+	{
+		projectCopy.projectDeviceCodeBookmark = self.projectDeviceCodeBookmark;
+		projectCopy.projectAgentCodeBookmark = self.projectAgentCodeBookmark;
+	}
     
     return projectCopy;
 }

@@ -24,6 +24,9 @@
 @property (nonatomic, strong) NSMutableDictionary *projectAgentFiles;       // Names, paths of local files #imported into agent code
 @property (nonatomic, strong) NSMutableArray *projectImpLibs;               // Names of EI libraries #required by either agent or device
 
+@property (nonatomic, strong) NSData *projectAgentCodeBookmark;
+@property (nonatomic, strong) NSData *projectDeviceCodeBookmark;
+
 // Properties that are NOT saved
 
 @property (nonatomic, strong) NSString *projectPath;                        // Project’s location on local storage

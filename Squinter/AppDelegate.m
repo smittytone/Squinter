@@ -1643,10 +1643,10 @@
 			// We are saving a new project or one derived from a model, so we
 			// need to write out the agent.nut and device.nut files too
 			
-			NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
-			NSString *aPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", aFileName];
-			NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
-			NSString *dPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", dFileName];
+			// NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
+			// NSString *aPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", aFileName];
+			// NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
+			// NSString *dPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", dFileName];
 			
 			NSString *dataString = nil;
 			
@@ -1660,7 +1660,7 @@
 			}
 			
 			NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL aSuccess = [fm createFileAtPath:aPathName contents:data attributes:nil];
+			BOOL aSuccess = [fm createFileAtPath:savingProject.projectAgentCodePath contents:data attributes:nil];
 			
 			if (savingProject.projectDeviceCode.length == 0)
 			{
@@ -1672,36 +1672,48 @@
 			}
 			
 			data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL dSuccess = [fm createFileAtPath:dPathName contents:data attributes:nil];
+			BOOL dSuccess = [fm createFileAtPath:savingProject.projectDeviceCodePath contents:data attributes:nil];
 			
 			if (aSuccess == NO)
 			{
 				// Warn user of 'file already exists' error
 				
-				[self writeToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" could not be created: file already exists.", aFileName] :YES];
+				[self writeToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" could not be created: file already exists.", savingProject.projectAgentCodePath] :YES];
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", aFileName, savingProject.projectName] :YES];
+				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectAgentCodePath, savingProject.projectName] :YES];
 				if (savingProject == currentProject)
                 {
                     externalOpenBothItem.enabled = YES;
                     externalOpenAgentItem.enabled = YES;
                 }
+
+				if (savingProject.projectVersion.floatValue > 2.0)
+				{
+					NSURL *url = [NSURL URLWithString:savingProject.projectAgentCodePath];
+					savingProject.projectAgentCodeBookmark = [self bookmarkForURL:url];
+				}
 			}
 			
 			if (dSuccess == NO)
 			{
-				[self writeToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" could not be created - file already exists.", dFileName] :YES];
+				[self writeToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" could not be created - file already exists.", savingProject.projectDeviceCodePath] :YES];
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", dFileName, savingProject.projectName] :YES];
+				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectDeviceCodePath, savingProject.projectName] :YES];
 				if (savingProject == currentProject)
                 {
                     externalOpenBothItem.enabled = YES;
                     externalOpenDeviceItem.enabled = YES;
                 }
+
+				if (savingProject.projectVersion.floatValue > 2.0)
+				{
+					NSURL *url = [NSURL URLWithString:savingProject.projectDeviceCodePath];
+					savingProject.projectDeviceCodeBookmark = [self bookmarkForURL:url];
+				}
 			}
 			
 			// If the 'open files' checkbox is ticked, open the files we've just created
@@ -6350,19 +6362,34 @@
 {
     NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
 
-    if (currentProject.projectDeviceCodePath) [workspace openFile:currentProject.projectDeviceCodePath withApplication:nil andDeactivate:NO];
+	if (currentProject.projectVersion.floatValue > 2.0)
+	{
+		NSURL *agentFileURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
+		NSString *agentFilePath = [agentFileURL absoluteString];
+		[workspace openFile:agentFilePath withApplication:nil andDeactivate:NO];
 
-    // Add a delay, or the second open is somehow missed out
+		[NSThread sleepForTimeInterval:0.2];
 
-    [NSThread sleepForTimeInterval:0.2];
+		NSURL *deviceFileURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
+		NSString *deviceFilePath = [deviceFileURL absoluteString];
+		[workspace openFile:deviceFilePath withApplication:nil andDeactivate:NO];
+	}
+	else
+	{
+		if (currentProject.projectDeviceCodePath) [workspace openFile:currentProject.projectDeviceCodePath withApplication:nil andDeactivate:NO];
 
-    if (currentProject.projectAgentCodePath) [workspace openFile:currentProject.projectAgentCodePath withApplication:nil andDeactivate:NO];
+		// Add a delay, or the second open is somehow missed out
 
-    if (sender != externalOpenBothItem)
-    {
-        [self externalLibOpen:externalOpenLibItem];
-        [self externalFileOpen:externalOpenFileItem];
-    }
+		[NSThread sleepForTimeInterval:0.2];
+
+		if (currentProject.projectAgentCodePath) [workspace openFile:currentProject.projectAgentCodePath withApplication:nil andDeactivate:NO];
+
+		if (sender != externalOpenBothItem)
+		{
+			[self externalLibOpen:externalOpenLibItem];
+			[self externalFileOpen:externalOpenFileItem];
+		}
+	}
 }
 
 
@@ -7520,6 +7547,46 @@
     connectionIndicator.hidden = YES;
 }
 
+
+- (NSData *)bookmarkForURL:(NSURL *)url
+{
+	NSError *error = nil;
+	NSData *bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationSuitableForBookmarkFile
+					 includingResourceValuesForKeys:nil
+									  relativeToURL:nil
+											  error:&error];
+	if (error || (bookmark == nil))
+	{
+		return nil;
+	}
+
+	return bookmark;
+}
+
+
+
+- (NSURL *)urlForBookmark:(NSData *)bookmark
+{
+	BOOL bookmarkIsStale = NO;
+	NSError *error = nil;
+	NSURL *bookmarkURL = [NSURL URLByResolvingBookmarkData:bookmark
+												   options:NSURLBookmarkResolutionWithoutUI
+											 relativeToURL:nil
+									   bookmarkDataIsStale:&bookmarkIsStale
+													 error:&error];
+
+	if (error != nil)
+	{
+		// Report error
+	}
+
+	if (bookmarkIsStale) {
+		// Need to refresh the bookmark from the URL eg.
+		currentProject.projectAgentCodeBookmark = [self bookmarkForURL:bookmarkURL];
+	}
+
+	return bookmarkURL;
+}
 
 
 #pragma mark - File Watching Methods

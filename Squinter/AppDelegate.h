@@ -424,5 +424,8 @@
 - (void)checkElectricImpLibs;
 - (void)compareElectricImpLibs;
 
+- (NSData *)bookmarkForURL:(NSURL *)url;
+- (NSURL *)urlForBookmark:(NSData *)bookmark;
+
 
 @end
