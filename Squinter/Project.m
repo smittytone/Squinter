@@ -25,6 +25,8 @@
         projectSquinted = 0;
         projectHasChanged = NO;
         projectVersion = @"2.0.1";
+		projectModelID = nil;
+
     }
 
     return self;

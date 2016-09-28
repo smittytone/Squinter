@@ -6917,7 +6917,7 @@
         {
             // Model selected but no project selected
 
-            linkMenuItem.title = [NSString stringWithFormat:@"Link Model “%@” to Current Project", mString];
+            linkMenuItem.title = [NSString stringWithFormat:@"Link Model “%@” to a Project", mString];
             linkMenuItem.enabled = NO;
         }
 
@@ -6958,13 +6958,13 @@
         {
             // Project selected but no model selected
 
-            linkMenuItem.title = [NSString stringWithFormat:@"Link Selected Model to Project “%@”", currentProject.projectName];
+            linkMenuItem.title = [NSString stringWithFormat:@"Link a Model to Project “%@”", currentProject.projectName];
         }
         else
         {
             // Neither project nor model selected
 
-            linkMenuItem.title = @"Link Selected Model to Current Project";
+            linkMenuItem.title = @"Link a Model to a Project";
         }
 
         linkMenuItem.enabled = NO;
@@ -7013,20 +7013,56 @@
             // Model and Project selected
 
             NSDictionary *mDict = [ide.models objectAtIndex:currentModel];
-            uploadMenuItem.title = [NSString stringWithFormat:@"Upload Project “%@” to Model “%@”", currentProject.projectName, [mDict objectForKey:@"name"]];
             projectLinkMenuItem.title = [NSString stringWithFormat:@"Link Project “%@” to Model “%@”", currentProject.projectName, [mDict objectForKey:@"name"]];
-			uploadMenuItem.enabled = YES;
 			projectLinkMenuItem.enabled = YES;
         }
         else
         {
             // Project selected but no Model
 
-            projectLinkMenuItem.title = [NSString stringWithFormat:@"Link “%@’ to Selected Model", currentProject.projectName];
-            uploadMenuItem.title = [NSString stringWithFormat:@"Upload “%@” to Selected Model", currentProject.projectName];
-			projectLinkMenuItem.enabled = NO;
-			uploadMenuItem.enabled = NO;
+            projectLinkMenuItem.title = [NSString stringWithFormat:@"Link “%@’ to a Model", currentProject.projectName];
+            projectLinkMenuItem.enabled = NO;
         }
+
+		if (currentProject.projectModelID != nil)
+		{
+			// Does the current project have a linked model?
+
+			NSString *mName;
+			BOOL nameFlag = NO;
+
+			for (NSDictionary *model in ide.models)
+			{
+				NSString *mID = [model objectForKey:@"id"];
+
+				if ([currentProject.projectModelID compare:mID] == NSOrderedSame)
+				{
+					mName = [model objectForKey:@"name"];
+					nameFlag = YES;
+					break;
+				}
+			}
+
+
+			if (nameFlag)
+			{
+				uploadMenuItem.title = [NSString stringWithFormat:@"Upload Project “%@” to Model “%@”", currentProject.projectName, mName];
+				uploadMenuItem.enabled = YES;
+			}
+			else
+			{
+				uploadMenuItem.title = [NSString stringWithFormat:@"Upload Project “%@” to a Model", currentProject.projectName];
+				uploadMenuItem.enabled = NO;
+			}
+		}
+		else
+		{
+			// We have no linked model, so suggest the currently selected one
+
+			uploadMenuItem.title = [NSString stringWithFormat:@"Upload Project “%@” to a Model", currentProject.projectName];
+			uploadMenuItem.enabled = NO;
+		}
+
     }
     else
     {
@@ -7062,15 +7098,15 @@
             // Model selected but no project
 
             NSDictionary *mDict = [ide.models objectAtIndex:currentModel];
-            uploadMenuItem.title = [NSString stringWithFormat:@"Upload Current Project to Model “%@”", [mDict objectForKey:@"name"]];
-            projectLinkMenuItem.title = [NSString stringWithFormat:@"Link Current Project to Model “%@”", [mDict objectForKey:@"name"]];
+            uploadMenuItem.title = [NSString stringWithFormat:@"Upload a Project to Model “%@”", [mDict objectForKey:@"name"]];
+            projectLinkMenuItem.title = [NSString stringWithFormat:@"Link a Project to Model “%@”", [mDict objectForKey:@"name"]];
 		}
         else
         {
             // Neither Project nor Model selected
 
-            projectLinkMenuItem.title = @"Link Current Project to Selected Model";
-            uploadMenuItem.title = @"Upload Current Project to Selected Model";
+            projectLinkMenuItem.title = @"Link a Project to a Model";
+            uploadMenuItem.title = @"Upload a Project to a Model";
         }
 		
 		uploadMenuItem.enabled = NO;
@@ -7329,7 +7365,17 @@
         openAllItem.enabled = YES;
 		copyAgentItem.enabled = YES;
 		copyDeviceItem.enabled = YES;
-		uploadCodeItem.enabled = YES;
+
+		// Display Upload button only if we have a linked model
+
+		if (currentProject.projectModelID != nil)
+		{
+			uploadCodeItem.enabled = YES;
+		}
+		else
+		{
+			uploadCodeItem.enabled = NO;
+		}
     }
     else
     {
