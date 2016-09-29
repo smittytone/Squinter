@@ -689,7 +689,7 @@
 		[self updateMenus];
         [self setToolbar];
 		
-		// Clear the external libraries menu - the new project by defenition has none
+		// Clear the external libraries menu - the new project by definition has none
 		
         [externalLibsMenu removeAllItems];
 
