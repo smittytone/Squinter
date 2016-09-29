@@ -134,6 +134,10 @@
     IBOutlet NSButton *newProjectAccessoryViewOpenCheckbox;
     IBOutlet NSButton *newProjectAccessoryViewAssociateCheckbox;
     IBOutlet NSButton *newProjectAccessoryViewNewModel;
+
+	IBOutlet NSView *projectFromFilesAccessoryView;
+	IBOutlet NSButton *projectFromFilesAccessoryViewCheckbox;
+	IBOutlet NSButton *projectFromFilesAccessoryViewLocCheckbox;
     
     // Save
     
@@ -236,6 +240,8 @@
 	NSURLSessionTask *eiLibListTask;
 	NSMutableData *eiLibListData;
 	NSDate *eiLibListTime;
+
+	NSOperatingSystemVersion sysVer;
 }
 
 
