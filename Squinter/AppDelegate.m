@@ -1096,13 +1096,13 @@
 						if (currentProject.projectAgentCodeBookmark)
 						{
 							NSURL *agentCodeURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
-							currentProject.projectAgentCode = agentCodeURL.absoluteString;
+							currentProject.projectAgentCode = agentCodeURL.path;
 						}
 
 						if (currentProject.projectDeviceCodeBookmark)
 						{
 							NSURL *deviceCodeURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
-							currentProject.projectDeviceCode = deviceCodeURL.absoluteString;
+							currentProject.projectDeviceCode = deviceCodeURL.path;
 						}
 					}
 
