@@ -807,7 +807,7 @@
                         <rect key="frame" x="-1" y="40" width="902" height="501"/>
                         <clipView key="contentView" id="yDW-Oe-C7r">
                             <rect key="frame" x="1" y="1" width="885" height="499"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" findStyle="bar" linkDetection="YES" id="NVb-Sr-a5Q">
                                     <rect key="frame" x="0.0" y="0.0" width="885" height="499"/>
@@ -897,17 +897,17 @@
                             <action selector="clearLog:" target="Voe-Tx-rLC" id="evB-Iv-YiJ"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="F3C94946-1F1B-47D4-91EC-0CA388F41F85" label="Open Device Code" paletteLabel="Open Device Code in Editor" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="F3C94946-1F1B-47D4-91EC-0CA388F41F85" label="View Device Code" paletteLabel="View Device Code in Editor" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="externalOpen:" target="Voe-Tx-rLC" id="97h-h9-GxD"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="E1D3BDB7-6D26-467A-8C4A-8AA3EDC72ADB" label="Open Agent Code" paletteLabel="Open Agent Code in Editor" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="E1D3BDB7-6D26-467A-8C4A-8AA3EDC72ADB" label="View Agent Code" paletteLabel="View Agent Code in Editor" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="externalOpen:" target="Voe-Tx-rLC" id="9Om-l5-zor"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="6B829CE9-BC16-4749-A015-B4B5E96A1BFF" label="Open Files" paletteLabel="Open All Project Files in Editor" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="6B829CE9-BC16-4749-A015-B4B5E96A1BFF" label="View Files" paletteLabel="View All Project Files in Editor" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
                         <size key="minSize" width="32" height="32"/>
                         <size key="maxSize" width="96" height="0.0"/>
                         <connections>

@@ -123,7 +123,7 @@
 	infoItem.toolTip = @"Display detailed project information.";
     openAllItem.onImageName = @"open";
     openAllItem.offImageName = @"open_grey";
-	openAllItem.toolTip = @"Open the project's code and library files in your external editor.";
+	openAllItem.toolTip = @"View the project's code and library files in your external editor.";
     viewDeviceCode.onImageName = @"open";
     viewDeviceCode.offImageName = @"open_grey";
 	viewDeviceCode.toolTip = @"Display the compiled device code.";
