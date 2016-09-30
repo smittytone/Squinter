@@ -55,6 +55,7 @@
     IBOutlet NSMenu *externalFilesMenu;
 	IBOutlet NSMenuItem *copyAgentCodeItem;
 	IBOutlet NSMenuItem *copyDeviceCodeItem;
+	IBOutlet NSMenuItem *checkElectricImpLibrariesItem;
 
     // Models Menu
 
@@ -258,17 +259,20 @@
 
 - (void)chooseProject:(id)sender;
 - (IBAction)pickProject:(id)sender;
-- (IBAction)selectFile:(id)sender;
 - (IBAction)openProject:(id)sender;
+- (IBAction)selectFile:(id)sender;
 - (IBAction)selectFileForProject:(id)sender;
-- (void)openFile:(NSInteger)operationType;
+- (void)openFile:(NSInteger)openActionType;
 - (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
 
 // Save Project Methods
 
-- (IBAction)saveProject:(id)sender;
 - (IBAction)saveProjectAs:(id)sender;
+- (IBAction)saveProject:(id)sender;
 - (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName;
+- (IBAction)cancelChanges:(id)sender;
+- (IBAction)ignoreChanges:(id)sender;
+- (IBAction)saveChanges:(id)sender;
 
 // Close Project Methods
 
@@ -285,6 +289,7 @@
 - (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(BOOL)willReturnCode;
 - (NSString *)processDefines:(NSString *)sourceCode :(NSInteger)codeType;
 - (NSUInteger)getLineNumber:(NSString *)code :(NSInteger)index;
+- (NSString *)getLibraryVersionNumber:(NSString *)libcode;
 
 // Library and Project Menu Methods
 
@@ -296,14 +301,15 @@
 - (void)updateFilesMenu;
 - (void)fileAdder:(NSArray *)keyArray;
 - (void)addFileToMenu:(NSString *)filename;
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle;
-- (void)launchLibsPage;
 - (NSString *)getLibraryTitle:(id)item;
+- (void)launchLibsPage;
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle;
 
 // Pasteboard Methods
 
 - (IBAction)copyDeviceCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentCodeToPasteboard:(id)sender;
+- (IBAction)copyAgentURL:(id)sender;
 
 // Model and Device Methods
 
@@ -313,28 +319,30 @@
 - (void)chooseModel:(id)sender;
 - (IBAction)modelToProjectStageOne:(id)sender;
 - (void)modelToProjectStageTwo;
-- (void)uploadCodeStageTwo;
+- (void)createdModel;
 - (IBAction)uploadCode:(id)sender;
+- (void)uploadCodeStageTwo;
 - (IBAction)refreshDevices:(id)sender;
 - (void)listDevices;
 - (IBAction)chooseDevice:(id)sender;
 - (void)setCurrentDeviceFromSelection:(id)sender;
-- (IBAction)restartDevices:(id)sender;
 - (IBAction)restartDevice:(id)sender;
+- (IBAction)restartDevices:(id)sender;
 - (void)restarted;
 - (IBAction)assignProject:(id)sender;
 - (IBAction)assignDevice:(id)sender;
 - (IBAction)assignDeviceSheetCancel:(id)sender;
 - (IBAction)assignDeviceSheetAssign:(id)sender;
 - (void)reassigned;
-- (IBAction)deleteDevice:(id)sender;
-- (void)deleteDeviceStageTwo;
 - (IBAction)deleteModel:(id)sender;
 - (void)deleteModelStageTwo;
+- (IBAction)deleteDevice:(id)sender;
+- (void)deleteDeviceStageTwo;
 - (IBAction)renameModel:(id)sender;
 - (void)renameModelStageTwo;
-- (void)createdModel;
 - (IBAction)renameDevice:(id)sender;
+- (IBAction)closeRenameSheet:(id)sender;
+- (IBAction)saveRenameSheet:(id)sender;
 - (void)renameDeviceStageTwo;
 - (IBAction)unassignDevice:(id)sender;
 
@@ -342,19 +350,6 @@
 
 - (IBAction)getLogs:(id)sender;
 - (void)listLogs:(NSNotification *)note;
-
-// Squinter Log Methods
-
-- (IBAction)getProjectInfo:(id)sender;
-- (IBAction)showDeviceInfo:(id)sender;
-- (IBAction)showModelInfo:(id)sender;
-- (IBAction)copyAgentURL:(id)sender;
-- (IBAction)logDeviceCode:(id)sender;
-- (IBAction)logAgentCode:(id)sender;
-- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp;
-- (void)writeStreamToLog:(NSAttributedString *)string;
-- (IBAction)clearLog:(id)sender;
-- (void)displayError;
 - (IBAction)printLog:(id)sender;
 - (void)printDone;
 - (IBAction)streamLogs:(id)sender;
@@ -363,6 +358,18 @@
 - (IBAction)showAppCode:(id)sender;
 - (void)listCode:(NSString *)code :(NSInteger)from :(NSInteger)to :(NSInteger)at;
 - (void)logCode;
+
+// Squinter Log Methods
+
+- (IBAction)getProjectInfo:(id)sender;
+- (IBAction)showDeviceInfo:(id)sender;
+- (IBAction)showModelInfo:(id)sender;
+- (IBAction)logDeviceCode:(id)sender;
+- (IBAction)logAgentCode:(id)sender;
+- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp;
+- (void)writeStreamToLog:(NSAttributedString *)string;
+- (IBAction)clearLog:(id)sender;
+- (void)displayError;
 - (void)listCodeErrors:(NSString *)code :(NSString *)codeKind;
 
 // Model and Device ID Look-up Methods
@@ -381,19 +388,18 @@
 // Preferences Methods
 
 - (IBAction)showPrefs:(id)sender;
-- (IBAction)setPrefs:(id)sender;
 - (IBAction)cancelPrefs:(id)sender;
+- (IBAction)setPrefs:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;
 - (void)setWorkingDirectory:(NSArray *)urls;
 - (NSString *)getFontName:(NSInteger)index;
-- (void)showPanelForBack;
 - (void)showPanelForText;
+- (void)showPanelForBack;
 
 // About and Help Sheet Methods
 
 - (IBAction)showAboutSheet:(id)sender;
 - (IBAction)closeAboutSheet:(id)sender;
-// - (IBAction)showHelpSheet:(id)sender;
 - (IBAction)showHideToolbar:(id)sender;
 - (IBAction)showAuthor:(id)sender;
 
@@ -405,9 +411,12 @@
 - (void)setProjectMenu;
 - (void)setViewMenu;
 - (void)setProjectLists;
-- (void)setToolbar;
 - (void)updateDeviceLists;
 - (NSString *)menuString:(NSString *)deviceID;
+- (void)setToolbar;
+- (void)setColours;
+- (void)setLoggingColours;
+- (NSInteger)perceivedBrightness:(NSColor *)colour;
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
 
 // Progress Methods
@@ -415,23 +424,17 @@
 - (void)startProgress;
 - (void)stopProgress;
 
-// Application Quit Methods
-
-- (IBAction)ignoreChanges:(id)sender;
-- (IBAction)saveChanges:(id)sender;
-- (IBAction)cancelChanges:(id)sender;
-
 // Misc
-
-- (void)setLoggingColours;
-- (void)setColours;
-- (NSInteger)perceivedBrightness:(NSColor *)colour;
-
-- (void)checkElectricImpLibs;
-- (void)compareElectricImpLibs;
 
 - (NSData *)bookmarkForURL:(NSURL *)url;
 - (NSURL *)urlForBookmark:(NSData *)bookmark;
+
+// Library Checking
+
+- (IBAction)checkElectricImpLibraries:(id)sender;
+- (void)checkElectricImpLibs;
+- (void)compareElectricImpLibs;
+
 
 
 @end
