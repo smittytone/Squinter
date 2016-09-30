@@ -3968,49 +3968,6 @@
 
 	[self getApps];
 	return;
-
-	/* Below is the code for single-device streaming
-
-
-    if (streamFlag == YES)
-    {
-        if (currentDevice != -1)
-        {
-            // Are we logging? If so warn the user
-
-            NSDictionary *device = [ide.devices	objectAtIndex:currentDevice];
-            NSAlert *ays = [[NSAlert alloc] init];
-            [ays addButtonWithTitle:@"No"];
-            [ays addButtonWithTitle:@"Yes"];
-            [ays setMessageText:[NSString stringWithFormat:@"You are currently logging from device \"%@\". Are you sure you want to proceed?", [device objectForKey:@"name"]]];
-            [ays setInformativeText:@"Updating the models list will stop device logging."];
-            [ays setAlertStyle:NSWarningAlertStyle];
-            [ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode){
-
-                if (returnCode == 1001)
-                {
-                    // User wants to continue with the change, so turn off streaming
-
-                    [self streamLogs:nil];
-                    [self setCurrentDeviceFromSelection:sender];
-                    [self getApps];
-                }
-            }];
-        }
-        else
-        {
-            // Don't have a current device, so shouldn't be streaming – turn it off
-            
-            [self streamLogs:nil];
-			streamFlag = NO;
-        }
-    }
-    else
-    {
-        [self getApps];
-    }
-	 
-	 */
 }
 
 
@@ -5312,6 +5269,14 @@
 
 
 
+- (void)renameModelStageTwo
+{
+
+	[self writeToLog:@"Model renamed. Refreshing the list of your models and devices." :YES];
+}
+
+
+
 - (IBAction)renameDevice:(id)sender
 {
     // NOTE The outer checking code is probably unnecessary: you can't select this
@@ -5446,26 +5411,18 @@
 - (void)renameDeviceStageTwo
 {
 	NSString *mString;
-	
+
 	if (unassignDeviceFlag) {
-		
+
 		mString = @"Device unassigned. Refreshing the list of your models and devices.";
 		unassignDeviceFlag = NO;
-		
+
 	} else {
-		
+
 		mString = @"Device renamed. Refreshing the list of your models and devices.";
 	}
-	
+
 	[self writeToLog:mString :YES];
-}
-
-
-
-- (void)renameModelStageTwo
-{
-
-	[self writeToLog:@"Model renamed. Refreshing the list of your models and devices." :YES];
 }
 
 
@@ -7223,9 +7180,20 @@
 		squintMenuItem.enabled = YES;
 		cleanMenuItem.enabled = YES;
 		
-		externalOpenMenuItem.title = [NSString stringWithFormat:@"Open “%@” Main Files in Editor", currentProject.projectName];
-		externalOpenLibItem.title = [NSString stringWithFormat:@"Open “%@” Library Files in Editor", currentProject.projectName];
-        externalOpenFileItem.title = [NSString stringWithFormat:@"Open “%@” Linked Files in Editor", currentProject.projectName];
+		externalOpenMenuItem.title = [NSString stringWithFormat:@"View “%@” Main Files in Editor", currentProject.projectName];
+		externalOpenLibItem.title = [NSString stringWithFormat:@"View “%@” Library Files in Editor", currentProject.projectName];
+        externalOpenFileItem.title = [NSString stringWithFormat:@"View “%@” Linked Files in Editor", currentProject.projectName];
+
+		checkElectricImpLibrariesItem.title = [NSString stringWithFormat:@"Check “%@” Electric Imp Libraries", currentProject.projectName];
+
+		if (currentProject.projectImpLibs.count > 0)
+		{
+			checkElectricImpLibrariesItem.enabled = YES;
+		}
+		else
+		{
+			checkElectricImpLibrariesItem.enabled = NO;
+		}
 		
 		copyAgentCodeItem.enabled = (currentProject.projectSquinted > 1);
 		copyDeviceCodeItem.enabled = (currentProject.projectSquinted == 1 || currentProject.projectSquinted == 3);
@@ -7300,6 +7268,9 @@
 		externalOpenMenuItem.title = @"Open Main Files in Editor";
 		externalOpenLibItem.title = @"Open Library Files in Editor";
 		externalOpenFileItem.title = @"Open Linked Files in Editor";
+
+		checkElectricImpLibrariesItem.title = @"Check Project Electric Imp Libraries";
+		checkElectricImpLibrariesItem.enabled = NO;
 
 		// Reset Open Libs submenu
 		
@@ -7858,7 +7829,16 @@
 }
 
 
+
 #pragma mark - Check EI Libs Methods
+
+
+- (IBAction)checkElectricImpLibraries:(id)sender
+{
+	[self checkElectricImpLibs];
+}
+
+
 
 - (void)checkElectricImpLibs
 {
@@ -7924,6 +7904,7 @@
 		}
 	}
 }
+
 
 
 - (void)URLSession:(NSURLSession *)session
@@ -8066,6 +8047,8 @@ didReceiveResponse:(NSURLResponse *)response
 	}
 }
 
+
+
 /*
 
  - (IBAction)showHelpSheet:(id)sender
@@ -8081,8 +8064,6 @@ didReceiveResponse:(NSURLResponse *)response
  }
 
  */
-
-
 
 
 
