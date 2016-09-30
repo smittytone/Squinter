@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
@@ -35,6 +35,7 @@
                 <outlet property="autoUpdateCheckCheckbox" destination="4RA-rZ-K8Y" id="MIk-Vs-MOl"/>
                 <outlet property="backColorWell" destination="IWf-Jb-Y7i" id="QiR-Eb-TbA"/>
                 <outlet property="boldTestCheckbox" destination="wvz-LP-lbe" id="Equ-Ci-HFP"/>
+                <outlet property="checkElectricImpLibrariesItem" destination="MSx-qG-GWA" id="BuB-1d-mRe"/>
                 <outlet property="cleanMenuItem" destination="nSB-h1-Raj" id="Mpl-z5-q5M"/>
                 <outlet property="clearItem" destination="ZWk-Ol-4mW" id="2Ce-Bb-His"/>
                 <outlet property="closeAllMenuItem" destination="DVo-aG-piG" id="oEU-me-bvR"/>
@@ -86,6 +87,9 @@
                 <outlet property="preferencesSheet" destination="h6Z-xR-T8e" id="wqb-yM-nls"/>
                 <outlet property="preserveCheckbox" destination="DkE-vS-yQU" id="EuC-Me-Ivt"/>
                 <outlet property="printItem" destination="p2B-MB-ilv" id="NGa-yN-EBC"/>
+                <outlet property="projectFromFilesAccessoryView" destination="7b2-dB-tnl" id="nPK-LE-Azm"/>
+                <outlet property="projectFromFilesAccessoryViewCheckbox" destination="VeH-Hs-c9G" id="uVd-Qv-fNe"/>
+                <outlet property="projectFromFilesAccessoryViewLocCheckbox" destination="Lu9-w2-Nua" id="jeI-6n-elJ"/>
                 <outlet property="projectLinkMenuItem" destination="5ex-Kh-8Kf" id="f8b-hx-JXJ"/>
                 <outlet property="projectMenu" destination="2kc-H0-RWn" id="Qva-5R-d4A"/>
                 <outlet property="projectsMenu" destination="oxC-Yl-kpg" id="03E-My-wet"/>
@@ -352,6 +356,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="cleanProject:" target="Voe-Tx-rLC" id="krI-8o-STL"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Check Project’s Electric Imp Libraries" id="MSx-qG-GWA">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="checkElectricImpLibraries:" target="Voe-Tx-rLC" id="O3Y-Io-9IK"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="jEp-Yk-v8v"/>
@@ -708,6 +718,7 @@
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="682" y="186"/>
         </menu>
         <window title="Squinter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" appearanceType="aqua" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
@@ -804,7 +815,7 @@
                         <rect key="frame" x="-1" y="40" width="902" height="501"/>
                         <clipView key="contentView" id="yDW-Oe-C7r">
                             <rect key="frame" x="1" y="1" width="885" height="499"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" findStyle="bar" linkDetection="YES" id="NVb-Sr-a5Q">
                                     <rect key="frame" x="0.0" y="0.0" width="885" height="499"/>
@@ -894,17 +905,17 @@
                             <action selector="clearLog:" target="Voe-Tx-rLC" id="evB-Iv-YiJ"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="F3C94946-1F1B-47D4-91EC-0CA388F41F85" label="Open Device Code" paletteLabel="Open Device Code in Editor" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="F3C94946-1F1B-47D4-91EC-0CA388F41F85" label="View Device Code" paletteLabel="View Device Code in Editor" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="externalOpen:" target="Voe-Tx-rLC" id="97h-h9-GxD"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="E1D3BDB7-6D26-467A-8C4A-8AA3EDC72ADB" label="Open Agent Code" paletteLabel="Open Agent Code in Editor" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="E1D3BDB7-6D26-467A-8C4A-8AA3EDC72ADB" label="View Agent Code" paletteLabel="View Agent Code in Editor" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="externalOpen:" target="Voe-Tx-rLC" id="9Om-l5-zor"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="6B829CE9-BC16-4749-A015-B4B5E96A1BFF" label="Open Files" paletteLabel="Open All Project Files in Editor" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="6B829CE9-BC16-4749-A015-B4B5E96A1BFF" label="View Files" paletteLabel="View All Project Files in Editor" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
                         <size key="minSize" width="32" height="32"/>
                         <size key="maxSize" width="96" height="0.0"/>
                         <connections>
@@ -1132,24 +1143,19 @@ DQ
             <point key="canvasLocation" x="387" y="-156"/>
         </window>
         <customView identifier="AccessoryView" id="MJe-9N-Smk">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="53"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="54"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="dDn-6x-nru">
-                    <rect key="frame" x="18" y="17" width="519" height="18"/>
+                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dDn-6x-nru">
+                    <rect key="frame" x="18" y="18" width="519" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Create new project with this file (uncheck to add the file to the current project)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="udf-qH-GUJ">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                 </button>
             </subviews>
-            <constraints>
-                <constraint firstItem="dDn-6x-nru" firstAttribute="leading" secondItem="MJe-9N-Smk" secondAttribute="leading" constant="20" id="YDz-o7-EeA"/>
-                <constraint firstItem="dDn-6x-nru" firstAttribute="top" secondItem="MJe-9N-Smk" secondAttribute="top" constant="20" id="b7q-Gn-KYu"/>
-                <constraint firstAttribute="trailing" secondItem="dDn-6x-nru" secondAttribute="trailing" constant="20" id="cue-sS-sKC"/>
-                <constraint firstAttribute="bottom" secondItem="dDn-6x-nru" secondAttribute="bottom" constant="19" id="o8E-k4-w6M"/>
-            </constraints>
-            <point key="canvasLocation" x="-546.5" y="-245.5"/>
+            <point key="canvasLocation" x="-546.5" y="-245"/>
         </customView>
         <window title="About..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="lSs-4y-dIl" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
@@ -1372,7 +1378,7 @@ Gw
                             <constraint firstAttribute="height" constant="17" id="0xp-he-Rnr"/>
                             <constraint firstAttribute="width" constant="284" id="pmA-5e-tP1"/>
                         </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Projects Directory" id="2tw-rg-OiT">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Primary Projects Directory" id="2tw-rg-OiT">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1998,6 +2004,41 @@ Gw
             <point key="canvasLocation" x="381.5" y="-35"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="KGf-08-aja"/>
+        <customView id="7b2-dB-tnl">
+            <rect key="frame" x="0.0" y="0.0" width="555" height="78"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="VeH-Hs-c9G">
+                    <rect key="frame" x="18" y="42" width="519" height="18"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="14" id="ShT-lT-gid"/>
+                    </constraints>
+                    <buttonCell key="cell" type="check" title="Auto-save the new project" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="S8Q-Ir-Mds">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                </button>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="Lu9-w2-Nua">
+                    <rect key="frame" x="18" y="18" width="519" height="18"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="14" id="6MR-cp-Sqt"/>
+                    </constraints>
+                    <buttonCell key="cell" type="check" title="Save to working directory (uncheck to save alongside source files)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="qLQ-1a-3aQ">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Lu9-w2-Nua" secondAttribute="trailing" constant="20" id="BGk-5o-nSY"/>
+                <constraint firstItem="VeH-Hs-c9G" firstAttribute="leading" secondItem="7b2-dB-tnl" secondAttribute="leading" constant="20" id="Hl7-cZ-HGD"/>
+                <constraint firstItem="Lu9-w2-Nua" firstAttribute="leading" secondItem="7b2-dB-tnl" secondAttribute="leading" constant="20" id="U8R-ii-oFq"/>
+                <constraint firstItem="Lu9-w2-Nua" firstAttribute="top" secondItem="VeH-Hs-c9G" secondAttribute="bottom" constant="10" id="fMJ-Fe-QIz"/>
+                <constraint firstAttribute="trailing" secondItem="VeH-Hs-c9G" secondAttribute="trailing" constant="20" id="frp-Jr-bBi"/>
+                <constraint firstItem="VeH-Hs-c9G" firstAttribute="top" secondItem="7b2-dB-tnl" secondAttribute="top" constant="20" id="ykZ-mj-6Tf"/>
+            </constraints>
+            <point key="canvasLocation" x="-546.5" y="-117"/>
+        </customView>
     </objects>
     <resources>
         <image name="bfi" width="32" height="30.5"/>
