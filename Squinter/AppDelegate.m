@@ -1060,7 +1060,7 @@
 
 					if (currentProjectVersion > 2.0)
 					{
-						currentProject.projectBookmark = [self bookmarkForURL:[NSURL URLWithString:filePath]];
+
 					}
 					
 					// Has the user changed the name of the file?
@@ -1093,17 +1093,7 @@
 					
 					if (currentProjectVersion > 2.0)
 					{
-						if (currentProject.projectAgentCodeBookmark)
-						{
-							NSURL *agentCodeURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
-							currentProject.projectAgentCode = agentCodeURL.path;
-						}
 
-						if (currentProject.projectDeviceCodeBookmark)
-						{
-							NSURL *deviceCodeURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
-							currentProject.projectDeviceCode = deviceCodeURL.path;
-						}
 					}
 
 					if (currentProject.projectAgentCodePath != nil)
@@ -1677,15 +1667,6 @@
 		NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
 		NSString *dPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", dFileName];
 		savingProject.projectDeviceCodePath = dPathName;
-
-		if (savingProject.projectVersion.floatValue > 2.0)
-		{
-			NSData *acbm = [self bookmarkForURL:[NSURL URLWithString:savingProject.projectAgentCodePath]];
-			if (acbm != nil) savingProject.projectAgentCodeBookmark = acbm;
-
-			NSData *dcbm = [self bookmarkForURL:[NSURL URLWithString:savingProject.projectDeviceCodePath]];
-			if (dcbm != nil) savingProject.projectDeviceCodeBookmark = dcbm;
-		}
 	}
 
     if ([fm fileExistsAtPath:savePath])
@@ -1727,8 +1708,7 @@
 
 		if (savingProject.projectVersion.floatValue > 2.0)
 		{
-			NSData *pbm = [self bookmarkForURL:[NSURL URLWithString:savePath]];
-			if (pbm != nil) savingProject.projectBookmark = pbm;
+			savingProject.oldProjectPath = savingProject.projectPath;
 		}
 		
 		if (savingProject == currentProject) 
@@ -1796,11 +1776,17 @@
 			else
 			{
 				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectAgentCodePath, savingProject.projectName] :YES];
+
 				if (savingProject == currentProject)
                 {
                     externalOpenBothItem.enabled = YES;
                     externalOpenAgentItem.enabled = YES;
                 }
+
+				if (savingProject.projectVersion.floatValue > 2.0)
+				{
+					savingProject.projectAgentCode = [self getRelativeFilePath:savingProject.projectPath :savingProject.projectAgentCode];
+				}
 			}
 			
 			if (dSuccess == NO)
@@ -1810,11 +1796,17 @@
 			else
 			{
 				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectDeviceCodePath, savingProject.projectName] :YES];
+
 				if (savingProject == currentProject)
                 {
                     externalOpenBothItem.enabled = YES;
                     externalOpenDeviceItem.enabled = YES;
                 }
+
+				if (savingProject.projectVersion.floatValue > 2.0)
+				{
+					savingProject.projectDeviceCode = [self getRelativeFilePath:savingProject.projectPath :savingProject.projectDeviceCode];
+				}
 			}
 			
 			// If the 'open files' checkbox is ticked, open the files we've just created
@@ -2068,58 +2060,10 @@
 
 	if (currentProject.projectVersion.floatValue > 2.0)
 	{
-		if (currentProject.projectAgentCodeBookmark != nil)
+		if (currentProject.oldProjectPath != nil)
 		{
-			NSURL *agentCodeURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
 
-			[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", agentCodeURL.absoluteString.lastPathComponent] :YES];
-			output = [self processSource:agentCodeURL.absoluteString :kCodeTypeAgent :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
 
-			output = [self processDefines:output :kCodeTypeAgent];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-
-			currentProject.projectAgentCode = output;
-			agentDoneFlag = YES;
-		}
-
-		if (currentProject.projectDeviceCodeBookmark != nil)
-		{
-			NSURL *deviceCodeURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
-
-			[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", deviceCodeURL.absoluteString.lastPathComponent] :YES];
-			output = [self processSource:deviceCodeURL.absoluteString :kCodeTypeDevice :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-
-			output = [self processDefines:output :kCodeTypeDevice];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-
-			currentProject.projectDeviceCode = output;
-			deviceDoneFlag = YES;
 		}
 	}
 	else
@@ -6516,15 +6460,7 @@
 
 	if (currentProject.projectVersion.floatValue > 2.0)
 	{
-		NSURL *agentFileURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
-		NSString *agentFilePath = [agentFileURL absoluteString];
-		[workspace openFile:agentFilePath withApplication:nil andDeactivate:NO];
 
-		[NSThread sleepForTimeInterval:0.2];
-
-		NSURL *deviceFileURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
-		NSString *deviceFilePath = [deviceFileURL absoluteString];
-		[workspace openFile:deviceFilePath withApplication:nil andDeactivate:NO];
 	}
 	else
 	{
@@ -7826,6 +7762,164 @@
 	// Update the Project Menu in case the 'projectSquinted' value has changed
 	
 	[self setProjectMenu];
+}
+
+
+
+#pragma mark - File Path Methods
+
+
+- (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath
+{
+	NSString *theFilePath = [filePath stringByDeletingLastPathComponent];
+	NSString *theFileName = [filePath lastPathComponent];
+
+	if (theFilePath.length > basePath.length)
+	{
+		NSRange r = [theFilePath rangeOfString:basePath];
+
+		if (r.location != NSNotFound)
+		{
+			theFilePath = [theFilePath substringFromIndex:r.length];
+			theFilePath = [theFilePath stringByAppendingFormat:@"/%@", theFileName];
+		}
+		else
+		{
+			theFilePath = [self getPathDelta:basePath :theFilePath];
+			theFilePath = [theFilePath stringByAppendingString:theFileName];
+		}
+	}
+	else if (theFilePath.length < basePath.length)
+	{
+		NSRange r = [basePath rangeOfString:theFilePath];
+
+		if (r.location != NSNotFound)
+		{
+			theFilePath = [basePath substringFromIndex:r.length];
+			NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
+			theFilePath = theFileName;
+
+			for (NSInteger i = 0 ; i < filePathParts.count - 1 ; ++i)
+			{
+				theFilePath = [@"../" stringByAppendingString:theFilePath];
+			}
+		}
+		else
+		{
+			theFilePath = [self getPathDelta:basePath :theFilePath];
+			theFilePath = [theFilePath stringByAppendingString:theFileName];
+		}
+	}
+	else
+	{
+		NSRange r = [theFilePath rangeOfString:basePath];
+
+		if (r.location != NSNotFound)
+		{
+			theFilePath = theFileName;
+		}
+		else
+		{
+			theFilePath = [self getPathDelta:basePath :theFilePath];
+			theFilePath = [theFilePath stringByAppendingString:theFileName];
+		}
+	}
+
+	return theFilePath;
+}
+
+
+- (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath
+{
+	NSUInteger location;
+	NSArray *fileParts = [filePath componentsSeparatedByString:@"/"];
+	NSArray *baseParts = [basePath componentsSeparatedByString:@"/"];
+
+	for (NSUInteger i = 0 ; i < fileParts.count ; ++i)
+	{
+		NSString *filePart = [fileParts objectAtIndex:i];
+		NSString *basePart = [baseParts objectAtIndex:i];
+
+		if ([filePart compare:basePart] != NSOrderedSame)
+		{
+			location = i;
+			break;
+		}
+	}
+
+	NSString *path = @"";
+
+	for (NSUInteger i = location ; i < baseParts.count ; ++i)
+	{
+		path = [path stringByAppendingString:@"../"];
+	}
+
+	for (NSUInteger i = location ; i < fileParts.count ; ++i)
+	{
+		path = [path stringByAppendingFormat:@"%@/", [fileParts objectAtIndex:i]];
+	}
+
+	return path;
+}
+
+
+
+- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
+{
+	NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
+	absolutePath = [absolutePath stringByStandardizingPath];
+	return absolutePath;
+}
+
+
+
+- (void)updateProject:(Project *)project
+{
+	Project *newProject = [[Project alloc] init];
+
+	if (project.projectVersion.floatValue < newProject.projectVersion.floatValue)
+	{
+		newProject.projectName = project.projectName;
+		newProject.projectAgentCode = project.projectAgentCode;
+		newProject.projectDeviceCode = project.projectDeviceCode;
+		newProject.projectImpLibs = project.projectImpLibs;
+		newProject.projectModelID = project.projectModelID;
+
+		if (project.projectVersion.floatValue < 2.1)
+		{
+			// 1.0 -> 2.1
+			// Add oldProjectPath property
+
+			newProject.oldProjectPath = project.projectPath;
+
+			// Convert saved paths to relative paths
+
+			newProject.projectAgentCodePath = [self getRelativeFilePath:newProject.oldProjectPath :project.projectAgentCodePath];
+			newProject.projectDeviceCodePath = [self getRelativeFilePath:newProject.oldProjectPath :project.projectDeviceCodePath];
+
+
+			
+		}
+
+
+		if (project == currentProject) currentProject = newProject;
+
+		[projectArray addObject:newProject];
+		[projectArray removeObject:project];
+		newProject.projectSquinted = 0;
+		newProject.projectHasChanged = YES;
+
+
+
+		/* ID of project's associated model
+
+		@property (nonatomic, strong) NSMutableDictionary *projectDeviceLibraries;  // Names, paths of local libraries #imported into device code
+		@property (nonatomic, strong) NSMutableDictionary *projectAgentLibraries;   // Names, paths of local libraries #imported into agent code
+		@property (nonatomic, strong) NSMutableDictionary *projectDeviceFiles;      // Names, paths of local files #imported into device code
+		@property (nonatomic, strong) NSMutableDictionary *projectAgentFiles;       // Names, paths of local files #imported into agent code
+
+		*/
+	}
 }
 
 

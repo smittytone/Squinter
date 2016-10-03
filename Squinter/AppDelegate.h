@@ -435,6 +435,12 @@
 - (void)checkElectricImpLibs;
 - (void)compareElectricImpLibs;
 
+// File Path Methods
+
+- (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
+- (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
+- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
+- (void)updateProject:(Project *)project;
 
 
 @end
