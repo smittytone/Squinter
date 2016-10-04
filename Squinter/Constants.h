@@ -12,8 +12,8 @@
 
 
 #define kOpenActionSquirrelProj		2
-#define kOpenActionNutFile				1
-#define kOpenActionNutFiles			0
+#define kOpenActionAddFiles			1
+#define kOpenActionNewFiles			0
 
 #define kMaxNumberOfOpenProjects		64
 

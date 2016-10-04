@@ -700,9 +700,9 @@
 
 		// User wants to view the auto-generated agent and device code files, so make sure they're generated
 
-		if (newProjectAccessoryViewFilesCheckbox.state == YES) saveProjectSubFilesFlag = YES;
+		if (newProjectAccessoryViewFilesCheckbox.state == NSOnState) saveProjectSubFilesFlag = YES;
 
-		if (newProjectAccessoryViewAssociateCheckbox.state == YES)
+		if (newProjectAccessoryViewAssociateCheckbox.state == NSOnState)
 		{
             // If the 'associate new project with current model' is checked
 
@@ -895,7 +895,9 @@
 
 - (IBAction)openProject:(id)sender
 {
-    // Set up an open panel to request a .squirrelproj file
+	// Locate and open an existing project file
+
+	// Set up an open panel to request a .squirrelproj file
     
     openDialog = [NSOpenPanel openPanel];
     openDialog.message = @"Select a Squirrel Project file...";
@@ -904,66 +906,85 @@
     
     // Set the panel's accessory view checkbox to OFF
     
-    accessoryViewCheckbox.state = NSOffState;
+    accessoryViewNewProjectCheckbox.state = NSOffState;
     
     // Hide the accessory view - though it's not shown, openFileHandler: checks its state
     
     openDialog.accessoryView = nil;
-    [self openFile:kOpenActionSquirrelProj];
+    [self presentOpenFilePanel:kOpenActionSquirrelProj];
 }
 
 
 
 - (IBAction)selectFile:(id)sender
 {
-    // Set up an open panel
+	// Called by 'Add Files to Project...' File menu item
+	// If no current project is selected, this should go into project create mode,
+	// ie. go to selectFileForProject:
+
+	if (currentProject == nil)
+	{
+		// There's no current project, so assume the user wants to create one
+
+		[self selectFileForProject:sender];
+		return;
+	}
+
+	// Set up an open panel
     
     openDialog = [NSOpenPanel openPanel];
-    openDialog.message = @"Select a Squirrel source code file...";
+    openDialog.message = @"Select a Squirrel source code files...";
     openDialog.allowedFileTypes = [NSArray arrayWithObjects:@"nut", nil];
     openDialog.allowsMultipleSelection = YES;
     
-    // Set the panel's accessory view checkbox to ON - ie. add file to a new project
+    // Set the panel's accessory view checkbox to OFF - ie. don't create a new project
     
-    accessoryViewCheckbox.state = NSOffState;
+    accessoryViewNewProjectCheckbox.state = NSOffState;
     
     // Add the accessory view to the panel
     
     openDialog.accessoryView = accessoryView;
 	if (sysVer.majorVersion >= 10 & sysVer.minorVersion >= 11) openDialog.accessoryViewDisclosed = YES;
-    [self openFile:kOpenActionNutFile];
+    [self presentOpenFilePanel:kOpenActionAddFiles];
 }
 
 
 
 - (IBAction)selectFileForProject:(id)sender
 {
-    // Set up an open panel
+	// Called by 'New Projec with Files...' File menu item OR
+	// via selectFile: when there is no current project
+
+	// Set up an open panel
     
     openDialog = [NSOpenPanel openPanel];
     openDialog.message = @"Select Agent and Device Squirrel source code files...";
     openDialog.allowedFileTypes = [NSArray arrayWithObjects:@"nut", nil];
     openDialog.allowsMultipleSelection = YES;
 
-	// Hide the accessory view - though it's not shown, we still check its checkbox state
+	// Set the accessory view new project checkbox to ON - ie. create a new project
+	// even though it won't be shown as we check this state later
 
-	accessoryViewCheckbox.state = NSOnState;
+	accessoryViewNewProjectCheckbox.state = NSOnState;
 
 	projectFromFilesAccessoryViewCheckbox.state = NSOnState;
     openDialog.accessoryView = projectFromFilesAccessoryView;
 	if (sysVer.majorVersion >= 10 & sysVer.minorVersion >= 11) openDialog.accessoryViewDisclosed = YES;
-    [self openFile:kOpenActionNutFiles];
+    [self presentOpenFilePanel:kOpenActionNewFiles];
 }
 
 
 
-- (void)openFile:(NSInteger)openActionType
+- (void)presentOpenFilePanel:(NSInteger)openActionType
 {
     // Complete the open file dialog settings with generic preferences
     
     openDialog.canChooseFiles = YES;
     openDialog.canChooseDirectories = NO;
 	openDialog.delegate = self;
+
+	// Start off at the working directory
+
 	openDialog.directoryURL = [NSURL fileURLWithPath:workingDirectory isDirectory:YES];
     
     // Run the NSOpenPanel
@@ -989,7 +1010,7 @@
 
 - (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType
 {
-	// This is where we open/add all files
+	// This is where we open/add all files selected by the open file dialog
 
 	Project *newProject;
 	NSString *projectName, *fileName, *filePath;
@@ -1247,8 +1268,7 @@
 	}
 	else
 	{
-		// We are opening other, non-project types of file
-		
+		// We are opening one or two source code files to add to a project, which may be new
 		// Check the number of files selected. If we are using source files to create a project, it should never be more than two
 		
 		if (urls.count > 2)
@@ -1258,23 +1278,30 @@
 			return NO;
 		}
 		
-		if (accessoryViewCheckbox.state == NSOnState)
+		if (accessoryViewNewProjectCheckbox.state == NSOnState)
 		{
-			// This will be set if either we have two source code files from which the user wants to make a project,
-			// or the user wants the one file opened to be used as the basis for a new project. So create a new project,
-			// make it current and add it to the array of open projects
+			// This will be set if we have one or two source code files from which the user wants to make a project.
+			// So create a new project and make it current
 			
 			currentProject = [[Project alloc] init];
-			// [projectArray addObject:currentProject];
+		}
+		else
+		{
+			if (currentProject == nil)
+			{
+				// We shouldn't be able to reach this point because we headed this off at the pass in selectFile:
+
+				return NO;
+			}
 		}
 		
 		// Clear 'foundLibs' and 'foundFiles' ahead of loading in new source code
-		
+
 		if (foundLibs != nil) foundLibs = nil;
 		if (foundFiles != nil) foundFiles = nil;
 		foundFiles = [[NSMutableArray alloc] init];
 		foundLibs = [[NSMutableArray alloc] init];
-		
+
 		// Get the current project name; this will be nil for a new project
 		
 		projectName = currentProject.projectName;
@@ -1306,23 +1333,7 @@
 					// The project name is nil, which means we created a new project earlier for this file and it has
 					// yet to be populated with data. Get the name by stripping 'device.nut' from the filename
 					
-					if (currentProject == nil)
-					{
-						// User is opening the file into no project, so make one anyway - user doesn't have to save it
-						
-						[self writeToLog:[NSString stringWithFormat:@"Opening file \"%@\" from “%@”.", projectName, filePath] :YES];
-						currentProject = [[Project alloc] init];
-						// [projectArray addObject:currentProject];
-					}
-					
 					projectName = [fileName stringByReplacingOccurrencesOfString:@".device.nut" withString:@""];
-					[self writeToLog:[NSString stringWithFormat:@"Creating project \"%@\" from \"%@\".", projectName, filePath] :YES];
-					
-					currentProject.projectName = projectName;
-					currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
-					
-					// BOOL success = [self addProjectMenuItem:projectName];
-
 					BOOL success = YES;
 
 					if (projectArray.count > 0)
@@ -1332,6 +1343,7 @@
 							if ([aProject.projectName compare:projectName] == NSOrderedSame)
 							{
 								success = NO;
+								break;
 							}
 						}
 					}
@@ -1342,19 +1354,13 @@
 						// TODO Should allow user to rename
 						
 						[self writeToLog:[NSString stringWithFormat:@"[ERROR] Project \"%@\" already loaded.", projectName] :YES];
-						
-						if (openActionType == kOpenActionNutFile)
-						{
-							// We're creating the project from this one file; we can't do so, so kill the new project object
-							
-							// [projectArray removeObject:currentProject];
-							currentProject = nil;
-						}
-						
 						return NO;
 					}
 					else
 					{
+						[self writeToLog:[NSString stringWithFormat:@"Creating project \"%@\" from \"%@\".", projectName, filePath] :YES];
+						currentProject.projectName = projectName;
+						currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
 						[projectArray addObject:currentProject];
 						[externalLibsMenu removeAllItems];
 					}
@@ -1377,22 +1383,7 @@
 						// The project name is nil, which means we created a new project earlier for this file and it has
 						// yet to be populated. Get the name by stripping 'agent.nut' from the filename
 						
-						if (currentProject == nil)
-						{
-							// User is opening the file into no project, so make one anyway - user doesn't have to save it
-							
-							[self writeToLog:[NSString stringWithFormat:@"Opening file \"%@\" from \"%@\".", projectName, filePath] :YES];
-							currentProject = [[Project alloc] init];
-							// [projectArray addObject:currentProject];
-						}
-						
 						projectName = [fileName stringByReplacingOccurrencesOfString:@".agent.nut" withString:@""];
-						currentProject.projectName = projectName;
-						
-						[self writeToLog:[NSString stringWithFormat:@"Creating project \"%@\" from file \"%@\".", projectName, fileName] :YES];
-						
-						// BOOL success = [self addProjectMenuItem:projectName];
-						
 						BOOL success = YES;
 
 						if (projectArray.count > 0)
@@ -1402,6 +1393,7 @@
 								if ([aProject.projectName compare:projectName] == NSOrderedSame)
 								{
 									success = NO;
+									break;
 								}
 							}
 						}
@@ -1409,23 +1401,16 @@
 						if (success == NO)
 						{
 							// The project's name is already on the Projects menu
-							
 							// Should allow user to rename [TODO]
 							
 							[self writeToLog:[NSString stringWithFormat:@"[ERROR] Project \"%@\" already loaded.", projectName] :YES];
-							
-							if (openActionType == kOpenActionNutFile)
-							{
-								// We're crearting the project from this one file; we can't do so, so kill the new project object
-								
-								[projectArray removeObject:currentProject];
-								currentProject = nil;
-							}
-							
 							return NO;
 						}
 						else
 						{
+							[self writeToLog:[NSString stringWithFormat:@"Creating project \"%@\" from file \"%@\".", projectName, fileName] :YES];
+							currentProject.projectName = projectName;
+							currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
 							[projectArray addObject:currentProject];
 							[externalLibsMenu removeAllItems];
 						}
@@ -1441,13 +1426,6 @@
 					{
 						[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
 
-						if (accessoryViewCheckbox.state == NSOnState)
-						{
-							// We created a project for this invalid file, so remove it
-							
-							[projectArray removeObject:currentProject];
-							currentProject = nil;
-						}
 					}
 					else
 					{
@@ -1456,20 +1434,12 @@
 						if (range.location != NSNotFound)
 						{
 							[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
-							
-							if (accessoryViewCheckbox.state == NSOnState)
-							{
-								// We created a project for this invalid file, so remove it
-								
-								[projectArray removeObject:currentProject];
-								currentProject = nil;
-							}
 						}
 						else
 						{
-							// Filename is not valid at all - but should never get here
+							// Filename doesn't indicate code type valid at all
 							
-							return NO;
+							[self writeToLog:[NSString stringWithFormat:@"[WARNING] It is unclear whether the file \"%@\" contains agent or device code.", fileName] :YES];
 						}
 					}
 				}
@@ -1500,29 +1470,86 @@
 				[self processSource:currentProject.projectAgentCodePath :kCodeTypeAgent :NO];
 			}
 		}
-	
+
+
+		// Did the loaded files fail to create a valid project even though the user wanted to create one?
+		// Doesn't matter: we will create an empty project in that case
+
+		if (currentProject.projectAgentCodePath == nil && currentProject.projectDeviceCodePath == nil)
+		{
+			// Project has no agent or device code references to clear the open menu item
+
+			[externalOpenMenuItem setEnabled:NO];
+
+			// Was this a new project? If so, we should add it to the array as an empty one
+
+			if (accessoryViewNewProjectCheckbox.state == NSOnState)
+			{
+				// If this is the case, 'currentProject' points to a new project that has no agent or device code refs, ie.
+				// it has no name and has yet to be added to 'projectArray' (only happens when device or agent code is detected)
+
+				// Set the name to 'Unititled xx'
+
+				NSUInteger count = 0;
+				if (projectArray.count > 0)
+				{
+					for (Project *aProject in projectArray)
+					{
+						NSRange uRange = [aProject.projectName rangeOfString:@"Untitled"];
+
+						if (uRange.location != NSNotFound)
+						{
+							// At least one project called 'Unititled'
+							++count;
+						}
+					}
+				}
+
+				if (count == 0)
+				{
+					currentProject.projectName = @"Untitled";
+				}
+				else
+				{
+					currentProject.projectName = [NSString stringWithFormat:@"Untitled %lu", (unsigned long)count];
+				}
+
+				// Set the project path
+
+				if (projectFromFilesAccessoryViewLocCheckbox.state == NSOnState)
+				{
+					currentProject.projectPath = workingDirectory;
+				}
+				else
+				{
+					currentProject.projectPath = [[[urls objectAtIndex:0] path] stringByDeletingLastPathComponent];
+				}
+
+				[projectArray addObject:currentProject];
+				[externalLibsMenu removeAllItems];
+			}
+		}
+
 		// Update libraries menu with updated list of libraries
-		
+
 		[self processLibraries];
 		[self updateLibraryMenu];
+		[self setProjectMenu];
+		[self setProjectLists];
 		[self updateFilesMenu];
 		[self setToolbar];
-		
-		if (currentProject == nil) return NO;
-		
+
 		// Did we change the current project at all? Signal if we did
-		
-        [saveLight setFull:!currentProject.projectHasChanged];
-        [saveLight setLight:YES];
-		
-		if (currentProject.projectAgentCodePath == nil && currentProject.projectDeviceCodePath == nil) [externalOpenMenuItem setEnabled:NO];
-		
-		// At this point, a new project should have a name and paths to device and/or agent code files.
-		// If loaded from a squirrelproj file, it should also have a path.
+
+		[saveLight setFull:!currentProject.projectHasChanged];
+		[saveLight setLight:YES];
+
+		// At this point, a new project should have a name, a path and (maybe) paths to device and/or agent code files.
+		// Though we may, of course, be adding files to an existing project, don't forget
 
 		// Finally, should we save the project?
 
-		if (openActionType == kOpenActionNutFiles)
+		if (openActionType == kOpenActionNewFiles)
 		{
 			if (projectFromFilesAccessoryViewCheckbox.state == NSOnState	)
 			{

@@ -18,7 +18,7 @@
                 <outlet property="aboutSheet" destination="lSs-4y-dIl" id="eWP-HA-lYN"/>
                 <outlet property="aboutVersionLabel" destination="CaW-Ui-WAP" id="OWh-sU-5mL"/>
                 <outlet property="accessoryView" destination="MJe-9N-Smk" id="06g-xh-CvS"/>
-                <outlet property="accessoryViewCheckbox" destination="dDn-6x-nru" id="1Xt-eM-6Md"/>
+                <outlet property="accessoryViewNewProjectCheckbox" destination="dDn-6x-nru" id="CEt-ye-R6g"/>
                 <outlet property="akTextField" destination="7MV-ww-bvq" id="qUA-Bh-QoE"/>
                 <outlet property="assignDeviceMenuDevices" destination="nh1-B0-bW0" id="c27-ei-VG6"/>
                 <outlet property="assignDeviceMenuModels" destination="UC3-wk-scu" id="9J3-Pd-YjQ"/>

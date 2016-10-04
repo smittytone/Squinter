@@ -129,7 +129,7 @@
     
     NSOpenPanel *openDialog;
     IBOutlet NSView *accessoryView;
-    IBOutlet NSButton *accessoryViewCheckbox;
+    IBOutlet NSButton *accessoryViewNewProjectCheckbox;
 
     IBOutlet NSButton *newProjectAccessoryViewFilesCheckbox;
     IBOutlet NSButton *newProjectAccessoryViewOpenCheckbox;
@@ -262,7 +262,7 @@
 - (IBAction)openProject:(id)sender;
 - (IBAction)selectFile:(id)sender;
 - (IBAction)selectFileForProject:(id)sender;
-- (void)openFile:(NSInteger)openActionType;
+- (void)presentOpenFilePanel:(NSInteger)openActionType;
 - (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
 
 // Save Project Methods
