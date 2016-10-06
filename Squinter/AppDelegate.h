@@ -153,6 +153,9 @@
     IBOutlet NSTextField *newProjectTextField;
     IBOutlet NSTextField *newProjectLabel;
     IBOutlet NSTextField *newProjectDirLabel;
+
+	IBOutlet NSPanel *renameProjectSheet;
+	IBOutlet NSTextField *renameProjectTextField;
     
     // About
     
@@ -191,7 +194,7 @@
     IBOutlet NSPopUpButton *renameMenu;
     IBOutlet NSTextField *renameName;
 
-    // Connection Variables
+	// Connection Variables
     
     BuildAPIAccess *ide;
     NSString *errorMessage;
@@ -263,7 +266,20 @@
 - (IBAction)selectFile:(id)sender;
 - (IBAction)selectFileForProject:(id)sender;
 - (void)presentOpenFilePanel:(NSInteger)openActionType;
+
 - (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
+- (void)processAddedFiles:(NSArray *)urls :(NSUInteger)count;
+- (void)processAddedDeviceFile:(NSString *)filePath;
+- (void)processAddedAgentFile:(NSString *)filePath;
+- (void)processAddedNewProject;
+- (void)processAddedNewProjectStageTwo;
+- (void)renameProject;
+- (IBAction)closeRenameProjectSheet:(id)sender;
+- (IBAction)saveRenameProjectSheet:(id)sender;
+
+- (BOOL)openSquirrelProject:(NSArray *)urls;
+- (BOOL)checkOpenProjects:(Project *)aProject;
+- (BOOL)checkFile:(NSString *)filePath;
 
 // Save Project Methods
 
