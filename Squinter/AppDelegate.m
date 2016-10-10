@@ -4008,22 +4008,17 @@
 
 - (IBAction)getProjectsFromServer:(id)sender
 {
-	// Calls ide method getInitialData: which acquires models *and* devices
-	// Ensure it zaps the selected model and device
+	// Handler that now simply calls getApps: in response to user action
 
 	[self getApps];
-	return;
 }
 
 
 
 - (void)getApps
 {
-    // currentDevice = -1;
-    // currentModel = -1;
-
-	// Make copies of the current device and model records (if they exists)
-	// We require copies because the ide arrays may be repopulated
+    // Make copies of the current device and model records (if we have current selections)
+	// We require copies because the ide arrays may be repopulated and we need to retain key data
 
 	if (currentDevice != -1) cDevice = [[ide.devices objectAtIndex:currentDevice] copy];
 	if (currentModel != -1) cModel = [[ide.models objectAtIndex:currentModel] copy];
@@ -4038,18 +4033,16 @@
 
 - (void)listModels
 {
-	
 	// This method should ONLY be called by the BuildAPI instance AFTER loading a list of models
+	// At this point we need to select or re-select a model, a device (maybe) and a project (maybe)
 
 	[modelsMenu removeAllItems];
 	
-	// currentModel = -1;
-	
 	if (ide.models.count == 0)
 	{
-		// No models in the list so warn and bail
+		// No models in the list, so warn and bail
 
-		[self writeToLog:@"[WARNING] There are no models listed on the server."  :YES];
+		[self writeToLog:@"[WARNING] There are no models listed on the server." :YES];
 		return;
 	}
 
@@ -4057,8 +4050,10 @@
 	{
 		// Run through the list of models (in the ide object) and add a menu item for each
 
-		NSString *title = [aModel valueForKey:@"name"];
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chooseModel:) keyEquivalent:@""];
+		NSString *mName = [aModel valueForKey:@"name"];
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:mName
+													  action:@selector(chooseModel:)
+											   keyEquivalent:@""];
 		[modelsMenu addItem:item];
 
 		if (newModelFlag == YES)
@@ -4068,9 +4063,10 @@
 
 			NSString *name = [aModel objectForKey:@"name"];
 
+			// TODO compare not the project name but project-model association
+
 			if ([name compare:currentProject.projectName] == NSOrderedSame)
 			{
-				
 				// Select the model in the menu (can't use chooseModel: as menu not built yet)
 
 				item.state = NSOnState;
@@ -4100,9 +4096,9 @@
 
 				if (cModel)
 				{
-					NSString *mName = [cModel objectForKey:@"name"];
+					NSString *prevName = [cModel objectForKey:@"name"];
 
-					if ([mName compare:title] == NSOrderedSame)
+					if ([prevName compare:mName] == NSOrderedSame)
 					{
 						// Select the model in the menu (can't use chooseModel: as menu not built yet)
 
@@ -4122,6 +4118,9 @@
 
 	if (checkModelsFlag)
 	{
+		// Just checking models? Return immediately to prevent the user being notified
+		// that devices are also being loaded
+
 		checkModelsFlag = NO;
 		return;
 	}
@@ -4143,8 +4142,9 @@
 	NSMenuItem *item = (NSMenuItem *)sender;
     NSInteger itemNumber = [modelsMenu indexOfItem:item];
 	NSInteger newModelIndex = -1;
-    
-    for (NSUInteger i = 0; i < modelsMenu.numberOfItems ; ++i)
+	BOOL autoSelectFlag = [[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autoselectdevice"];
+
+	for (NSUInteger i = 0; i < modelsMenu.numberOfItems ; ++i)
     {
         // Turn off all the menu items except the current one
         
@@ -4157,11 +4157,10 @@
 
             item.state = NSOnState;
 			newModelIndex = i;
-			NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-			
-			if ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"] && fromDeviceSelectFlag == NO)
+
+			if (autoSelectFlag == YES && fromDeviceSelectFlag == NO)
 			{
-				// Preference to auto-select model's first device (if it has one) so select it
+				// User's preference is to auto-select model's first device (if it has one)
 				
 				if ([item submenu] != nil)
 				{
@@ -4200,7 +4199,7 @@
 			// If we are NOT coming from device selection, and we have changed
 			// models, we must also de-select any previously selected device
 			
-			if (![[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autoselectdevice"])
+			if (autoSelectFlag == NO)
 			{
 				currentDevice = -1;
 				[self setDeviceMenu];
@@ -4749,6 +4748,10 @@
 	// The user has selected a device from a Models menu item’s sub-menu
     // or has selected a device by some other means, eg. switching projects
 	
+	[self setCurrentDeviceFromSelection:sender];
+
+	/*
+
 	if (streamFlag == YES)
 	{
 		// NOTE THIS SECTION SHOULD NOT BE RUN NOW WE HAVE MULTI-DEVICE STREAMING
@@ -4795,6 +4798,8 @@
 	{
 		[self setCurrentDeviceFromSelection:sender];
 	}
+	 
+	 */
 }
 
 
@@ -5488,17 +5493,19 @@
 
 - (IBAction)getLogs:(id)sender
 {
-    if (currentModel == -1 || currentDevice == -1)
+    if (currentDevice == -1)
     {
         [self writeToLog:@"[ERROR] You have not selected a device. Go to Models > Current Models to select a model and one of its devices." :YES];
         return;
     }
 
-    if (ide.models.count == 0)
+	/*
+	if (ide.models.count == 0)
     {
         [self writeToLog:@"[ERROR] You have no models in your account. You will need to create one before any device can be assigned to a model." :YES];
         return;
     }
+	 */
 
     if (ide.devices.count == 0)
     {
