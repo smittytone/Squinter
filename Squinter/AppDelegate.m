@@ -36,8 +36,7 @@
     noProjectsFlag = YES;
     noLibsFlag = YES;
 	saveProjectSubFilesFlag = NO;
-    selectDeviceFlag = NO;
-	unassignDeviceFlag = NO;
+    unassignDeviceFlag = NO;
 	requiresAllowedAnywhereFlag = NO;
 	checkModelsFlag = NO;
 	eiLibListData = nil;
@@ -197,9 +196,9 @@
 
     // Set up Key and Value arrays as template for Defaults
 
-    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", nil];
 
-    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], nil];
+    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], nil];
 
     // Drop the arrays into the Defauts
 
@@ -840,9 +839,7 @@
                     if ([modelCode compare:currentProject.projectModelID] == NSOrderedSame)
 					{
 						NSMenuItem *mitem = [modelsMenu itemAtIndex:j];
-                        selectDeviceFlag = YES;
-						[self chooseModel:mitem];
-                        selectDeviceFlag = NO;
+                        [self chooseModel:mitem];
 					}
 				}
 			}
@@ -1466,7 +1463,7 @@
 				// Set the newly opened project to be the current one
 
 				currentProject = newProject;
-				Float32 currentProjectVersion = currentProject.projectVersion.floatValue;
+				//Float32 currentProjectVersion = currentProject.projectVersion.floatValue;
 
 				[self writeToLog:[NSString stringWithFormat:@"Loading project \"%@\" from file \"%@\".", currentProject.projectName, filePath] :YES];
 
@@ -1586,9 +1583,7 @@
 						{
 							// Select the linked model
 
-							selectDeviceFlag = YES;
 							[self chooseModel:[modelsMenu itemAtIndex:count]];
-							selectDeviceFlag = NO;
 						}
 						else
 						{
@@ -3626,7 +3621,6 @@
 - (void)updateLibraryMenu
 {
     NSMenuItem *item;
-    NSArray *keyArray;
 	
     // Update the external library menu. First clear the current menu
     
@@ -3634,20 +3628,11 @@
 	
 	// Add agent libraries, if any
 
-    if (currentProject.projectAgentLibraries.count > 0)
-    {
-		keyArray = [currentProject.projectAgentLibraries allKeys];
-        [self libAdder:keyArray];
-
-    }
+    if (currentProject.projectAgentLibraries.count > 0) [self libAdder:[currentProject.projectAgentLibraries allKeys]];
 	
 	// Add device libraries, if any
     
-    if (currentProject.projectDeviceLibraries.count > 0)
-    {
-		keyArray = [currentProject.projectDeviceLibraries allKeys];
-        [self libAdder:keyArray];
-    }
+    if (currentProject.projectDeviceLibraries.count > 0) [self libAdder:[currentProject.projectDeviceLibraries allKeys]];
 
     // Add EI Libraries, if any
 
@@ -3682,7 +3667,7 @@
 		
 		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
 		[externalLibsMenu addItem:item];
-		[item setEnabled:NO];
+		item.enabled = NO;
 	}
     else
     {
@@ -3741,7 +3726,7 @@
             }
 
             [externalLibsMenu addItem:item];
-            [item setEnabled:NO];
+            item.enabled = YES;
         }
 
         NSString *libTitle = [self getLibraryTitle:[keyArray objectAtIndex:i]];
@@ -3774,27 +3759,17 @@
 
 - (void)updateFilesMenu
 {
-    NSArray *keyArray;
-
     // Update the external files menu. First clear the current menu
 
     if (externalFilesMenu.numberOfItems > 0) [externalFilesMenu removeAllItems];
 
     // Add agent linked files, if any
 
-    if (currentProject.projectAgentFiles.count > 0)
-    {
-        keyArray = [currentProject.projectAgentFiles allKeys];
-        [self fileAdder:keyArray];
-    }
+    if (currentProject.projectAgentFiles.count > 0) [self fileAdder:[currentProject.projectAgentFiles allKeys]];
 
     // Add device linked files, if any (Comments as above)
 
-    if (currentProject.projectDeviceFiles.count > 0)
-    {
-        keyArray = [currentProject.projectDeviceFiles allKeys];
-        [self fileAdder:keyArray];
-    }
+    if (currentProject.projectDeviceFiles.count > 0) [self fileAdder:[currentProject.projectDeviceFiles allKeys]];
 
 	// Tidy up the menu
 
@@ -3804,7 +3779,7 @@
 
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
         [externalFilesMenu addItem:item];
-        [item setEnabled:NO];
+        item.enabled = NO;
     }
     else
     {
@@ -3932,7 +3907,7 @@
 	[projectsPopUp addItemWithTitle:menuItemTitle];
 	NSUInteger index = [projectsPopUp indexOfItemWithTitle:menuItemTitle];
 	[projectsPopUp selectItemAtIndex:index];
-	if (projectsPopUp.enabled == NO) projectsPopUp.enabled = YES;
+	projectsPopUp.enabled = YES;
 
 	// Return success
 	
@@ -4043,7 +4018,21 @@
 		// No models in the list, so warn and bail
 
 		[self writeToLog:@"[WARNING] There are no models listed on the server." :YES];
-		return;
+
+		if (checkModelsFlag)
+		{
+			// We're only checking the models available, so bail
+
+			checkModelsFlag = NO;
+			return;
+		}
+		else
+		{
+			// There may be no models but there still might be devices
+
+			[self writeToLog:@"Acquiring list of devices..." :YES];
+			return;
+		}
 	}
 
 	for (NSDictionary *aModel in ide.models)
@@ -4059,13 +4048,12 @@
 		if (newModelFlag == YES)
 		{
 			// We are here after creating a new model successfully and getting a fresh list of models, 
-			// so we auto-select the new model
+			// so we auto-select the new model. Can only create a new model by creating a new project,
+			// and the names will match at this point (we don't yet have the model ID)
 
-			NSString *name = [aModel objectForKey:@"name"];
+			NSString *mName = [aModel objectForKey:@"name"];
 
-			// TODO compare not the project name but project-model association
-
-			if ([name compare:currentProject.projectName] == NSOrderedSame)
+			if ([mName compare:currentProject.projectName] == NSOrderedSame)
 			{
 				// Select the model in the menu (can't use chooseModel: as menu not built yet)
 
@@ -4080,9 +4068,9 @@
 			{
 				// If we have a project open, see if it is linked to one of the newly loaded models
 
-				NSString *modelID = [aModel objectForKey:@"id"];
+				NSString *mID = [aModel objectForKey:@"id"];
 
-				if ([modelID compare:currentProject.projectModelID] == NSOrderedSame)
+				if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
 				{
 					// Select the model in the menu (can't use chooseModel: as menu not built yet)
 
@@ -4114,7 +4102,7 @@
     [self updateMenus];
 	[self setToolbar];
 
-	if (newModelFlag == YES) newModelFlag = NO;
+	newModelFlag = NO;
 
 	if (checkModelsFlag)
 	{
@@ -4146,7 +4134,7 @@
 
 	for (NSUInteger i = 0; i < modelsMenu.numberOfItems ; ++i)
     {
-        // Turn off all the menu items except the current one
+        // Turn off all the menu items except the sender's
         
         item = [modelsMenu itemAtIndex:i];
         
@@ -4194,19 +4182,12 @@
 	
 	if (currentModel != newModelIndex)
 	{
-		if (fromDeviceSelectFlag == NO)
-		{
-			// If we are NOT coming from device selection, and we have changed
-			// models, we must also de-select any previously selected device
-			
-			if (autoSelectFlag == NO)
-			{
-				currentDevice = -1;
-				[self setDeviceMenu];
-			}
-		}
-		
 		currentModel = newModelIndex;
+
+		// If we are NOT coming from device selection, and we have changed
+		// models, we must also de-select any previously selected device
+
+		if (fromDeviceSelectFlag == NO && autoSelectFlag == NO) currentDevice = -1;
 	}
 
     [self updateMenus];
@@ -4241,7 +4222,7 @@
 
 - (void)modelToProjectStageTwo
 {
-    // This method is called by ToolsAPI ONLY
+    // This method is called by ToolsAPI ONLY in response to modelToProjectStageOne:
 	
 	if (showCodeFlag == YES)
     {
@@ -4440,32 +4421,36 @@
 
     NSMenuItem *aMenuItem = nil;
 
-    for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
-    {
-        aMenuItem = [modelsMenu itemAtIndex:i];
-
-		if (aMenuItem.submenu != nil)
+    if (modelsMenu.numberOfItems > 0)
+	{
+		for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
 		{
-			[aMenuItem.submenu removeAllItems];
-			aMenuItem.submenu = nil;
+			aMenuItem = [modelsMenu itemAtIndex:i];
+
+			if (aMenuItem.submenu != nil)
+			{
+				[aMenuItem.submenu removeAllItems];
+				aMenuItem.submenu = nil;
+			}
+		}
+
+		// Clear the unassigned section if there is one (we add it back if required; it may not be)
+
+		aMenuItem = [modelsMenu itemAtIndex:modelsMenu.numberOfItems - 1];
+
+		if ([aMenuItem.title compare:@"Unassigned"] == NSOrderedSame)
+		{
+			// There is an Unassigned entry (+ spacer if there are other models) so remove both
+
+			[modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
+			if (modelsMenu.numberOfItems > 0) [modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
 		}
 	}
-	
-	// Clear the unassigned section if there is one (we add it back if required; it may not be)
-
-    aMenuItem = [modelsMenu itemAtIndex:modelsMenu.numberOfItems - 1];
-
-    if ([aMenuItem.title compare:@"Unassigned"] == NSOrderedSame)
-    {
-        // There is an Unassigned entry (+ spacer) so remove both 
-
-        [modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
-        [modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
-    }
 
 	// Clear the devices list pop up
 
 	[devicesPopUp removeAllItems];
+	devicesPopUp.enabled = NO;
 
 	// Run through the current list of devices from the server and add them to the model menu submenus
 	// We store a fresh list of device names in 'deviceList'
@@ -4611,21 +4596,21 @@
 		}
 		else
 		{
-			// No devices, so add a 'None' item at the top
-			
+			// No saved device, so add a 'None' item and select it
+
 			[devicesPopUp addItemWithTitle:@"None"];
 			NSMenuItem *item = [devicesPopUp itemWithTitle:@"None"];
 			[devicesPopUp selectItemWithTitle:@"None"];
 			item.enabled = NO;
 		}
 	}
-
 	
 	// Sort the models menu's submenus
 	
 	for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
 	{
 		NSMenuItem *item = [modelsMenu itemAtIndex:i];
+
 		if (item.submenu != nil)
 		{
 			NSArray *items = item.submenu.itemArray;
@@ -4663,7 +4648,7 @@
 
 	if (reDeviceIndex == -1)
     {
-        // Reselect current model if there is one
+        // Reselect current device if there is one
 		
 		if (cDevice)
 		{
@@ -4706,10 +4691,6 @@
         if (item != refreshMenuItem) item.enabled = NO;
     }
 	
-	// Enable model menu items that require the presence of loaded devices
-
-    assignDeviceModelMenuItem.enabled = YES;
-
 	// Finally, did we 'rename' any unassigned devices? If so, actually rename them
 
 	if (autoRenameList.count > 0)
@@ -4748,92 +4729,31 @@
 	// The user has selected a device from a Models menu item’s sub-menu
     // or has selected a device by some other means, eg. switching projects
 	
-	[self setCurrentDeviceFromSelection:sender];
-
-	/*
-
-	if (streamFlag == YES)
-	{
-		// NOTE THIS SECTION SHOULD NOT BE RUN NOW WE HAVE MULTI-DEVICE STREAMING
-
-		if (currentDevice != -1)
-		{
-            NSDictionary *device = [ide.devices	objectAtIndex:currentDevice];
-
-            if (selectDeviceFlag == NO)
-            {
-				// Are we logging? If so warn the user
-                
-                NSAlert *ays = [[NSAlert alloc] init];
-                [ays addButtonWithTitle:@"No"];
-                [ays addButtonWithTitle:@"Yes"];
-                [ays setMessageText:[NSString stringWithFormat:@"You are currently logging from device \"%@\". Are you sure you want to proceed?", [device objectForKey:@"name"]]];
-                [ays setInformativeText:@"Selecting another device will stop device logging."];
-                [ays setAlertStyle:NSWarningAlertStyle];
-                [ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode){
-
-                    if (returnCode == 1001)
-                    {
-                        // User wants to continue with the change, so turn off streaming
-                        
-                        [self streamLogs:nil];
-                        [self setCurrentDeviceFromSelection:sender];
-                    }
-                }];
-            }
-            else
-            {
-                [self writeToLog:[NSString stringWithFormat:@"Reminder: you are currently logging from device \"%@\"", [device objectForKey:@"name"]] :YES];
-            }
-		}
-        else
-        {
-            // Don't have a current device, so shouldn't be streaming – turn it off
-
-            [self streamLogs:nil];
-            [self setCurrentDeviceFromSelection:sender];
-        }
-	}
-	else
-	{
-		[self setCurrentDeviceFromSelection:sender];
-	}
-	 
-	 */
-}
-
-
-
-- (void)setCurrentDeviceFromSelection:(id)sender
-{
 	// Sets currentDevice: based on (unique) name of device as presented by the menu
-	
+
 	NSMenuItem *item;
 	NSString *dName;
 	NSString *rawName;
-	
+
 	if (sender == devicesPopUp)
 	{
 		// Device selected from the popup rather than the menu
-		
+
 		item = devicesPopUp.selectedItem;
-		
-		if ([item.title compare:@"None"] == NSOrderedSame) 
+
+		if ([item.title compare:@"None"] == NSOrderedSame)
 		{
 			item.enabled = NO;
 			return;
 		}
-		
-		NSMenuItem *nitem = [devicesPopUp itemWithTitle:@"None"];
-		if (nitem != nil) [devicesPopUp removeItemWithTitle:@"None"];
 	}
 	else
 	{
 		item = (NSMenuItem *)sender;
 	}
-	
+
 	rawName = item.title;
-	
+
 	//dName = [rawName substringToIndex:item.title.length - kStatusIndicatorWidth];    // For offline bullet
 
 	// Extract the device name from the menu title
@@ -4845,42 +4765,42 @@
 	/*
 
 	 NSRange oRange = [rawName rangeOfString:kOfflineTag];
-	 
+
 	 if (oRange.location != NSNotFound)
-	{
+	 {
 		dName = [rawName substringToIndex:oRange.location];
-	}
-	else
-	{
+	 }
+	 else
+	 {
 		dName = rawName;
-	}
-	 
+	 }
+
 	 */
 
 	for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
 	{
 		// Get the device data from the devices list by name not index
-		
+
 		NSDictionary *dDict = [ide.devices objectAtIndex:i];
 		NSString *dString = [dDict objectForKey:@"name"];
-		
+
 		if ([dString compare:dName] == NSOrderedSame) currentDevice = i;
 	}
-	
+
 	// Update menus with new selection's name as necessary
-	
+
 	for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
 	{
 		NSMenuItem *model = [modelsMenu itemAtIndex:i];
-		
+
 		if (sender == devicesPopUp)
 		{
 			NSMenu *smenu = model.submenu;
-			
+
 			if (smenu != nil)
 			{
 				// Model has a submenu - see if it contains the selected device
-				
+
 				for (NSUInteger j = 0 ; j < smenu.numberOfItems ; ++j)
 				{
 					NSMenuItem *sdev = [smenu itemAtIndex:j];
@@ -4899,17 +4819,17 @@
 					{
 						sName = sdev.title;
 					}
-					
+
 					if ([sName compare:dName] == NSOrderedSame)
 					{
 						// We have a match so select the model, unless it's 'unassigned'
-						
+
 						if ([model.title compare:@"Unassigned"] != NSOrderedSame)
 						{
 							// Device’s assigned model can be selected so call chooseModel:
 							// to select the model to ensure menus are enabled. This will
 							// deselect all other device sub-menus but this one
-							
+
 							fromDeviceSelectFlag = YES;
 							[self chooseModel:model];
 							fromDeviceSelectFlag = NO;
@@ -4917,18 +4837,18 @@
 						else
 						{
 							// The device is unassigned, so don't select the model and clear the menu selection
-							
+
 							for (NSUInteger k = 0 ; k < modelsMenu.numberOfItems ; ++k)
 							{
 								NSMenuItem *aModel = [modelsMenu itemAtIndex:k];
 								aModel.state = NSOffState;
 							}
-							
+
 							currentModel = -1;
 						}
-						
+
 						// Select the device itself
-						
+
 						sdev.state = NSOnState;
 					}
 				}
@@ -4939,7 +4859,7 @@
 			if (model == item.parentItem)
 			{
 				// Select the device in its models menu submenu...
-				
+
 				if (model.submenu != nil)
 				{
 					for (NSUInteger j = 0 ; j < model.submenu.numberOfItems ; ++j)
@@ -4948,25 +4868,25 @@
 						sitem.state = NSOffState;
 					}
 				}
-				
+
 				item.state = NSOnState;
-				
+
 				// ...and in the devices popup
-				
+
 				[devicesPopUp selectItemWithTitle:rawName];
-				
+
 				// Is the device in the Unassigned section?
-				
+
 				if ([model.title compare:@"Unassigned"] == NSOrderedSame)
 				{
 					// The device is unassigned, so don't select the model and clear the menu selection
-					
+
 					for (NSUInteger j = 0 ; j < modelsMenu.numberOfItems ; ++j)
 					{
 						NSMenuItem *aModel = [modelsMenu itemAtIndex:j];
 						aModel.state = NSOffState;
 					}
-					
+
 					currentModel = -1;
 				}
 				else
@@ -4974,7 +4894,7 @@
 					// Device’s assigned model can be selected so call chooseModel:
 					// to select the model to ensure menus are enabled. This will
 					// deselect all other device sub-menus but this one
-					
+
 					fromDeviceSelectFlag = YES;
 					[self chooseModel:model];
 					fromDeviceSelectFlag = NO;
@@ -4995,8 +4915,13 @@
 		[streamLogsItem validate];
 	}
 
+	// Remove the 'None' item from the devices popup on the first device selection
+
+	NSMenuItem *nitem = [devicesPopUp itemWithTitle:@"None"];
+	if (nitem != nil) [devicesPopUp removeItemWithTitle:@"None"];
+
 	// Update Menus etc
-	
+
 	[self setDeviceMenu];
 	[self updateMenus];
 	[self setToolbar];
@@ -7007,10 +6932,10 @@
 {
     // Single point to run all the menu-setting methods
 	
+	[self setProjectMenu];
+	[self setModelsMenu];
 	[self setDeviceMenu];
-    [self setModelsMenu];
-    [self setProjectMenu];
-    [self setViewMenu];
+	[self setViewMenu];
 }
 
 
@@ -7145,7 +7070,6 @@
         }
 
 		// Enable or disable items that also require models with devices
-
 
 		NSMutableDictionary *aModel = [ide.models objectAtIndex:currentModel];
 		NSArray *mDevs = [aModel objectForKey:@"devices"];
