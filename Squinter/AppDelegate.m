@@ -196,9 +196,9 @@
 
     // Set up Key and Value arrays as template for Defaults
 
-    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", @"com.bps.squinter.displaypath", nil];
 
-    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], nil];
+    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithInteger:1], nil];
 
     // Drop the arrays into the Defauts
 
@@ -1218,28 +1218,44 @@
 
 - (void)processAddedDeviceFile:(NSString *)filePath
 {
-	currentProject.projectDeviceCodePath = filePath;
+	if (currentProject.projectVersion.floatValue > 2.0)
+	{
+		currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
+	}
+	else
+	{
+		currentProject.projectDeviceCodePath = filePath;
+	}
+
 	currentProject.projectHasChanged = YES;
 	externalOpenMenuItem.enabled = YES;
 	externalOpenDeviceItem.enabled = YES;
 	externalOpenBothItem.enabled = YES;
 	squintMenuItem.enabled = YES;
 	[fileWatchQueue addPath:filePath];
-	[self processSource:currentProject.projectDeviceCodePath :kCodeTypeDevice :NO];
+	[self processSource:filePath :kCodeTypeDevice :NO];
 }
 
 
 
 - (void)processAddedAgentFile:(NSString *)filePath
 {
-	currentProject.projectAgentCodePath = filePath;
+	if (currentProject.projectVersion.floatValue > 2.0)
+	{
+		currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
+	}
+	else
+	{
+		currentProject.projectAgentCodePath = filePath;
+	}
+
 	currentProject.projectHasChanged = YES;
 	externalOpenMenuItem.enabled = YES;
 	externalOpenAgentItem.enabled = YES;
 	externalOpenBothItem.enabled = YES;
 	squintMenuItem.enabled = YES;
 	[fileWatchQueue addPath:filePath];
-	[self processSource:currentProject.projectAgentCodePath :kCodeTypeAgent :NO];
+	[self processSource:filePath :kCodeTypeAgent :NO];
 }
 
 
@@ -1443,6 +1459,7 @@
 
 	Project *newProject;
 	NSString *fileName, *filePath;
+	NSString *currentAgentPath, *currentDevicePath;
 	BOOL gotFlag = NO;
 
 	for (NSUInteger i = 0 ; i < urls.count ; ++i)
@@ -1463,7 +1480,7 @@
 				// Set the newly opened project to be the current one
 
 				currentProject = newProject;
-				//Float32 currentProjectVersion = currentProject.projectVersion.floatValue;
+				Float32 currentProjectVersion = currentProject.projectVersion.floatValue;
 
 				[self writeToLog:[NSString stringWithFormat:@"Loading project \"%@\" from file \"%@\".", currentProject.projectName, filePath] :YES];
 
@@ -1479,11 +1496,22 @@
 					[fileWatchQueue setDelegate:self];
 				}
 
-				if (currentProject.projectAgentCodePath != nil)
+				if (currentProjectVersion > 2.0)
+				{
+					currentAgentPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
+					currentDevicePath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
+				}
+				else
+				{
+					if (currentProject.projectAgentCodePath != nil) currentAgentPath = currentProject.projectAgentCodePath;
+					if (currentProject.projectDeviceCodePath != nil) currentDevicePath = currentProject.projectDeviceCodePath;
+				}
+
+				if (currentAgentPath != nil)
 				{
 					// Does the project's recorded agent code path point to a real file?
 
-					if ([self checkFile:currentProject.projectAgentCodePath] == YES)
+					if ([self checkFile:currentAgentPath] == YES)
 					{
 						// It does and the pointer indicates an extant file
 
@@ -1495,14 +1523,14 @@
 					{
 						// There is no file where the pointer is indicating, so see if it's in the working directory
 
-						NSString *path = [currentProject.projectAgentCodePath lastPathComponent];
+						NSString *path = [currentAgentPath lastPathComponent];
 						path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
 
 						if ([self checkFile:path] == YES)
 						{
 							// File is in the working directory, so update the saved path
 
-							currentProject.projectAgentCodePath = path;
+							currentAgentPath = path;
 							externalOpenMenuItem.enabled = YES;
 							externalOpenAgentItem.enabled = YES;
 							externalOpenBothItem.enabled = YES;
@@ -1512,7 +1540,7 @@
 						{
 							// Can't see the agent code file in the working directory so clear the pointer and warn the user
 
-							currentProject.projectAgentCodePath = nil;
+							currentAgentPath = nil;
 							[self writeToLog:@"[WARNING] The project’s agent code file has been moved to an unknown location. You will need to add it back to the project." :YES];
 						}
 
@@ -1520,11 +1548,11 @@
 					}
 				}
 
-				if (currentProject.projectDeviceCodePath != nil)
+				if (currentDevicePath != nil)
 				{
 					// As above per the agent code file, this time for the device code file
 
-					if ([self checkFile:currentProject.projectDeviceCodePath] == YES)
+					if ([self checkFile:currentDevicePath] == YES)
 					{
 						externalOpenMenuItem.enabled = YES;
 						externalOpenDeviceItem.enabled = YES;
@@ -1532,12 +1560,12 @@
 					}
 					else
 					{
-						NSString *path = [currentProject.projectDeviceCodePath lastPathComponent];
+						NSString *path = [currentDevicePath lastPathComponent];
 						path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
 
 						if ([self checkFile:path] == YES)
 						{
-							currentProject.projectDeviceCodePath = path;
+							currentDevicePath = path;
 							externalOpenMenuItem.enabled = YES;
 							externalOpenDeviceItem.enabled = YES;
 							externalOpenBothItem.enabled = YES;
@@ -1545,12 +1573,23 @@
 						}
 						else
 						{
-							currentProject.projectDeviceCodePath = nil;
+							currentDevicePath = nil;
 							[self writeToLog:@"[WARNING] The project’s device code file has been moved to an unknown location. You will need to add it back to the project." :YES];
 						}
 
 						currentProject.projectHasChanged = YES;
 					}
+				}
+
+				if (currentProjectVersion > 2.0)
+				{
+					currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :currentAgentPath];
+					currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :currentDevicePath];
+				}
+				else
+				{
+					currentProject.projectAgentCodePath = currentAgentPath;
+					currentProject.projectDeviceCodePath = currentDevicePath;
 				}
 
 				// Do we need to autocompile the project we have opened?
@@ -1733,11 +1772,11 @@
 	// Save the savingProject project. This may be a newly created project and may not currentProject
 	
 	BOOL success = NO;
-	
+	Float32 version = savingProject.projectVersion.floatValue;
 	NSFileManager *fm = [NSFileManager defaultManager];
     NSString *savePath = [saveDirectory path];
 	NSString *oldName = savingProject.projectName;
-	
+
 	if (newFileName == nil) newFileName = savingProject.projectName;
 	
 	NSRange range = [newFileName rangeOfString:@".squirrelproj"];
@@ -1748,7 +1787,7 @@
 	
 	range = [newFileName rangeOfString:@".squirrelproj"];
 	savingProject.projectName = [newFileName substringToIndex:range.location];
-	
+
 	// Set the agent and device code paths. We need to do this here because they are saved with the project file
 	
 	if (saveProjectSubFilesFlag == YES)
@@ -1756,13 +1795,21 @@
         // 'saveProjectSubFilesFlag' is set by newProject: if the user has selected the option to create
         // agent and device code files automatically
 
-        NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
-		NSString *aPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", aFileName];
-		savingProject.projectAgentCodePath = aPathName;
-		
+		NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
 		NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
+		NSString *aPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", aFileName];
 		NSString *dPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", dFileName];
-		savingProject.projectDeviceCodePath = dPathName;
+
+		if (version > 2.0)
+		{
+			savingProject.projectAgentCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :aPathName];
+			savingProject.projectDeviceCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :dPathName];
+		}
+		else
+		{
+			savingProject.projectAgentCodePath = aPathName;
+			savingProject.projectDeviceCodePath = dPathName;
+		}
 	}
 
     if ([fm fileExistsAtPath:savePath])
@@ -1799,10 +1846,10 @@
 	if (success == YES)
 	{
 		// The new file was successfully written
-		
+
 		savingProject.projectPath = [savePath stringByDeletingLastPathComponent];
 
-		if (savingProject.projectVersion.floatValue > 2.0)
+		if (version > 2.0)
 		{
 			savingProject.oldProjectPath = savingProject.projectPath;
 		}
@@ -1832,11 +1879,6 @@
 			// We are saving a new project or one derived from a model, so we
 			// need to write out the agent.nut and device.nut files too
 			
-			// NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
-			// NSString *aPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", aFileName];
-			// NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
-			// NSString *dPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", dFileName];
-			
 			NSString *dataString = nil;
 			
 			if (savingProject.projectAgentCode.length == 0)
@@ -1849,8 +1891,18 @@
 			}
 			
 			NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL aSuccess = [fm createFileAtPath:savingProject.projectAgentCodePath contents:data attributes:nil];
-			
+			BOOL aSuccess = NO;
+
+			if (version > 2.0)
+			{
+				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectAgentCodePath];
+				aSuccess = [fm createFileAtPath:path contents:data attributes:nil];
+			}
+			else
+			{
+				aSuccess = [fm createFileAtPath:savingProject.projectAgentCodePath contents:data attributes:nil];
+			}
+
 			if (savingProject.projectDeviceCode.length == 0)
 			{
 				dataString = @"// Device Code\n\n";
@@ -1861,7 +1913,17 @@
 			}
 			
 			data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL dSuccess = [fm createFileAtPath:savingProject.projectDeviceCodePath contents:data attributes:nil];
+			BOOL dSuccess = NO;
+
+			if (version > 2.0)
+			{
+				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectDeviceCodePath];
+				dSuccess = [fm createFileAtPath:path contents:data attributes:nil];
+			}
+			else
+			{
+				dSuccess = [fm createFileAtPath:savingProject.projectDeviceCodePath contents:data attributes:nil];
+			}
 			
 			if (aSuccess == NO)
 			{
@@ -1878,11 +1940,6 @@
                     externalOpenBothItem.enabled = YES;
                     externalOpenAgentItem.enabled = YES;
                 }
-
-				if (savingProject.projectVersion.floatValue > 2.0)
-				{
-					savingProject.projectAgentCode = [self getRelativeFilePath:savingProject.projectPath :savingProject.projectAgentCode];
-				}
 			}
 			
 			if (dSuccess == NO)
@@ -1898,11 +1955,6 @@
                     externalOpenBothItem.enabled = YES;
                     externalOpenDeviceItem.enabled = YES;
                 }
-
-				if (savingProject.projectVersion.floatValue > 2.0)
-				{
-					savingProject.projectDeviceCode = [self getRelativeFilePath:savingProject.projectPath :savingProject.projectDeviceCode];
-				}
 			}
 			
 			// If the 'open files' checkbox is ticked, open the files we've just created
@@ -2122,7 +2174,6 @@
     // lists of recorded libraries and files, and compiles the code into an upload-ready form (code stored in 
 	// current project's 'projectAgentCode' and 'projectDeviceCode' properties
 
-	
     // If we have no currently selected project, bail
 
     if (currentProject == nil)
@@ -2148,7 +2199,7 @@
 
     BOOL agentDoneFlag = NO;
 	BOOL deviceDoneFlag = NO;
-	NSString *output;
+	NSString *output, *aPath, *dPath;
 	
     [self writeToLog:[NSString stringWithFormat:@"Processing project \"%@\"...", currentProject.projectName] :YES];
 
@@ -2156,63 +2207,67 @@
 
 	if (currentProject.projectVersion.floatValue > 2.0)
 	{
-		if (currentProject.oldProjectPath != nil)
-		{
-
-
-		}
+		aPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
+		dPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
 	}
 	else
 	{
-		if (currentProject.projectAgentCodePath != nil)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", currentProject.projectAgentCodePath.lastPathComponent] :YES];
-			output = [self processSource:currentProject.projectAgentCodePath :kCodeTypeAgent :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			output = [self processDefines:output :kCodeTypeAgent];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			currentProject.projectAgentCode = output;
-			agentDoneFlag = YES;
-		}
+		aPath = currentProject.projectAgentCodePath;
+		dPath = currentProject.projectDeviceCodePath;
+	}
 
-		if (currentProject.projectDeviceCodePath != nil)
+	if (aPath != nil)
+	{
+		[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", aPath.lastPathComponent] :YES];
+		output = [self processSource:aPath :kCodeTypeAgent :YES];
+
+		if (output == nil)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", currentProject.projectDeviceCodePath.lastPathComponent] :YES];
-			output = [self processSource:currentProject.projectDeviceCodePath :kCodeTypeDevice :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			output = [self processDefines:output :kCodeTypeDevice];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			currentProject.projectDeviceCode = output;
-			deviceDoneFlag = YES;
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
 		}
+		
+		output = [self processDefines:output :kCodeTypeAgent];
+
+		if (output == nil)
+		{
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
+		}
+		
+		currentProject.projectAgentCode = output;
+		agentDoneFlag = YES;
+	}
+
+	if (dPath != nil)
+	{
+		[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", dPath.lastPathComponent] :YES];
+		output = [self processSource:dPath :kCodeTypeDevice :YES];
+
+		if (output == nil)
+		{
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
+		}
+		
+		output = [self processDefines:output :kCodeTypeDevice];
+
+		if (output == nil)
+		{
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
+		}
+		
+		currentProject.projectDeviceCode = output;
+		deviceDoneFlag = YES;
 	}
 
 	if (agentDoneFlag || deviceDoneFlag)
@@ -2222,10 +2277,8 @@
 		externalOpenMenuItem.enabled = YES;
 		externalOpenDeviceItem.enabled = YES;
 		externalOpenBothItem.enabled = YES;
-
 		logDeviceCodeMenuItem.enabled = deviceDoneFlag;
 		logAgentCodeMenuItem.enabled = agentDoneFlag;
-
 	}
 	
 	// Sort out the libraries and files found in this compilation
@@ -5836,7 +5889,9 @@
 	
     NSArray *array;
     NSString *string = nil;
-	
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+
     [self writeToLog:@"------------------------------------------------------------------------------------" :YES];
 
 	if (ide.models != nil && ide.models.count > 0)
@@ -5864,10 +5919,26 @@
 	}
 	else
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Project directory: %@", currentProject.projectPath] :YES];
+		[self writeToLog:[NSString stringWithFormat:@"Project location: %@/%@.squirrelproj", currentProject.projectPath, currentProject.projectName] :YES];
 	}
 
-	[self writeToLog:[NSString stringWithFormat:@"Current working directory: %@", workingDirectory] :YES];
+	NSString *rString;
+	if (index == 0)
+	{
+		rString = @"absolute paths";
+	}
+	else if (index == 1)
+	{
+		rString = @"relative to the project file (above)";
+	}
+	else
+	{
+		rString = @"relative to your home directory";
+	}
+
+	[self writeToLog:[NSString stringWithFormat:@"The following file locations are %@", rString] :YES];
+
+	// [self writeToLog:[NSString stringWithFormat:@"Current working directory: %@", workingDirectory] :YES];
     [self writeToLog:@" " :YES];
 
     if (currentProject.projectAgentCodePath != nil)
@@ -5884,7 +5955,8 @@
         }
         
         [self writeToLog:string :YES];
-        [self writeToLog:[NSString stringWithFormat:@"Agent code path: %@", currentProject.projectAgentCodePath] :YES];
+
+		[self writeToLog:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectAgentCodePath]] :YES];
 
         if (currentProject.projectAgentLibraries.count == 0)
         {
@@ -5904,11 +5976,9 @@
             array = [currentProject.projectAgentLibraries allValues];
             for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
             }
         }
-
-        //[self writeToLog:@" " :YES];
 
         if (currentProject.projectAgentFiles.count == 0)
         {
@@ -5928,7 +5998,7 @@
             array = [currentProject.projectAgentFiles allValues];
             for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
             }
         }
 
@@ -5954,7 +6024,8 @@
 		}
 
 		[self writeToLog:string :YES];
-        [self writeToLog:[NSString stringWithFormat:@"Device Code path: %@", currentProject.projectDeviceCodePath] :YES];
+
+		[self writeToLog:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectDeviceCodePath]] :YES];
 
         if (currentProject.projectDeviceLibraries.count == 0)
         {
@@ -5974,7 +6045,7 @@
             array = [currentProject.projectDeviceLibraries allValues];
             for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
             }
         }
 
@@ -5998,7 +6069,7 @@
             array = [currentProject.projectDeviceFiles allValues];
             for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
             }
         }
 
@@ -6032,6 +6103,33 @@
     }
 	
 	[self writeToLog:@"------------------------------------------------------------------------------------" :YES];
+}
+
+
+
+- (NSString *)getDisplayPath:(NSString *)path
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+	Float32 version = currentProject.projectVersion.floatValue;
+
+	if (version > 2.0)
+	{
+		if (index == 0) path = [self getAbsolutePath:currentProject.projectPath :path];
+
+		if (index == 2)
+		{
+			path = [self getAbsolutePath:currentProject.projectPath :path];
+			path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :path];
+		}
+	}
+	else
+	{
+		if (index == 2) path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :path];
+		if (index == 1) path = [self getRelativeFilePath:currentProject.projectPath :path];
+	}
+
+	return path;
 }
 
 
@@ -6368,12 +6466,32 @@
     
     if (sender == externalOpenDeviceItem || sender == externalOpenMenuItem || sender == viewDeviceCode)
     {
-        if (currentProject.projectDeviceCodePath) [workspace openFile:currentProject.projectDeviceCodePath];
+        if (currentProject.projectDeviceCodePath)
+		{
+			if (currentProject.projectVersion.floatValue > 2.0)
+			{
+				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
+			}
+			else
+			{
+				[workspace openFile:currentProject.projectDeviceCodePath];
+			}
+		}
     }
     
     if (sender == externalOpenAgentItem || sender == externalOpenMenuItem || sender == viewAgentCode)
     {
-        if (currentProject.projectAgentCodePath) [workspace openFile:currentProject.projectAgentCodePath];
+        if (currentProject.projectAgentCodePath)
+		{
+			if (currentProject.projectVersion.floatValue > 2.0)
+			{
+				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
+			}
+			else
+			{
+				[workspace openFile:currentProject.projectAgentCodePath];
+			}
+		}
     }
 }
 
@@ -6493,7 +6611,13 @@
 
 	if (currentProject.projectVersion.floatValue > 2.0)
 	{
+		if (currentProject.projectDeviceCodePath) [workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
 
+		// Add a delay, or the second open is somehow missed out
+
+		[NSThread sleepForTimeInterval:0.2];
+
+		if (currentProject.projectAgentCodePath) [workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
 	}
 	else
 	{
@@ -6504,12 +6628,12 @@
 		[NSThread sleepForTimeInterval:0.2];
 
 		if (currentProject.projectAgentCodePath) [workspace openFile:currentProject.projectAgentCodePath withApplication:nil andDeactivate:NO];
+	}
 
-		if (sender != externalOpenBothItem)
-		{
-			[self externalLibOpen:externalOpenLibItem];
-			[self externalFileOpen:externalOpenFileItem];
-		}
+	if (sender != externalOpenBothItem)
+	{
+		[self externalLibOpen:externalOpenLibItem];
+		[self externalFileOpen:externalOpenFileItem];
 	}
 }
 
@@ -6623,6 +6747,10 @@
 	{
 		boldTestCheckbox.state = NSOffState;
 	}
+
+	// Set location menu
+
+	[locationMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue]];
 
     // Show the sheet
 
@@ -6775,7 +6903,9 @@
     [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
 
-    // Close the sheet
+	[defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
+
+	// Close the sheet
 
     [_window endSheet:preferencesSheet];
 }

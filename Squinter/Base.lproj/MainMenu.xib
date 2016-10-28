@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
         <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -65,6 +66,7 @@
                 <outlet property="infoItem" destination="5z3-es-brQ" id="1Fd-Wj-L65"/>
                 <outlet property="linkMenuItem" destination="Hw6-Uq-Uet" id="Rlb-Pc-u5d"/>
                 <outlet property="loadModelsCheckbox" destination="rcb-N4-0Pa" id="kfq-5d-MR1"/>
+                <outlet property="locationMenu" destination="vma-F5-cck" id="mmI-uY-ysD"/>
                 <outlet property="logAgentCodeMenuItem" destination="eJA-O9-0JO" id="gt6-fs-Nry"/>
                 <outlet property="logClipView" destination="yDW-Oe-C7r" id="cUH-6X-KbY"/>
                 <outlet property="logDeviceCodeMenuItem" destination="dvm-h5-7wW" id="6OE-kV-MwD"/>
@@ -728,7 +730,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="900" height="540"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <value key="minSize" type="size" width="900" height="200"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="900" height="540"/>
@@ -975,7 +977,7 @@
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="432" height="284"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <value key="minSize" type="size" width="432" height="284"/>
             <value key="maxSize" type="size" width="432" height="284"/>
             <view key="contentView" id="nog-1L-n3G">
@@ -1164,7 +1166,7 @@ DQ
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="612" height="397"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="D0u-hz-bfS">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="397"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1287,7 +1289,7 @@ DQ
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="512" height="99"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="5zF-NP-iig">
                 <rect key="frame" x="0.0" y="0.0" width="512" height="99"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1370,7 +1372,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="466"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="s7S-r6-RD9">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="466"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1591,12 +1593,12 @@ Gw
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="102" id="Qql-mh-8Pe"/>
                                             </constraints>
-                                            <popUpButtonCell key="cell" type="push" title="9" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="qB1-Bd-bs0">
+                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="qB1-Bd-bs0">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="menu"/>
                                                 <menu key="menu" id="a0r-FK-kCr">
                                                     <items>
-                                                        <menuItem title="9" state="on" id="tta-eW-r4c">
+                                                        <menuItem title="9" id="tta-eW-r4c">
                                                             <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                         </menuItem>
                                                         <menuItem title="10" id="UuL-ui-iaR"/>
@@ -1620,9 +1622,9 @@ Gw
                                             </popUpButtonCell>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hPz-sZ-S8C">
-                                            <rect key="frame" x="15" y="313" width="186" height="16"/>
+                                            <rect key="frame" x="15" y="313" width="186" height="17"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="182" id="74l-2U-puC"/>
+                                                <constraint firstAttribute="width" constant="182" id="9bz-lg-IMm"/>
                                             </constraints>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Log Text Colour:" id="e1V-fv-JHD">
                                                 <font key="font" metaFont="system"/>
@@ -1673,35 +1675,69 @@ Gw
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jW9-Cx-8Sh">
+                                            <rect key="frame" x="15" y="191" width="238" height="17"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="17" id="z4k-YQ-2Vc"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Display file locations" id="aG4-BK-For">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vma-F5-cck">
+                                            <rect key="frame" x="257" y="186" width="295" height="26"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="290" id="Ehw-WS-9jJ"/>
+                                            </constraints>
+                                            <popUpButtonCell key="cell" type="push" title="Absolute Path" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="wFO-k1-eeb" id="mla-qu-pfB">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" id="d6o-dG-91w">
+                                                    <items>
+                                                        <menuItem title="Absolute Path" state="on" id="wFO-k1-eeb">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Path Relative to Project" id="Iz5-RE-C8V"/>
+                                                        <menuItem title="Path Relative to Home" id="eWf-A8-8Xp"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                        </popUpButton>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="mp1-IV-KMg" firstAttribute="leading" secondItem="d4R-1w-VNe" secondAttribute="trailing" constant="8" symbolic="YES" id="5IW-Yb-lkz"/>
                                         <constraint firstItem="0Uf-yP-hej" firstAttribute="leading" secondItem="wRn-QZ-S9O" secondAttribute="leading" id="6vq-KJ-fWT"/>
                                         <constraint firstItem="ffQ-DA-y1D" firstAttribute="baseline" secondItem="uGC-jy-Emm" secondAttribute="firstBaseline" id="9xp-ya-d65"/>
+                                        <constraint firstItem="hPz-sZ-S8C" firstAttribute="top" secondItem="mp1-IV-KMg" secondAttribute="top" id="B06-LG-5a0"/>
+                                        <constraint firstItem="hPz-sZ-S8C" firstAttribute="centerY" secondItem="0Uf-yP-hej" secondAttribute="centerY" id="BWt-cE-10g"/>
+                                        <constraint firstItem="jW9-Cx-8Sh" firstAttribute="leading" secondItem="NBx-iW-M9L" secondAttribute="leading" constant="17" id="C1n-GS-CHz"/>
                                         <constraint firstItem="pAc-bH-SEg" firstAttribute="top" secondItem="ffQ-DA-y1D" secondAttribute="bottom" constant="8" id="Chf-62-tsF"/>
                                         <constraint firstItem="mp1-IV-KMg" firstAttribute="trailing" secondItem="pAc-bH-SEg" secondAttribute="trailing" id="Ddj-ZE-CfW"/>
                                         <constraint firstItem="d4R-1w-VNe" firstAttribute="leading" secondItem="0Uf-yP-hej" secondAttribute="trailing" constant="31" id="E78-n2-QrK"/>
                                         <constraint firstItem="d4R-1w-VNe" firstAttribute="leading" secondItem="qU3-x5-sno" secondAttribute="leading" id="Jnp-QV-xtr"/>
-                                        <constraint firstItem="hPz-sZ-S8C" firstAttribute="centerY" secondItem="0Uf-yP-hej" secondAttribute="centerY" id="Kel-lH-OaK"/>
+                                        <constraint firstItem="vma-F5-cck" firstAttribute="centerY" secondItem="jW9-Cx-8Sh" secondAttribute="centerY" id="KLf-db-Nxj"/>
                                         <constraint firstItem="ffQ-DA-y1D" firstAttribute="leading" secondItem="pAc-bH-SEg" secondAttribute="leading" id="LrQ-9N-L9P"/>
-                                        <constraint firstItem="uGC-jy-Emm" firstAttribute="top" secondItem="hPz-sZ-S8C" secondAttribute="bottom" constant="11" id="NFE-bR-e0T"/>
                                         <constraint firstItem="wRn-QZ-S9O" firstAttribute="top" secondItem="0Uf-yP-hej" secondAttribute="bottom" constant="5" id="NQO-Pb-Zb1"/>
-                                        <constraint firstItem="0Uf-yP-hej" firstAttribute="leading" secondItem="hPz-sZ-S8C" secondAttribute="trailing" constant="8" symbolic="YES" id="Ojg-Hl-qu1"/>
+                                        <constraint firstItem="jW9-Cx-8Sh" firstAttribute="top" secondItem="wRn-QZ-S9O" secondAttribute="bottom" constant="74" id="RBB-Sd-W8s"/>
+                                        <constraint firstItem="hPz-sZ-S8C" firstAttribute="leading" secondItem="uGC-jy-Emm" secondAttribute="leading" id="Tcr-Mh-xsA"/>
                                         <constraint firstItem="d4R-1w-VNe" firstAttribute="centerY" secondItem="mp1-IV-KMg" secondAttribute="centerY" id="WqQ-7f-Lsl"/>
+                                        <constraint firstItem="hPz-sZ-S8C" firstAttribute="leading" secondItem="jW9-Cx-8Sh" secondAttribute="leading" id="X6S-dd-3tB"/>
                                         <constraint firstItem="qU3-x5-sno" firstAttribute="centerY" secondItem="ffQ-DA-y1D" secondAttribute="centerY" id="YIf-nU-hDy"/>
                                         <constraint firstItem="0Uf-yP-hej" firstAttribute="trailing" secondItem="wRn-QZ-S9O" secondAttribute="trailing" id="bF3-tX-bNa"/>
                                         <constraint firstItem="wRn-QZ-S9O" firstAttribute="leading" secondItem="uGC-jy-Emm" secondAttribute="trailing" constant="8" symbolic="YES" id="bX8-h1-9qK"/>
                                         <constraint firstAttribute="trailing" secondItem="mp1-IV-KMg" secondAttribute="trailing" constant="17" id="byr-fQ-CAl"/>
-                                        <constraint firstItem="hPz-sZ-S8C" firstAttribute="leading" secondItem="NBx-iW-M9L" secondAttribute="leading" constant="17" id="hAL-Tt-SZm"/>
+                                        <constraint firstItem="vma-F5-cck" firstAttribute="trailing" secondItem="pAc-bH-SEg" secondAttribute="trailing" id="fNa-Pj-uQ2"/>
                                         <constraint firstItem="uGC-jy-Emm" firstAttribute="baseline" secondItem="ffQ-DA-y1D" secondAttribute="firstBaseline" id="hkk-3R-Lf3"/>
                                         <constraint firstItem="ffQ-DA-y1D" firstAttribute="leading" secondItem="qU3-x5-sno" secondAttribute="trailing" constant="8" symbolic="YES" id="iJG-Oc-wfS"/>
                                         <constraint firstItem="mp1-IV-KMg" firstAttribute="leading" secondItem="ffQ-DA-y1D" secondAttribute="leading" id="jvs-ZK-4Y2"/>
-                                        <constraint firstItem="mp1-IV-KMg" firstAttribute="baseline" secondItem="hPz-sZ-S8C" secondAttribute="firstBaseline" id="jw1-Ef-Cxn"/>
                                         <constraint firstItem="wRn-QZ-S9O" firstAttribute="bottom" secondItem="ffQ-DA-y1D" secondAttribute="bottom" id="m0k-MU-Sy6"/>
                                         <constraint firstItem="0Uf-yP-hej" firstAttribute="top" secondItem="NBx-iW-M9L" secondAttribute="top" constant="22" id="mE5-Qz-QWi"/>
                                         <constraint firstItem="ffQ-DA-y1D" firstAttribute="top" secondItem="mp1-IV-KMg" secondAttribute="bottom" constant="6" id="oJO-FI-fHc"/>
-                                        <constraint firstItem="hPz-sZ-S8C" firstAttribute="leading" secondItem="uGC-jy-Emm" secondAttribute="leading" id="ssT-gw-vUk"/>
+                                        <constraint firstItem="0Uf-yP-hej" firstAttribute="leading" secondItem="hPz-sZ-S8C" secondAttribute="trailing" constant="8" symbolic="YES" id="rJo-SF-Ubt"/>
                                         <constraint firstItem="uGC-jy-Emm" firstAttribute="centerY" secondItem="wRn-QZ-S9O" secondAttribute="centerY" id="wMc-kf-gao"/>
+                                        <constraint firstItem="vma-F5-cck" firstAttribute="leading" secondItem="jW9-Cx-8Sh" secondAttribute="trailing" constant="8" symbolic="YES" id="z43-nU-POo"/>
                                     </constraints>
                                 </view>
                             </tabViewItem>
@@ -1756,7 +1792,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="555" height="177"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="4Uw-Cu-gD6">
                 <rect key="frame" x="0.0" y="0.0" width="555" height="177"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1888,7 +1924,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="555" height="214"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="iMu-Ht-Fna">
                 <rect key="frame" x="0.0" y="0.0" width="555" height="214"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2042,7 +2078,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="158" width="555" height="147"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="Uci-OE-MtE">
                 <rect key="frame" x="0.0" y="0.0" width="555" height="147"/>
                 <autoresizingMask key="autoresizingMask"/>

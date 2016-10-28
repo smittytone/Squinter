@@ -178,6 +178,7 @@
 	IBOutlet NSButton *autoSelectDeviceCheckbox;
 	IBOutlet NSButton *autoUpdateCheckCheckbox;
 	IBOutlet NSButton *boldTestCheckbox;
+	IBOutlet NSPopUpButton *locationMenu;
 
 	// Assign Device
 
@@ -341,7 +342,7 @@
 - (IBAction)refreshDevices:(id)sender;
 - (void)listDevices;
 - (IBAction)chooseDevice:(id)sender;
-- (void)setCurrentDeviceFromSelection:(id)sender;
+// - (void)setCurrentDeviceFromSelection:(id)sender;
 - (IBAction)restartDevice:(id)sender;
 - (IBAction)restartDevices:(id)sender;
 - (void)restarted;
@@ -378,6 +379,7 @@
 // Squinter Log Methods
 
 - (IBAction)getProjectInfo:(id)sender;
+- (NSString *)getDisplayPath:(NSString *)path;
 - (IBAction)showDeviceInfo:(id)sender;
 - (IBAction)showModelInfo:(id)sender;
 - (IBAction)logDeviceCode:(id)sender;
