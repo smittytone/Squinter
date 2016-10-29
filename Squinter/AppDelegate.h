@@ -156,6 +156,7 @@
 
 	IBOutlet NSPanel *renameProjectSheet;
 	IBOutlet NSTextField *renameProjectTextField;
+	IBOutlet NSTextField *renameProjectLabel;
     
     // About
     
@@ -229,7 +230,7 @@
 	BOOL noProjectsFlag, noLibsFlag, sureSheetResult, newModelFlag, autoRenameFlag, showCodeFlag;
 	BOOL streamFlag, menuValid, restartFlag, fromDeviceSelectFlag, saveProjectSubFilesFlag;
     BOOL isLightThemeFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
-	BOOL checkModelsFlag;
+	BOOL checkModelsFlag, newProjectFlag;
 
     NSMutableArray *foundLibs, *foundFiles, *colors, *logColors;
 
@@ -279,7 +280,7 @@
 - (IBAction)saveRenameProjectSheet:(id)sender;
 
 - (BOOL)openSquirrelProject:(NSArray *)urls;
-- (BOOL)checkOpenProjects:(Project *)aProject;
+- (BOOL)checkOpenProjects:(Project *)byProject :(NSString *)orProjectName;
 - (BOOL)checkFile:(NSString *)filePath;
 
 // Save Project Methods

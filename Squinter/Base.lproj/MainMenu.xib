@@ -105,6 +105,7 @@
                 <outlet property="renameMenu" destination="mdx-HT-kOU" id="NQe-HZ-mVE"/>
                 <outlet property="renameModelMenuItem" destination="1rF-MS-Fic" id="0me-Ak-xrb"/>
                 <outlet property="renameName" destination="uwS-rr-4gC" id="eNg-PE-Bq1"/>
+                <outlet property="renameProjectLabel" destination="MeL-tZ-lHl" id="44J-nk-bpe"/>
                 <outlet property="renameProjectSheet" destination="TMW-57-pcx" id="y3q-4e-Aa7"/>
                 <outlet property="renameProjectTextField" destination="5UG-HO-ON3" id="Wx5-8q-xQb"/>
                 <outlet property="renameSheet" destination="hav-Uy-J5n" id="W6z-8F-OLf"/>
@@ -723,7 +724,7 @@
                     </menu>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="682" y="186"/>
+            <point key="canvasLocation" x="126" y="46"/>
         </menu>
         <window title="Squinter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" appearanceType="aqua" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>

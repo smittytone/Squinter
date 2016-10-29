@@ -1341,7 +1341,7 @@
 {
 	// Is the project already open?
 
-	if ([self checkOpenProjects:currentProject])
+	if ([self checkOpenProjects:currentProject :nil])
 	{
 		// The project is open, so warn the user and ask for an action
 
@@ -1362,6 +1362,7 @@
 			 {
 				 // User wants to rename the project
 
+				 newProjectFlag = YES;
 				 [self renameProject];
 			 }
 			 else
@@ -1430,6 +1431,11 @@
 {
 	// Present the sheet
 
+	if (newProjectFlag)
+	{
+		renameProjectLabel.stringValue = @"Enter a new project name:";
+	}
+
 	[_window beginSheet:renameProjectSheet completionHandler:nil];
 }
 
@@ -1444,11 +1450,22 @@
 
 - (IBAction)saveRenameProjectSheet:(id)sender
 {
-	currentProject.projectName = renameProjectTextField.stringValue;
-
 	[_window endSheet:renameProjectSheet];
 
-	[self processAddedNewProjectStageTwo];
+	if (newProjectFlag)
+	{
+		newProjectFlag = NO;
+		currentProject.projectName = renameProjectTextField.stringValue;
+		[self processAddedNewProjectStageTwo];
+	}
+	else
+	{
+		NSString *newName = renameProjectTextField.stringValue;
+
+		// Check name and if necessary go back and ask again
+
+		[self checkOpenProjects:nil :newName];
+	}
 }
 
 
@@ -1473,7 +1490,27 @@
 
 			newProject.projectPath = [filePath stringByDeletingLastPathComponent];
 
-			if (projectArray.count > 0) gotFlag = [self checkOpenProjects:newProject];
+			// Check for a change of project name
+
+			NSString *newName = [[filePath lastPathComponent] stringByDeletingPathExtension];
+
+			if ([newName compare:newProject.projectName] != NSOrderedSame)
+			{
+				NSString *oldName = newProject.projectName;
+				newProject.projectName = newName;
+
+				if (projectArray.count > 0) gotFlag = [self checkOpenProjects:newProject :nil];
+
+				if (gotFlag)
+				{
+					// Need to warn user that the new name they have given to the .squirrelproj
+					// file is already in use
+
+					newProject.projectName = oldName;
+				}
+			}
+
+			if (projectArray.count > 0) gotFlag = [self checkOpenProjects:newProject :nil];
 
 			if (!gotFlag)
 			{
@@ -1670,16 +1707,28 @@
 
 
 
-- (BOOL)checkOpenProjects:(Project *)aProject
+- (BOOL)checkOpenProjects:(Project *)byProject :(NSString *)orProjectName
 {
 	// Method runs through the list of open projects and returns YES if the
 	// passed project matches one of them, otherwise NO
 
-	for (NSUInteger j = 0 ; j < projectArray.count ; ++j)
+	if (projectArray.count > 0)
 	{
-		Project *project = [projectArray objectAtIndex:j];
+		if (byProject != nil)
+		{
+			for (Project *aProject in projectArray)
+			{
+				if ([byProject.projectName compare:aProject.projectName] == NSOrderedSame) return YES;
+			}
+		}
 
-		if ([project.projectName compare:aProject.projectName] == NSOrderedSame) return YES;
+		if (orProjectName != nil)
+		{
+			for (Project *aProject in projectArray)
+			{
+				if ([orProjectName compare:aProject.projectName] == NSOrderedSame) return YES;
+			}
+		}
 	}
 
 	return NO;
@@ -1697,6 +1746,17 @@
 	}
 
 	return NO;
+}
+
+
+
+- (IBAction)renameCurrentProject:(id)sender
+{
+	if (currentProject == nil) return;
+
+	renameProjectLabel.stringValue = [NSString stringWithFormat:@"Enter a new name for project \"%@\":", currentProject.projectName];
+
+	[self renameProject];
 }
 
 
