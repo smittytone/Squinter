@@ -460,6 +460,7 @@
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
 - (void)updateProject:(Project *)project;
+- (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath;
 
 
 @end

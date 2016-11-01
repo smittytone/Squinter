@@ -1216,7 +1216,7 @@
 
 - (void)processAddedDeviceFile:(NSString *)filePath
 {
-	if (currentProject.projectVersion.floatValue > 2.0)
+	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 	{
 		currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
 	}
@@ -1238,7 +1238,7 @@
 
 - (void)processAddedAgentFile:(NSString *)filePath
 {
-	if (currentProject.projectVersion.floatValue > 2.0)
+	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 	{
 		currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
 	}
@@ -1531,7 +1531,7 @@
 					[fileWatchQueue setDelegate:self];
 				}
 
-				if (currentProjectVersion > 2.0)
+				if (currentProjectVersion > kPreviousProjectVersion)
 				{
 					currentAgentPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
 					currentDevicePath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
@@ -1616,7 +1616,7 @@
 					}
 				}
 
-				if (currentProjectVersion > 2.0)
+				if (currentProjectVersion > kPreviousProjectVersion)
 				{
 					currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :currentAgentPath];
 					currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :currentDevicePath];
@@ -1858,7 +1858,7 @@
 		NSString *aPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", aFileName];
 		NSString *dPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", dFileName];
 
-		if (version > 2.0)
+		if (version > kPreviousProjectVersion)
 		{
 			savingProject.projectAgentCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :aPathName];
 			savingProject.projectDeviceCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :dPathName];
@@ -1907,7 +1907,7 @@
 
 		savingProject.projectPath = [savePath stringByDeletingLastPathComponent];
 
-		if (version > 2.0)
+		if (version > kPreviousProjectVersion)
 		{
 			savingProject.oldProjectPath = savingProject.projectPath;
 		}
@@ -1951,7 +1951,7 @@
 			NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
 			BOOL aSuccess = NO;
 
-			if (version > 2.0)
+			if (version > kPreviousProjectVersion)
 			{
 				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectAgentCodePath];
 				aSuccess = [fm createFileAtPath:path contents:data attributes:nil];
@@ -1973,7 +1973,7 @@
 			data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
 			BOOL dSuccess = NO;
 
-			if (version > 2.0)
+			if (version > kPreviousProjectVersion)
 			{
 				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectDeviceCodePath];
 				dSuccess = [fm createFileAtPath:path contents:data attributes:nil];
@@ -2088,32 +2088,64 @@
 	}
 	
 	// Stop watching the current project's files
-	
-	if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:currentProject.projectDeviceCodePath];
-	if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:currentProject.projectAgentCodePath];
 
-	NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
+		if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
+
+		NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
+
+		fileItems = [currentProject.projectAgentFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
+
+		fileItems = [currentProject.projectDeviceLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
+
+		fileItems = [currentProject.projectDeviceFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
 	}
-
-	fileItems = [currentProject.projectAgentFiles allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+	else
 	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
-	}
+		if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:currentProject.projectDeviceCodePath];
+		if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:currentProject.projectAgentCodePath];
 
-	fileItems = [currentProject.projectDeviceLibraries allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
-	}
+		NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
 
-	fileItems = [currentProject.projectDeviceFiles allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		fileItems = [currentProject.projectAgentFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
+
+		fileItems = [currentProject.projectDeviceLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
+
+		fileItems = [currentProject.projectDeviceFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
 	}
 
     if (projectArray.count == 1)
@@ -2261,7 +2293,7 @@
 
     // Process 'agent.nut' then 'device.nut' if either or both exist
 
-	if (currentProject.projectVersion.floatValue > 2.0)
+	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 	{
 		aPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
 		dPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
@@ -2897,6 +2929,9 @@
 	for (NSUInteger i = 0 ; i < paths.count ; ++i)
 	{
 		NSString *path = [paths objectAtIndex:i];
+
+		if (currentProject.projectVersion.floatValue > kPreviousProjectVersion) path = [self getAbsolutePath:currentProject.projectPath :path];
+
 		if (![fileWatchQueue isPathBeingWatched:path]) [fileWatchQueue addPath:path];
 	}
 }
@@ -6255,7 +6290,7 @@
 	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
 	Float32 version = currentProject.projectVersion.floatValue;
 
-	if (version > 2.0)
+	if (version > kPreviousProjectVersion)
 	{
 		if (index == 0) path = [self getAbsolutePath:currentProject.projectPath :path];
 
@@ -6610,7 +6645,7 @@
     {
         if (currentProject.projectDeviceCodePath)
 		{
-			if (currentProject.projectVersion.floatValue > 2.0)
+			if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 			{
 				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
 			}
@@ -6625,7 +6660,7 @@
     {
         if (currentProject.projectAgentCodePath)
 		{
-			if (currentProject.projectVersion.floatValue > 2.0)
+			if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 			{
 				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
 			}
@@ -6751,7 +6786,7 @@
 {
     NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
 
-	if (currentProject.projectVersion.floatValue > 2.0)
+	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 	{
 		if (currentProject.projectDeviceCodePath) [workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
 
@@ -8180,50 +8215,52 @@
 
 - (void)updateProject:(Project *)project
 {
-	Project *newProject = [[Project alloc] init];
+	if (project != currentProject) return;
 
-	if (project.projectVersion.floatValue < newProject.projectVersion.floatValue)
+	project.projectHasChanged = YES;
+	project.projectVersion = [NSString stringWithFormat:@"%f", kCurrentProjectVersion];
+
+	if (project.projectVersion.floatValue < 2.1)
 	{
-		newProject.projectName = project.projectName;
-		newProject.projectAgentCode = project.projectAgentCode;
-		newProject.projectDeviceCode = project.projectDeviceCode;
-		newProject.projectImpLibs = project.projectImpLibs;
-		newProject.projectModelID = project.projectModelID;
+		// 1.0 -> 2.1
+		// Add oldProjectPath property
 
-		if (project.projectVersion.floatValue < 2.1)
-		{
-			// 1.0 -> 2.1
-			// Add oldProjectPath property
+		project.oldProjectPath = project.projectPath;
 
-			newProject.oldProjectPath = project.projectPath;
+		// Convert saved paths to relative paths
 
-			// Convert saved paths to relative paths
+		project.projectAgentCodePath = [self getRelativeFilePath:project.projectPath :project.projectAgentCodePath];
+		project.projectDeviceCodePath = [self getRelativeFilePath:project.projectPath :project.projectDeviceCodePath];
 
-			newProject.projectAgentCodePath = [self getRelativeFilePath:newProject.oldProjectPath :project.projectAgentCodePath];
-			newProject.projectDeviceCodePath = [self getRelativeFilePath:newProject.oldProjectPath :project.projectDeviceCodePath];
+		[self updatePaths:project.projectDeviceLibraries :project.projectPath];
+		[self updatePaths:project.projectDeviceFiles :project.projectPath];
+		[self updatePaths:project.projectAgentLibraries :project.projectPath];
+		[self updatePaths:project.projectAgentFiles :project.projectPath];
+	}
 
+	// Update the Menus and the Toolbar
 
-			
-		}
+	[self updateMenus];
+	[self setToolbar];
 
+	// Finally, set the status light
 
-		if (project == currentProject) currentProject = newProject;
-
-		[projectArray addObject:newProject];
-		[projectArray removeObject:project];
-		newProject.projectSquinted = 0;
-		newProject.projectHasChanged = YES;
+	[saveLight setLight:YES];
+	[saveLight setFull:!currentProject.projectHasChanged];
+}
 
 
 
-		/* ID of project's associated model
+- (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath
+{
+	NSArray *keys = [set allKeys];
 
-		@property (nonatomic, strong) NSMutableDictionary *projectDeviceLibraries;  // Names, paths of local libraries #imported into device code
-		@property (nonatomic, strong) NSMutableDictionary *projectAgentLibraries;   // Names, paths of local libraries #imported into agent code
-		@property (nonatomic, strong) NSMutableDictionary *projectDeviceFiles;      // Names, paths of local files #imported into device code
-		@property (nonatomic, strong) NSMutableDictionary *projectAgentFiles;       // Names, paths of local files #imported into agent code
-
-		*/
+	for (NSUInteger i = 0 ; i < keys.count ; ++i)
+	{
+		NSString *key = [keys objectAtIndex:i];
+		NSString *path = [set objectForKey:key];
+		path = [self getRelativeFilePath:relPath :path];
+		[set setObject:path forKey:key];
 	}
 }
 
