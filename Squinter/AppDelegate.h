@@ -217,7 +217,7 @@
 
 	// Project variables
 
-	NSMutableArray *projectArray, *projectIncludes;
+	NSMutableArray *projectArray;
 	NSMutableDictionary *projectDefines;
 	Project *currentProject;
 	NSString *currentAgentCode, *currentDeviceCode, *toDelete, *itemToCreate;
@@ -232,7 +232,7 @@
     BOOL isLightThemeFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
 	BOOL checkModelsFlag, newProjectFlag;
 
-    NSMutableArray *foundLibs, *foundFiles, *colors, *logColors;
+    NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors;
 
     NSDateFormatter *def;
 

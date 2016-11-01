@@ -389,8 +389,6 @@
 	ide = [[BuildAPIAccess alloc] initForNSURLSession];
     //ide = [[BuildAPIAccess alloc] initForNSURLConnection];
 	
-	projectIncludes = [[NSMutableArray alloc] init];
-
 	// Load in working directory, reading in the location from the defaults in case it has been changed by a previous launch
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -2245,19 +2243,17 @@
     // Clear the lists of local libraries and files found in this compile
 	// 'foundLibs' - all the libraries #imported or #included in the source files
 	// 'foundFiles' - all the non-libraries #imported or #included in the source files
+	// 'foundEILibs' - all the EI libraries #required in the source files
 
     if (foundLibs != nil) foundLibs = nil;
     if (foundFiles != nil) foundFiles = nil;
+	if (foundEILibs != nil) foundEILibs = nil;
+
 	foundFiles = [[NSMutableArray alloc] init];
     foundLibs = [[NSMutableArray alloc] init];
-	
-	// Clear the EI libraries listing - it will be repopulated via processSource: and processRequires:
-	
-	currentProject.projectImpLibs = nil;
-	
-	[projectIncludes removeAllObjects];
+	foundEILibs = [[NSMutableArray alloc] init];
 
-    BOOL agentDoneFlag = NO;
+	BOOL agentDoneFlag = NO;
 	BOOL deviceDoneFlag = NO;
 	NSString *output, *aPath, *dPath;
 	
@@ -2403,25 +2399,107 @@
 	// PROCESS EI LIBRARIES
 
 	// Do we have any Electric Imp libraries #required in the source code?
-	
-	if (currentProject.projectImpLibs.count > 0)
+
+	if (foundEILibs.count != currentProject.projectImpLibs.count) currentProject.projectHasChanged = YES;
+
+	if (foundEILibs.count == 0)
 	{
-		if (currentProject.projectImpLibs.count == 1)
+		if (currentProject.projectImpLibs.count > 0)
 		{
-			[self writeToLog:@"1 Electric Imp library included." :YES];
+			if (currentProject.projectImpLibs.count == 1)
+			{
+				[self writeToLog:@"1 Electric Imp library no longer included." :YES];
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included.", (long)currentProject.projectImpLibs.count] :YES];
+			}
+
+			[currentProject.projectImpLibs removeAllObjects];
+			currentProject.projectHasChanged = YES;
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"%lu Electric Imp libraries included.", (long)currentProject.projectImpLibs.count] :YES];
+			[self writeToLog:@"No Electric Imp libraries included." :YES];
 		}
-
-		[self checkElectricImpLibs];
 	}
 	else
 	{
-		[self writeToLog:@"No Electric Imp libraries included." :YES];
+		NSInteger total = currentProject.projectImpLibs.count - foundEILibs.count;
+
+		if (total == 1)
+		{
+			[self writeToLog:@"1 Electric Imp library no longer included." :YES];
+		}
+		else if (total > 1)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included.", (long)total] :YES];
+		}
+
+		// First, run through the contents of 'foundEILibs' to see if there is a 1:1 match with
+		// the lists of known local librariess; if not, mark that the project has changed
+
+		total = 0;
+
+		for (NSUInteger i = 0 ; i < foundEILibs.count ; ++i)
+		{
+			NSArray *aLib = [foundEILibs objectAtIndex:i];
+			NSString *libName = [aLib objectAtIndex:0];
+			NSString *libVer = [aLib objectAtIndex:1];
+
+			NSString *match = nil;
+
+			if (currentProject.projectImpLibs.count > 0)
+			{
+				// Does the library name match an existing one?
+
+				for (NSUInteger j = 0 ; j < currentProject.projectImpLibs.count ; ++j)
+				{
+					NSArray *bLib = [currentProject.projectImpLibs objectAtIndex:j];
+					NSString *bLibName = [bLib objectAtIndex:0];
+
+					if ([bLibName compare:libName] == NSOrderedSame)
+					{
+						match = [bLib objectAtIndex:1];
+						break;
+					}
+				}
+			}
+
+			if (match == nil)
+			{
+				currentProject.projectHasChanged = YES;
+				++total;
+			}
+			else
+			{
+				// The found library does match, but we should check if its version has changed.
+
+				if ([match compare:libVer] != NSOrderedSame)
+				{
+					// Names match but the bersion doesn't.
+
+					currentProject.projectHasChanged = YES;
+					[self writeToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", libName, match, libVer] :YES];
+				}
+			}
+		}
+
+		if (total == 1)
+		{
+			[self writeToLog:@"1 Electric Imp library added." :YES];
+		}
+		else if (total > 1)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries added.", (long)total] :YES];
+		}
+
+
+		// Now replace the recorded EI library list with the new one from 'foundEILibs'
+
+		currentProject.projectImpLibs = foundEILibs;
 	}
-	
+
 	// PROCESS LOCAL LIBRARIES
 
 	// Do we have any local libraries #included or #imported in the source code?
@@ -2474,8 +2552,8 @@
 	{
 		// Calculate and display the number of library references removed from the source
 
-		NSUInteger aCount = 0;
-		NSUInteger dCount = 0;
+		NSUInteger agentLibCount = 0;
+		NSUInteger deviceLibCount = 0;
 
 		for (NSDictionary *item in foundLibs)
 		{
@@ -2484,15 +2562,15 @@
 
 			if (codeType == kCodeTypeAgent)
 			{
-				++aCount;
+				++agentLibCount;
 			}
 			else
 			{
-				++dCount;
+				++deviceLibCount;
 			}
 		}
 
-		NSInteger total = currentProject.projectAgentLibraries.count - aCount;
+		NSInteger total = currentProject.projectAgentLibraries.count - agentLibCount;
 
 		if (total == 1)
 		{
@@ -2503,7 +2581,7 @@
 			[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the project's agent code.", (long)total] :YES];
 		}
 
-		total = currentProject.projectDeviceLibraries.count - aCount;
+		total = currentProject.projectDeviceLibraries.count - deviceLibCount;
 
 		if (total == 1)
 		{
@@ -2525,9 +2603,9 @@
 			NSString *libName = [aLib objectForKey:@"libName"];
 			NSNumber *codeNumber = [aLib objectForKey:@"libType"];
 			NSString *libLoc = [aLib objectForKey:@"libPath"];
-			NSInteger codeType = codeNumber.integerValue;
+			NSInteger libCode = codeNumber.integerValue;
 
-			if (codeType == kCodeTypeAgent)
+			if (libCode == kCodeTypeAgent)
 			{
 				if (currentProject.projectAgentLibraries == nil) currentProject.projectAgentLibraries = [[NSMutableDictionary alloc] init];
 				projectLibList = currentProject.projectAgentLibraries;
@@ -2591,11 +2669,10 @@
 			NSString *libName = [aLib objectForKey:@"libName"];
 			NSString *libPath = [aLib objectForKey:@"libPath"];
 			NSNumber *codeNumber = [aLib objectForKey:@"libType"];
+			NSInteger libCode = codeNumber.integerValue;
 			// NSString *libVersion = [aLib objectForKey:@"libVer"];
-
-			NSInteger codeType = codeNumber.integerValue;
 			
-			if (codeType == kCodeTypeAgent)
+			if (libCode == kCodeTypeAgent)
 			{
 				[currentProject.projectAgentLibraries setObject:libPath forKey:libName];
 			}
@@ -2655,7 +2732,7 @@
 
 		if (currentProject.projectDeviceFiles != nil && currentProject.projectDeviceFiles.count > 0)
 		{
-			if (currentProject.projectAgentFiles.count == 1)
+			if (currentProject.projectDeviceFiles.count == 1)
 			{
 				[self writeToLog:@"1 local file no longer referenced in the project's device code." :YES];
 			}
@@ -2669,8 +2746,8 @@
 	}
 	else
 	{
-		NSUInteger aCount = 0;
-		NSUInteger dCount = 0;
+		NSUInteger aFilesCount = 0;
+		NSUInteger dFilesCount = 0;
 
 		for (NSDictionary *item in foundFiles)
 		{
@@ -2679,15 +2756,15 @@
 
 			if (codeType == kCodeTypeAgent)
 			{
-				++aCount;
+				++aFilesCount;
 			}
 			else
 			{
-				++dCount;
+				++dFilesCount;
 			}
 		}
 
-		NSInteger total = currentProject.projectAgentFiles.count - aCount;
+		NSInteger total = currentProject.projectAgentFiles.count - aFilesCount;
 
 		if (total == 1)
 		{
@@ -2698,7 +2775,7 @@
 			[self writeToLog:[NSString stringWithFormat:@"%li local files no longer referenced in the project's agent code.", (long)total] :YES];
 		}
 
-		total = currentProject.projectDeviceFiles.count - aCount;
+		total = currentProject.projectDeviceFiles.count - dFilesCount;
 
 		if (total == 1)
 		{
@@ -2717,9 +2794,9 @@
 			NSString *fileName = [aFile objectForKey:@"fileName"];
 			NSNumber *codeNumber = [aFile objectForKey:@"fileType"];
 			NSString *fileLoc = [aFile objectForKey:@"filePath"];
-			NSInteger codeType = codeNumber.integerValue;
+			NSInteger fileType = codeNumber.integerValue;
 
-			if (codeType == kCodeTypeAgent)
+			if (fileType == kCodeTypeAgent)
 			{
 				if (currentProject.projectAgentFiles == nil) currentProject.projectAgentFiles = [[NSMutableDictionary alloc] init];
 				projectFileList = currentProject.projectAgentFiles;
@@ -2774,9 +2851,9 @@
 			NSString *fileName = [aFile objectForKey:@"fileName"];
 			NSString *filePath = [aFile objectForKey:@"filePath"];
 			NSNumber *codeNumber = [aFile objectForKey:@"fileType"];
-			NSInteger codeType = codeNumber.integerValue;
+			NSInteger fileType = codeNumber.integerValue;
 
-			if (codeType == kCodeTypeAgent)
+			if (fileType == kCodeTypeAgent)
 			{
 				[currentProject.projectAgentFiles setObject:filePath forKey:fileName];
 			}
@@ -3019,21 +3096,20 @@
 
                 // Add the library to the project - name and version (as string)
 
-                if (currentProject.projectImpLibs == nil)
+                if (foundEILibs.count == 0)
                 {
-                    currentProject.projectImpLibs = [[NSMutableArray alloc] init];
                     NSArray *library = [NSArray arrayWithObjects:[elements objectAtIndex:0], [elements objectAtIndex:1], nil];
-                    [currentProject.projectImpLibs addObject:library];
+                    [foundEILibs addObject:library];
                 }
                 else
                 {
                     BOOL match = NO;
 
-                    for (NSUInteger k = 0 ; k < currentProject.projectImpLibs.count ; ++k)
+                    for (NSUInteger k = 0 ; k < foundEILibs.count ; ++k)
                     {
                         // See if the library is already listed
 
-                        NSArray *aLib = [currentProject.projectImpLibs objectAtIndex:k];
+                        NSArray *aLib = [foundEILibs objectAtIndex:k];
                         NSString *libName = [aLib objectAtIndex:0];
                         NSString *libVersion = [aLib objectAtIndex:1];
                         if (([libName compare:[elements objectAtIndex:0]] == NSOrderedSame) && ([libVersion compare:[elements objectAtIndex:1]] == NSOrderedSame)) match = YES;
@@ -3041,7 +3117,7 @@
 
                     if (!match) {
                         NSArray *library = [NSArray arrayWithObjects:[elements objectAtIndex:0], [elements objectAtIndex:1], nil];
-                        [currentProject.projectImpLibs addObject:library];
+                        [foundEILibs addObject:library];
                     }
                 }
             }
@@ -5966,8 +6042,14 @@
 			}
 		}
 	}
-	
+
     [self writeToLog:[NSString stringWithFormat:@"Project \"%@\"", currentProject.projectName] :YES];
+
+#ifdef DEBUG
+
+	[self writeToLog:[NSString stringWithFormat:@"Project Object Version %@", currentProject.projectVersion] :YES];
+
+#endif
 
 	if (string) [self writeToLog:[NSString stringWithFormat:@"Project linked to model \"%@\"", string] :YES];
 
