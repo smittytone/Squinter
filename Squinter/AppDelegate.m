@@ -678,7 +678,7 @@
 		// Add the new project to the project menu. We've already checked for a name clash,
 		// so we needn't care about the return value.
 		
-        [self addProjectMenuItem:projectName];
+		[self addProjectMenuItem:projectName :currentProject];
 
         // Enable project-related UI items
 		
@@ -771,79 +771,99 @@
 
 	if (sender == currentProject)
 	{
+		// Is this ever reached? Needs fixing if it is
+
 		item = [projectsMenu itemWithTitle:currentProject.projectName];
 	}
 	else if (sender != nil)
 	{
+		// The user has selected a projects from the 'projectsMenu' submenu
+
 		item = (NSMenuItem *)sender;
 	}
 	else
 	{
-		item = [projectsMenu itemWithTitle:[projectsPopUp titleOfSelectedItem]];
+		// 'sender' is nil if the project was selected using 'projectsPopUp',
+		// which is set to action 'pickProject:'
+
+		NSInteger tag = projectsPopUp.selectedItem.tag;
+		item = [projectsMenu itemAtIndex:tag];
 	}
-    
-    for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
-    {
-        Project *project = [projectArray objectAtIndex:i];
-        
-        if ([project.projectName compare:item.title] == NSOrderedSame)
-        {
-            // Compare the name of the menu item to the projects' names until we find
-            // the one we want to make current
-            
-            itemNumber = i;
-            currentProject = project;
-            currentDeviceLibCount = 0;
-            currentAgentLibCount = 0;
 
-            // Enable or disable code view menu options whether we have code to view
-            
-            if (currentProject.projectDeviceCode != nil)
-            {
-                [logDeviceCodeMenuItem setEnabled:YES];
-            }
-            else
-            {
-                [logDeviceCodeMenuItem setEnabled:NO];
-            }
-            
-            if (currentProject.projectAgentCode != nil)
-            {
-                [logAgentCodeMenuItem setEnabled:YES];
-            }
-            else
-            {
-                [logAgentCodeMenuItem setEnabled:NO];
-            }
-            
-            // Update the external library and file menus
-            
-            [self updateLibraryMenu];
-            [self updateFilesMenu];
+	Project *chosenProject = nil;
 
-			// Update the save? indicator
+	if (item.representedObject != nil)
+	{
+		chosenProject = item.representedObject;
+		itemNumber = [projectsMenu indexOfItem:item];
+	}
+	else
+	{
+	    for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
+    	{
+        	chosenProject = [projectArray objectAtIndex:i];
 
-			[saveLight setFull:!currentProject.projectHasChanged];
-
-			// Is the project associated with a model? If so, select it
-			
-			if (ide.models.count != 0)
+			if ([chosenProject.projectName compare:item.title] == NSOrderedSame)
 			{
-				for (NSInteger j = 0 ; j < ide.models.count ; ++j)
-				{
-					NSDictionary *model = [ide.models objectAtIndex:j];
-					NSString *modelCode = [model objectForKey:@"id"];
-					
-                    if ([modelCode compare:currentProject.projectModelID] == NSOrderedSame)
-					{
-						NSMenuItem *mitem = [modelsMenu itemAtIndex:j];
-                        [self chooseModel:mitem];
-					}
-				}
+				itemNumber = i;
+				break;
 			}
-        }
-    }
+		}
+	}
+
+	// Compare the name of the menu item to the projects' names until we find
+	// the one we want to make current
 	
+	currentProject = chosenProject;
+	currentDeviceLibCount = 0;
+	currentAgentLibCount = 0;
+
+	// Enable or disable code view menu options whether we have code to view
+	
+	if (currentProject.projectDeviceCode != nil)
+	{
+		[logDeviceCodeMenuItem setEnabled:YES];
+	}
+	else
+	{
+		[logDeviceCodeMenuItem setEnabled:NO];
+	}
+	
+	if (currentProject.projectAgentCode != nil)
+	{
+		[logAgentCodeMenuItem setEnabled:YES];
+	}
+	else
+	{
+		[logAgentCodeMenuItem setEnabled:NO];
+	}
+	
+	// Update the external library and file menus
+	
+	[self updateLibraryMenu];
+	[self updateFilesMenu];
+
+	// Update the save? indicator
+
+	[saveLight setFull:!currentProject.projectHasChanged];
+
+	// Is the project associated with a model? If so, select it
+	
+	if (ide.models.count != 0)
+	{
+		for (NSInteger j = 0 ; j < ide.models.count ; ++j)
+		{
+			NSDictionary *model = [ide.models objectAtIndex:j];
+			NSString *modelCode = [model objectForKey:@"id"];
+			
+			if ([modelCode compare:currentProject.projectModelID] == NSOrderedSame)
+			{
+				NSMenuItem *mitem = [modelsMenu itemAtIndex:j];
+				[self chooseModel:mitem];
+			}
+		}
+	}
+
     // We've made the selected project the current one, so adjust the project menu's tick marks
     
     for (NSUInteger i = 0; i < projectsMenu.numberOfItems ; ++i)
@@ -864,7 +884,7 @@
 
 	// Update the Project list popup
 
-	NSUInteger index = [projectsPopUp indexOfItemWithTitle:currentProject.projectName];
+	NSUInteger index = [projectsPopUp indexOfItemWithTag:itemNumber];
 	[projectsPopUp selectItemAtIndex:index];
 
 	// Update the Menus and the Toolbar (left until now in case models etc are selected)
@@ -1260,7 +1280,6 @@
 
 - (void)processAddedFilesUIUpdate
 {
-
 	// Update libraries menu with updated list of libraries
 
 	[self updateMenus];
@@ -1303,7 +1322,7 @@
 	{
 		// There were no loaded source code files, so use 'Untitled'
 
-		NSUInteger count = 0;
+		NSInteger count = 0;
 
 		if (projectArray.count > 0)
 		{
@@ -1326,7 +1345,7 @@
 		}
 		else
 		{
-			currentProject.projectName = [NSString stringWithFormat:@"Untitled %lu", (unsigned long)count];
+			currentProject.projectName = [NSString stringWithFormat:@"Untitled %li", (long)count];
 		}
 	}
 
@@ -1339,7 +1358,7 @@
 {
 	// Is the project already open?
 
-	if ([self checkOpenProjects:currentProject :nil])
+	if ([self checkProjectNames:currentProject :nil])
 	{
 		// The project is open, so warn the user and ask for an action
 
@@ -1462,7 +1481,7 @@
 
 		// Check name and if necessary go back and ask again
 
-		[self checkOpenProjects:nil :newName];
+		[self checkProjectNames:nil :newName];
 	}
 }
 
@@ -1473,8 +1492,10 @@
 	// We are opening Squirrel project file(s)
 
 	Project *newProject;
-	NSString *fileName, *filePath;
+	NSString *fileName, *newName, *filePath;
 	NSString *currentAgentPath, *currentDevicePath;
+	BOOL nameMatch = NO;
+	BOOL pathMatch = NO;
 	BOOL gotFlag = NO;
 
 	for (NSUInteger i = 0 ; i < urls.count ; ++i)
@@ -1484,38 +1505,110 @@
 
 		if (newProject)
 		{
-			// Project loaded from file correctly, but is it already open?
+			// Check for a change of project name via project filename
 
-			newProject.projectPath = [filePath stringByDeletingLastPathComponent];
+			pathMatch = [self checkProjectPaths:nil :filePath];
 
-			// Check for a change of project name
-
-			NSString *newName = [[filePath lastPathComponent] stringByDeletingPathExtension];
-
-			if ([newName compare:newProject.projectName] != NSOrderedSame)
+			if (!pathMatch)
 			{
-				NSString *oldName = newProject.projectName;
-				newProject.projectName = newName;
+				// Full path (path + name) of opened project doesn't match, but we still need to check the name,
+				// in case we have to add '01' to the name
 
-				if (projectArray.count > 0) gotFlag = [self checkOpenProjects:newProject :nil];
+				newName = [[filePath lastPathComponent] stringByDeletingPathExtension];
+				nameMatch = [self checkProjectNames:nil :newProject.projectName];
 
-				if (gotFlag)
+				if (nameMatch)
 				{
-					// Need to warn user that the new name they have given to the .squirrelproj
-					// file is already in use
+					// Name matches an existing open project from a different project file
 
-					newProject.projectName = oldName;
+					if ([newName compare:newProject.projectName] != NSOrderedSame)
+					{
+						// The project's name and its filename don't match, so try the filename
+
+						if (![self checkProjectNames:nil :newName])
+						{
+							// Filename-derived project name doesn't match, so use that
+
+							[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
+							newProject.projectName = newName;
+							newName = nil;
+						}
+						else
+						{
+							// Project name matches *and* filename-derived name
+						}
+					}
+					else
+					{
+						// We have a project with the same name as another
+
+						NSInteger count = 0;
+
+						for (NSUInteger j = 0 ; j < projectsMenu.numberOfItems ; ++j)
+						{
+							NSString *aProject = [[projectsMenu itemAtIndex:j] title];
+
+							if ([aProject containsString:newProject.projectName])
+							{
+								if (aProject.length == newProject.projectName.length)
+								{
+									++count;
+								}
+								else
+								{
+									NSString *sub = [aProject substringFromIndex:newProject.projectName.length + 1];
+
+									if (sub.integerValue > 0)
+									{
+										++count;
+									}
+								}
+							}
+						}
+
+						if (count > 0) newName = [newProject.projectName stringByAppendingFormat:@" %li", (long)(count + 1)];
+					}
+				}
+				else
+				{
+					// Name doesn't match an existing open project
+
+					if ([newName compare:newProject.projectName] != NSOrderedSame)
+					{
+						// The project's name and its filename don't match, so try the filename
+
+						if (![self checkProjectNames:nil :newName])
+						{
+							// Filename-derived project name doesn't match, so use that
+
+							[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
+							newProject.projectName = newName;
+						}
+
+						newName = nil;
+					}
+					else
+					{
+						newName = nil;
+					}
 				}
 			}
+			else
+			{
+				// Full path (path + name) matches so user is trying to open an already open project
 
-			if (projectArray.count > 0) gotFlag = [self checkOpenProjects:newProject :nil];
+				gotFlag = YES;
+			}
 
 			if (!gotFlag)
 			{
 				// Set the newly opened project to be the current one
 
 				currentProject = newProject;
+				currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
+
 				Float32 currentProjectVersion = currentProject.projectVersion.floatValue;
+
 
 				[self writeToLog:[NSString stringWithFormat:@"Loading project \"%@\" from file \"%@\".", currentProject.projectName, filePath] :YES];
 
@@ -1668,7 +1761,14 @@
 
 				// Update the Project menu’s projects sub-menu
 
-				[self addProjectMenuItem:currentProject.projectName];
+				if (newName)
+				{
+					[self addProjectMenuItem:newName :currentProject];
+				}
+				else
+				{
+					[self addProjectMenuItem:currentProject.projectName :currentProject];
+				}
 
 				// Update the Menus and the Toolbar
 
@@ -1697,6 +1797,7 @@
 			// Project didn't load for some reason so warn the user
 
 			[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
+			return NO;
 		}
 	}
 
@@ -1705,7 +1806,7 @@
 
 
 
-- (BOOL)checkOpenProjects:(Project *)byProject :(NSString *)orProjectName
+- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName
 {
 	// Method runs through the list of open projects and returns YES if the
 	// passed project matches one of them, otherwise NO
@@ -1727,6 +1828,30 @@
 				if ([orProjectName compare:aProject.projectName] == NSOrderedSame) return YES;
 			}
 		}
+	}
+
+	return NO;
+}
+
+
+
+- (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath
+{
+	// Method runs through the list of open projects and returns YES if the
+	// passed project's path matches one of them, otherwise NO
+
+	if (projectArray.count > 0)
+	{
+		if (orProjectPath != nil)
+		{
+			for (Project *aProject in projectArray)
+			{
+				NSString *aPath = [aProject.projectPath stringByAppendingPathComponent:[aProject.projectName stringByAppendingString:@".squirrelproj"]];
+				if ([orProjectPath compare:aPath] == NSOrderedSame) return YES;
+			}
+		}
+
+
 	}
 
 	return NO;
@@ -1924,7 +2049,7 @@
 			{
 				NSMenuItem *item = [projectsMenu itemWithTitle:oldName];
 				[projectsMenu removeItem:item];
-				[self addProjectMenuItem:savingProject.projectName];
+				[self addProjectMenuItem:savingProject.projectName :savingProject];
 				
 				NSInteger index = [projectsPopUp indexOfItemWithTitle:oldName];
 				[projectsPopUp removeItemAtIndex:index];
@@ -4082,11 +4207,14 @@
 
 
 
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject
 {
-	// Create a new menu entry to the Projects menu’s Open Projects submenu
-	// and to the Current Project popup
-	
+	// Create a new menu entry to the Projects menu’s Open Projects submenu and to the Current Project popup
+	// For the Open Projects submenu, each menu item's representedObject points to the named project
+	// For the Current Project popup, each menu item's tag is set to the index of the project in the submenu
+	// This allows us to choose projects irrespective of the name used in the menu, for example letting us
+	// distinguish between 'explorer' and 'explorer 2'
+
 	NSMenuItem *item;
 	
 	// Run through the existing menu items, to check that we're not adding one already there
@@ -4103,11 +4231,13 @@
 	
 	if (projectsMenu.numberOfItems > 0)
 	{
+		// Run through the existing menu items and turn them off
+
 		for (NSUInteger i = 0 ; i < projectsMenu.numberOfItems ; ++i)
 		{
 			item = [projectsMenu itemAtIndex:i];
 			
-			if ([item.title compare:currentProject.projectName] == NSOrderedSame)
+			if ([item.title compare:menuItemTitle] == NSOrderedSame)
 			{
 				// The new project is already on the menu, so return failure
 				
@@ -4123,14 +4253,16 @@
 	// If we have got this far, we can safely add the project to the submenu...
 	
 	item = [[NSMenuItem alloc] initWithTitle:menuItemTitle action:@selector(chooseProject:) keyEquivalent:@""];
+	item.representedObject = aProject;
 	item.state = NSOnState;
 	[projectsMenu addItem:item];
 	
 	// ...and to the popup
 	
 	[projectsPopUp addItemWithTitle:menuItemTitle];
-	NSUInteger index = [projectsPopUp indexOfItemWithTitle:menuItemTitle];
+	NSInteger index = [projectsPopUp indexOfItemWithTitle:menuItemTitle];
 	[projectsPopUp selectItemAtIndex:index];
+	projectsPopUp.selectedItem.tag = [projectsMenu indexOfItem:item];
 	projectsPopUp.enabled = YES;
 
 	// Return success
@@ -7616,8 +7748,12 @@
 		{
 			Project *project = [projectArray objectAtIndex:i];
 			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:project.projectName action:@selector(chooseProject:) keyEquivalent:@""];
+			item.representedObject = project;
 			[projectsMenu addItem:item];
 			[projectsPopUp addItemWithTitle:project.projectName];
+			NSInteger index = [projectsPopUp indexOfItemWithTitle:project.projectName];
+			NSMenuItem *subitem = [projectsPopUp itemAtIndex:index];
+			subitem.tag = [projectsMenu indexOfItem:item];
 		}
 
 		if (currentProject != nil)

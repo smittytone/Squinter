@@ -280,7 +280,8 @@
 - (IBAction)saveRenameProjectSheet:(id)sender;
 
 - (BOOL)openSquirrelProject:(NSArray *)urls;
-- (BOOL)checkOpenProjects:(Project *)byProject :(NSString *)orProjectName;
+- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName;
+- (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
 - (BOOL)checkFile:(NSString *)filePath;
 
 // Save Project Methods
@@ -321,7 +322,7 @@
 - (void)addFileToMenu:(NSString *)filename;
 - (NSString *)getLibraryTitle:(id)item;
 - (void)launchLibsPage;
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle;
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
 
 // Pasteboard Methods
 
