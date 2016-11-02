@@ -1531,6 +1531,7 @@
 
 							[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
 							newProject.projectName = newName;
+							newProject.projectHasChanged = YES;
 							newName = nil;
 						}
 						else
@@ -1583,6 +1584,7 @@
 
 							[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
 							newProject.projectName = newName;
+							newProject.projectHasChanged = YES;
 						}
 
 						newName = nil;
