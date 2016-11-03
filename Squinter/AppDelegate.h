@@ -9,6 +9,7 @@
 #include <Security/Security.h>
 #include <Foundation/Foundation.h>
 #include <Sparkle/Sparkle.h>
+#include <math.h>
 #import "Constants.h"
 #import "StatusLight.h"
 #import "Project.h"
@@ -269,7 +270,7 @@
 - (IBAction)selectFileForProject:(id)sender;
 - (void)presentOpenFilePanel:(NSInteger)openActionType;
 
-- (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
+- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
 - (void)processAddedFiles:(NSArray *)urls :(NSUInteger)count;
 - (void)processAddedDeviceFile:(NSString *)filePath;
 - (void)processAddedAgentFile:(NSString *)filePath;
@@ -279,10 +280,11 @@
 - (IBAction)closeRenameProjectSheet:(id)sender;
 - (IBAction)saveRenameProjectSheet:(id)sender;
 
-- (BOOL)openSquirrelProject:(NSArray *)urls;
+- (void)openSquirrelProjects:(NSArray *)urls :(NSInteger)count;
 - (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName;
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
 - (BOOL)checkFile:(NSString *)filePath;
+- (void)presentUpdateAlert:(NSArray *)urls :(NSInteger)count :(Project *)aProject;
 
 // Save Project Methods
 

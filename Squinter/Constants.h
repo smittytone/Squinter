@@ -34,7 +34,14 @@
 
 #define kEILibCheckInterval -3600
 
-#define kCurrentProjectVersion 2.1
 #define kPreviousProjectVersion 2.0
+#define kCurrentProjectVersion 2.1
+
+#define kCurrentProjectVersionString @"2.1"
+#define kPathChangeProjectVersion @"2.1"
+
+#define kLower -1
+#define kEqual 0
+#define kHigher 1
 
 #endif
