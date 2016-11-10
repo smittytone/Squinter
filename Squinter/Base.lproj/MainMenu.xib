@@ -68,10 +68,10 @@
                 <outlet property="loadModelsCheckbox" destination="rcb-N4-0Pa" id="kfq-5d-MR1"/>
                 <outlet property="locationMenu" destination="vma-F5-cck" id="mmI-uY-ysD"/>
                 <outlet property="logAgentCodeMenuItem" destination="eJA-O9-0JO" id="gt6-fs-Nry"/>
-                <outlet property="logClipView" destination="yDW-Oe-C7r" id="cUH-6X-KbY"/>
+                <outlet property="logClipView" destination="DPZ-Ai-vv0" id="lmd-Na-DiV"/>
                 <outlet property="logDeviceCodeMenuItem" destination="dvm-h5-7wW" id="6OE-kV-MwD"/>
-                <outlet property="logScrollView" destination="nh9-Pb-Sik" id="cHI-Js-2tC"/>
-                <outlet property="logTextView" destination="NVb-Sr-a5Q" id="isg-gA-M6T"/>
+                <outlet property="logScrollView" destination="lqH-aA-GxX" id="6GN-Xu-mQf"/>
+                <outlet property="logTextView" destination="lMN-b4-gk7" id="yS1-xW-60Z"/>
                 <outlet property="mainModelsMenu" destination="tLA-Sz-bci" id="7Yd-9D-hwk"/>
                 <outlet property="modelsMenu" destination="fT0-wm-05B" id="egQ-gl-Qwb"/>
                 <outlet property="newProjectAccessoryViewAssociateCheckbox" destination="nkA-My-3OK" id="7y4-2P-tqE"/>
@@ -730,11 +730,11 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="0.0" y="0.0" width="900" height="540"/>
+            <rect key="contentRect" x="0.0" y="0.0" width="905" height="529"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="900" height="200"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="900" height="540"/>
+                <rect key="frame" x="0.0" y="0.0" width="905" height="529"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lSl-gT-Zzl">
@@ -778,19 +778,19 @@
                         </connections>
                     </popUpButton>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="JQf-zG-6rJ">
-                        <rect key="frame" x="442" y="13" width="16" height="16"/>
+                        <rect key="frame" x="445" y="13" width="16" height="16"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="16" id="Jb5-XR-qpF"/>
                             <constraint firstAttribute="height" constant="16" id="xt5-bb-oun"/>
                         </constraints>
                     </progressIndicator>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oez-pq-fUm">
-                        <rect key="frame" x="693" y="9" width="195" height="26"/>
+                        <rect key="frame" x="667" y="9" width="226" height="26"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="190" id="50Y-w1-QMK"/>
-                            <constraint firstAttribute="height" constant="21" id="6pG-Vr-CKJ"/>
+                            <constraint firstAttribute="width" constant="221" id="6DJ-vq-Edw"/>
+                            <constraint firstAttribute="height" constant="21" id="iWS-st-ycl"/>
                         </constraints>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" selectedItem="rGV-sH-LP7" id="Mt0-uu-Rsh">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" selectedItem="rGV-sH-LP7" id="Mt0-uu-Rsh">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" id="S3N-Hd-x1h">
@@ -805,11 +805,38 @@
                             <action selector="chooseDevice:" target="Voe-Tx-rLC" id="8fd-qy-ale"/>
                         </connections>
                     </popUpButton>
+                    <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lqH-aA-GxX">
+                        <rect key="frame" x="-1" y="40" width="907" height="490"/>
+                        <clipView key="contentView" id="DPZ-Ai-vv0">
+                            <rect key="frame" x="1" y="1" width="905" height="488"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView editable="NO" drawsBackground="NO" importsGraphics="NO" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7">
+                                    <rect key="frame" x="0.0" y="-1" width="998" height="488"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="textColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="905" height="488"/>
+                                    <size key="maxSize" width="998" height="10000000"/>
+                                    <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                </textView>
+                            </subviews>
+                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="1Gm-ax-KPO">
+                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="9jw-jx-liH">
+                            <rect key="frame" x="891" y="1" width="15" height="488"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wZt-aV-DMH">
-                        <rect key="frame" x="588" y="14" width="101" height="17"/>
+                        <rect key="frame" x="562" y="14" width="101" height="17"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="17" id="Gce-g7-Rc8"/>
-                            <constraint firstAttribute="width" constant="97" id="zEU-sf-pcA"/>
+                            <constraint firstAttribute="height" constant="17" id="2Fq-a9-ZyZ"/>
+                            <constraint firstAttribute="width" constant="97" id="SrI-QM-prc"/>
                         </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Current Device" id="RTE-4P-gRi">
                             <font key="font" metaFont="systemBold"/>
@@ -817,51 +844,24 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nh9-Pb-Sik">
-                        <rect key="frame" x="-1" y="40" width="902" height="501"/>
-                        <clipView key="contentView" id="yDW-Oe-C7r">
-                            <rect key="frame" x="1" y="1" width="885" height="499"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                            <subviews>
-                                <textView editable="NO" drawsBackground="NO" importsGraphics="NO" findStyle="bar" linkDetection="YES" id="NVb-Sr-a5Q">
-                                    <rect key="frame" x="0.0" y="0.0" width="885" height="499"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="textColor" red="0.0" green="1" blue="0.09229462986623993" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="885" height="499"/>
-                                    <size key="maxSize" width="902" height="10000000"/>
-                                    <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                </textView>
-                            </subviews>
-                            <color key="backgroundColor" red="0.14455097853535348" green="0.14455097853535348" blue="0.14455097853535348" alpha="1" colorSpace="calibratedRGB"/>
-                        </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="ZHL-cj-4Ak">
-                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="u7e-gJ-edv">
-                            <rect key="frame" x="886" y="1" width="15" height="499"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                    </scrollView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="05z-Fa-E8J" firstAttribute="top" secondItem="nh9-Pb-Sik" secondAttribute="bottom" constant="8" id="3eS-N2-lxP"/>
+                    <constraint firstAttribute="bottom" secondItem="oez-pq-fUm" secondAttribute="bottom" constant="12" id="2Dk-vt-kUA"/>
                     <constraint firstAttribute="bottom" secondItem="kgZ-xK-Ij1" secondAttribute="bottom" constant="11" id="6JY-4Z-CXv"/>
+                    <constraint firstItem="05z-Fa-E8J" firstAttribute="top" secondItem="lqH-aA-GxX" secondAttribute="bottom" constant="8" symbolic="YES" id="7yM-Ka-wbc"/>
                     <constraint firstAttribute="bottom" secondItem="lSl-gT-Zzl" secondAttribute="bottom" constant="14" id="D2b-kT-Yfw"/>
-                    <constraint firstItem="nh9-Pb-Sik" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="-1" id="Fg8-1d-vNI"/>
-                    <constraint firstItem="oez-pq-fUm" firstAttribute="leading" secondItem="wZt-aV-DMH" secondAttribute="trailing" constant="8" id="GZw-o2-YZm"/>
+                    <constraint firstItem="lqH-aA-GxX" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="-1" id="HvO-Nw-ETS"/>
                     <constraint firstItem="05z-Fa-E8J" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="10" id="JM9-Oi-BXM"/>
-                    <constraint firstAttribute="trailing" secondItem="nh9-Pb-Sik" secondAttribute="trailing" constant="-1" id="K8b-Ve-Kuk"/>
                     <constraint firstAttribute="bottom" secondItem="05z-Fa-E8J" secondAttribute="bottom" constant="12" id="Q41-2V-nLN"/>
+                    <constraint firstItem="lqH-aA-GxX" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="-1" id="RVK-hR-5Fm"/>
                     <constraint firstItem="JQf-zG-6rJ" firstAttribute="centerX" secondItem="EiT-Mj-1SZ" secondAttribute="centerX" id="SaQ-Uk-5Ib"/>
-                    <constraint firstItem="nh9-Pb-Sik" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="-1" id="UMv-Ys-T0T"/>
-                    <constraint firstAttribute="trailing" secondItem="oez-pq-fUm" secondAttribute="trailing" constant="15" id="YNx-Dl-gDQ"/>
+                    <constraint firstAttribute="trailing" secondItem="oez-pq-fUm" secondAttribute="trailing" constant="15" id="Yd7-dS-pSm"/>
                     <constraint firstItem="kgZ-xK-Ij1" firstAttribute="leading" secondItem="lSl-gT-Zzl" secondAttribute="trailing" constant="8" id="eRb-8a-SxW"/>
+                    <constraint firstItem="oez-pq-fUm" firstAttribute="leading" secondItem="wZt-aV-DMH" secondAttribute="trailing" constant="8" id="g1h-T8-72r"/>
                     <constraint firstItem="lSl-gT-Zzl" firstAttribute="leading" secondItem="05z-Fa-E8J" secondAttribute="trailing" constant="8" id="i2n-2T-VkP"/>
-                    <constraint firstAttribute="bottom" secondItem="wZt-aV-DMH" secondAttribute="bottom" constant="14" id="jqr-zS-THU"/>
+                    <constraint firstAttribute="bottom" secondItem="wZt-aV-DMH" secondAttribute="bottom" constant="14" id="kSK-b8-Gdk"/>
                     <constraint firstAttribute="bottom" secondItem="JQf-zG-6rJ" secondAttribute="bottom" constant="13" id="kh4-gT-bud"/>
-                    <constraint firstAttribute="bottom" secondItem="oez-pq-fUm" secondAttribute="bottom" constant="12" id="lyt-vf-9rF"/>
+                    <constraint firstItem="lqH-aA-GxX" firstAttribute="centerX" secondItem="JQf-zG-6rJ" secondAttribute="centerX" id="mQE-Ji-apa"/>
                 </constraints>
             </view>
             <toolbar key="toolbar" implicitIdentifier="B3EC3009-665A-4008-AF07-80CBA64DA7FB" displayMode="iconAndLabel" sizeMode="regular" id="TRV-z7-UZS">
@@ -972,7 +972,7 @@
                     <outlet property="delegate" destination="Voe-Tx-rLC" id="zhA-ZK-2Wc"/>
                 </connections>
             </toolbar>
-            <point key="canvasLocation" x="777" y="369"/>
+            <point key="canvasLocation" x="761.5" y="363.5"/>
         </window>
         <window title="New Project" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="D74-Fr-OkO" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>

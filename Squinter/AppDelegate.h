@@ -233,7 +233,7 @@
     BOOL isLightThemeFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
 	BOOL checkModelsFlag, newProjectFlag;
 
-    NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors;
+    NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *logLines;
 
     NSDateFormatter *def;
 
@@ -281,6 +281,7 @@
 - (IBAction)saveRenameProjectSheet:(id)sender;
 
 - (void)openSquirrelProjects:(NSArray *)urls :(NSInteger)count;
+- (NSInteger)compareVersion:(NSString *)newVersion :(NSString *)oldVersion;
 - (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName;
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
 - (BOOL)checkFile:(NSString *)filePath;
@@ -371,6 +372,7 @@
 
 - (IBAction)getLogs:(id)sender;
 - (void)listLogs:(NSNotification *)note;
+- (void)logLogs;
 - (IBAction)printLog:(id)sender;
 - (void)printDone;
 - (IBAction)streamLogs:(id)sender;
@@ -385,6 +387,7 @@
 - (IBAction)getProjectInfo:(id)sender;
 - (NSString *)getDisplayPath:(NSString *)path;
 - (IBAction)showDeviceInfo:(id)sender;
+- (void)printInfoInLog:(NSMutableArray *)lines;
 - (IBAction)showModelInfo:(id)sender;
 - (IBAction)logDeviceCode:(id)sender;
 - (IBAction)logAgentCode:(id)sender;

@@ -183,6 +183,10 @@
     [saveLight setFull:YES];
     [saveLight setLight:NO];
 
+	// Set the log NSTextView only to check for embedded URLs
+
+	logTextView.enabledTextCheckingTypes = NSTextCheckingTypeLink;
+
     // Set initial working directory to user's Documents folder - this may be changed when we read in the defaults
 
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -354,6 +358,8 @@
 	// Get macOS version
 
 	sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+
+	logLines = [[NSMutableArray alloc] init];
 }
 
 
@@ -1495,8 +1501,9 @@
 
 - (void)openSquirrelProjects:(NSArray *)urls :(NSInteger)count
 {
-	// We are opening one Squirrel project files from a list
-	// We will re-call this method with an incremented 'count' to open the next file
+	// We are opening one Squirrel project files from a list ('urls')
+	// We will re-call this method with an incremented 'count' in order to open the next file,
+	// or bail if we've processed all of the files
 
 	if (count == urls.count) return;
 
@@ -1512,14 +1519,15 @@
 
 	if (newProject)
 	{
+		// Project opened successfully
 		// Check for a change of project name via project filename
 
 		pathMatch = [self checkProjectPaths:nil :filePath];
 
 		if (!pathMatch)
 		{
-			// Full path (path + name) of opened project doesn't match, but we still need to check the name,
-			// in case we have to add '01' to the name
+			// Full path (path + name) of opened project doesn't match,
+			// but we still need to check the name, in case we have to add '01' to the name
 
 			newName = [[filePath lastPathComponent] stringByDeletingPathExtension];
 			nameMatch = [self checkProjectNames:nil :newProject.projectName];
@@ -1764,7 +1772,7 @@
 					{
 						// Select the linked model
 
-						[self chooseModel:[modelsMenu itemAtIndex:count]];
+						[self chooseModel:[modelsMenu itemAtIndex:c]];
 					}
 					else
 					{
@@ -1831,15 +1839,16 @@
 }
 
 
-- (NSInteger)compareVersion:(NSString *)version :(NSString *)toVersion
+
+- (NSInteger)compareVersion:(NSString *)newVersion :(NSString *)oldVersion
 {
 	// Compare version strings:
-	// 1 - version > toVersion
-	// 0 - version = toVersion
-	// -1 - version < toVersion
+	// 1 - newVersion > oldVersion
+	// 0 - newVersion = oldVersion
+	// -1 - newVersion < oldVersion
 
-	NSArray *va1 = [version componentsSeparatedByString:@"."];
-	NSArray *va2 = [toVersion componentsSeparatedByString:@"."];
+	NSArray *va1 = [newVersion componentsSeparatedByString:@"."];
+	NSArray *va2 = [oldVersion componentsSeparatedByString:@"."];
 
 	NSString *s1 = (NSString *)[va1 objectAtIndex:0];
 	NSString *s2 = (NSString *)[va2 objectAtIndex:0];
@@ -1858,8 +1867,10 @@
 
 	if (i1 > i2) return kHigher;
 	if (i1 < i2) return kLower;
+
 	return kEqual;
 }
+
 
 
 - (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName
@@ -1876,8 +1887,7 @@
 				if ([byProject.projectName compare:aProject.projectName] == NSOrderedSame) return YES;
 			}
 		}
-
-		if (orProjectName != nil)
+		else if (orProjectName != nil)
 		{
 			for (Project *aProject in projectArray)
 			{
@@ -5908,15 +5918,7 @@
         return;
     }
 
-	/*
-	if (ide.models.count == 0)
-    {
-        [self writeToLog:@"[ERROR] You have no models in your account. You will need to create one before any device can be assigned to a model." :YES];
-        return;
-    }
-	 */
-
-    if (ide.devices.count == 0)
+	if (ide.devices.count == 0)
     {
         [self writeToLog:@"[ERROR] You have no devices in your account." :YES];
         return;
@@ -5946,30 +5948,52 @@
     // a device selected
 
     [self writeToLog:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [device objectForKey:@"name"]] :NO];
-	NSArray *theLogs = (NSArray *)note.object;
 
-	// Calculate the width of the widest status message for spacing the output into columns
+	if (logLines.count > 0) [logLines removeAllObjects];
 
-	NSUInteger width = 0;
+	__block NSArray *theLogs = (NSArray *)note.object;
 
-	for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
+	[extraOpQueue addOperationWithBlock:^(void){
+
+		// Calculate the width of the widest status message for spacing the output into columns
+
+		NSUInteger width = 0;
+
+		for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
+		{
+			NSDictionary *aLog = [theLogs objectAtIndex:i];
+			NSString *sString = [aLog objectForKey:@"type"];
+			if (sString.length > width) width = sString.length;
+		}
+
+		for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
+		{
+			NSDictionary *aLog = [theLogs objectAtIndex:i];
+			NSString *dString = [aLog objectForKey:@"timestamp"];
+			dString = [dString stringByReplacingOccurrencesOfString:@"T" withString:@" "];
+			dString = [dString substringToIndex:19];
+			NSString *tString = [aLog objectForKey:@"type"];
+			NSString *sString = [@"                    " substringToIndex:width - tString.length];
+			NSString *lString = [NSString stringWithFormat:@"%@ [%@] %@%@", dString, tString, sString, [aLog objectForKey:@"message"]];
+			[logLines addObject:lString];
+		}
+
+		[self performSelectorOnMainThread:@selector(logLogs) withObject:nil waitUntilDone:NO];
+	}];
+}
+
+
+
+- (void)logLogs
+{
+	for (NSString *line in logLines)
 	{
-		NSDictionary *aLog = [theLogs objectAtIndex:i];
-		NSString *sString = [aLog objectForKey:@"type"];
-		if (sString.length > width) width = sString.length;
+		[self writeToLog:line :NO];
 	}
 
-	for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-	{
-		NSDictionary *aLog = [theLogs objectAtIndex:i];
-		NSString *dString = [aLog objectForKey:@"timestamp"];
-		dString = [dString stringByReplacingOccurrencesOfString:@"T" withString:@" "];
-		dString = [dString substringToIndex:19];
-		NSString *tString = [aLog objectForKey:@"type"];
-		NSString *sString = [@"                    " substringToIndex:width - tString.length];
-		NSString *lString = [NSString stringWithFormat:@"%@ [%@] %@%@", dString, tString, sString, [aLog objectForKey:@"message"]];
-		[self writeToLog:lString :NO];
-	}
+	logTextView.editable = YES;
+	[logTextView checkTextInDocument:nil];
+	logTextView.editable = NO;
 }
 
 
@@ -6319,13 +6343,12 @@
 	}
 	
     NSArray *array;
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
     NSString *string = nil;
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
 
-    [self writeToLog:@"------------------------------------------------------------------------------------" :YES];
-
-	if (ide.models != nil && ide.models.count > 0)
+    if (ide.models != nil && ide.models.count > 0)
 	{
 		for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
 		{
@@ -6338,25 +6361,25 @@
 		}
 	}
 
-    [self writeToLog:[NSString stringWithFormat:@"Project \"%@\"", currentProject.projectName] :YES];
+    [lines addObject:[NSString stringWithFormat:@"Project \"%@\"", currentProject.projectName]];
 
 #ifdef DEBUG
 
-	[self writeToLog:[NSString stringWithFormat:@"Project Object Version %@", currentProject.projectVersion] :YES];
+	[lines addObject:[NSString stringWithFormat:@"Project Object Version %@", currentProject.projectVersion]];
 
 #endif
 
-	if (string) [self writeToLog:[NSString stringWithFormat:@"Project linked to model \"%@\"", string] :YES];
+	if (string) [lines addObject:[NSString stringWithFormat:@"Project linked to model \"%@\"", string]];
 
 	if (currentProject.projectPath == nil)
 	{
 		// This will be case if it's a new project that has not been saved yet
 
-		[self writeToLog:@"Project has not yet been saved" :YES];
+		[lines addObject:@"Project has not yet been saved"];
 	}
 	else
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Project location: %@/%@.squirrelproj", currentProject.projectPath, currentProject.projectName] :YES];
+		[lines addObject:[NSString stringWithFormat:@"Project location: %@/%@.squirrelproj", currentProject.projectPath, currentProject.projectName]];
 	}
 
 	NSString *rString;
@@ -6373,10 +6396,8 @@
 		rString = @"relative to your home directory";
 	}
 
-	[self writeToLog:[NSString stringWithFormat:@"The following file locations are %@", rString] :YES];
-
-	// [self writeToLog:[NSString stringWithFormat:@"Current working directory: %@", workingDirectory] :YES];
-    [self writeToLog:@" " :YES];
+	[lines addObject:[NSString stringWithFormat:@"The following file locations are %@", rString]];
+	[lines addObject:@" "];
 
     if (currentProject.projectAgentCodePath != nil)
     {
@@ -6391,59 +6412,60 @@
             string = [string stringByAppendingString:@" which has not been compiled."];
         }
         
-        [self writeToLog:string :YES];
-
-		[self writeToLog:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectAgentCodePath]] :YES];
+        [lines addObject:string];
+		[lines addObject:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectAgentCodePath]]];
 
         if (currentProject.projectAgentLibraries.count == 0)
         {
-            [self writeToLog:@"There are no local libraries in the agent code." :YES];
+            [lines addObject:@"There are no local libraries in the agent code."];
         }
         else if (currentProject.projectAgentLibraries.count == 1)
         {
-            [self writeToLog:@"There is 1 local library in the agent code:" :YES];
+            [lines addObject:@"There is 1 local library in the agent code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local libraries in the agent code:", (long)currentProject.projectAgentLibraries.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local libraries in the agent code:", (long)currentProject.projectAgentLibraries.count]];
         }
 
         if (currentProject.projectAgentLibraries.count > 0)
         {
             array = [currentProject.projectAgentLibraries allValues];
+
             for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
         if (currentProject.projectAgentFiles.count == 0)
         {
-            [self writeToLog:@"There are no local files in the agent code." :YES];
+            [lines addObject:@"There are no local files in the agent code."];
         }
         else if (currentProject.projectAgentFiles.count == 1)
         {
-            [self writeToLog:@"There is 1 local file in the agent code:" :YES];
+            [lines addObject:@"There is 1 local file in the agent code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local files in the agent code:", (long)currentProject.projectAgentFiles.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local files in the agent code:", (long)currentProject.projectAgentFiles.count]];
         }
 
         if (currentProject.projectAgentFiles.count > 0)
         {
             array = [currentProject.projectAgentFiles allValues];
-            for (NSUInteger i = 0 ; i < array.count ; ++i)
+
+			for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
-        [self writeToLog:@" " :YES];
+        [lines addObject:@" "];
     }
     else
     {
-        [self writeToLog:@"Project has no agent code." :YES];
+        [lines addObject:@"Project has no agent code."];
     }
 
 
@@ -6460,86 +6482,85 @@
 			string = [string stringByAppendingString:@" which has not been compiled."];
 		}
 
-		[self writeToLog:string :YES];
-
-		[self writeToLog:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectDeviceCodePath]] :YES];
+		[lines addObject:string];
+		[lines addObject:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectDeviceCodePath]]];
 
         if (currentProject.projectDeviceLibraries.count == 0)
         {
-            [self writeToLog:@"There are no local libraries in the device code." :YES];
+            [lines addObject:@"There are no local libraries in the device code."];
         }
         else if (currentProject.projectDeviceLibraries.count == 1)
         {
-            [self writeToLog:@"There is 1 local library in the device code:" :YES];
+            [lines addObject:@"There is 1 local library in the device code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local libraries in the device code:", (long)currentProject.projectDeviceLibraries.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local libraries in the device code:", (long)currentProject.projectDeviceLibraries.count]];
         }
 
         if (currentProject.projectDeviceLibraries.count > 0)
         {
             array = [currentProject.projectDeviceLibraries allValues];
-            for (NSUInteger i = 0 ; i < array.count ; ++i)
+
+			for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
-        //[self writeToLog:@" " :YES];
-
         if (currentProject.projectDeviceFiles.count == 0)
         {
-            [self writeToLog:@"There are no local files in the device code." :YES];
+            [lines addObject:@"There are no local files in the device code."];
         }
         else if (currentProject.projectDeviceFiles.count == 1)
         {
-            [self writeToLog:@"There is 1 local file in the device code:" :YES];
+            [lines addObject:@"There is 1 local file in the device code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local files in the device code:", (long)currentProject.projectDeviceFiles.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local files in the device code:", (long)currentProject.projectDeviceFiles.count]];
         }
 
         if (currentProject.projectDeviceFiles.count > 0)
         {
             array = [currentProject.projectDeviceFiles allValues];
-            for (NSUInteger i = 0 ; i < array.count ; ++i)
+
+			for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
-        [self writeToLog:@" " :YES];
+        [lines addObject:@" "];
 
 	}
 	else
 	{
-		[self writeToLog:@"Project has no device code." :YES];
+		[lines addObject:@"Project has no device code."];
 	}
 
 	if (currentProject.projectImpLibs.count > 0)
     {
         if (currentProject.projectImpLibs.count == 1)
         {
-            [self writeToLog:@"The Project includes the following Electric Imp library:" :YES];
+            [lines addObject:@"The Project includes the following Electric Imp library:"];
         }
         else
         {
-            [self writeToLog:@"The Project includes the following Electric Imp libraries:" :YES];
+            [lines addObject:@"The Project includes the following Electric Imp libraries:"];
         }
 
 		for (NSUInteger i = 0 ; i < currentProject.projectImpLibs.count ; ++i)
 		{
-            [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getLibraryTitle:[currentProject.projectImpLibs objectAtIndex:i]]] :YES];
+            [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getLibraryTitle:[currentProject.projectImpLibs objectAtIndex:i]]]];
 		}
     }
     else
     {
-        [self writeToLog:@"The Project contains no Electric Imp libraries." :YES];
+        [lines addObject:@"The Project contains no Electric Imp libraries."];
     }
 	
-	[self writeToLog:@"------------------------------------------------------------------------------------" :YES];
+	[self printInfoInLog:lines];
 }
 
 
@@ -6582,7 +6603,12 @@
 	}
 	
 	NSDictionary *device = [ide.devices objectAtIndex:currentDevice];
-							
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
+
+	[lines addObject:[NSString stringWithFormat:@"Device: %@", [device objectForKey:@"name"]]];
+	[lines addObject:[NSString stringWithFormat:@"Device ID: %@", [device objectForKey:@"id"]]];
+	[lines addObject:[NSString stringWithFormat:@"State: %@", [device objectForKey:@"powerstate"]]];
+
 	// If the device is unassigned, it will have a null model id
 
 	NSString *mId = [device objectForKey:@"model_id"];
@@ -6601,11 +6627,7 @@
 		modelName = @"This device is not assigned to a model.";
 	}
 
-	[self writeToLog:@"--------------------------------------------------------------" :YES];
-	[self writeToLog:[NSString stringWithFormat:@"Device: %@", [device objectForKey:@"name"]] :YES];
-	[self writeToLog:[NSString stringWithFormat:@"Device ID: %@", [device objectForKey:@"id"]] :YES];
-	[self writeToLog:[NSString stringWithFormat:@"State: %@", [device objectForKey:@"powerstate"]] :YES];
-	[self writeToLog:modelName :YES];
+	[lines addObject:modelName];
 
 	NSString *agentId = [device objectForKey:@"agent_id"];
 
@@ -6613,21 +6635,25 @@
 
 	if ((NSNull *)agentId != [NSNull null])
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Agent State: %@", [device objectForKey:@"agent_status"]] :YES];
-		[self writeToLog:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [device objectForKey:@"agent_id"]] :YES];
+		[lines addObject:[NSString stringWithFormat:@"Agent State: %@", [device objectForKey:@"agent_status"]]];
+		[lines addObject:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [device objectForKey:@"agent_id"]]];
 
-		// Briefly switch on editing to activate the Agent URL link
 
-		logTextView.editable = YES;
-		[logTextView checkTextInDocument:nil];
-		logTextView.editable = NO;
 	}
 	else
 	{
-		[self writeToLog:@"This device has no agent. You must assign it to a model first." :YES];
+		[lines addObject:@"This device has no agent. You must assign it to a model first."];
 	}
 
-	[self writeToLog:@"--------------------------------------------------------------" :YES];
+	[self printInfoInLog:lines];
+
+	// Briefly switch on editing to activate the Agent URL link
+
+	logTextView.editable = YES;
+	[logTextView checkTextInDocument:nil];
+	logTextView.editable = NO;
+
+
 }
 
 
@@ -6642,8 +6668,6 @@
 
         if (ide.models.count > 0)
         {
-
-
             for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
             {
                 NSMenuItem *item = [modelsMenu itemAtIndex:i];
@@ -6670,14 +6694,15 @@
     }
 
     NSDictionary *model = [ide.models objectAtIndex:index];
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
     NSString *mid = [model objectForKey:@"id"];
 
-    [self writeToLog:@"------------------------------------------------------------" :YES];
-    [self writeToLog:[NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]] :YES];
-    [self writeToLog:[NSString stringWithFormat:@"Model ID: %@", mid] :YES];
+    [lines addObject:[NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]]];
+    [lines addObject:[NSString stringWithFormat:@"Model ID: %@", mid]];
 
     NSString *dString = @"";
     NSUInteger dCount = 0;
+
     for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
     {
         NSDictionary *dev = [ide.devices objectAtIndex:i];
@@ -6697,14 +6722,14 @@
         dString = [dString substringToIndex:dString.length - 2];
         NSString *cString = @"device";
         if (dCount > 1) cString = @"devices";
-        [self writeToLog:[NSString stringWithFormat:@"%lu %@ assigned to this model: %@", (unsigned long)dCount, cString, dString] :YES];
+        [lines addObject:[NSString stringWithFormat:@"%lu %@ assigned to this model: %@", (unsigned long)dCount, cString, dString]];
     }
     else
     {
-        [self writeToLog:@"No devices assigned to this model" :YES];
+        [lines addObject:@"No devices assigned to this model"];
     }
 
-    [self writeToLog:@"------------------------------------------------------------" :YES];
+	[self printInfoInLog:lines];
 }
 
 
@@ -6727,9 +6752,6 @@
 	
 	[self writeToLog:@"Device Code:" :NO];
 	[self writeToLog:@" " :NO];
-
-	//[self listCode:currentProject.projectDeviceCode :-1 :-1 :-1];
-	//[self writeToLog:@" " :NO];
 
 	[extraOpQueue addOperationWithBlock:^{[self listCode:currentProject.projectDeviceCode :-1 :-1 :-1];}];
 }
@@ -6755,10 +6777,35 @@
 	[self writeToLog:@"Agent Code:" :NO];
 	[self writeToLog:@" " :NO];
 
-	//[self listCode:currentProject.projectAgentCode :-1 :-1 :-1];
-	//[self writeToLog:@" " :NO];
-
 	[extraOpQueue addOperationWithBlock:^{[self listCode:currentProject.projectAgentCode :-1 :-1 :-1];}];
+}
+
+
+
+- (void)printInfoInLog:(NSMutableArray *)lines
+{
+	NSInteger dashCount = 0;
+
+	for (NSString *string in lines)
+	{
+		if (string.length > dashCount) dashCount = string.length;
+	}
+
+	NSString *dashes = @"";
+
+	for (NSUInteger i = 0 ; i < dashCount ; ++i)
+	{
+		dashes = [dashes stringByAppendingString:@"-"];
+	}
+
+	[self writeToLog:dashes :YES];
+
+	for (NSString *string in lines)
+	{
+		[self writeToLog:string :YES];
+	}
+
+	[self writeToLog:dashes :YES];
 }
 
 
@@ -8261,8 +8308,8 @@
 
 - (void)startProgress
 {
-    connectionIndicator.hidden = NO;
     [connectionIndicator startAnimation:self];
+	connectionIndicator.hidden = NO;
 }
 
 
@@ -8530,7 +8577,6 @@
 		// Mark the project as needing to be saved, and up the version
 
 		project.projectHasChanged = YES;
-		project.projectUpdated = YES;
 		project.projectVersion = kCurrentProjectVersionString;
 
 		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" project file updated to version %@", project.projectName, project.projectVersion] :YES];
