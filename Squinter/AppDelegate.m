@@ -358,8 +358,6 @@
 	// Get macOS version
 
 	sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
-
-	logLines = [[NSMutableArray alloc] init];
 }
 
 
@@ -5947,11 +5945,7 @@
     // to acquire its name; this method wouldn't have been called if there *hadn't* been
     // a device selected
 
-    [self writeToLog:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [device objectForKey:@"name"]] :NO];
-
-	if (logLines.count > 0) [logLines removeAllObjects];
-
-	__block NSArray *theLogs = (NSArray *)note.object;
+    __block NSArray *theLogs = (NSArray *)note.object;
 
 	[extraOpQueue addOperationWithBlock:^(void){
 
@@ -5966,6 +5960,8 @@
 			if (sString.length > width) width = sString.length;
 		}
 
+		[self performSelectorOnMainThread:@selector(logLogs:) withObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [device objectForKey:@"name"]] waitUntilDone:NO];
+
 		for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
 		{
 			NSDictionary *aLog = [theLogs objectAtIndex:i];
@@ -5975,22 +5971,24 @@
 			NSString *tString = [aLog objectForKey:@"type"];
 			NSString *sString = [@"                    " substringToIndex:width - tString.length];
 			NSString *lString = [NSString stringWithFormat:@"%@ [%@] %@%@", dString, tString, sString, [aLog objectForKey:@"message"]];
-			[logLines addObject:lString];
+			[self performSelectorOnMainThread:@selector(logLogs:) withObject:lString waitUntilDone:NO];
 		}
 
-		[self performSelectorOnMainThread:@selector(logLogs) withObject:nil waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(parseLog) withObject:nil waitUntilDone:NO];
 	}];
 }
 
 
 
-- (void)logLogs
+- (void)logLogs:(NSString *)logLine
 {
-	for (NSString *line in logLines)
-	{
-		[self writeToLog:line :NO];
-	}
+	[self writeToLog:logLine :NO];
+}
 
+
+
+- (void)parseLog
+{
 	logTextView.editable = YES;
 	[logTextView checkTextInDocument:nil];
 	logTextView.editable = NO;
@@ -6647,13 +6645,7 @@
 
 	[self printInfoInLog:lines];
 
-	// Briefly switch on editing to activate the Agent URL link
-
-	logTextView.editable = YES;
-	[logTextView checkTextInDocument:nil];
-	logTextView.editable = NO;
-
-
+	[self parseLog];
 }
 
 
@@ -7989,17 +7981,17 @@
 {
 	// Rename all menus based on online state and logging state
 	// Note we only use the existing info; we don't reload the device
-	// list from the server
+	// list from the server. Status string added via 'menuString:'
 
 	// Do the popup
 
-	NSUInteger len = 24;
+	NSUInteger truncateLength = 24;
 
 	for (NSMenuItem *item in devicesPopUp.itemArray)
 	{
 		NSArray *itemTitleParts = [item.title componentsSeparatedByString:@" "];
 		NSString *itemTitle = [itemTitleParts objectAtIndex:0];
-		if (itemTitle.length > len) len = itemTitle.length;
+		if (itemTitle.length > truncateLength) truncateLength = itemTitle.length;
 	}
 
 	for (NSMenuItem *item in devicesPopUp.itemArray)
@@ -8011,12 +8003,7 @@
 		{
 			NSString *deviceName = [device objectForKey:@"name"];
 
-			if ((NSNull *)deviceName == [NSNull null])
-			{
-				// We have to check for null device
-
-				deviceName = [device objectForKey:@"id"];
-			}
+			if ((NSNull *)deviceName == [NSNull null]) deviceName = [device objectForKey:@"id"];
 
 			if ([itemTitle compare:deviceName] == NSOrderedSame)
 			{
@@ -8083,15 +8070,9 @@
 				{
 					NSString *deviceName = [device objectForKey:@"name"];
 
-					if ((NSNull *)deviceName == [NSNull null])
-					{
-						deviceName = [device objectForKey:@"id"];
-					}
+					if ((NSNull *)deviceName == [NSNull null]) deviceName = [device objectForKey:@"id"];
 
-					if ([itemTitle compare:deviceName] == NSOrderedSame)
-					{
-						submenuItem.title = [itemTitle stringByAppendingString:[self menuString:[device objectForKey:@"id"]]];
-					}
+					if ([itemTitle compare:deviceName] == NSOrderedSame) submenuItem.title = [itemTitle stringByAppendingString:[self menuString:[device objectForKey:@"id"]]];
 				}
 			}
 		}
@@ -8115,8 +8096,6 @@
 
 		if ([aDeviceID compare:deviceID] == NSOrderedSame)
 		{
-			// Get the online state
-
 			aDeviceID = [device objectForKey:@"powerstate"];
 			if ([aDeviceID compare:@"online"] != NSOrderedSame) statusString = @"offline";
 			break;
@@ -8135,11 +8114,14 @@
 		returnString = @" (";
 
 		if (statusString.length > 0) returnString = [returnString stringByAppendingString:statusString];
+
 		if (loggingString.length > 0)
 		{
 			if (returnString.length > 2) returnString = [returnString stringByAppendingString:@", "];
 			returnString = [returnString stringByAppendingString:loggingString];
 		}
+
+		// Finish with a close bracket
 
 		returnString = [returnString stringByAppendingString:@")"];
 	}
@@ -8722,7 +8704,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 	if (task == eiLibListTask)
 	{
-		if ([ide getConnectionCount] < 1)
+		if (ide.numberOfConnections < 1)
 		{
 			// Only hide the connection indicator if 'ide' has no live connections
 

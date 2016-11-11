@@ -233,7 +233,7 @@
     BOOL isLightThemeFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
 	BOOL checkModelsFlag, newProjectFlag;
 
-    NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *logLines;
+    NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors;
 
     NSDateFormatter *def;
 
@@ -372,7 +372,8 @@
 
 - (IBAction)getLogs:(id)sender;
 - (void)listLogs:(NSNotification *)note;
-- (void)logLogs;
+- (void)logLogs:(NSString *)logLine;
+- (void)parseLog;
 - (IBAction)printLog:(id)sender;
 - (void)printDone;
 - (IBAction)streamLogs:(id)sender;
