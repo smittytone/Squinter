@@ -2697,13 +2697,23 @@
 
 				for (NSUInteger j = 0 ; j < currentProject.projectImpLibs.count ; ++j)
 				{
-					NSArray *bLib = [currentProject.projectImpLibs objectAtIndex:j];
-					NSString *bLibName = [bLib objectAtIndex:0];
+					NSString *bLibName = @"";
 
-					if ([bLibName compare:libName] == NSOrderedSame)
+					NSArray *bLib = [currentProject.projectImpLibs objectAtIndex:j];
+
+					if ([bLib isKindOfClass:[NSString class]])
 					{
-						match = [bLib objectAtIndex:1];
-						break;
+						bLibName = (NSString *)bLib;
+					}
+					else
+					{
+						bLibName = [bLib objectAtIndex:0];
+
+						if ([bLibName compare:libName] == NSOrderedSame)
+						{
+							match = [bLib objectAtIndex:1];
+							break;
+						}
 					}
 				}
 			}
