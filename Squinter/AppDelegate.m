@@ -3496,6 +3496,8 @@
                     // Found at least one / so there must be directory info here,
                     // even if it's just ~/lib.class.nut
 
+					/*
+
 					// What it if is ../lib.class.nut? This indicates relativity - but relative to what?
 					// We can only assume it's the project file.
 
@@ -3516,9 +3518,19 @@
 
 						libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					}
+					else
+					{
+						// We have directory info but no .., so we must have a subdirectory
+						// eg. abc/def/lib.class.nut
+
+						libName = [self getAbsolutePath:currentProject.projectPath :libName];
+					}
+
+					*/
 
                     // Get the path component from the source file's library name info
 
+					libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					libPath = [libName stringByStandardizingPath];
 					libPath = [libPath stringByDeletingLastPathComponent];
 
