@@ -26,8 +26,7 @@
 
 // Version 2.1 properties
 
-@property (nonatomic, strong) NSData *projectAgentCodeBookmark;				// macOS Bookmark for agent code file
-@property (nonatomic, strong) NSData *projectDeviceCodeBookmark;				// macOS Bookmark for device code file
+@property (nonatomic, strong) NSString *oldProjectPath;						// Saved path to project file
 
 // Properties that are NOT saved
 
@@ -36,10 +35,6 @@
 @property (nonatomic, strong) NSString *projectDeviceCode;                  // Compiled device code
 @property (nonatomic, assign) char projectSquinted;                         // Bitfield indicating compilation status
 @property (nonatomic, assign) bool projectHasChanged;                       // Has the project changed in any way, ie. does it need saving?
-
-// Version 2.1 properties
-
-@property (nonatomic, strong) NSData *projectBookmark;						// macOS Bookmark for project file
 
 
 @end

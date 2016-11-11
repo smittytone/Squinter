@@ -36,8 +36,7 @@
     noProjectsFlag = YES;
     noLibsFlag = YES;
 	saveProjectSubFilesFlag = NO;
-    selectDeviceFlag = NO;
-	unassignDeviceFlag = NO;
+    unassignDeviceFlag = NO;
 	requiresAllowedAnywhereFlag = NO;
 	checkModelsFlag = NO;
 	eiLibListData = nil;
@@ -100,7 +99,6 @@
 
     refreshMenuItem.enabled = YES;
 	deviceMenu.autoenablesItems = NO;
-    // streamLogsMenuItem.title = @"Start Log";
 
     for (item in deviceMenu.itemArray) item.enabled = NO;
 
@@ -185,6 +183,10 @@
     [saveLight setFull:YES];
     [saveLight setLight:NO];
 
+	// Set the log NSTextView only to check for embedded URLs
+
+	logTextView.enabledTextCheckingTypes = NSTextCheckingTypeLink;
+
     // Set initial working directory to user's Documents folder - this may be changed when we read in the defaults
 
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -198,9 +200,9 @@
 
     // Set up Key and Value arrays as template for Defaults
 
-    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", @"com.bps.squinter.displaypath", nil];
 
-    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], nil];
+    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithInteger:1], nil];
 
     // Drop the arrays into the Defauts
 
@@ -371,8 +373,8 @@
     // Turn the opened file’s path into an NSURL an add to the array that openFileHandler: expects
 
     NSArray *array = [NSArray arrayWithObjects:[NSURL fileURLWithPath:filename], nil];
-    BOOL success = [self openFileHandler:array :kOpenActionSquirrelProj];
-    return success;
+    [self openFileHandler:array :kOpenActionSquirrelProj];
+	return YES;
 }
 
 
@@ -391,8 +393,6 @@
 	ide = [[BuildAPIAccess alloc] initForNSURLSession];
     //ide = [[BuildAPIAccess alloc] initForNSURLConnection];
 	
-	projectIncludes = [[NSMutableArray alloc] init];
-
 	// Load in working directory, reading in the location from the defaults in case it has been changed by a previous launch
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -682,7 +682,7 @@
 		// Add the new project to the project menu. We've already checked for a name clash,
 		// so we needn't care about the return value.
 		
-        [self addProjectMenuItem:projectName];
+		[self addProjectMenuItem:projectName :currentProject];
 
         // Enable project-related UI items
 		
@@ -700,9 +700,9 @@
 
 		// User wants to view the auto-generated agent and device code files, so make sure they're generated
 
-		if (newProjectAccessoryViewFilesCheckbox.state == YES) saveProjectSubFilesFlag = YES;
+		if (newProjectAccessoryViewFilesCheckbox.state == NSOnState) saveProjectSubFilesFlag = YES;
 
-		if (newProjectAccessoryViewAssociateCheckbox.state == YES)
+		if (newProjectAccessoryViewAssociateCheckbox.state == NSOnState)
 		{
             // If the 'associate new project with current model' is checked
 
@@ -754,6 +754,17 @@
 
 #pragma mark - Choose and Open Project Methods
 
+
+- (IBAction)pickProject:(id)sender
+{
+	// Stub to handle UI interaction and call chooseProject: which actually
+	// handles project selection
+
+	[self chooseProject:nil];
+}
+
+
+
 - (void)chooseProject:(id)sender
 {
     // Select one of the open projects from the Projects sub-menu or the Project menu
@@ -764,81 +775,99 @@
 
 	if (sender == currentProject)
 	{
+		// Is this ever reached? Needs fixing if it is
+
 		item = [projectsMenu itemWithTitle:currentProject.projectName];
 	}
 	else if (sender != nil)
 	{
+		// The user has selected a projects from the 'projectsMenu' submenu
+
 		item = (NSMenuItem *)sender;
 	}
 	else
 	{
-		item = [projectsMenu itemWithTitle:[projectsPopUp titleOfSelectedItem]];
+		// 'sender' is nil if the project was selected using 'projectsPopUp',
+		// which is set to action 'pickProject:'
+
+		NSInteger tag = projectsPopUp.selectedItem.tag;
+		item = [projectsMenu itemAtIndex:tag];
 	}
-    
-    for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
-    {
-        Project *project = [projectArray objectAtIndex:i];
-        
-        if ([project.projectName compare:item.title] == NSOrderedSame)
-        {
-            // Compare the name of the menu item to the projects' names until we find
-            // the one we want to make current
-            
-            itemNumber = i;
-            currentProject = project;
-            currentDeviceLibCount = 0;
-            currentAgentLibCount = 0;
 
-            // Enable or disable code view menu options whether we have code to view
-            
-            if (currentProject.projectDeviceCode != nil)
-            {
-                [logDeviceCodeMenuItem setEnabled:YES];
-            }
-            else
-            {
-                [logDeviceCodeMenuItem setEnabled:NO];
-            }
-            
-            if (currentProject.projectAgentCode != nil)
-            {
-                [logAgentCodeMenuItem setEnabled:YES];
-            }
-            else
-            {
-                [logAgentCodeMenuItem setEnabled:NO];
-            }
-            
-            // Update the external library and file menus
-            
-            [self updateLibraryMenu];
-            [self updateFilesMenu];
+	Project *chosenProject = nil;
 
-			// Update the save? indicator
+	if (item.representedObject != nil)
+	{
+		chosenProject = item.representedObject;
+		itemNumber = [projectsMenu indexOfItem:item];
+	}
+	else
+	{
+	    for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
+    	{
+        	chosenProject = [projectArray objectAtIndex:i];
 
-			[saveLight setFull:!currentProject.projectHasChanged];
-
-			// Is the project associated with a model? If so, select it
-			
-			if (ide.models.count != 0)
+			if ([chosenProject.projectName compare:item.title] == NSOrderedSame)
 			{
-				for (NSInteger j = 0 ; j < ide.models.count ; ++j)
-				{
-					NSDictionary *model = [ide.models objectAtIndex:j];
-					NSString *modelCode = [model objectForKey:@"id"];
-					
-                    if ([modelCode compare:currentProject.projectModelID] == NSOrderedSame)
-					{
-						NSMenuItem *mitem = [modelsMenu itemAtIndex:j];
-                        selectDeviceFlag = YES;
-						[self chooseModel:mitem];
-                        selectDeviceFlag = NO;
-					}
-				}
+				itemNumber = i;
+				break;
 			}
-        }
-    }
+		}
+	}
+
+	// Compare the name of the menu item to the projects' names until we find
+	// the one we want to make current
 	
+	currentProject = chosenProject;
+	currentDeviceLibCount = 0;
+	currentAgentLibCount = 0;
+
+	// Enable or disable code view menu options whether we have code to view
+	
+	if (currentProject.projectDeviceCode != nil)
+	{
+		[logDeviceCodeMenuItem setEnabled:YES];
+	}
+	else
+	{
+		[logDeviceCodeMenuItem setEnabled:NO];
+	}
+	
+	if (currentProject.projectAgentCode != nil)
+	{
+		[logAgentCodeMenuItem setEnabled:YES];
+	}
+	else
+	{
+		[logAgentCodeMenuItem setEnabled:NO];
+	}
+	
+	// Update the external library and file menus
+	
+	[self updateLibraryMenu];
+	[self updateFilesMenu];
+
+	// Update the save? indicator
+
+	[saveLight setFull:!currentProject.projectHasChanged];
+
+	// Is the project associated with a model? If so, select it
+	
+	if (ide.models.count != 0)
+	{
+		for (NSInteger j = 0 ; j < ide.models.count ; ++j)
+		{
+			NSDictionary *model = [ide.models objectAtIndex:j];
+			NSString *modelCode = [model objectForKey:@"id"];
+			
+			if ([modelCode compare:currentProject.projectModelID] == NSOrderedSame)
+			{
+				NSMenuItem *mitem = [modelsMenu itemAtIndex:j];
+				[self chooseModel:mitem];
+			}
+		}
+	}
+
     // We've made the selected project the current one, so adjust the project menu's tick marks
     
     for (NSUInteger i = 0; i < projectsMenu.numberOfItems ; ++i)
@@ -859,7 +888,7 @@
 
 	// Update the Project list popup
 
-	NSUInteger index = [projectsPopUp indexOfItemWithTitle:currentProject.projectName];
+	NSUInteger index = [projectsPopUp indexOfItemWithTag:itemNumber];
 	[projectsPopUp selectItemAtIndex:index];
 
 	// Update the Menus and the Toolbar (left until now in case models etc are selected)
@@ -883,19 +912,11 @@
 
 
 
-- (IBAction)pickProject:(id)sender
-{
-	// Stub to handle UI interaction and call chooseProject: which actually
-	// handles project selection
-
-	[self chooseProject:nil];
-}
-
-
-
 - (IBAction)openProject:(id)sender
 {
-    // Set up an open panel to request a .squirrelproj file
+	// Locate and open an existing project file
+
+	// Set up an open panel to request a .squirrelproj file
     
     openDialog = [NSOpenPanel openPanel];
     openDialog.message = @"Select a Squirrel Project file...";
@@ -904,66 +925,88 @@
     
     // Set the panel's accessory view checkbox to OFF
     
-    accessoryViewCheckbox.state = NSOffState;
+    accessoryViewNewProjectCheckbox.state = NSOffState;
     
     // Hide the accessory view - though it's not shown, openFileHandler: checks its state
     
     openDialog.accessoryView = nil;
-    [self openFile:kOpenActionSquirrelProj];
+    [self presentOpenFilePanel:kOpenActionSquirrelProj];
 }
 
 
 
+#pragma mark - File Location and Opening Methods
+
+
 - (IBAction)selectFile:(id)sender
 {
-    // Set up an open panel
+	// Called by 'Add Files to Project...' File menu item
+	// If no current project is selected, this should go into project create mode,
+	// ie. go to selectFileForProject:
+
+	if (currentProject == nil)
+	{
+		// There's no current project, so assume the user wants to create one
+
+		[self selectFileForProject:sender];
+		return;
+	}
+
+	// Set up an open panel
     
     openDialog = [NSOpenPanel openPanel];
-    openDialog.message = @"Select a Squirrel source code file...";
+    openDialog.message = @"Select a Squirrel source code files...";
     openDialog.allowedFileTypes = [NSArray arrayWithObjects:@"nut", nil];
     openDialog.allowsMultipleSelection = YES;
     
-    // Set the panel's accessory view checkbox to ON - ie. add file to a new project
+    // Set the panel's accessory view checkbox to OFF - ie. don't create a new project
     
-    accessoryViewCheckbox.state = NSOffState;
+    accessoryViewNewProjectCheckbox.state = NSOffState;
     
     // Add the accessory view to the panel
     
     openDialog.accessoryView = accessoryView;
 	if (sysVer.majorVersion >= 10 & sysVer.minorVersion >= 11) openDialog.accessoryViewDisclosed = YES;
-    [self openFile:kOpenActionNutFile];
+    [self presentOpenFilePanel:kOpenActionAddFiles];
 }
 
 
 
 - (IBAction)selectFileForProject:(id)sender
 {
-    // Set up an open panel
+	// Called by 'New Projec with Files...' File menu item OR
+	// via selectFile: when there is no current project
+
+	// Set up an open panel
     
     openDialog = [NSOpenPanel openPanel];
     openDialog.message = @"Select Agent and Device Squirrel source code files...";
     openDialog.allowedFileTypes = [NSArray arrayWithObjects:@"nut", nil];
     openDialog.allowsMultipleSelection = YES;
 
-	// Hide the accessory view - though it's not shown, we still check its checkbox state
+	// Set the accessory view new project checkbox to ON - ie. create a new project
+	// even though it won't be shown as we check this state later
 
-	accessoryViewCheckbox.state = NSOnState;
+	accessoryViewNewProjectCheckbox.state = NSOnState;
 
 	projectFromFilesAccessoryViewCheckbox.state = NSOnState;
     openDialog.accessoryView = projectFromFilesAccessoryView;
 	if (sysVer.majorVersion >= 10 & sysVer.minorVersion >= 11) openDialog.accessoryViewDisclosed = YES;
-    [self openFile:kOpenActionNutFiles];
+    [self presentOpenFilePanel:kOpenActionNewFiles];
 }
 
 
 
-- (void)openFile:(NSInteger)openActionType
+- (void)presentOpenFilePanel:(NSInteger)openActionType
 {
     // Complete the open file dialog settings with generic preferences
     
     openDialog.canChooseFiles = YES;
     openDialog.canChooseDirectories = NO;
 	openDialog.delegate = self;
+
+	// Start off at the working directory
+
 	openDialog.directoryURL = [NSURL fileURLWithPath:workingDirectory isDirectory:YES];
     
     // Run the NSOpenPanel
@@ -987,591 +1030,944 @@
 
 
 
-- (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType
+- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType
 {
-	// This is where we open/add all files
-
-	Project *newProject;
-	NSString *projectName, *fileName, *filePath;
-	NSUInteger count;
-	BOOL gotFlag;
+	// This is where we open/add all files selected by the open file dialog
 
 	if (openActionType == kOpenActionSquirrelProj)
 	{
-		// We are opening Squirrel project file(s)
-		
-		for (NSUInteger i = 0 ; i < urls.count ; ++i)
-		{
-			filePath = [[urls objectAtIndex:i] path];
-			newProject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-			gotFlag = NO;
-			
-			if (newProject)
-			{
-				// Project loaded from file correctly, but is it already open?
-				
-				count = 0;
-
-				if (projectArray.count > 0)
-				{
-					// We have open projects already so check we're not opening an already open one
-
-					for (NSUInteger j = 0 ; j < projectArray.count ; ++j)
-					{
-						Project *project = [projectArray objectAtIndex:j];
-						
-						if ([project.projectName compare:newProject.projectName] == NSOrderedSame)
-						{
-							// The names match, so check the path too
-							
-							if ([project.projectPath compare:[filePath stringByDeletingLastPathComponent]] == NSOrderedSame)
-							{
-								// Projects' paths match too, so they are almost certainly the same
-								// TODO check for bookmark match?
-								
-								[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project \"%@\" is already open.", newProject.projectName] :YES];
-								gotFlag = YES;
-								break;
-							}
-							else
-							{
-								// The two projects' paths are different, so they may not be the same; rename the new one
-								
-								++count;
-							}
-						}
-					}
-
-					// TODO This approach to multiple projects of the same name is a bit crap - find a better one
-
-					if (count > 0) newProject.projectName = [newProject.projectName stringByAppendingFormat:@" %lu", (unsigned long)count];
-				}
-				
-				if (!gotFlag)
-				{	
-					// Set the newly opened project to be the current one as it's not loaded already
-					
-					currentProject = newProject;
-					Float32 currentProjectVersion = currentProject.projectVersion.floatValue;
-					
-					// Update the project's path property which is not saved in case the user moves the file
-					
-					currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
-
-					if (currentProjectVersion > 2.0)
-					{
-						currentProject.projectBookmark = [self bookmarkForURL:[NSURL URLWithString:filePath]];
-					}
-					
-					// Has the user changed the name of the file?
-					
-					NSString *aName = [[filePath lastPathComponent] stringByDeletingPathExtension];
-					
-					if ([aName compare:currentProject.projectName] != NSOrderedSame)
-					{
-						// The file name has changed so rename the project
-						// TODO this is user-optional so should be deprecated
-						
-						[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" has been renamed \"%@\" to match its filename.", currentProject.projectName, aName] :YES];
-						currentProject.projectName = aName;
-						currentProject.projectHasChanged = YES;
-					}
-					
-					[self writeToLog:[NSString stringWithFormat:@"Loading project \"%@\" from file \"%@\".", currentProject.projectName, filePath] :YES];
-					
-					[projectArray addObject:currentProject];
-
-                    // Set up kernel queue to watch for file changes
-					
-					if (fileWatchQueue == nil)
-					{
-						fileWatchQueue = [[VDKQueue alloc] init];
-						[fileWatchQueue setDelegate:self];
-					}
-					
-					NSFileManager *fm = [NSFileManager defaultManager];
-					
-					if (currentProjectVersion > 2.0)
-					{
-						if (currentProject.projectAgentCodeBookmark)
-						{
-							NSURL *agentCodeURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
-							currentProject.projectAgentCode = agentCodeURL.path;
-						}
-
-						if (currentProject.projectDeviceCodeBookmark)
-						{
-							NSURL *deviceCodeURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
-							currentProject.projectDeviceCode = deviceCodeURL.path;
-						}
-					}
-
-					if (currentProject.projectAgentCodePath != nil)
-					{
-						// Does the project's recorded agent code path point to a real file?
-
-						if ([fm fileExistsAtPath:currentProject.projectAgentCodePath isDirectory:NO] == YES)
-						{
-							// It does and the pointer indicates an extant file
-
-							[fileWatchQueue addPath:currentProject.projectAgentCodePath notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
-							externalOpenMenuItem.enabled = YES;
-							externalOpenAgentItem.enabled = YES;
-							externalOpenBothItem.enabled = YES;
-						}
-						else
-						{
-							// There is no file where the pointer is indicating, so see if it's in the working directory
-
-							NSString *path = [currentProject.projectAgentCodePath lastPathComponent];
-							path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
-							
-							if ([fm fileExistsAtPath:path isDirectory:NO] == YES)
-							{
-								// File is in the working directory, so update the saved path
-
-								currentProject.projectAgentCodePath = path;
-								[fileWatchQueue addPath:currentProject.projectAgentCodePath notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
-								externalOpenMenuItem.enabled = YES;
-								externalOpenAgentItem.enabled = YES;
-								externalOpenBothItem.enabled = YES;
-								[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project’s agent code file has been moved to \"%@\".", path] :YES];
-							}
-							else
-							{
-								// Can't see the agent code file in the working directory so clear the pointer and warn the user
-
-								currentProject.projectAgentCodePath = nil;
-								[self writeToLog:@"[WARNING] The project’s agent code file has been moved to an unknown location. You will need to add it back to the project." :YES];
-							}
-							
-							currentProject.projectHasChanged = YES;
-						}
-					}
-				
-					if (currentProject.projectDeviceCodePath != nil)
-					{
-						// As above per the agent code file, this time for the device code file
-
-						if ([fm fileExistsAtPath:currentProject.projectDeviceCodePath isDirectory:NO] == YES)
-						{
-							[fileWatchQueue addPath:currentProject.projectDeviceCodePath notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
-							externalOpenMenuItem.enabled = YES;
-							externalOpenDeviceItem.enabled = YES;
-							externalOpenBothItem.enabled = YES;
-						}
-						else
-						{
-							NSString *path = [currentProject.projectDeviceCodePath lastPathComponent];
-							path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
-							
-							if ([fm fileExistsAtPath:path isDirectory:NO] == YES)
-							{
-								currentProject.projectDeviceCodePath = path;
-								[fileWatchQueue addPath:currentProject.projectDeviceCodePath notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
-								externalOpenMenuItem.enabled = YES;
-								externalOpenDeviceItem.enabled = YES;
-								externalOpenBothItem.enabled = YES;
-								[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project’s device code file has been moved to \"%@\".", path] :YES];
-							}
-							else
-							{
-								currentProject.projectDeviceCodePath = nil;
-								[self writeToLog:@"[WARNING] The project’s device code file has been moved to an unknown location. You will need to add it back to the project." :YES];
-							}
-							
-							currentProject.projectHasChanged = YES;
-						}
-					}
-
-					// Do we need to autocompile the project we have opened?
-					
-					if ([[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autocompile"])
-					{
-						// NOTE squint: calls updateLibraryMenu: so we don't need to do it here
-						
-						[self writeToLog:@"Auto-compiling project. This can be disabled in Preferences." :YES];
-						[self squint:nil];  // Currently jumps to squintr:
-					}
-					else
-					{
-						// Update the library menus with stored lists
-
-						[self writeToLog:@"Please compile the project to update the library and linked file lists." :YES];
-						[self updateLibraryMenu];
-                        [self updateFilesMenu];
-					}
-
-					// Select the model associated with the project, if one has been
-
-					count = 0;
-
-					if (ide.models.count > 0)
-					{
-						// If we have loaded the models list, select the one which the project is linked to
-
-						for (NSDictionary *model in ide.models)
-						{
-							NSString *mID = [model objectForKey:@"id"];
-							if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
-							{
-								// Select the linked model
-
-                                selectDeviceFlag = YES;
-								[self chooseModel:[modelsMenu itemAtIndex:count]];
-                                selectDeviceFlag = NO;
-							}
-							else
-							{
-								++count;
-							}
-						}
-					}
-
-                    // Update the Project menu’s projects sub-menu
-
-                    [self addProjectMenuItem:currentProject.projectName];
-					
-					// Update the Menus and the Toolbar
-					
-                    [self updateMenus];
-                    [self setToolbar];
-
-					// Finally, set the status light
-
-					[saveLight setLight:YES];
-					[saveLight setFull:!currentProject.projectHasChanged];
-
-					// Mark that we have at least one open project
-
-					noProjectsFlag = NO;
-				}
-			}
-			else
-			{
-				// Project didn't load for some reason so warn the user
-				
-				[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
-			}
-		}
+		[self openSquirrelProjects:urls :0];
+		return;
 	}
 	else
 	{
-		// We are opening other, non-project types of file
-		
+		// We are opening one or two source code files to add to a project, which may be new
 		// Check the number of files selected. If we are using source files to create a project, it should never be more than two
 		
 		if (urls.count > 2)
 		{
 			[self writeToLog:@"[ERROR] Too many source files selected for project." :YES];
 			[self writeToLog:[NSString stringWithFormat:@"Projects contain only two files: *.agent.nut and *.device.nut. You selected %lu files.", (long)urls.count] :YES];
-			return NO;
+			return;
 		}
 		
-		if (accessoryViewCheckbox.state == NSOnState)
-		{
-			// This will be set if either we have two source code files from which the user wants to make a project,
-			// or the user wants the one file opened to be used as the basis for a new project. So create a new project,
-			// make it current and add it to the array of open projects
-			
-			currentProject = [[Project alloc] init];
-			// [projectArray addObject:currentProject];
-		}
-		
-		// Clear 'foundLibs' and 'foundFiles' ahead of loading in new source code
-		
+		// Clear 'foundLibs' and 'foundFiles' ahead of loading in any new source code
+		// Need to do this here as we bypass 'squintr:' (as we don't want to compile)
+
 		if (foundLibs != nil) foundLibs = nil;
 		if (foundFiles != nil) foundFiles = nil;
 		foundFiles = [[NSMutableArray alloc] init];
 		foundLibs = [[NSMutableArray alloc] init];
-		
-		// Get the current project name; this will be nil for a new project
-		
-		projectName = currentProject.projectName;
-		
-		for (NSUInteger i = 0 ; i < urls.count ; ++i)
+
+		if (accessoryViewNewProjectCheckbox.state == NSOnState)
 		{
-			// Step through the files passed by the NSOpenPanel; may be one or two
+			// This will be set if we have one or two source code files from which the user wants to make a project.
+			// So create a new project and make it current
 			
-			BOOL isDeviceCodeFile = NO;
-			BOOL isAgentCodeFile = NO;
-			
-			filePath = [[urls objectAtIndex:i] path];
-			fileName = [filePath lastPathComponent];
-			
-			[self writeToLog:[NSString stringWithFormat:@"Processing file: \"%@\".", filePath] :YES];
-			
-			// Is the file a *.device.nut file?
-			
-			NSRange range = [fileName rangeOfString:@"device.nut"];
-			
+			currentProject = [[Project alloc] init];
+		}
+		else
+		{
+			if (currentProject == nil)
+			{
+				// We shouldn't be able to reach this point because we headed this off at the pass in selectFile:
+
+				return;
+			}
+		}
+
+		// Process the first of the added files
+
+		[self processAddedFiles:urls :0];
+		return;
+	}
+
+	return;
+}
+
+
+
+- (void)processAddedFiles:(NSArray *)urls :(NSUInteger)count
+{
+	// Each pass through this method, we process the 'count' item in the array 'urls'
+	// NOTE we always come here to exit the file handling process via the following line
+
+	if (count == urls.count)
+	{
+		// We've processed all the input files. If we created a new project we have to
+		// check that then end the process - of just end it
+
+		if (accessoryViewNewProjectCheckbox.state == NSOnState) [self processAddedNewProject];
+
+		// Now update the UI
+
+		if (currentProject.projectHasChanged || accessoryViewNewProjectCheckbox.state == NSOnState)
+		{
+			[self processAddedFilesUIUpdate];
+		}
+
+		return;
+	}
+
+	BOOL isDeviceCodeFile = NO;
+	BOOL isAgentCodeFile = NO;
+
+	NSString *filePath = [[urls objectAtIndex:count] path];
+	NSString *fileName = [filePath lastPathComponent];
+
+	[self writeToLog:[NSString stringWithFormat:@"Processing file: \"%@\".", filePath] :YES];
+
+	// Is the file a *.device.nut file?
+
+	NSRange range = [fileName rangeOfString:@"device.nut"];
+
+	if (range.location != NSNotFound)
+	{
+		// Filename contains 'device.nut'
+
+		isDeviceCodeFile = YES;
+	}
+	else
+	{
+		// Filename doesn't contain 'device.nut', so check for 'agent.nut'
+
+		range = [fileName rangeOfString:@"agent.nut"];
+
+		if (range.location != NSNotFound)
+		{
+			// Filename contains 'agent.nut'
+
+			isAgentCodeFile = YES;
+		}
+		else
+		{
+			// Filename contains neither 'agent.nut', 'device.nut' or '.squirrelproj' so is unknown
+			// Just warn the user but take no other action - ie. end up with an empty file
+
+			range = [fileName rangeOfString:@".class"];
+
 			if (range.location != NSNotFound)
 			{
-				// Filename contains 'device.nut'
-				
-				isDeviceCodeFile = YES;
-				
-				if (projectName == nil)
-				{
-					// The project name is nil, which means we created a new project earlier for this file and it has
-					// yet to be populated with data. Get the name by stripping 'device.nut' from the filename
-					
-					if (currentProject == nil)
-					{
-						// User is opening the file into no project, so make one anyway - user doesn't have to save it
-						
-						[self writeToLog:[NSString stringWithFormat:@"Opening file \"%@\" from “%@”.", projectName, filePath] :YES];
-						currentProject = [[Project alloc] init];
-						// [projectArray addObject:currentProject];
-					}
-					
-					projectName = [fileName stringByReplacingOccurrencesOfString:@".device.nut" withString:@""];
-					[self writeToLog:[NSString stringWithFormat:@"Creating project \"%@\" from \"%@\".", projectName, filePath] :YES];
-					
-					currentProject.projectName = projectName;
-					currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
-					
-					// BOOL success = [self addProjectMenuItem:projectName];
-
-					BOOL success = YES;
-
-					if (projectArray.count > 0)
-					{
-						for (Project *aProject in projectArray)
-						{
-							if ([aProject.projectName compare:projectName] == NSOrderedSame)
-							{
-								success = NO;
-							}
-						}
-					}
-					
-					if (success == NO)
-					{
-						// The project's name is already on the Projects menu
-						// TODO Should allow user to rename
-						
-						[self writeToLog:[NSString stringWithFormat:@"[ERROR] Project \"%@\" already loaded.", projectName] :YES];
-						
-						if (openActionType == kOpenActionNutFile)
-						{
-							// We're creating the project from this one file; we can't do so, so kill the new project object
-							
-							// [projectArray removeObject:currentProject];
-							currentProject = nil;
-						}
-						
-						return NO;
-					}
-					else
-					{
-						[projectArray addObject:currentProject];
-						[externalLibsMenu removeAllItems];
-					}
-				}
+				[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
 			}
 			else
 			{
-				// Filename doesn't contain 'device.nut', so check for 'agent.nut'
-				
-				range = [fileName rangeOfString:@"agent.nut"];
-				
+				range = [fileName rangeOfString:@".lib"];
+
 				if (range.location != NSNotFound)
 				{
-					// Filename contains 'agent.nut'
-					
-					isAgentCodeFile = YES;
-					
-					if (projectName == nil)
-					{
-						// The project name is nil, which means we created a new project earlier for this file and it has
-						// yet to be populated. Get the name by stripping 'agent.nut' from the filename
-						
-						if (currentProject == nil)
-						{
-							// User is opening the file into no project, so make one anyway - user doesn't have to save it
-							
-							[self writeToLog:[NSString stringWithFormat:@"Opening file \"%@\" from \"%@\".", projectName, filePath] :YES];
-							currentProject = [[Project alloc] init];
-							// [projectArray addObject:currentProject];
-						}
-						
-						projectName = [fileName stringByReplacingOccurrencesOfString:@".agent.nut" withString:@""];
-						currentProject.projectName = projectName;
-						
-						[self writeToLog:[NSString stringWithFormat:@"Creating project \"%@\" from file \"%@\".", projectName, fileName] :YES];
-						
-						// BOOL success = [self addProjectMenuItem:projectName];
-						
-						BOOL success = YES;
-
-						if (projectArray.count > 0)
-						{
-							for (Project *aProject in projectArray)
-							{
-								if ([aProject.projectName compare:projectName] == NSOrderedSame)
-								{
-									success = NO;
-								}
-							}
-						}
-						
-						if (success == NO)
-						{
-							// The project's name is already on the Projects menu
-							
-							// Should allow user to rename [TODO]
-							
-							[self writeToLog:[NSString stringWithFormat:@"[ERROR] Project \"%@\" already loaded.", projectName] :YES];
-							
-							if (openActionType == kOpenActionNutFile)
-							{
-								// We're crearting the project from this one file; we can't do so, so kill the new project object
-								
-								[projectArray removeObject:currentProject];
-								currentProject = nil;
-							}
-							
-							return NO;
-						}
-						else
-						{
-							[projectArray addObject:currentProject];
-							[externalLibsMenu removeAllItems];
-						}
-					}
+					[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
 				}
 				else
 				{
-					// Filename contains neither 'agent.nut', 'device.nut' or '.squirrelproj' so is unknown - we'll have to ask
-					
-					range = [fileName rangeOfString:@".class"];
-					
-					if (range.location != NSNotFound)
-					{
-						[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
+					// Filename doesn't indicate code type valid at all
 
-						if (accessoryViewCheckbox.state == NSOnState)
-						{
-							// We created a project for this invalid file, so remove it
-							
-							[projectArray removeObject:currentProject];
-							currentProject = nil;
-						}
-					}
-					else
-					{
-						range = [fileName rangeOfString:@".lib"];
-						
-						if (range.location != NSNotFound)
-						{
-							[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
-							
-							if (accessoryViewCheckbox.state == NSOnState)
-							{
-								// We created a project for this invalid file, so remove it
-								
-								[projectArray removeObject:currentProject];
-								currentProject = nil;
-							}
-						}
-						else
-						{
-							// Filename is not valid at all - but should never get here
-							
-							return NO;
-						}
-					}
-				}
-			}
-			
-			// If we identified agent or device code from the filename(s), save the path(s) to those file(s)
-			
-			if (isDeviceCodeFile == YES)
-			{
-				currentProject.projectDeviceCodePath = filePath;
-				currentProject.projectHasChanged = YES;
-				externalOpenMenuItem.enabled = YES;
-                externalOpenDeviceItem.enabled = YES;
-                externalOpenBothItem.enabled = YES;
-				squintMenuItem.enabled = YES;
-				[fileWatchQueue addPath:filePath];
-				[self processSource:currentProject.projectDeviceCodePath :kCodeTypeDevice :NO];
-			}
-			else if (isAgentCodeFile == YES)
-			{
-				currentProject.projectAgentCodePath = filePath;
-				currentProject.projectHasChanged = YES;
-                externalOpenMenuItem.enabled = YES;
-                externalOpenAgentItem.enabled = YES;
-                externalOpenBothItem.enabled = YES;
-                squintMenuItem.enabled = YES;
-                [fileWatchQueue addPath:filePath];
-				[self processSource:currentProject.projectAgentCodePath :kCodeTypeAgent :NO];
-			}
-		}
-	
-		// Update libraries menu with updated list of libraries
-		
-		[self processLibraries];
-		[self updateLibraryMenu];
-		[self updateFilesMenu];
-		[self setToolbar];
-		
-		if (currentProject == nil) return NO;
-		
-		// Did we change the current project at all? Signal if we did
-		
-        [saveLight setFull:!currentProject.projectHasChanged];
-        [saveLight setLight:YES];
-		
-		if (currentProject.projectAgentCodePath == nil && currentProject.projectDeviceCodePath == nil) [externalOpenMenuItem setEnabled:NO];
-		
-		// At this point, a new project should have a name and paths to device and/or agent code files.
-		// If loaded from a squirrelproj file, it should also have a path.
-
-		// Finally, should we save the project?
-
-		if (openActionType == kOpenActionNutFiles)
-		{
-			if (projectFromFilesAccessoryViewCheckbox.state == NSOnState	)
-			{
-				savingProject = currentProject;
-
-				if (projectFromFilesAccessoryViewLocCheckbox.state == NSOnState)
-				{
-					// User wants to save the project to the working directory
-
-					[self savePrep:[NSURL URLWithString:workingDirectory] :projectName];
-				}
-				else
-				{
-					// User wants to save the project to the source file directory
-
-					NSURL *url;
-
-					if (currentProject.projectAgentCodePath != nil)
-					{
-						url = [NSURL URLWithString:[currentProject.projectAgentCodePath stringByDeletingLastPathComponent]];
-					}
-					else if (currentProject.projectDeviceCodePath != nil)
-					{
-						url = [NSURL URLWithString:[currentProject.projectDeviceCodePath stringByDeletingLastPathComponent]];
-					}
-					else
-					{
-						// Just in case
-
-						url = [NSURL URLWithString:workingDirectory];
-					}
-
-					[self savePrep:url :projectName];
+					[self writeToLog:[NSString stringWithFormat:@"[WARNING] It is unclear whether the file \"%@\" contains agent or device code.", fileName] :YES];
 				}
 			}
 		}
 	}
-	
-	return YES;
+
+	// If we identified agent or device code from the filename(s), save the path(s) to those file(s)
+
+	if (isDeviceCodeFile == YES)
+	{
+		if (currentProject.projectDeviceCodePath != nil)
+		{
+			// We already have a device code file reference, so ask if the user wants the new one
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = [NSString stringWithFormat:@"Project \"%@\" already has device code. Do you wish to replace it?", currentProject.projectName];
+			[alert addButtonWithTitle:@"Yes"];
+			[alert addButtonWithTitle:@"No"];
+			[alert beginSheetModalForWindow:_window
+						  completionHandler:^(NSModalResponse response)
+			 {
+				 if (response == NSAlertFirstButtonReturn)
+				 {
+					 // User wants to replace the existing device code file
+
+					 [self processAddedDeviceFile:filePath];
+				 }
+
+				 // We may still have files to process, so go on to the next one
+
+				 [self processAddedFiles:urls :count + 1];
+			 }
+			];
+		}
+		else
+		{
+			// Add the file to the project record
+
+			[self processAddedDeviceFile:filePath];
+
+			// We may still have files to process, so move on to the next one
+
+			[self processAddedFiles:urls :count + 1];
+		}
+	}
+	else if (isAgentCodeFile == YES)
+	{
+		if (currentProject.projectAgentCodePath != nil)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = [NSString stringWithFormat:@"Project \"%@\" already has agent code. Do you wish to replace it?", currentProject.projectName];
+			[alert addButtonWithTitle:@"Yes"];
+			[alert addButtonWithTitle:@"No"];
+			[alert beginSheetModalForWindow:_window
+						  completionHandler:^(NSModalResponse response)
+			 {
+				 if (response == NSAlertFirstButtonReturn) [self processAddedAgentFile:filePath];
+				 [self processAddedFiles:urls :count + 1];
+			 }
+			 ];
+		}
+		else
+		{
+			[self processAddedAgentFile:filePath];
+			[self processAddedFiles:urls :count + 1];
+		}
+	}
+	else
+	{
+		// The file we processed was neither an agent file nor a device file,
+		// but we may have more on the list, so re-invoke the method to check
+
+		[self processAddedFiles:urls :count + 1];
+	}
+}
+
+
+
+- (void)processAddedDeviceFile:(NSString *)filePath
+{
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
+	if (cv != kLower)
+	{
+		currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
+	}
+	else
+	{
+		currentProject.projectDeviceCodePath = filePath;
+	}
+
+	currentProject.projectHasChanged = YES;
+	externalOpenMenuItem.enabled = YES;
+	externalOpenDeviceItem.enabled = YES;
+	externalOpenBothItem.enabled = YES;
+	squintMenuItem.enabled = YES;
+	[fileWatchQueue addPath:filePath];
+	[self processSource:filePath :kCodeTypeDevice :NO];
+}
+
+
+
+- (void)processAddedAgentFile:(NSString *)filePath
+{
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
+	if (cv != kLower)
+	{
+		currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
+	}
+	else
+	{
+		currentProject.projectAgentCodePath = filePath;
+	}
+
+	currentProject.projectHasChanged = YES;
+	externalOpenMenuItem.enabled = YES;
+	externalOpenAgentItem.enabled = YES;
+	externalOpenBothItem.enabled = YES;
+	squintMenuItem.enabled = YES;
+	[fileWatchQueue addPath:filePath];
+	[self processSource:filePath :kCodeTypeAgent :NO];
+}
+
+
+
+- (void)processAddedFilesUIUpdate
+{
+	// Update libraries menu with updated list of libraries
+
+	[self updateMenus];
+	[self processLibraries];
+	[self updateLibraryMenu];
+	[self setProjectLists];
+	[self updateFilesMenu];
+	[self setToolbar];
+
+	// Did we change the current project at all? Signal if we did
+
+	[saveLight setFull:!currentProject.projectHasChanged];
+	[saveLight setLight:YES];
+
+	if (currentProject.projectAgentCodePath == nil && currentProject.projectDeviceCodePath == nil)
+	{
+		// Project has no agent or device code references to clear the open menu item
+
+		[externalOpenBothItem setEnabled:NO];
+	}
+}
+
+
+
+- (void)processAddedNewProject
+{
+	// The method is use to process a newly created project - and should only be called in that circumstance
+
+	// Give the project a name based on the loaded source code files, if any
+
+	if (currentProject.projectAgentCodePath != nil)
+	{
+		currentProject.projectName = [[currentProject.projectAgentCodePath lastPathComponent] stringByReplacingOccurrencesOfString:@".agent.nut" withString:@""];
+	}
+	else if (currentProject.projectDeviceCodePath != nil)
+	{
+		currentProject.projectName = [[currentProject.projectDeviceCodePath lastPathComponent] stringByReplacingOccurrencesOfString:@".device.nut" withString:@""];
+	}
+	else
+	{
+		// There were no loaded source code files, so use 'Untitled'
+
+		NSInteger count = 0;
+
+		if (projectArray.count > 0)
+		{
+			for (Project *aProject in projectArray)
+			{
+				NSRange uRange = [aProject.projectName rangeOfString:@"Untitled"];
+
+				if (uRange.location != NSNotFound)
+				{
+					// At least one project called 'Unititled' so add one to the count
+
+					++count;
+				}
+			}
+		}
+
+		if (count == 0)
+		{
+			currentProject.projectName = @"Untitled";
+		}
+		else
+		{
+			currentProject.projectName = [NSString stringWithFormat:@"Untitled %li", (long)count];
+		}
+	}
+
+	[self processAddedNewProjectStageTwo];
+}
+
+
+
+- (void)processAddedNewProjectStageTwo
+{
+	// Is the project already open?
+
+	if ([self checkProjectNames:currentProject :nil])
+	{
+		// The project is open, so warn the user and ask for an action
+
+		// Adjust project record to prevent updating the UI too early
+
+		currentProject.projectHasChanged = NO;
+		accessoryViewNewProjectCheckbox.state = NSOffState;
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = [NSString stringWithFormat:@"A project named \"%@\" is already open. Do you want to rename the new project?", currentProject.projectName];
+	    alert.informativeText = @"If you select ‘Cancel’, the new project will not be saved.";
+		[alert addButtonWithTitle:@"Rename"];
+		[alert addButtonWithTitle:@"Cancel"];
+		[alert beginSheetModalForWindow:_window
+					  completionHandler:^(NSModalResponse response)
+		 {
+			 if (response == NSAlertFirstButtonReturn)
+			 {
+				 // User wants to rename the project
+
+				 newProjectFlag = YES;
+				 [self renameProject];
+			 }
+			 else
+			 {
+				 // Zap the existing project
+
+				 currentProject = nil;
+
+				 if (projectArray.count > 0) currentProject = [projectArray objectAtIndex:0];
+			 }
+		 }
+		 ];
+	}
+	else
+	{
+		// The new project is not already open, so we can save it
+		// Remember, we're only here because the project is new
+
+		// Add project to project array
+
+		[projectArray addObject:currentProject];
+
+		if (projectFromFilesAccessoryViewCheckbox.state == NSOnState)
+		{
+			// The 'auto-save project' checkbox is ticked
+
+			savingProject = currentProject;
+
+			if (projectFromFilesAccessoryViewLocCheckbox.state == NSOnState)
+			{
+				// User wants to save the project to the working directory
+
+				[self savePrep:[NSURL URLWithString:workingDirectory] :savingProject.projectName];
+			}
+			else
+			{
+				// User wants to save the project to the source file directory
+
+				NSURL *url;
+
+				if (currentProject.projectAgentCodePath != nil)
+				{
+					url = [NSURL URLWithString:[savingProject.projectAgentCodePath stringByDeletingLastPathComponent]];
+				}
+				else if (currentProject.projectDeviceCodePath != nil)
+				{
+					url = [NSURL URLWithString:[savingProject.projectDeviceCodePath stringByDeletingLastPathComponent]];
+				}
+				else
+				{
+					// Just in case
+
+					[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" contains no source files. Saving in the working directory.", savingProject.projectName] :YES];
+					url = [NSURL URLWithString:workingDirectory];
+				}
+
+				[self savePrep:url :savingProject.projectName];
+			}
+		}
+	}
+}
+
+
+
+- (void)renameProject
+{
+	// Present the sheet
+
+	if (newProjectFlag)
+	{
+		renameProjectLabel.stringValue = @"Enter a new project name:";
+	}
+
+	[_window beginSheet:renameProjectSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)closeRenameProjectSheet:(id)sender
+{
+	[_window endSheet:renameProjectSheet];
+}
+
+
+
+- (IBAction)saveRenameProjectSheet:(id)sender
+{
+	[_window endSheet:renameProjectSheet];
+
+	if (newProjectFlag)
+	{
+		newProjectFlag = NO;
+		currentProject.projectName = renameProjectTextField.stringValue;
+		[self processAddedNewProjectStageTwo];
+	}
+	else
+	{
+		NSString *newName = renameProjectTextField.stringValue;
+
+		// Check name and if necessary go back and ask again
+
+		[self checkProjectNames:nil :newName];
+	}
+}
+
+
+
+- (void)openSquirrelProjects:(NSArray *)urls :(NSInteger)count
+{
+	// We are opening one Squirrel project files from a list ('urls')
+	// We will re-call this method with an incremented 'count' in order to open the next file,
+	// or bail if we've processed all of the files
+
+	if (count == urls.count) return;
+
+	Project *newProject;
+	NSString *fileName, *newName, *filePath;
+	NSString *currentAgentPath, *currentDevicePath;
+	BOOL nameMatch = NO;
+	BOOL pathMatch = NO;
+	BOOL gotFlag = NO;
+
+	filePath = [[urls objectAtIndex:count] path];
+	newProject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+
+	if (newProject)
+	{
+		// Project opened successfully
+		// Check for a change of project name via project filename
+
+		pathMatch = [self checkProjectPaths:nil :filePath];
+
+		if (!pathMatch)
+		{
+			// Full path (path + name) of opened project doesn't match,
+			// but we still need to check the name, in case we have to add '01' to the name
+
+			newName = [[filePath lastPathComponent] stringByDeletingPathExtension];
+			nameMatch = [self checkProjectNames:nil :newProject.projectName];
+
+			if (nameMatch)
+			{
+				// Name matches an existing open project from a different project file
+
+				if ([newName compare:newProject.projectName] != NSOrderedSame)
+				{
+					// The project's name and its filename don't match, so try the filename
+
+					if (![self checkProjectNames:nil :newName])
+					{
+						// Filename-derived project name doesn't match, so use that
+
+						[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
+						newProject.projectName = newName;
+						newProject.projectHasChanged = YES;
+						newName = nil;
+					}
+					else
+					{
+						// Project name matches *and* filename-derived name
+						// TODO
+					}
+				}
+				else
+				{
+					// We have a project with the same name as another
+
+					NSInteger c = 0;
+
+					for (NSUInteger j = 0 ; j < projectsMenu.numberOfItems ; ++j)
+					{
+						NSString *aProject = [[projectsMenu itemAtIndex:j] title];
+
+						if ([aProject containsString:newProject.projectName])
+						{
+							if (aProject.length == newProject.projectName.length)
+							{
+								++c;
+							}
+							else
+							{
+								NSString *sub = [aProject substringFromIndex:newProject.projectName.length + 1];
+
+								if (sub.integerValue > 0)
+								{
+									++c;
+								}
+							}
+						}
+					}
+
+					if (c > 0) newName = [newProject.projectName stringByAppendingFormat:@" %li", (long)(c + 1)];
+				}
+			}
+			else
+			{
+				// Name doesn't match an existing open project
+
+				if ([newName compare:newProject.projectName] != NSOrderedSame)
+				{
+					// The project's name and its filename don't match, so try the filename
+
+					if (![self checkProjectNames:nil :newName])
+					{
+						// Filename-derived project name doesn't match, so use that
+
+						[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
+						newProject.projectName = newName;
+						newProject.projectHasChanged = YES;
+					}
+				}
+
+				newName = nil;
+			}
+		}
+		else
+		{
+			// Full path (path + name) matches so user is trying to open an already open project
+
+			gotFlag = YES;
+		}
+
+		if (!gotFlag)
+		{
+			// Set the newly opened project to be the current one
+
+			currentProject = newProject;
+			currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
+
+			NSInteger versionComparison = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
+			[self writeToLog:[NSString stringWithFormat:@"Loading project \"%@\" from file \"%@\".", currentProject.projectName, filePath] :YES];
+
+			// Add the opened project to the array of open projects
+
+			[projectArray addObject:currentProject];
+
+			// Set up kernel queue to watch for file changes
+
+			if (fileWatchQueue == nil)
+			{
+				fileWatchQueue = [[VDKQueue alloc] init];
+				[fileWatchQueue setDelegate:self];
+			}
+
+			if (versionComparison != kLower)
+			{
+				// Projects of version 2.1 and up stored relative paths, so convert to temporary absolute path
+
+				currentAgentPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
+				currentDevicePath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
+			}
+			else
+			{
+				// Projects of version 2.0 and below stored absolute path, os use them unchanged
+
+				if (currentProject.projectAgentCodePath != nil) currentAgentPath = currentProject.projectAgentCodePath;
+				if (currentProject.projectDeviceCodePath != nil) currentDevicePath = currentProject.projectDeviceCodePath;
+			}
+
+			if (currentAgentPath != nil)
+			{
+				// Does the project's recorded agent code path point to a real file?
+
+				if ([self checkFile:currentAgentPath] == YES)
+				{
+					// It does and the pointer indicates an extant file
+
+					externalOpenMenuItem.enabled = YES;
+					externalOpenAgentItem.enabled = YES;
+					externalOpenBothItem.enabled = YES;
+				}
+				else
+				{
+					// There is no file where the pointer is indicating, so see if it's in the working directory
+
+					NSString *path = [currentAgentPath lastPathComponent];
+					path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
+
+					if ([self checkFile:path] == YES)
+					{
+						// File is in the working directory, so update the saved path
+
+						currentAgentPath = path;
+						externalOpenMenuItem.enabled = YES;
+						externalOpenAgentItem.enabled = YES;
+						externalOpenBothItem.enabled = YES;
+						[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project’s agent code file has been moved to \"%@\".", path] :YES];
+					}
+					else
+					{
+						// Can't see the agent code file in the working directory so clear the pointer and warn the user
+
+						currentAgentPath = nil;
+						[self writeToLog:@"[WARNING] The project’s agent code file has been moved to an unknown location. You will need to add it back to the project." :YES];
+					}
+
+					currentProject.projectHasChanged = YES;
+				}
+			}
+
+			if (currentDevicePath != nil)
+			{
+				// As above per the agent code file, this time for the device code file
+
+				if ([self checkFile:currentDevicePath] == YES)
+				{
+					externalOpenMenuItem.enabled = YES;
+					externalOpenDeviceItem.enabled = YES;
+					externalOpenBothItem.enabled = YES;
+				}
+				else
+				{
+					NSString *path = [currentDevicePath lastPathComponent];
+					path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
+
+					if ([self checkFile:path] == YES)
+					{
+						currentDevicePath = path;
+						externalOpenMenuItem.enabled = YES;
+						externalOpenDeviceItem.enabled = YES;
+						externalOpenBothItem.enabled = YES;
+						[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project’s device code file has been moved to \"%@\".", path] :YES];
+					}
+					else
+					{
+						currentDevicePath = nil;
+						[self writeToLog:@"[WARNING] The project’s device code file has been moved to an unknown location. You will need to add it back to the project." :YES];
+					}
+
+					currentProject.projectHasChanged = YES;
+				}
+			}
+
+			// Agent and/or Device code paths may have changed so record their latest values
+
+			if (versionComparison != kLower)
+			{
+				// Convert absolute paths back to relative
+
+				currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :currentAgentPath];
+				currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :currentDevicePath];
+			}
+			else
+			{
+				currentProject.projectAgentCodePath = currentAgentPath;
+				currentProject.projectDeviceCodePath = currentDevicePath;
+			}
+
+			// Do we need to autocompile the project we have opened?
+
+			if ([[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autocompile"])
+			{
+				// NOTE squint: calls updateLibraryMenu: so we don't need to do it here
+
+				[self writeToLog:@"Auto-compiling project. This can be disabled in Preferences." :YES];
+				[self squint:nil];
+			}
+			else
+			{
+				[self updateLibraryMenu];
+				[self updateFilesMenu];
+			}
+
+			// Select the model associated with the project, if one has been
+
+			NSUInteger c = 0;
+
+			if (ide.models.count > 0)
+			{
+				// If we have loaded the models list, select the one which the project is linked to
+
+				for (NSDictionary *model in ide.models)
+				{
+					NSString *mID = [model objectForKey:@"id"];
+
+					if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
+					{
+						// Select the linked model
+
+						[self chooseModel:[modelsMenu itemAtIndex:c]];
+					}
+					else
+					{
+						++c;
+					}
+				}
+			}
+
+			// Update the Project menu’s projects sub-menu
+
+			if (newName)
+			{
+				[self addProjectMenuItem:newName :currentProject];
+			}
+			else
+			{
+				[self addProjectMenuItem:currentProject.projectName :currentProject];
+			}
+
+			// Update the Menus and the Toolbar
+
+			[self updateMenus];
+			[self setToolbar];
+
+			// Mark that we have at least one open project
+
+			noProjectsFlag = NO;
+
+			// Finally, set the status light
+
+			[saveLight setLight:YES];
+			[saveLight setFull:!currentProject.projectHasChanged];
+
+			versionComparison = [self compareVersion:currentProject.projectVersion :kCurrentProjectVersionString];
+
+			if (versionComparison == kLower)
+			{
+				// Ask if we want to update the project
+
+				[self presentUpdateAlert:urls :count :currentProject];
+			}
+			else
+			{
+				// Select the next project file on the list
+
+				[self openSquirrelProjects:urls :count + 1];
+			}
+		}
+		else
+		{
+			// Got project, so warn the user
+
+			[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is already open.", newProject.projectName] :YES];
+			[self openSquirrelProjects:urls :count + 1];
+		}
+	}
+	else
+	{
+		// Project didn't load for some reason so warn the user
+
+		[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
+		[self openSquirrelProjects:urls :count + 1];
+	}
+}
+
+
+
+- (NSInteger)compareVersion:(NSString *)newVersion :(NSString *)oldVersion
+{
+	// Compare version strings:
+	// 1 - newVersion > oldVersion
+	// 0 - newVersion = oldVersion
+	// -1 - newVersion < oldVersion
+
+	NSArray *va1 = [newVersion componentsSeparatedByString:@"."];
+	NSArray *va2 = [oldVersion componentsSeparatedByString:@"."];
+
+	NSString *s1 = (NSString *)[va1 objectAtIndex:0];
+	NSString *s2 = (NSString *)[va2 objectAtIndex:0];
+
+	NSInteger i1 = s1.integerValue;
+	NSInteger i2 = s2.integerValue;
+
+	if (i1 > i2) return kHigher;
+	if (i1 < i2) return kLower;
+
+	s1 = (NSString *)[va1 objectAtIndex:1];
+	s2 = (NSString *)[va2 objectAtIndex:1];
+
+	i1 = s1.integerValue;
+	i2 = s2.integerValue;
+
+	if (i1 > i2) return kHigher;
+	if (i1 < i2) return kLower;
+
+	return kEqual;
+}
+
+
+
+- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName
+{
+	// Method runs through the list of open projects and returns YES if the
+	// passed project matches one of them, otherwise NO
+
+	if (projectArray.count > 0)
+	{
+		if (byProject != nil)
+		{
+			for (Project *aProject in projectArray)
+			{
+				if ([byProject.projectName compare:aProject.projectName] == NSOrderedSame) return YES;
+			}
+		}
+		else if (orProjectName != nil)
+		{
+			for (Project *aProject in projectArray)
+			{
+				if ([orProjectName compare:aProject.projectName] == NSOrderedSame) return YES;
+			}
+		}
+	}
+
+	return NO;
+}
+
+
+
+- (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath
+{
+	// Method runs through the list of open projects and returns YES if the
+	// passed project's path matches one of them, otherwise NO
+
+	if (projectArray.count > 0)
+	{
+		if (orProjectPath != nil)
+		{
+			for (Project *aProject in projectArray)
+			{
+				NSString *aPath = [aProject.projectPath stringByAppendingPathComponent:[aProject.projectName stringByAppendingString:@".squirrelproj"]];
+				if ([orProjectPath compare:aPath] == NSOrderedSame) return YES;
+			}
+		}
+
+
+	}
+
+	return NO;
+}
+
+
+
+- (BOOL)checkFile:(NSString *)filePath
+{
+	if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:NO] == YES)
+	{
+		[fileWatchQueue addPath:filePath
+				 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
+		return YES;
+	}
+
+	return NO;
+}
+
+
+
+- (IBAction)renameCurrentProject:(id)sender
+{
+	if (currentProject == nil) return;
+
+	renameProjectLabel.stringValue = [NSString stringWithFormat:@"Enter a new name for project \"%@\":", currentProject.projectName];
+
+	[self renameProject];
+}
+
+
+
+- (void)presentUpdateAlert:(NSArray *)urls :(NSInteger)count :(Project *)aProject
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	alert.messageText = [NSString stringWithFormat:@"The Squinter file for project \"%@\" should be updated", aProject.projectName];
+	alert.informativeText = [NSString stringWithFormat:@"Click ‘Update’ to convert the project filetype from format %@ to format %@. Updated project files may not be compatible with older version of Squinter, but this version will read old project file formats", aProject.projectVersion, kCurrentProjectVersionString];
+	[alert addButtonWithTitle:@"Update"];
+	[alert addButtonWithTitle:@"Cancel"];
+	[alert beginSheetModalForWindow:_window
+				  completionHandler:^(NSModalResponse response)
+	 {
+		if (response == NSAlertFirstButtonReturn)
+		{
+			// User wants to rename the project
+
+			[self updateProject:aProject];
+		}
+
+		[self openSquirrelProjects:urls :count + 1];
+	 }
+	 ];
 }
 
 
@@ -1582,7 +1978,7 @@
 - (IBAction)saveProjectAs:(id)sender
 {
     // Call this method to save the project referenced by savingProject to disk a new name and/or location
-	
+
 	// If the method is called directly by a menu, set savingProject to currentProject
 	
 	if (sender == fileSaveAsMenuItem || sender == fileSaveMenuItem) savingProject = currentProject;
@@ -1647,11 +2043,11 @@
 	// Save the savingProject project. This may be a newly created project and may not currentProject
 	
 	BOOL success = NO;
-	
+	NSInteger version = [self compareVersion:savingProject.projectVersion :kPathChangeProjectVersion];
 	NSFileManager *fm = [NSFileManager defaultManager];
     NSString *savePath = [saveDirectory path];
 	NSString *oldName = savingProject.projectName;
-	
+
 	if (newFileName == nil) newFileName = savingProject.projectName;
 	
 	NSRange range = [newFileName rangeOfString:@".squirrelproj"];
@@ -1662,7 +2058,7 @@
 	
 	range = [newFileName rangeOfString:@".squirrelproj"];
 	savingProject.projectName = [newFileName substringToIndex:range.location];
-	
+
 	// Set the agent and device code paths. We need to do this here because they are saved with the project file
 	
 	if (saveProjectSubFilesFlag == YES)
@@ -1670,21 +2066,20 @@
         // 'saveProjectSubFilesFlag' is set by newProject: if the user has selected the option to create
         // agent and device code files automatically
 
-        NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
-		NSString *aPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", aFileName];
-		savingProject.projectAgentCodePath = aPathName;
-		
+		NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
 		NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
+		NSString *aPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", aFileName];
 		NSString *dPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", dFileName];
-		savingProject.projectDeviceCodePath = dPathName;
 
-		if (savingProject.projectVersion.floatValue > 2.0)
+		if (version != kLower)
 		{
-			NSData *acbm = [self bookmarkForURL:[NSURL URLWithString:savingProject.projectAgentCodePath]];
-			if (acbm != nil) savingProject.projectAgentCodeBookmark = acbm;
-
-			NSData *dcbm = [self bookmarkForURL:[NSURL URLWithString:savingProject.projectDeviceCodePath]];
-			if (dcbm != nil) savingProject.projectDeviceCodeBookmark = dcbm;
+			savingProject.projectAgentCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :aPathName];
+			savingProject.projectDeviceCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :dPathName];
+		}
+		else
+		{
+			savingProject.projectAgentCodePath = aPathName;
+			savingProject.projectDeviceCodePath = dPathName;
 		}
 	}
 
@@ -1722,14 +2117,10 @@
 	if (success == YES)
 	{
 		// The new file was successfully written
-		
+
 		savingProject.projectPath = [savePath stringByDeletingLastPathComponent];
 
-		if (savingProject.projectVersion.floatValue > 2.0)
-		{
-			NSData *pbm = [self bookmarkForURL:[NSURL URLWithString:savePath]];
-			if (pbm != nil) savingProject.projectBookmark = pbm;
-		}
+		if (version != kLower) savingProject.oldProjectPath = savingProject.projectPath;
 		
 		if (savingProject == currentProject) 
 		{
@@ -1743,7 +2134,7 @@
 			{
 				NSMenuItem *item = [projectsMenu itemWithTitle:oldName];
 				[projectsMenu removeItem:item];
-				[self addProjectMenuItem:savingProject.projectName];
+				[self addProjectMenuItem:savingProject.projectName :savingProject];
 				
 				NSInteger index = [projectsPopUp indexOfItemWithTitle:oldName];
 				[projectsPopUp removeItemAtIndex:index];
@@ -1755,11 +2146,6 @@
 		{
 			// We are saving a new project or one derived from a model, so we
 			// need to write out the agent.nut and device.nut files too
-			
-			// NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
-			// NSString *aPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", aFileName];
-			// NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
-			// NSString *dPathName = [savingProject.projectPath stringByAppendingFormat:@"/%@", dFileName];
 			
 			NSString *dataString = nil;
 			
@@ -1773,8 +2159,18 @@
 			}
 			
 			NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL aSuccess = [fm createFileAtPath:savingProject.projectAgentCodePath contents:data attributes:nil];
-			
+			BOOL aSuccess = NO;
+
+			if (version != kLower)
+			{
+				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectAgentCodePath];
+				aSuccess = [fm createFileAtPath:path contents:data attributes:nil];
+			}
+			else
+			{
+				aSuccess = [fm createFileAtPath:savingProject.projectAgentCodePath contents:data attributes:nil];
+			}
+
 			if (savingProject.projectDeviceCode.length == 0)
 			{
 				dataString = @"// Device Code\n\n";
@@ -1785,7 +2181,17 @@
 			}
 			
 			data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL dSuccess = [fm createFileAtPath:savingProject.projectDeviceCodePath contents:data attributes:nil];
+			BOOL dSuccess = NO;
+
+			if (version > kPreviousProjectVersion)
+			{
+				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectDeviceCodePath];
+				dSuccess = [fm createFileAtPath:path contents:data attributes:nil];
+			}
+			else
+			{
+				dSuccess = [fm createFileAtPath:savingProject.projectDeviceCodePath contents:data attributes:nil];
+			}
 			
 			if (aSuccess == NO)
 			{
@@ -1796,6 +2202,7 @@
 			else
 			{
 				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectAgentCodePath, savingProject.projectName] :YES];
+
 				if (savingProject == currentProject)
                 {
                     externalOpenBothItem.enabled = YES;
@@ -1810,6 +2217,7 @@
 			else
 			{
 				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectDeviceCodePath, savingProject.projectName] :YES];
+
 				if (savingProject == currentProject)
                 {
                     externalOpenBothItem.enabled = YES;
@@ -1890,32 +2298,64 @@
 	}
 	
 	// Stop watching the current project's files
-	
-	if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:currentProject.projectDeviceCodePath];
-	if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:currentProject.projectAgentCodePath];
 
-	NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
+		if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
+
+		NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
+
+		fileItems = [currentProject.projectAgentFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
+
+		fileItems = [currentProject.projectDeviceLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
+
+		fileItems = [currentProject.projectDeviceFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
+		}
 	}
-
-	fileItems = [currentProject.projectAgentFiles allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+	else
 	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
-	}
+		if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:currentProject.projectDeviceCodePath];
+		if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:currentProject.projectAgentCodePath];
 
-	fileItems = [currentProject.projectDeviceLibraries allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
-	}
+		NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
 
-	fileItems = [currentProject.projectDeviceFiles allValues];
-	for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-	{
-		[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		fileItems = [currentProject.projectAgentFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
+
+		fileItems = [currentProject.projectDeviceLibraries allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
+
+		fileItems = [currentProject.projectDeviceFiles allValues];
+		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		{
+			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+		}
 	}
 
     if (projectArray.count == 1)
@@ -2034,7 +2474,6 @@
     // lists of recorded libraries and files, and compiles the code into an upload-ready form (code stored in 
 	// current project's 'projectAgentCode' and 'projectDeviceCode' properties
 
-	
     // If we have no currently selected project, bail
 
     if (currentProject == nil)
@@ -2046,133 +2485,87 @@
     // Clear the lists of local libraries and files found in this compile
 	// 'foundLibs' - all the libraries #imported or #included in the source files
 	// 'foundFiles' - all the non-libraries #imported or #included in the source files
+	// 'foundEILibs' - all the EI libraries #required in the source files
 
     if (foundLibs != nil) foundLibs = nil;
     if (foundFiles != nil) foundFiles = nil;
+	if (foundEILibs != nil) foundEILibs = nil;
+
 	foundFiles = [[NSMutableArray alloc] init];
     foundLibs = [[NSMutableArray alloc] init];
-	
-	// Clear the EI libraries listing - it will be repopulated via processSource: and processRequires:
-	
-	currentProject.projectImpLibs = nil;
-	
-	[projectIncludes removeAllObjects];
+	foundEILibs = [[NSMutableArray alloc] init];
 
-    BOOL agentDoneFlag = NO;
+	BOOL agentDoneFlag = NO;
 	BOOL deviceDoneFlag = NO;
-	NSString *output;
+	NSString *output, *aPath, *dPath;
 	
     [self writeToLog:[NSString stringWithFormat:@"Processing project \"%@\"...", currentProject.projectName] :YES];
 
     // Process 'agent.nut' then 'device.nut' if either or both exist
 
-	if (currentProject.projectVersion.floatValue > 2.0)
+	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
 	{
-		if (currentProject.projectAgentCodeBookmark != nil)
-		{
-			NSURL *agentCodeURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
-
-			[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", agentCodeURL.absoluteString.lastPathComponent] :YES];
-			output = [self processSource:agentCodeURL.absoluteString :kCodeTypeAgent :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-
-			output = [self processDefines:output :kCodeTypeAgent];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-
-			currentProject.projectAgentCode = output;
-			agentDoneFlag = YES;
-		}
-
-		if (currentProject.projectDeviceCodeBookmark != nil)
-		{
-			NSURL *deviceCodeURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
-
-			[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", deviceCodeURL.absoluteString.lastPathComponent] :YES];
-			output = [self processSource:deviceCodeURL.absoluteString :kCodeTypeDevice :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-
-			output = [self processDefines:output :kCodeTypeDevice];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-
-			currentProject.projectDeviceCode = output;
-			deviceDoneFlag = YES;
-		}
+		aPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
+		dPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
 	}
 	else
 	{
-		if (currentProject.projectAgentCodePath != nil)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", currentProject.projectAgentCodePath.lastPathComponent] :YES];
-			output = [self processSource:currentProject.projectAgentCodePath :kCodeTypeAgent :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			output = [self processDefines:output :kCodeTypeAgent];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			currentProject.projectAgentCode = output;
-			agentDoneFlag = YES;
-		}
+		aPath = currentProject.projectAgentCodePath;
+		dPath = currentProject.projectDeviceCodePath;
+	}
 
-		if (currentProject.projectDeviceCodePath != nil)
+	if (aPath != nil)
+	{
+		[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", aPath.lastPathComponent] :YES];
+		output = [self processSource:aPath :kCodeTypeAgent :YES];
+
+		if (output == nil)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", currentProject.projectDeviceCodePath.lastPathComponent] :YES];
-			output = [self processSource:currentProject.projectDeviceCodePath :kCodeTypeDevice :YES];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			output = [self processDefines:output :kCodeTypeDevice];
-			if (output == nil)
-			{
-				[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-				currentProject.projectSquinted = 0;
-				[self setProjectMenu];
-				return;
-			}
-			
-			currentProject.projectDeviceCode = output;
-			deviceDoneFlag = YES;
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
 		}
+		
+		output = [self processDefines:output :kCodeTypeAgent];
+
+		if (output == nil)
+		{
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
+		}
+		
+		currentProject.projectAgentCode = output;
+		agentDoneFlag = YES;
+	}
+
+	if (dPath != nil)
+	{
+		[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", dPath.lastPathComponent] :YES];
+		output = [self processSource:dPath :kCodeTypeDevice :YES];
+
+		if (output == nil)
+		{
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
+		}
+		
+		output = [self processDefines:output :kCodeTypeDevice];
+
+		if (output == nil)
+		{
+			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
+			currentProject.projectSquinted = 0;
+			[self setProjectMenu];
+			return;
+		}
+		
+		currentProject.projectDeviceCode = output;
+		deviceDoneFlag = YES;
 	}
 
 	if (agentDoneFlag || deviceDoneFlag)
@@ -2182,10 +2575,8 @@
 		externalOpenMenuItem.enabled = YES;
 		externalOpenDeviceItem.enabled = YES;
 		externalOpenBothItem.enabled = YES;
-
 		logDeviceCodeMenuItem.enabled = deviceDoneFlag;
 		logAgentCodeMenuItem.enabled = agentDoneFlag;
-
 	}
 	
 	// Sort out the libraries and files found in this compilation
@@ -2250,26 +2641,121 @@
 	// PROCESS EI LIBRARIES
 
 	// Do we have any Electric Imp libraries #required in the source code?
-	
-	if (currentProject.projectImpLibs.count > 0)
+
+	if (foundEILibs.count != currentProject.projectImpLibs.count) currentProject.projectHasChanged = YES;
+
+	if (foundEILibs.count == 0)
 	{
-		if (currentProject.projectImpLibs.count == 1)
+		if (currentProject.projectImpLibs.count > 0)
 		{
-			[self writeToLog:@"1 Electric Imp library included." :YES];
+			if (currentProject.projectImpLibs.count == 1)
+			{
+				[self writeToLog:@"1 Electric Imp library no longer included." :YES];
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included.", (long)currentProject.projectImpLibs.count] :YES];
+			}
+
+			[currentProject.projectImpLibs removeAllObjects];
+			currentProject.projectHasChanged = YES;
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"%lu Electric Imp libraries included.", (long)currentProject.projectImpLibs.count] :YES];
+			[self writeToLog:@"No Electric Imp libraries included." :YES];
 		}
-
-		[self checkElectricImpLibs];
 	}
 	else
 	{
-		[self writeToLog:@"No Electric Imp libraries included." :YES];
+		NSInteger total = currentProject.projectImpLibs.count - foundEILibs.count;
+
+		if (total == 1)
+		{
+			[self writeToLog:@"1 Electric Imp library no longer included." :YES];
+		}
+		else if (total > 1)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included.", (long)total] :YES];
+		}
+
+		// First, run through the contents of 'foundEILibs' to see if there is a 1:1 match with
+		// the lists of known local librariess; if not, mark that the project has changed
+
+		total = 0;
+
+		for (NSUInteger i = 0 ; i < foundEILibs.count ; ++i)
+		{
+			NSArray *aLib = [foundEILibs objectAtIndex:i];
+			NSString *libName = [aLib objectAtIndex:0];
+			NSString *libVer = [aLib objectAtIndex:1];
+
+			NSString *match = nil;
+
+			if (currentProject.projectImpLibs.count > 0)
+			{
+				// Does the library name match an existing one?
+
+				for (NSUInteger j = 0 ; j < currentProject.projectImpLibs.count ; ++j)
+				{
+					NSString *bLibName = @"";
+
+					NSArray *bLib = [currentProject.projectImpLibs objectAtIndex:j];
+
+					if ([bLib isKindOfClass:[NSString class]])
+					{
+						bLibName = (NSString *)bLib;
+					}
+					else
+					{
+						bLibName = [bLib objectAtIndex:0];
+
+						if ([bLibName compare:libName] == NSOrderedSame)
+						{
+							match = [bLib objectAtIndex:1];
+							break;
+						}
+					}
+				}
+			}
+
+			if (match == nil)
+			{
+				currentProject.projectHasChanged = YES;
+				++total;
+			}
+			else
+			{
+				// The found library does match, but we should check if its version has changed.
+
+				if ([match compare:libVer] != NSOrderedSame)
+				{
+					// Names match but the bersion doesn't.
+
+					currentProject.projectHasChanged = YES;
+					[self writeToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", libName, match, libVer] :YES];
+				}
+			}
+		}
+
+		if (total == 1)
+		{
+			[self writeToLog:@"1 Electric Imp library added." :YES];
+		}
+		else if (total > 1)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries added.", (long)total] :YES];
+		}
+
+
+		// Now replace the recorded EI library list with the new one from 'foundEILibs'
+
+		currentProject.projectImpLibs = foundEILibs;
 	}
-	
+
 	// PROCESS LOCAL LIBRARIES
+
+	// NOTE From file version 2.1 (kPathChangeProjectVersion) library file paths are relative to project file
+	//      Earlier versions use absolute paths (should not change unless project files is updated at load)
 
 	// Do we have any local libraries #included or #imported in the source code?
 	
@@ -2321,8 +2807,8 @@
 	{
 		// Calculate and display the number of library references removed from the source
 
-		NSUInteger aCount = 0;
-		NSUInteger dCount = 0;
+		NSUInteger agentLibCount = 0;
+		NSUInteger deviceLibCount = 0;
 
 		for (NSDictionary *item in foundLibs)
 		{
@@ -2331,15 +2817,15 @@
 
 			if (codeType == kCodeTypeAgent)
 			{
-				++aCount;
+				++agentLibCount;
 			}
 			else
 			{
-				++dCount;
+				++deviceLibCount;
 			}
 		}
 
-		NSInteger total = currentProject.projectAgentLibraries.count - aCount;
+		NSInteger total = currentProject.projectAgentLibraries.count - agentLibCount;
 
 		if (total == 1)
 		{
@@ -2350,7 +2836,7 @@
 			[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the project's agent code.", (long)total] :YES];
 		}
 
-		total = currentProject.projectDeviceLibraries.count - aCount;
+		total = currentProject.projectDeviceLibraries.count - deviceLibCount;
 
 		if (total == 1)
 		{
@@ -2362,6 +2848,7 @@
 		}
 
 		NSMutableDictionary *projectLibList;
+		NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
 		
 		// First, run through the contents of 'foundLibs' to see if there is a 1:1 match with
 		// the lists of known local librariess; if not, mark that the project has changed
@@ -2372,9 +2859,9 @@
 			NSString *libName = [aLib objectForKey:@"libName"];
 			NSNumber *codeNumber = [aLib objectForKey:@"libType"];
 			NSString *libLoc = [aLib objectForKey:@"libPath"];
-			NSInteger codeType = codeNumber.integerValue;
+			NSInteger libCode = codeNumber.integerValue;
 
-			if (codeType == kCodeTypeAgent)
+			if (libCode == kCodeTypeAgent)
 			{
 				if (currentProject.projectAgentLibraries == nil) currentProject.projectAgentLibraries = [[NSMutableDictionary alloc] init];
 				projectLibList = currentProject.projectAgentLibraries;
@@ -2413,8 +2900,16 @@
 			else
 			{
 				// The found library does match, but we should check if it has moved.
+				// Note saved paths ('aPath') may be absolute or relative; found paths ('libLoc') are absolute
 
 				NSString *aPath = [projectLibList objectForKey:libName];
+
+				if (cv != kLower)
+				{
+					// Version is 2.1 or above, so saved path is relative - convert it for comparison
+
+					aPath = [self getAbsolutePath:currentProject.projectPath :aPath];
+				}
 
 				if ([aPath compare:libLoc] != NSOrderedSame)
 				{
@@ -2436,13 +2931,16 @@
 		{
 			NSDictionary *aLib = [foundLibs objectAtIndex:i];
 			NSString *libName = [aLib objectForKey:@"libName"];
-			NSString *libPath = [aLib objectForKey:@"libPath"];
-			NSNumber *codeNumber = [aLib objectForKey:@"libType"];
-			// NSString *libVersion = [aLib objectForKey:@"libVer"];
 
-			NSInteger codeType = codeNumber.integerValue;
+			NSString *libPath = [aLib objectForKey:@"libPath"];
+			if (cv != kLower) libPath = [self getRelativeFilePath:currentProject.projectPath :libPath];
+
+			NSNumber *codeNumber = [aLib objectForKey:@"libType"];
+			NSInteger libCode = codeNumber.integerValue;
+
+			// NSString *libVersion = [aLib objectForKey:@"libVer"];
 			
-			if (codeType == kCodeTypeAgent)
+			if (libCode == kCodeTypeAgent)
 			{
 				[currentProject.projectAgentLibraries setObject:libPath forKey:libName];
 			}
@@ -2477,6 +2975,9 @@
 	
 	// PROCESS LOCAL FILES
 
+	// NOTE From file version 2.1 (kPathChangeProjectVersion) file paths are relative to project file
+	//      Earlier versions use absolute paths (should not change unless project files is updated at load)
+
 	// Do we have any local files #included or #imported in the source code?
 	
 	// Local files #included or #imported in the source code will all be stored in 'foundFiles'
@@ -2502,7 +3003,7 @@
 
 		if (currentProject.projectDeviceFiles != nil && currentProject.projectDeviceFiles.count > 0)
 		{
-			if (currentProject.projectAgentFiles.count == 1)
+			if (currentProject.projectDeviceFiles.count == 1)
 			{
 				[self writeToLog:@"1 local file no longer referenced in the project's device code." :YES];
 			}
@@ -2516,8 +3017,8 @@
 	}
 	else
 	{
-		NSUInteger aCount = 0;
-		NSUInteger dCount = 0;
+		NSUInteger aFilesCount = 0;
+		NSUInteger dFilesCount = 0;
 
 		for (NSDictionary *item in foundFiles)
 		{
@@ -2526,15 +3027,15 @@
 
 			if (codeType == kCodeTypeAgent)
 			{
-				++aCount;
+				++aFilesCount;
 			}
 			else
 			{
-				++dCount;
+				++dFilesCount;
 			}
 		}
 
-		NSInteger total = currentProject.projectAgentFiles.count - aCount;
+		NSInteger total = currentProject.projectAgentFiles.count - aFilesCount;
 
 		if (total == 1)
 		{
@@ -2545,7 +3046,7 @@
 			[self writeToLog:[NSString stringWithFormat:@"%li local files no longer referenced in the project's agent code.", (long)total] :YES];
 		}
 
-		total = currentProject.projectDeviceFiles.count - aCount;
+		total = currentProject.projectDeviceFiles.count - dFilesCount;
 
 		if (total == 1)
 		{
@@ -2557,16 +3058,19 @@
 		}
 		
 		NSMutableDictionary *projectFileList;
+		NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
 
 		for (NSUInteger i = 0 ; i < foundFiles.count ; ++i)
 		{
+			// Found files' paths will be absolute
+
 			NSDictionary *aFile = [foundFiles objectAtIndex:i];
 			NSString *fileName = [aFile objectForKey:@"fileName"];
 			NSNumber *codeNumber = [aFile objectForKey:@"fileType"];
 			NSString *fileLoc = [aFile objectForKey:@"filePath"];
-			NSInteger codeType = codeNumber.integerValue;
+			NSInteger fileType = codeNumber.integerValue;
 
-			if (codeType == kCodeTypeAgent)
+			if (fileType == kCodeTypeAgent)
 			{
 				if (currentProject.projectAgentFiles == nil) currentProject.projectAgentFiles = [[NSMutableDictionary alloc] init];
 				projectFileList = currentProject.projectAgentFiles;
@@ -2602,6 +3106,8 @@
 			{
 				NSString *aPath = [projectFileList objectForKey:fileName];
 
+				if (cv != kLower) aPath = [self getAbsolutePath:currentProject.projectPath :aPath];
+
 				if ([aPath compare:fileLoc] != NSOrderedSame)
 				{
 					currentProject.projectHasChanged = YES;
@@ -2619,11 +3125,14 @@
 		{
 			NSDictionary *aFile = [foundFiles objectAtIndex:i];
 			NSString *fileName = [aFile objectForKey:@"fileName"];
-			NSString *filePath = [aFile objectForKey:@"filePath"];
-			NSNumber *codeNumber = [aFile objectForKey:@"fileType"];
-			NSInteger codeType = codeNumber.integerValue;
 
-			if (codeType == kCodeTypeAgent)
+			NSString *filePath = [aFile objectForKey:@"filePath"];
+			if (cv != kLower) filePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
+
+			NSNumber *codeNumber = [aFile objectForKey:@"fileType"];
+			NSInteger fileType = codeNumber.integerValue;
+
+			if (fileType == kCodeTypeAgent)
 			{
 				[currentProject.projectAgentFiles setObject:filePath forKey:fileName];
 			}
@@ -2664,9 +3173,16 @@
 
 - (void)addFileWatchPaths:(NSArray *)paths
 {
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
 	for (NSUInteger i = 0 ; i < paths.count ; ++i)
 	{
 		NSString *path = [paths objectAtIndex:i];
+
+		// File version >= 2.1? Convert relative path to absolute before passing it to file watcher
+
+		if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+
 		if (![fileWatchQueue isPathBeingWatched:path]) [fileWatchQueue addPath:path];
 	}
 }
@@ -2866,21 +3382,20 @@
 
                 // Add the library to the project - name and version (as string)
 
-                if (currentProject.projectImpLibs == nil)
+                if (foundEILibs.count == 0)
                 {
-                    currentProject.projectImpLibs = [[NSMutableArray alloc] init];
                     NSArray *library = [NSArray arrayWithObjects:[elements objectAtIndex:0], [elements objectAtIndex:1], nil];
-                    [currentProject.projectImpLibs addObject:library];
+                    [foundEILibs addObject:library];
                 }
                 else
                 {
                     BOOL match = NO;
 
-                    for (NSUInteger k = 0 ; k < currentProject.projectImpLibs.count ; ++k)
+                    for (NSUInteger k = 0 ; k < foundEILibs.count ; ++k)
                     {
                         // See if the library is already listed
 
-                        NSArray *aLib = [currentProject.projectImpLibs objectAtIndex:k];
+                        NSArray *aLib = [foundEILibs objectAtIndex:k];
                         NSString *libName = [aLib objectAtIndex:0];
                         NSString *libVersion = [aLib objectAtIndex:1];
                         if (([libName compare:[elements objectAtIndex:0]] == NSOrderedSame) && ([libVersion compare:[elements objectAtIndex:1]] == NSOrderedSame)) match = YES;
@@ -2888,7 +3403,7 @@
 
                     if (!match) {
                         NSArray *library = [NSArray arrayWithObjects:[elements objectAtIndex:0], [elements objectAtIndex:1], nil];
-                        [currentProject.projectImpLibs addObject:library];
+                        [foundEILibs addObject:library];
                     }
                 }
             }
@@ -2914,7 +3429,6 @@
 	// The value of 'codeType' indicates whether the source is agent or device code.
 	// The value of 'willReturnCode' indicates whether the method should returne compiled code or not. If it is
 	// being used to gather a list of #included libraries and files, 'willReturnCode' will be NO.
-	
 	
 	NSUInteger lineStartIndex;
     NSRange includeRange, commentRange;
@@ -2982,8 +3496,10 @@
                     // Found at least one / so there must be directory info here,
                     // even if it's just ~/lib.class.nut
 
+					/*
+
 					// What it if is ../lib.class.nut? This indicates relativity - but relative to what?
-					// We can only assume it's the code file or the project file.
+					// We can only assume it's the project file.
 
 					NSRange dotRange = [libName rangeOfString:@".."];
 
@@ -2993,16 +3509,28 @@
 
 						if (codeType == kCodeTypeAgent)
 						{
-							libName = [[currentProject.projectAgentCodePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", libName];
+							//libName = [[currentProject.projectAgentCodePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", libName];
 						}
 						else
 						{
-							libName = [[currentProject.projectDeviceCodePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", libName];
+							//libName = [[currentProject.projectDeviceCodePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", libName];
 						}
+
+						libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					}
+					else
+					{
+						// We have directory info but no .., so we must have a subdirectory
+						// eg. abc/def/lib.class.nut
+
+						libName = [self getAbsolutePath:currentProject.projectPath :libName];
+					}
+
+					*/
 
                     // Get the path component from the source file's library name info
 
+					libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					libPath = [libName stringByStandardizingPath];
 					libPath = [libPath stringByDeletingLastPathComponent];
 
@@ -3013,12 +3541,14 @@
                 else
                 {
                     // Didn't find any / characters so we can assume we just have a file name
-                    // eg. library.class.nut. Assume the file is in the same folder as the project
+                    // eg. 'lib.class.nut'. Assume the file is in the same folder as the project (otherwise it's in / which is unlikely
 
-                    // libPath = workingDirectory;
-					libPath = currentProject.projectPath;
+                    libPath = currentProject.projectPath;
                 }
-				
+
+				// At this point, 'libName' should be of the form 'lib.class.nut', and
+				// 'libPath' should be an *absolute* path (we will convert later)
+
 				// Assume library or file will be added to the project
 
                 BOOL addToCodeFlag = YES;
@@ -3040,111 +3570,124 @@
 
                 if (libCode == nil)
                 {
-                    // Library or file is not in the named directory, so try the working directory
-					// Note: this is repeated test if the user only #includes the library file name
+					// Library or file is not in the named directory, so try the project directory
 
-                    libCode = [NSString stringWithContentsOfFile:[workingDirectory stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
+					libCode = [NSString stringWithContentsOfFile:[currentProject.projectPath stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
 
-                    if (libCode == nil)
-                    {
-                        // Library or file is not in the working directory, try the saved directory, if we have one
+					if (libCode == nil)
+					{
+						// Library or file is not in the named directory, so try the working directory
+						// Note: this is repeated test if the user only #includes the library file name
 
-                        NSString *savedPath = nil;
+						libCode = [NSString stringWithContentsOfFile:[workingDirectory stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
 
-                        if (codeType == kCodeTypeAgent)
-                        {
-                            if (isLibraryFlag)
+						if (libCode == nil)
+						{
+							// Library or file is not in the working directory, try the saved directory, if we have one - change to project directory?
+
+							NSString *savedPath = nil;
+
+							if (codeType == kCodeTypeAgent)
 							{
-								savedPath = [currentProject.projectAgentLibraries valueForKey:libName];
+								if (isLibraryFlag)
+								{
+									savedPath = [currentProject.projectAgentLibraries valueForKey:libName];
+								}
+								else
+								{
+									savedPath = [currentProject.projectAgentFiles valueForKey:libName];
+								}
+							}
+							else if (codeType == kCodeTypeDevice)
+							{
+								if (isLibraryFlag)
+								{
+									savedPath = [currentProject.projectDeviceLibraries valueForKey:libName];
+								}
+								else
+								{
+									savedPath = [currentProject.projectDeviceFiles valueForKey:libName];
+								}
+							}
+
+							if (savedPath != nil)
+							{
+								// We have a saved path for this file, so try it
+
+								NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
+								// For version 2.1 and up, 'savedPath' will be a relative path so convert to absolute before using
+
+								if (cv != kLower) savedPath = [self getAbsolutePath:currentProject.projectPath :savedPath];
+
+								libCode = [NSString stringWithContentsOfFile:savedPath encoding:NSUTF8StringEncoding error:&error];
+
+								if (libCode == nil)
+								{
+									// The library in not in the working directory or in its saved location, so bail if we are compiling
+									// We can't really continue the compilation, but we can look for other libraries if that's all we're doing
+
+									if (isLibraryFlag)
+									{
+										if (deadLibs == nil) deadLibs = [[NSMutableArray alloc] init];
+										[deadLibs addObject:libName];
+									}
+									else
+									{
+										if (deadFiles == nil) deadFiles = [[NSMutableArray alloc] init];
+										[deadFiles addObject:libName];
+									}
+
+									addToCodeFlag = NO;
+									addToProjectFlag = NO;
+									if (willReturnCode) done = YES;
+
+								}
+								else
+								{
+									// Found the file, so use the saved path
+
+									libPath = savedPath;
+								}
 							}
 							else
 							{
-								savedPath = [currentProject.projectAgentFiles valueForKey:libName];
-							}
-                        }
-                        else if (codeType == kCodeTypeDevice)
-                        {
-							if (isLibraryFlag)
-							{
-								savedPath = [currentProject.projectDeviceLibraries valueForKey:libName];
-							}
-							else
-							{
-								savedPath = [currentProject.projectDeviceFiles valueForKey:libName];
-							}
-                        }
-
-                        if (savedPath != nil)
-                        {
-                            // We have a saved path for this file, so try it
-
-                            libCode = [NSString stringWithContentsOfFile:savedPath encoding:NSUTF8StringEncoding error:&error];
-
-                            if (libCode == nil)
-                            {
-                                // The library in not in the working directory or in its saved location, so bail if we are compiling
-								// We can't really continue the compilation, but we can look for other libraries if that's all we're doing
+								// The library or file is not in the named or working directory, and we have no saved location for it, so bail
+								// We can't really continue the compilation, but we can look for other libraries
 
 								if (isLibraryFlag)
 								{
-									//[self writeToLog:[NSString stringWithFormat:@"[ERROR] Listed local library \"%@\" not found.", libName ] :YES];
 									if (deadLibs == nil) deadLibs = [[NSMutableArray alloc] init];
 									[deadLibs addObject:libName];
 								}
 								else
 								{
-									//[self writeToLog:[NSString stringWithFormat:@"[ERROR] Listed local files \"%@\" not found.", libName ] :YES];
 									if (deadFiles == nil) deadFiles = [[NSMutableArray alloc] init];
 									[deadFiles addObject:libName];
 								}
 
-                                //libPath = @"";
-                                addToCodeFlag = NO;
-                                addToProjectFlag = NO;
+								addToCodeFlag = NO;
+								addToProjectFlag = NO;
 								if (willReturnCode) done = YES;
-
-                            }
-                            else
-                            {
-                                // Found the file, so use the saved path
-
-                                libPath = savedPath;
-                            }
-                        }
-                        else
-                        {
-                            // The library or file is not in the named or working directory, and we have no saved location for it, so bail
-							// We can't really continue the compilation, but we can look for other libraries
-
-							if (isLibraryFlag)
-							{
-								//[self writeToLog:[NSString stringWithFormat:@"[ERROR] Listed local library \"%@\" not found.", libName ] :YES];
-								if (deadLibs == nil) deadLibs = [[NSMutableArray alloc] init];
-								[deadLibs addObject:libName];
 							}
-							else
-							{
-								//[self writeToLog:[NSString stringWithFormat:@"[ERROR] Listed local files \"%@\" not found.", libName ] :YES];
-								if (deadFiles == nil) deadFiles = [[NSMutableArray alloc] init];
-								[deadFiles addObject:libName];
-							}
+						}
+						else
+						{
+							// The library is in the working directory, so use that as its path
+							
+							libPath = [workingDirectory stringByAppendingFormat:@"/%@", libName];
+						}
+					}
+					else
+					{
+						// The library is in the project directory, so use that as its path
 
-							//libPath = @"";
-							addToCodeFlag = NO;
-							addToProjectFlag = NO;
-							if (willReturnCode) done = YES;
-                        }
-                    }
-                    else
-                    {
-                        // The library is in the working directory, so use that as its path
-						
-						libPath = [workingDirectory stringByAppendingFormat:@"/%@", libName];
-                    }
+						libPath = [currentProject.projectPath stringByAppendingFormat:@"/%@", libName];
+					}
                 }
                 else
                 {
-                    // We've got the file, so just add the name to complete the path
+                    // We've got the file, so just add the name to complete the path (which is absolute)
 					
 					libPath = [libPath stringByAppendingFormat:@"/%@", libName];
                 }
@@ -3282,12 +3825,11 @@
 
     if (!found) return nil;
 
-    // If any libraries have been removed, these are listed in 'deadLibs' and 'codeType' flags this
+    // If any libraries have been removed, these are listed in 'deadLibs'
 
     if (deadLibs.count > 0)
     {
-        // One or more libraries in the source file are neither in the working directory nor
-        // their recorded location.
+        // One or more libraries in the source file are neither in the working directory nor their recorded location.
 
         // NOTE Do we care if we're not returning code???
 
@@ -3563,11 +4105,16 @@
 	currentProject.projectDeviceLibraries = nil;
 	[currentProject.projectAgentLibraries removeAllObjects];
 	currentProject.projectAgentLibraries = nil;
+	[currentProject.projectDeviceFiles removeAllObjects];
+	currentProject.projectDeviceFiles = nil;
+	[currentProject.projectAgentFiles removeAllObjects];
+	currentProject.projectAgentFiles = nil;
 	currentProject.projectModelID = nil;
 	currentProject.projectAgentCode = nil;
 	currentProject.projectDeviceCode = nil;
 	currentProject.projectAgentCodePath = nil;
 	currentProject.projectDeviceCodePath = nil;
+	currentProject.projectVersion = kCurrentProjectVersionString;
 	
 	// Indicate the project needs saving
 	
@@ -3581,7 +4128,6 @@
 - (void)updateLibraryMenu
 {
     NSMenuItem *item;
-    NSArray *keyArray;
 	
     // Update the external library menu. First clear the current menu
     
@@ -3589,20 +4135,11 @@
 	
 	// Add agent libraries, if any
 
-    if (currentProject.projectAgentLibraries.count > 0)
-    {
-		keyArray = [currentProject.projectAgentLibraries allKeys];
-        [self libAdder:keyArray];
-
-    }
+    if (currentProject.projectAgentLibraries.count > 0) [self libAdder:[currentProject.projectAgentLibraries allKeys]];
 	
 	// Add device libraries, if any
     
-    if (currentProject.projectDeviceLibraries.count > 0)
-    {
-		keyArray = [currentProject.projectDeviceLibraries allKeys];
-        [self libAdder:keyArray];
-    }
+    if (currentProject.projectDeviceLibraries.count > 0) [self libAdder:[currentProject.projectDeviceLibraries allKeys]];
 
     // Add EI Libraries, if any
 
@@ -3637,7 +4174,7 @@
 		
 		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
 		[externalLibsMenu addItem:item];
-		[item setEnabled:NO];
+		item.enabled = NO;
 	}
     else
     {
@@ -3696,12 +4233,28 @@
             }
 
             [externalLibsMenu addItem:item];
-            [item setEnabled:NO];
+            item.enabled = YES;
         }
 
         NSString *libTitle = [self getLibraryTitle:[keyArray objectAtIndex:i]];
         [self addLibraryToMenu:libTitle :NO];
     }
+}
+
+
+
+- (NSString *)getLibraryTitle:(id)item
+{
+	if ([item isKindOfClass:[NSString class]])
+	{
+		return (NSString *)item;
+	}
+	else
+	{
+		NSString *title = [item objectAtIndex:0];
+		title = [title stringByAppendingFormat:@" (%@)", [item objectAtIndex:1]];
+		return title;
+	}
 }
 
 
@@ -3729,27 +4282,17 @@
 
 - (void)updateFilesMenu
 {
-    NSArray *keyArray;
-
     // Update the external files menu. First clear the current menu
 
     if (externalFilesMenu.numberOfItems > 0) [externalFilesMenu removeAllItems];
 
     // Add agent linked files, if any
 
-    if (currentProject.projectAgentFiles.count > 0)
-    {
-        keyArray = [currentProject.projectAgentFiles allKeys];
-        [self fileAdder:keyArray];
-    }
+    if (currentProject.projectAgentFiles.count > 0) [self fileAdder:[currentProject.projectAgentFiles allKeys]];
 
     // Add device linked files, if any (Comments as above)
 
-    if (currentProject.projectDeviceFiles.count > 0)
-    {
-        keyArray = [currentProject.projectDeviceFiles allKeys];
-        [self fileAdder:keyArray];
-    }
+    if (currentProject.projectDeviceFiles.count > 0) [self fileAdder:[currentProject.projectDeviceFiles allKeys]];
 
 	// Tidy up the menu
 
@@ -3759,7 +4302,7 @@
 
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
         [externalFilesMenu addItem:item];
-        [item setEnabled:NO];
+        item.enabled = NO;
     }
     else
     {
@@ -3815,22 +4358,6 @@
 
 
 
-- (NSString *)getLibraryTitle:(id)item
-{
-    if ([item isKindOfClass:[NSString class]])
-    {
-        return (NSString *)item;
-    }
-    else
-    {
-        NSString *title = [item objectAtIndex:0];
-        title = [title stringByAppendingFormat:@" (%@)", [item objectAtIndex:1]];
-        return title;
-    }
-}
-
-
-
 - (void)launchLibsPage
 {
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/libraries/"]];
@@ -3838,11 +4365,14 @@
 
 
 
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject
 {
-	// Create a new menu entry to the Projects menu’s Open Projects submenu
-	// and to the Current Project popup
-	
+	// Create a new menu entry to the Projects menu’s Open Projects submenu and to the Current Project popup
+	// For the Open Projects submenu, each menu item's representedObject points to the named project
+	// For the Current Project popup, each menu item's tag is set to the index of the project in the submenu
+	// This allows us to choose projects irrespective of the name used in the menu, for example letting us
+	// distinguish between 'explorer' and 'explorer 2'
+
 	NSMenuItem *item;
 	
 	// Run through the existing menu items, to check that we're not adding one already there
@@ -3859,11 +4389,13 @@
 	
 	if (projectsMenu.numberOfItems > 0)
 	{
+		// Run through the existing menu items and turn them off
+
 		for (NSUInteger i = 0 ; i < projectsMenu.numberOfItems ; ++i)
 		{
 			item = [projectsMenu itemAtIndex:i];
 			
-			if ([item.title compare:currentProject.projectName] == NSOrderedSame)
+			if ([item.title compare:menuItemTitle] == NSOrderedSame)
 			{
 				// The new project is already on the menu, so return failure
 				
@@ -3879,15 +4411,17 @@
 	// If we have got this far, we can safely add the project to the submenu...
 	
 	item = [[NSMenuItem alloc] initWithTitle:menuItemTitle action:@selector(chooseProject:) keyEquivalent:@""];
+	item.representedObject = aProject;
 	item.state = NSOnState;
 	[projectsMenu addItem:item];
 	
 	// ...and to the popup
 	
 	[projectsPopUp addItemWithTitle:menuItemTitle];
-	NSUInteger index = [projectsPopUp indexOfItemWithTitle:menuItemTitle];
+	NSInteger index = [projectsPopUp indexOfItemWithTitle:menuItemTitle];
 	[projectsPopUp selectItemAtIndex:index];
-	if (projectsPopUp.enabled == NO) projectsPopUp.enabled = YES;
+	projectsPopUp.selectedItem.tag = [projectsMenu indexOfItem:item];
+	projectsPopUp.enabled = YES;
 
 	// Return success
 	
@@ -3963,22 +4497,17 @@
 
 - (IBAction)getProjectsFromServer:(id)sender
 {
-	// Calls ide method getInitialData: which acquires models *and* devices
-	// Ensure it zaps the selected model and device
+	// Handler that now simply calls getApps: in response to user action
 
 	[self getApps];
-	return;
 }
 
 
 
 - (void)getApps
 {
-    // currentDevice = -1;
-    // currentModel = -1;
-
-	// Make copies of the current device and model records (if they exists)
-	// We require copies because the ide arrays may be repopulated
+    // Make copies of the current device and model records (if we have current selections)
+	// We require copies because the ide arrays may be repopulated and we need to retain key data
 
 	if (currentDevice != -1) cDevice = [[ide.devices objectAtIndex:currentDevice] copy];
 	if (currentModel != -1) cModel = [[ide.models objectAtIndex:currentModel] copy];
@@ -3993,39 +4522,53 @@
 
 - (void)listModels
 {
-	
 	// This method should ONLY be called by the BuildAPI instance AFTER loading a list of models
+	// At this point we need to select or re-select a model, a device (maybe) and a project (maybe)
 
 	[modelsMenu removeAllItems];
 	
-	// currentModel = -1;
-	
 	if (ide.models.count == 0)
 	{
-		// No models in the list so warn and bail
+		// No models in the list, so warn and bail
 
-		[self writeToLog:@"[WARNING] There are no models listed on the server."  :YES];
-		return;
+		[self writeToLog:@"[WARNING] There are no models listed on the server." :YES];
+
+		if (checkModelsFlag)
+		{
+			// We're only checking the models available, so bail
+
+			checkModelsFlag = NO;
+			return;
+		}
+		else
+		{
+			// There may be no models but there still might be devices
+
+			[self writeToLog:@"Acquiring list of devices..." :YES];
+			return;
+		}
 	}
 
 	for (NSDictionary *aModel in ide.models)
 	{
 		// Run through the list of models (in the ide object) and add a menu item for each
 
-		NSString *title = [aModel valueForKey:@"name"];
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chooseModel:) keyEquivalent:@""];
+		NSString *mName = [aModel valueForKey:@"name"];
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:mName
+													  action:@selector(chooseModel:)
+											   keyEquivalent:@""];
 		[modelsMenu addItem:item];
 
 		if (newModelFlag == YES)
 		{
 			// We are here after creating a new model successfully and getting a fresh list of models, 
-			// so we auto-select the new model
+			// so we auto-select the new model. Can only create a new model by creating a new project,
+			// and the names will match at this point (we don't yet have the model ID)
 
-			NSString *name = [aModel objectForKey:@"name"];
+			NSString *mName = [aModel objectForKey:@"name"];
 
-			if ([name compare:currentProject.projectName] == NSOrderedSame)
+			if ([mName compare:currentProject.projectName] == NSOrderedSame)
 			{
-				
 				// Select the model in the menu (can't use chooseModel: as menu not built yet)
 
 				item.state = NSOnState;
@@ -4039,9 +4582,9 @@
 			{
 				// If we have a project open, see if it is linked to one of the newly loaded models
 
-				NSString *modelID = [aModel objectForKey:@"id"];
+				NSString *mID = [aModel objectForKey:@"id"];
 
-				if ([modelID compare:currentProject.projectModelID] == NSOrderedSame)
+				if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
 				{
 					// Select the model in the menu (can't use chooseModel: as menu not built yet)
 
@@ -4055,9 +4598,9 @@
 
 				if (cModel)
 				{
-					NSString *mName = [cModel objectForKey:@"name"];
+					NSString *prevName = [cModel objectForKey:@"name"];
 
-					if ([mName compare:title] == NSOrderedSame)
+					if ([prevName compare:mName] == NSOrderedSame)
 					{
 						// Select the model in the menu (can't use chooseModel: as menu not built yet)
 
@@ -4073,10 +4616,13 @@
     [self updateMenus];
 	[self setToolbar];
 
-	if (newModelFlag == YES) newModelFlag = NO;
+	newModelFlag = NO;
 
 	if (checkModelsFlag)
 	{
+		// Just checking models? Return immediately to prevent the user being notified
+		// that devices are also being loaded
+
 		checkModelsFlag = NO;
 		return;
 	}
@@ -4098,10 +4644,11 @@
 	NSMenuItem *item = (NSMenuItem *)sender;
     NSInteger itemNumber = [modelsMenu indexOfItem:item];
 	NSInteger newModelIndex = -1;
-    
-    for (NSUInteger i = 0; i < modelsMenu.numberOfItems ; ++i)
+	BOOL autoSelectFlag = [[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autoselectdevice"];
+
+	for (NSUInteger i = 0; i < modelsMenu.numberOfItems ; ++i)
     {
-        // Turn off all the menu items except the current one
+        // Turn off all the menu items except the sender's
         
         item = [modelsMenu itemAtIndex:i];
         
@@ -4112,11 +4659,10 @@
 
             item.state = NSOnState;
 			newModelIndex = i;
-			NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-			
-			if ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"] && fromDeviceSelectFlag == NO)
+
+			if (autoSelectFlag == YES && fromDeviceSelectFlag == NO)
 			{
-				// Preference to auto-select model's first device (if it has one) so select it
+				// User's preference is to auto-select model's first device (if it has one)
 				
 				if ([item submenu] != nil)
 				{
@@ -4150,19 +4696,12 @@
 	
 	if (currentModel != newModelIndex)
 	{
-		if (fromDeviceSelectFlag == NO)
-		{
-			// If we are NOT coming from device selection, and we have changed
-			// models, we must also de-select any previously selected device
-			
-			if (![[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autoselectdevice"])
-			{
-				currentDevice = -1;
-				[self setDeviceMenu];
-			}
-		}
-		
 		currentModel = newModelIndex;
+
+		// If we are NOT coming from device selection, and we have changed
+		// models, we must also de-select any previously selected device
+
+		if (fromDeviceSelectFlag == NO && autoSelectFlag == NO) currentDevice = -1;
 	}
 
     [self updateMenus];
@@ -4197,7 +4736,7 @@
 
 - (void)modelToProjectStageTwo
 {
-    // This method is called by ToolsAPI ONLY
+    // This method is called by ToolsAPI ONLY in response to modelToProjectStageOne:
 	
 	if (showCodeFlag == YES)
     {
@@ -4396,32 +4935,36 @@
 
     NSMenuItem *aMenuItem = nil;
 
-    for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
-    {
-        aMenuItem = [modelsMenu itemAtIndex:i];
-
-		if (aMenuItem.submenu != nil)
+    if (modelsMenu.numberOfItems > 0)
+	{
+		for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
 		{
-			[aMenuItem.submenu removeAllItems];
-			aMenuItem.submenu = nil;
+			aMenuItem = [modelsMenu itemAtIndex:i];
+
+			if (aMenuItem.submenu != nil)
+			{
+				[aMenuItem.submenu removeAllItems];
+				aMenuItem.submenu = nil;
+			}
+		}
+
+		// Clear the unassigned section if there is one (we add it back if required; it may not be)
+
+		aMenuItem = [modelsMenu itemAtIndex:modelsMenu.numberOfItems - 1];
+
+		if ([aMenuItem.title compare:@"Unassigned"] == NSOrderedSame)
+		{
+			// There is an Unassigned entry (+ spacer if there are other models) so remove both
+
+			[modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
+			if (modelsMenu.numberOfItems > 0) [modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
 		}
 	}
-	
-	// Clear the unassigned section if there is one (we add it back if required; it may not be)
-
-    aMenuItem = [modelsMenu itemAtIndex:modelsMenu.numberOfItems - 1];
-
-    if ([aMenuItem.title compare:@"Unassigned"] == NSOrderedSame)
-    {
-        // There is an Unassigned entry (+ spacer) so remove both 
-
-        [modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
-        [modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
-    }
 
 	// Clear the devices list pop up
 
 	[devicesPopUp removeAllItems];
+	devicesPopUp.enabled = NO;
 
 	// Run through the current list of devices from the server and add them to the model menu submenus
 	// We store a fresh list of device names in 'deviceList'
@@ -4567,21 +5110,21 @@
 		}
 		else
 		{
-			// No devices, so add a 'None' item at the top
-			
+			// No saved device, so add a 'None' item and select it
+
 			[devicesPopUp addItemWithTitle:@"None"];
 			NSMenuItem *item = [devicesPopUp itemWithTitle:@"None"];
 			[devicesPopUp selectItemWithTitle:@"None"];
 			item.enabled = NO;
 		}
 	}
-
 	
 	// Sort the models menu's submenus
 	
 	for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
 	{
 		NSMenuItem *item = [modelsMenu itemAtIndex:i];
+
 		if (item.submenu != nil)
 		{
 			NSArray *items = item.submenu.itemArray;
@@ -4619,7 +5162,7 @@
 
 	if (reDeviceIndex == -1)
     {
-        // Reselect current model if there is one
+        // Reselect current device if there is one
 		
 		if (cDevice)
 		{
@@ -4662,10 +5205,6 @@
         if (item != refreshMenuItem) item.enabled = NO;
     }
 	
-	// Enable model menu items that require the presence of loaded devices
-
-    assignDeviceModelMenuItem.enabled = YES;
-
 	// Finally, did we 'rename' any unassigned devices? If so, actually rename them
 
 	if (autoRenameList.count > 0)
@@ -4704,86 +5243,31 @@
 	// The user has selected a device from a Models menu item’s sub-menu
     // or has selected a device by some other means, eg. switching projects
 	
-	if (streamFlag == YES)
-	{
-		// NOTE THIS SECTION SHOULD NOT BE RUN NOW WE HAVE MULTI-DEVICE STREAMING
-
-		if (currentDevice != -1)
-		{
-            NSDictionary *device = [ide.devices	objectAtIndex:currentDevice];
-
-            if (selectDeviceFlag == NO)
-            {
-				// Are we logging? If so warn the user
-                
-                NSAlert *ays = [[NSAlert alloc] init];
-                [ays addButtonWithTitle:@"No"];
-                [ays addButtonWithTitle:@"Yes"];
-                [ays setMessageText:[NSString stringWithFormat:@"You are currently logging from device \"%@\". Are you sure you want to proceed?", [device objectForKey:@"name"]]];
-                [ays setInformativeText:@"Selecting another device will stop device logging."];
-                [ays setAlertStyle:NSWarningAlertStyle];
-                [ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode){
-
-                    if (returnCode == 1001)
-                    {
-                        // User wants to continue with the change, so turn off streaming
-                        
-                        [self streamLogs:nil];
-                        [self setCurrentDeviceFromSelection:sender];
-                    }
-                }];
-            }
-            else
-            {
-                [self writeToLog:[NSString stringWithFormat:@"Reminder: you are currently logging from device \"%@\"", [device objectForKey:@"name"]] :YES];
-            }
-		}
-        else
-        {
-            // Don't have a current device, so shouldn't be streaming – turn it off
-
-            [self streamLogs:nil];
-            [self setCurrentDeviceFromSelection:sender];
-        }
-	}
-	else
-	{
-		[self setCurrentDeviceFromSelection:sender];
-	}
-}
-
-
-
-- (void)setCurrentDeviceFromSelection:(id)sender
-{
 	// Sets currentDevice: based on (unique) name of device as presented by the menu
-	
+
 	NSMenuItem *item;
 	NSString *dName;
 	NSString *rawName;
-	
+
 	if (sender == devicesPopUp)
 	{
 		// Device selected from the popup rather than the menu
-		
+
 		item = devicesPopUp.selectedItem;
-		
-		if ([item.title compare:@"None"] == NSOrderedSame) 
+
+		if ([item.title compare:@"None"] == NSOrderedSame)
 		{
 			item.enabled = NO;
 			return;
 		}
-		
-		NSMenuItem *nitem = [devicesPopUp itemWithTitle:@"None"];
-		if (nitem != nil) [devicesPopUp removeItemWithTitle:@"None"];
 	}
 	else
 	{
 		item = (NSMenuItem *)sender;
 	}
-	
+
 	rawName = item.title;
-	
+
 	//dName = [rawName substringToIndex:item.title.length - kStatusIndicatorWidth];    // For offline bullet
 
 	// Extract the device name from the menu title
@@ -4795,42 +5279,42 @@
 	/*
 
 	 NSRange oRange = [rawName rangeOfString:kOfflineTag];
-	 
+
 	 if (oRange.location != NSNotFound)
-	{
+	 {
 		dName = [rawName substringToIndex:oRange.location];
-	}
-	else
-	{
+	 }
+	 else
+	 {
 		dName = rawName;
-	}
-	 
+	 }
+
 	 */
 
 	for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
 	{
 		// Get the device data from the devices list by name not index
-		
+
 		NSDictionary *dDict = [ide.devices objectAtIndex:i];
 		NSString *dString = [dDict objectForKey:@"name"];
-		
+
 		if ([dString compare:dName] == NSOrderedSame) currentDevice = i;
 	}
-	
+
 	// Update menus with new selection's name as necessary
-	
+
 	for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
 	{
 		NSMenuItem *model = [modelsMenu itemAtIndex:i];
-		
+
 		if (sender == devicesPopUp)
 		{
 			NSMenu *smenu = model.submenu;
-			
+
 			if (smenu != nil)
 			{
 				// Model has a submenu - see if it contains the selected device
-				
+
 				for (NSUInteger j = 0 ; j < smenu.numberOfItems ; ++j)
 				{
 					NSMenuItem *sdev = [smenu itemAtIndex:j];
@@ -4849,17 +5333,17 @@
 					{
 						sName = sdev.title;
 					}
-					
+
 					if ([sName compare:dName] == NSOrderedSame)
 					{
 						// We have a match so select the model, unless it's 'unassigned'
-						
+
 						if ([model.title compare:@"Unassigned"] != NSOrderedSame)
 						{
 							// Device’s assigned model can be selected so call chooseModel:
 							// to select the model to ensure menus are enabled. This will
 							// deselect all other device sub-menus but this one
-							
+
 							fromDeviceSelectFlag = YES;
 							[self chooseModel:model];
 							fromDeviceSelectFlag = NO;
@@ -4867,18 +5351,18 @@
 						else
 						{
 							// The device is unassigned, so don't select the model and clear the menu selection
-							
+
 							for (NSUInteger k = 0 ; k < modelsMenu.numberOfItems ; ++k)
 							{
 								NSMenuItem *aModel = [modelsMenu itemAtIndex:k];
 								aModel.state = NSOffState;
 							}
-							
+
 							currentModel = -1;
 						}
-						
+
 						// Select the device itself
-						
+
 						sdev.state = NSOnState;
 					}
 				}
@@ -4889,7 +5373,7 @@
 			if (model == item.parentItem)
 			{
 				// Select the device in its models menu submenu...
-				
+
 				if (model.submenu != nil)
 				{
 					for (NSUInteger j = 0 ; j < model.submenu.numberOfItems ; ++j)
@@ -4898,25 +5382,25 @@
 						sitem.state = NSOffState;
 					}
 				}
-				
+
 				item.state = NSOnState;
-				
+
 				// ...and in the devices popup
-				
+
 				[devicesPopUp selectItemWithTitle:rawName];
-				
+
 				// Is the device in the Unassigned section?
-				
+
 				if ([model.title compare:@"Unassigned"] == NSOrderedSame)
 				{
 					// The device is unassigned, so don't select the model and clear the menu selection
-					
+
 					for (NSUInteger j = 0 ; j < modelsMenu.numberOfItems ; ++j)
 					{
 						NSMenuItem *aModel = [modelsMenu itemAtIndex:j];
 						aModel.state = NSOffState;
 					}
-					
+
 					currentModel = -1;
 				}
 				else
@@ -4924,7 +5408,7 @@
 					// Device’s assigned model can be selected so call chooseModel:
 					// to select the model to ensure menus are enabled. This will
 					// deselect all other device sub-menus but this one
-					
+
 					fromDeviceSelectFlag = YES;
 					[self chooseModel:model];
 					fromDeviceSelectFlag = NO;
@@ -4945,8 +5429,13 @@
 		[streamLogsItem validate];
 	}
 
+	// Remove the 'None' item from the devices popup on the first device selection
+
+	NSMenuItem *nitem = [devicesPopUp itemWithTitle:@"None"];
+	if (nitem != nil) [devicesPopUp removeItemWithTitle:@"None"];
+
 	// Update Menus etc
-	
+
 	[self setDeviceMenu];
 	[self updateMenus];
 	[self setToolbar];
@@ -5443,19 +5932,13 @@
 
 - (IBAction)getLogs:(id)sender
 {
-    if (currentModel == -1 || currentDevice == -1)
+    if (currentDevice == -1)
     {
         [self writeToLog:@"[ERROR] You have not selected a device. Go to Models > Current Models to select a model and one of its devices." :YES];
         return;
     }
 
-    if (ide.models.count == 0)
-    {
-        [self writeToLog:@"[ERROR] You have no models in your account. You will need to create one before any device can be assigned to a model." :YES];
-        return;
-    }
-
-    if (ide.devices.count == 0)
+	if (ide.devices.count == 0)
     {
         [self writeToLog:@"[ERROR] You have no devices in your account." :YES];
         return;
@@ -5484,31 +5967,53 @@
     // to acquire its name; this method wouldn't have been called if there *hadn't* been
     // a device selected
 
-    [self writeToLog:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [device objectForKey:@"name"]] :NO];
-	NSArray *theLogs = (NSArray *)note.object;
+    __block NSArray *theLogs = (NSArray *)note.object;
 
-	// Calculate the width of the widest status message for spacing the output into columns
+	[extraOpQueue addOperationWithBlock:^(void){
 
-	NSUInteger width = 0;
+		// Calculate the width of the widest status message for spacing the output into columns
 
-	for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-	{
-		NSDictionary *aLog = [theLogs objectAtIndex:i];
-		NSString *sString = [aLog objectForKey:@"type"];
-		if (sString.length > width) width = sString.length;
-	}
+		NSUInteger width = 0;
 
-	for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-	{
-		NSDictionary *aLog = [theLogs objectAtIndex:i];
-		NSString *dString = [aLog objectForKey:@"timestamp"];
-		dString = [dString stringByReplacingOccurrencesOfString:@"T" withString:@" "];
-		dString = [dString substringToIndex:19];
-		NSString *tString = [aLog objectForKey:@"type"];
-		NSString *sString = [@"                    " substringToIndex:width - tString.length];
-		NSString *lString = [NSString stringWithFormat:@"%@ [%@] %@%@", dString, tString, sString, [aLog objectForKey:@"message"]];
-		[self writeToLog:lString :NO];
-	}
+		for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
+		{
+			NSDictionary *aLog = [theLogs objectAtIndex:i];
+			NSString *sString = [aLog objectForKey:@"type"];
+			if (sString.length > width) width = sString.length;
+		}
+
+		[self performSelectorOnMainThread:@selector(logLogs:) withObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [device objectForKey:@"name"]] waitUntilDone:NO];
+
+		for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
+		{
+			NSDictionary *aLog = [theLogs objectAtIndex:i];
+			NSString *dString = [aLog objectForKey:@"timestamp"];
+			dString = [dString stringByReplacingOccurrencesOfString:@"T" withString:@" "];
+			dString = [dString substringToIndex:19];
+			NSString *tString = [aLog objectForKey:@"type"];
+			NSString *sString = [@"                    " substringToIndex:width - tString.length];
+			NSString *lString = [NSString stringWithFormat:@"%@ [%@] %@%@", dString, tString, sString, [aLog objectForKey:@"message"]];
+			[self performSelectorOnMainThread:@selector(logLogs:) withObject:lString waitUntilDone:NO];
+		}
+
+		[self performSelectorOnMainThread:@selector(parseLog) withObject:nil waitUntilDone:NO];
+	}];
+}
+
+
+
+- (void)logLogs:(NSString *)logLine
+{
+	[self writeToLog:logLine :NO];
+}
+
+
+
+- (void)parseLog
+{
+	logTextView.editable = YES;
+	[logTextView checkTextInDocument:nil];
+	logTextView.editable = NO;
 }
 
 
@@ -5858,11 +6363,12 @@
 	}
 	
     NSArray *array;
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
     NSString *string = nil;
-	
-    [self writeToLog:@"------------------------------------------------------------------------------------" :YES];
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
 
-	if (ide.models != nil && ide.models.count > 0)
+    if (ide.models != nil && ide.models.count > 0)
 	{
 		for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
 		{
@@ -5874,24 +6380,44 @@
 			}
 		}
 	}
-	
-    [self writeToLog:[NSString stringWithFormat:@"Project \"%@\"", currentProject.projectName] :YES];
 
-	if (string) [self writeToLog:[NSString stringWithFormat:@"Project linked to model \"%@\"", string] :YES];
+    [lines addObject:[NSString stringWithFormat:@"Project \"%@\"", currentProject.projectName]];
+
+#ifdef DEBUG
+
+	[lines addObject:[NSString stringWithFormat:@"Project Object Version %@", currentProject.projectVersion]];
+
+#endif
+
+	if (string) [lines addObject:[NSString stringWithFormat:@"Project linked to model \"%@\"", string]];
 
 	if (currentProject.projectPath == nil)
 	{
 		// This will be case if it's a new project that has not been saved yet
 
-		[self writeToLog:@"Project has not yet been saved" :YES];
+		[lines addObject:@"Project has not yet been saved"];
 	}
 	else
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Project directory: %@", currentProject.projectPath] :YES];
+		[lines addObject:[NSString stringWithFormat:@"Project location: %@/%@.squirrelproj", currentProject.projectPath, currentProject.projectName]];
 	}
 
-	[self writeToLog:[NSString stringWithFormat:@"Current working directory: %@", workingDirectory] :YES];
-    [self writeToLog:@" " :YES];
+	NSString *rString;
+	if (index == 0)
+	{
+		rString = @"absolute paths";
+	}
+	else if (index == 1)
+	{
+		rString = @"relative to the project file (above)";
+	}
+	else
+	{
+		rString = @"relative to your home directory";
+	}
+
+	[lines addObject:[NSString stringWithFormat:@"The following file locations are %@", rString]];
+	[lines addObject:@" "];
 
     if (currentProject.projectAgentCodePath != nil)
     {
@@ -5906,60 +6432,60 @@
             string = [string stringByAppendingString:@" which has not been compiled."];
         }
         
-        [self writeToLog:string :YES];
-        [self writeToLog:[NSString stringWithFormat:@"Agent code path: %@", currentProject.projectAgentCodePath] :YES];
+        [lines addObject:string];
+		[lines addObject:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectAgentCodePath]]];
 
         if (currentProject.projectAgentLibraries.count == 0)
         {
-            [self writeToLog:@"There are no local libraries in the agent code." :YES];
+            [lines addObject:@"There are no local libraries in the agent code."];
         }
         else if (currentProject.projectAgentLibraries.count == 1)
         {
-            [self writeToLog:@"There is 1 local library in the agent code:" :YES];
+            [lines addObject:@"There is 1 local library in the agent code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local libraries in the agent code:", (long)currentProject.projectAgentLibraries.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local libraries in the agent code:", (long)currentProject.projectAgentLibraries.count]];
         }
 
         if (currentProject.projectAgentLibraries.count > 0)
         {
             array = [currentProject.projectAgentLibraries allValues];
+
             for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
-        //[self writeToLog:@" " :YES];
-
         if (currentProject.projectAgentFiles.count == 0)
         {
-            [self writeToLog:@"There are no local files in the agent code." :YES];
+            [lines addObject:@"There are no local files in the agent code."];
         }
         else if (currentProject.projectAgentFiles.count == 1)
         {
-            [self writeToLog:@"There is 1 local file in the agent code:" :YES];
+            [lines addObject:@"There is 1 local file in the agent code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local files in the agent code:", (long)currentProject.projectAgentFiles.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local files in the agent code:", (long)currentProject.projectAgentFiles.count]];
         }
 
         if (currentProject.projectAgentFiles.count > 0)
         {
             array = [currentProject.projectAgentFiles allValues];
-            for (NSUInteger i = 0 ; i < array.count ; ++i)
+
+			for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
-        [self writeToLog:@" " :YES];
+        [lines addObject:@" "];
     }
     else
     {
-        [self writeToLog:@"Project has no agent code." :YES];
+        [lines addObject:@"Project has no agent code."];
     }
 
 
@@ -5976,85 +6502,112 @@
 			string = [string stringByAppendingString:@" which has not been compiled."];
 		}
 
-		[self writeToLog:string :YES];
-        [self writeToLog:[NSString stringWithFormat:@"Device Code path: %@", currentProject.projectDeviceCodePath] :YES];
+		[lines addObject:string];
+		[lines addObject:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectDeviceCodePath]]];
 
         if (currentProject.projectDeviceLibraries.count == 0)
         {
-            [self writeToLog:@"There are no local libraries in the device code." :YES];
+            [lines addObject:@"There are no local libraries in the device code."];
         }
         else if (currentProject.projectDeviceLibraries.count == 1)
         {
-            [self writeToLog:@"There is 1 local library in the device code:" :YES];
+            [lines addObject:@"There is 1 local library in the device code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local libraries in the device code:", (long)currentProject.projectDeviceLibraries.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local libraries in the device code:", (long)currentProject.projectDeviceLibraries.count]];
         }
 
         if (currentProject.projectDeviceLibraries.count > 0)
         {
             array = [currentProject.projectDeviceLibraries allValues];
-            for (NSUInteger i = 0 ; i < array.count ; ++i)
+
+			for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
-        //[self writeToLog:@" " :YES];
-
         if (currentProject.projectDeviceFiles.count == 0)
         {
-            [self writeToLog:@"There are no local files in the device code." :YES];
+            [lines addObject:@"There are no local files in the device code."];
         }
         else if (currentProject.projectDeviceFiles.count == 1)
         {
-            [self writeToLog:@"There is 1 local file in the device code:" :YES];
+            [lines addObject:@"There is 1 local file in the device code:"];
         }
         else
         {
-            [self writeToLog:[NSString stringWithFormat:@"There are %li local files in the device code:", (long)currentProject.projectDeviceFiles.count] :YES];
+            [lines addObject:[NSString stringWithFormat:@"There are %li local files in the device code:", (long)currentProject.projectDeviceFiles.count]];
         }
 
         if (currentProject.projectDeviceFiles.count > 0)
         {
             array = [currentProject.projectDeviceFiles allValues];
-            for (NSUInteger i = 0 ; i < array.count ; ++i)
+
+			for (NSUInteger i = 0 ; i < array.count ; ++i)
             {
-                [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [array objectAtIndex:i]] :YES];
+                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
             }
         }
 
-        [self writeToLog:@" " :YES];
+        [lines addObject:@" "];
 
 	}
 	else
 	{
-		[self writeToLog:@"Project has no device code." :YES];
+		[lines addObject:@"Project has no device code."];
 	}
 
 	if (currentProject.projectImpLibs.count > 0)
     {
         if (currentProject.projectImpLibs.count == 1)
         {
-            [self writeToLog:@"The Project includes the following Electric Imp library:" :YES];
+            [lines addObject:@"The Project includes the following Electric Imp library:"];
         }
         else
         {
-            [self writeToLog:@"The Project includes the following Electric Imp libraries:" :YES];
+            [lines addObject:@"The Project includes the following Electric Imp libraries:"];
         }
 
 		for (NSUInteger i = 0 ; i < currentProject.projectImpLibs.count ; ++i)
 		{
-            [self writeToLog:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getLibraryTitle:[currentProject.projectImpLibs objectAtIndex:i]]] :YES];
+            [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getLibraryTitle:[currentProject.projectImpLibs objectAtIndex:i]]]];
 		}
     }
     else
     {
-        [self writeToLog:@"The Project contains no Electric Imp libraries." :YES];
+        [lines addObject:@"The Project contains no Electric Imp libraries."];
     }
 	
-	[self writeToLog:@"------------------------------------------------------------------------------------" :YES];
+	[self printInfoInLog:lines];
+}
+
+
+
+- (NSString *)getDisplayPath:(NSString *)path
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+	Float32 version = currentProject.projectVersion.floatValue;
+
+	if (version > kPreviousProjectVersion)
+	{
+		if (index == 0) path = [self getAbsolutePath:currentProject.projectPath :path];
+
+		if (index == 2)
+		{
+			path = [self getAbsolutePath:currentProject.projectPath :path];
+			path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :path];
+		}
+	}
+	else
+	{
+		if (index == 2) path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :path];
+		if (index == 1) path = [self getRelativeFilePath:currentProject.projectPath :path];
+	}
+
+	return path;
 }
 
 
@@ -6070,7 +6623,12 @@
 	}
 	
 	NSDictionary *device = [ide.devices objectAtIndex:currentDevice];
-							
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
+
+	[lines addObject:[NSString stringWithFormat:@"Device: %@", [device objectForKey:@"name"]]];
+	[lines addObject:[NSString stringWithFormat:@"Device ID: %@", [device objectForKey:@"id"]]];
+	[lines addObject:[NSString stringWithFormat:@"State: %@", [device objectForKey:@"powerstate"]]];
+
 	// If the device is unassigned, it will have a null model id
 
 	NSString *mId = [device objectForKey:@"model_id"];
@@ -6089,11 +6647,7 @@
 		modelName = @"This device is not assigned to a model.";
 	}
 
-	[self writeToLog:@"--------------------------------------------------------------" :YES];
-	[self writeToLog:[NSString stringWithFormat:@"Device: %@", [device objectForKey:@"name"]] :YES];
-	[self writeToLog:[NSString stringWithFormat:@"Device ID: %@", [device objectForKey:@"id"]] :YES];
-	[self writeToLog:[NSString stringWithFormat:@"State: %@", [device objectForKey:@"powerstate"]] :YES];
-	[self writeToLog:modelName :YES];
+	[lines addObject:modelName];
 
 	NSString *agentId = [device objectForKey:@"agent_id"];
 
@@ -6101,21 +6655,19 @@
 
 	if ((NSNull *)agentId != [NSNull null])
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Agent State: %@", [device objectForKey:@"agent_status"]] :YES];
-		[self writeToLog:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [device objectForKey:@"agent_id"]] :YES];
+		[lines addObject:[NSString stringWithFormat:@"Agent State: %@", [device objectForKey:@"agent_status"]]];
+		[lines addObject:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [device objectForKey:@"agent_id"]]];
 
-		// Briefly switch on editing to activate the Agent URL link
 
-		logTextView.editable = YES;
-		[logTextView checkTextInDocument:nil];
-		logTextView.editable = NO;
 	}
 	else
 	{
-		[self writeToLog:@"This device has no agent. You must assign it to a model first." :YES];
+		[lines addObject:@"This device has no agent. You must assign it to a model first."];
 	}
 
-	[self writeToLog:@"--------------------------------------------------------------" :YES];
+	[self printInfoInLog:lines];
+
+	[self parseLog];
 }
 
 
@@ -6130,8 +6682,6 @@
 
         if (ide.models.count > 0)
         {
-
-
             for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
             {
                 NSMenuItem *item = [modelsMenu itemAtIndex:i];
@@ -6158,14 +6708,15 @@
     }
 
     NSDictionary *model = [ide.models objectAtIndex:index];
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
     NSString *mid = [model objectForKey:@"id"];
 
-    [self writeToLog:@"------------------------------------------------------------" :YES];
-    [self writeToLog:[NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]] :YES];
-    [self writeToLog:[NSString stringWithFormat:@"Model ID: %@", mid] :YES];
+    [lines addObject:[NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]]];
+    [lines addObject:[NSString stringWithFormat:@"Model ID: %@", mid]];
 
     NSString *dString = @"";
     NSUInteger dCount = 0;
+
     for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
     {
         NSDictionary *dev = [ide.devices objectAtIndex:i];
@@ -6185,14 +6736,14 @@
         dString = [dString substringToIndex:dString.length - 2];
         NSString *cString = @"device";
         if (dCount > 1) cString = @"devices";
-        [self writeToLog:[NSString stringWithFormat:@"%lu %@ assigned to this model: %@", (unsigned long)dCount, cString, dString] :YES];
+        [lines addObject:[NSString stringWithFormat:@"%lu %@ assigned to this model: %@", (unsigned long)dCount, cString, dString]];
     }
     else
     {
-        [self writeToLog:@"No devices assigned to this model" :YES];
+        [lines addObject:@"No devices assigned to this model"];
     }
 
-    [self writeToLog:@"------------------------------------------------------------" :YES];
+	[self printInfoInLog:lines];
 }
 
 
@@ -6215,9 +6766,6 @@
 	
 	[self writeToLog:@"Device Code:" :NO];
 	[self writeToLog:@" " :NO];
-
-	//[self listCode:currentProject.projectDeviceCode :-1 :-1 :-1];
-	//[self writeToLog:@" " :NO];
 
 	[extraOpQueue addOperationWithBlock:^{[self listCode:currentProject.projectDeviceCode :-1 :-1 :-1];}];
 }
@@ -6243,10 +6791,35 @@
 	[self writeToLog:@"Agent Code:" :NO];
 	[self writeToLog:@" " :NO];
 
-	//[self listCode:currentProject.projectAgentCode :-1 :-1 :-1];
-	//[self writeToLog:@" " :NO];
-
 	[extraOpQueue addOperationWithBlock:^{[self listCode:currentProject.projectAgentCode :-1 :-1 :-1];}];
+}
+
+
+
+- (void)printInfoInLog:(NSMutableArray *)lines
+{
+	NSInteger dashCount = 0;
+
+	for (NSString *string in lines)
+	{
+		if (string.length > dashCount) dashCount = string.length;
+	}
+
+	NSString *dashes = @"";
+
+	for (NSUInteger i = 0 ; i < dashCount ; ++i)
+	{
+		dashes = [dashes stringByAppendingString:@"-"];
+	}
+
+	[self writeToLog:dashes :YES];
+
+	for (NSString *string in lines)
+	{
+		[self writeToLog:string :YES];
+	}
+
+	[self writeToLog:dashes :YES];
 }
 
 
@@ -6388,15 +6961,36 @@
     // Open the original source code files an external editor
     
     NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-    
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
     if (sender == externalOpenDeviceItem || sender == externalOpenMenuItem || sender == viewDeviceCode)
     {
-        if (currentProject.projectDeviceCodePath) [workspace openFile:currentProject.projectDeviceCodePath];
+        if (currentProject.projectDeviceCodePath)
+		{
+			if (cv != kLower)
+			{
+				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
+			}
+			else
+			{
+				[workspace openFile:currentProject.projectDeviceCodePath];
+			}
+		}
     }
     
     if (sender == externalOpenAgentItem || sender == externalOpenMenuItem || sender == viewAgentCode)
     {
-        if (currentProject.projectAgentCodePath) [workspace openFile:currentProject.projectAgentCodePath];
+        if (currentProject.projectAgentCodePath)
+		{
+			if (cv != kLower)
+			{
+				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
+			}
+			else
+			{
+				[workspace openFile:currentProject.projectAgentCodePath];
+			}
+		}
     }
 }
 
@@ -6408,7 +7002,8 @@
     
     NSArray *keyArray;
     NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-	
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
     if (sender == externalOpenLibItem)
     {
         if (currentProject.projectAgentLibraries.count > 0)
@@ -6420,7 +7015,9 @@
 				// Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
 				
 				[NSThread sleepForTimeInterval:0.2];
-				[workspace openFile:[currentProject.projectAgentLibraries objectForKey:[keyArray objectAtIndex:i]] withApplication:nil andDeactivate:NO];
+				NSString *path = [currentProject.projectAgentLibraries objectForKey:[keyArray objectAtIndex:i]];
+				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+				[workspace openFile:path withApplication:nil andDeactivate:NO];
             }
         }
         
@@ -6431,7 +7028,9 @@
 			for (NSUInteger i = 0 ; i < currentProject.projectDeviceLibraries.count ; ++i)
             {
 				[NSThread sleepForTimeInterval:0.2];
-				[workspace openFile:[currentProject.projectDeviceLibraries objectForKey:[keyArray objectAtIndex:i]] withApplication:nil andDeactivate:NO];
+				NSString *path = [currentProject.projectDeviceLibraries objectForKey:[keyArray objectAtIndex:i]];
+				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+				[workspace openFile:path withApplication:nil andDeactivate:NO];
 			}
         }
     }
@@ -6439,17 +7038,21 @@
     {
         NSMenuItem *item = (NSMenuItem *)sender;
         NSInteger itemNumber = [item.menu indexOfItem:item];
-        
+
         // We always present agent libs then device libs, so if the itemNumber is greater than
         // the number of items in the AgentProjectLibraryPaths, it's device code
         
         if (itemNumber - 1 < currentProject.projectAgentLibraries.count)
         {
-			[workspace openFile:[currentProject.projectAgentLibraries objectForKey:item.title] withApplication:nil andDeactivate:NO];
+			NSString *path = [currentProject.projectAgentLibraries objectForKey:item.title];
+			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+			[workspace openFile:path withApplication:nil andDeactivate:NO];
         }
         else
         {
-            [workspace openFile:[currentProject.projectDeviceLibraries objectForKey:item.title] withApplication:nil andDeactivate:NO];
+			NSString *path = [currentProject.projectDeviceLibraries objectForKey:item.title];
+			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+			[workspace openFile:path withApplication:nil andDeactivate:NO];
         }
     }
 }
@@ -6462,6 +7065,7 @@
 
     NSArray *keyArray;
     NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
 
     if (sender == externalOpenFileItem)
     {
@@ -6474,7 +7078,9 @@
                 // Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
 
                 [NSThread sleepForTimeInterval:0.2];
-                [workspace openFile:[currentProject.projectAgentFiles objectForKey:[keyArray objectAtIndex:i]] withApplication:nil andDeactivate:NO];
+				NSString *path = [currentProject.projectAgentFiles objectForKey:[keyArray objectAtIndex:i]];
+				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+				[workspace openFile:path withApplication:nil andDeactivate:NO];
             }
         }
 
@@ -6485,7 +7091,9 @@
             for (NSUInteger i = 0 ; i < currentProject.projectDeviceFiles.count ; ++i)
             {
                 [NSThread sleepForTimeInterval:0.2];
-                [workspace openFile:[currentProject.projectDeviceFiles objectForKey:[keyArray objectAtIndex:i]] withApplication:nil andDeactivate:NO];
+				NSString *path = [currentProject.projectDeviceFiles objectForKey:[keyArray objectAtIndex:i]];
+				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+				[workspace openFile:path withApplication:nil andDeactivate:NO];
             }
         }
     }
@@ -6499,11 +7107,15 @@
 
         if (itemNumber < currentProject.projectAgentFiles.count)
         {
-            [workspace openFile:[currentProject.projectAgentFiles objectForKey:item.title] withApplication:nil andDeactivate:NO];
+			NSString *path = [currentProject.projectAgentFiles objectForKey:item.title];
+			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+			[workspace openFile:path withApplication:nil andDeactivate:NO];
         }
         else
         {
-            [workspace openFile:[currentProject.projectDeviceFiles objectForKey:item.title] withApplication:nil andDeactivate:NO];
+			NSString *path = [currentProject.projectDeviceFiles objectForKey:item.title];
+			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
+			[workspace openFile:path withApplication:nil andDeactivate:NO];
         }
     }
 }
@@ -6513,18 +7125,17 @@
 - (IBAction)externalOpenAll:(id)sender
 {
     NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
 
-	if (currentProject.projectVersion.floatValue > 2.0)
+	if (cv != kLower)
 	{
-		NSURL *agentFileURL = [self urlForBookmark:currentProject.projectAgentCodeBookmark];
-		NSString *agentFilePath = [agentFileURL absoluteString];
-		[workspace openFile:agentFilePath withApplication:nil andDeactivate:NO];
+		if (currentProject.projectDeviceCodePath) [workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
+
+		// Add a delay, or the second open is somehow missed out
 
 		[NSThread sleepForTimeInterval:0.2];
 
-		NSURL *deviceFileURL = [self urlForBookmark:currentProject.projectDeviceCodeBookmark];
-		NSString *deviceFilePath = [deviceFileURL absoluteString];
-		[workspace openFile:deviceFilePath withApplication:nil andDeactivate:NO];
+		if (currentProject.projectAgentCodePath) [workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
 	}
 	else
 	{
@@ -6535,12 +7146,12 @@
 		[NSThread sleepForTimeInterval:0.2];
 
 		if (currentProject.projectAgentCodePath) [workspace openFile:currentProject.projectAgentCodePath withApplication:nil andDeactivate:NO];
+	}
 
-		if (sender != externalOpenBothItem)
-		{
-			[self externalLibOpen:externalOpenLibItem];
-			[self externalFileOpen:externalOpenFileItem];
-		}
+	if (sender != externalOpenBothItem)
+	{
+		[self externalLibOpen:externalOpenLibItem];
+		[self externalFileOpen:externalOpenFileItem];
 	}
 }
 
@@ -6654,6 +7265,10 @@
 	{
 		boldTestCheckbox.state = NSOffState;
 	}
+
+	// Set location menu
+
+	[locationMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue]];
 
     // Show the sheet
 
@@ -6806,7 +7421,9 @@
     [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
 
-    // Close the sheet
+	[defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
+
+	// Close the sheet
 
     [_window endSheet:preferencesSheet];
 }
@@ -6963,10 +7580,10 @@
 {
     // Single point to run all the menu-setting methods
 	
+	[self setProjectMenu];
+	[self setModelsMenu];
 	[self setDeviceMenu];
-    [self setModelsMenu];
-    [self setProjectMenu];
-    [self setViewMenu];
+	[self setViewMenu];
 }
 
 
@@ -7101,7 +7718,6 @@
         }
 
 		// Enable or disable items that also require models with devices
-
 
 		NSMutableDictionary *aModel = [ide.models objectAtIndex:currentModel];
 		NSArray *mDevs = [aModel objectForKey:@"devices"];
@@ -7341,8 +7957,12 @@
 		{
 			Project *project = [projectArray objectAtIndex:i];
 			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:project.projectName action:@selector(chooseProject:) keyEquivalent:@""];
+			item.representedObject = project;
 			[projectsMenu addItem:item];
 			[projectsPopUp addItemWithTitle:project.projectName];
+			NSInteger index = [projectsPopUp indexOfItemWithTitle:project.projectName];
+			NSMenuItem *subitem = [projectsPopUp itemAtIndex:index];
+			subitem.tag = [projectsMenu indexOfItem:item];
 		}
 
 		if (currentProject != nil)
@@ -7358,6 +7978,7 @@
 				{
 					anItem.state = NSOnState;
 					[projectsPopUp selectItemWithTitle:selected.title];
+					projectsPopUp.enabled = YES;
 				}
 				else
 				{
@@ -7382,17 +8003,17 @@
 {
 	// Rename all menus based on online state and logging state
 	// Note we only use the existing info; we don't reload the device
-	// list from the server
+	// list from the server. Status string added via 'menuString:'
 
 	// Do the popup
 
-	NSUInteger len = 24;
+	NSUInteger truncateLength = 24;
 
 	for (NSMenuItem *item in devicesPopUp.itemArray)
 	{
 		NSArray *itemTitleParts = [item.title componentsSeparatedByString:@" "];
 		NSString *itemTitle = [itemTitleParts objectAtIndex:0];
-		if (itemTitle.length > len) len = itemTitle.length;
+		if (itemTitle.length > truncateLength) truncateLength = itemTitle.length;
 	}
 
 	for (NSMenuItem *item in devicesPopUp.itemArray)
@@ -7404,12 +8025,7 @@
 		{
 			NSString *deviceName = [device objectForKey:@"name"];
 
-			if ((NSNull *)deviceName == [NSNull null])
-			{
-				// We have to check for null device
-
-				deviceName = [device objectForKey:@"id"];
-			}
+			if ((NSNull *)deviceName == [NSNull null]) deviceName = [device objectForKey:@"id"];
 
 			if ([itemTitle compare:deviceName] == NSOrderedSame)
 			{
@@ -7476,15 +8092,9 @@
 				{
 					NSString *deviceName = [device objectForKey:@"name"];
 
-					if ((NSNull *)deviceName == [NSNull null])
-					{
-						deviceName = [device objectForKey:@"id"];
-					}
+					if ((NSNull *)deviceName == [NSNull null]) deviceName = [device objectForKey:@"id"];
 
-					if ([itemTitle compare:deviceName] == NSOrderedSame)
-					{
-						submenuItem.title = [itemTitle stringByAppendingString:[self menuString:[device objectForKey:@"id"]]];
-					}
+					if ([itemTitle compare:deviceName] == NSOrderedSame) submenuItem.title = [itemTitle stringByAppendingString:[self menuString:[device objectForKey:@"id"]]];
 				}
 			}
 		}
@@ -7508,8 +8118,6 @@
 
 		if ([aDeviceID compare:deviceID] == NSOrderedSame)
 		{
-			// Get the online state
-
 			aDeviceID = [device objectForKey:@"powerstate"];
 			if ([aDeviceID compare:@"online"] != NSOrderedSame) statusString = @"offline";
 			break;
@@ -7528,11 +8136,14 @@
 		returnString = @" (";
 
 		if (statusString.length > 0) returnString = [returnString stringByAppendingString:statusString];
+
 		if (loggingString.length > 0)
 		{
 			if (returnString.length > 2) returnString = [returnString stringByAppendingString:@", "];
 			returnString = [returnString stringByAppendingString:loggingString];
 		}
+
+		// Finish with a close bracket
 
 		returnString = [returnString stringByAppendingString:@")"];
 	}
@@ -7701,8 +8312,8 @@
 
 - (void)startProgress
 {
-    connectionIndicator.hidden = NO;
     [connectionIndicator startAnimation:self];
+	connectionIndicator.hidden = NO;
 }
 
 
@@ -7830,6 +8441,174 @@
 
 
 
+#pragma mark - File Path Methods
+
+
+- (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath
+{
+	NSString *theFilePath = [filePath stringByDeletingLastPathComponent];
+	NSString *theFileName = [filePath lastPathComponent];
+
+	if (theFilePath.length > basePath.length)
+	{
+		NSRange r = [theFilePath rangeOfString:basePath];
+
+		if (r.location != NSNotFound)
+		{
+			theFilePath = [theFilePath substringFromIndex:r.length];
+			theFilePath = [theFilePath stringByAppendingFormat:@"/%@", theFileName];
+		}
+		else
+		{
+			theFilePath = [self getPathDelta:basePath :theFilePath];
+			theFilePath = [theFilePath stringByAppendingString:theFileName];
+		}
+	}
+	else if (theFilePath.length < basePath.length)
+	{
+		NSRange r = [basePath rangeOfString:theFilePath];
+
+		if (r.location != NSNotFound)
+		{
+			theFilePath = [basePath substringFromIndex:r.length];
+			NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
+			theFilePath = theFileName;
+
+			for (NSInteger i = 0 ; i < filePathParts.count - 1 ; ++i)
+			{
+				theFilePath = [@"../" stringByAppendingString:theFilePath];
+			}
+		}
+		else
+		{
+			theFilePath = [self getPathDelta:basePath :theFilePath];
+			theFilePath = [theFilePath stringByAppendingString:theFileName];
+		}
+	}
+	else
+	{
+		NSRange r = [theFilePath rangeOfString:basePath];
+
+		if (r.location != NSNotFound)
+		{
+			theFilePath = theFileName;
+		}
+		else
+		{
+			theFilePath = [self getPathDelta:basePath :theFilePath];
+			theFilePath = [theFilePath stringByAppendingString:theFileName];
+		}
+	}
+
+	return theFilePath;
+}
+
+
+- (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath
+{
+	NSUInteger location;
+	NSArray *fileParts = [filePath componentsSeparatedByString:@"/"];
+	NSArray *baseParts = [basePath componentsSeparatedByString:@"/"];
+
+	for (NSUInteger i = 0 ; i < fileParts.count ; ++i)
+	{
+		NSString *filePart = [fileParts objectAtIndex:i];
+		NSString *basePart = [baseParts objectAtIndex:i];
+
+		if ([filePart compare:basePart] != NSOrderedSame)
+		{
+			location = i;
+			break;
+		}
+	}
+
+	NSString *path = @"";
+
+	for (NSUInteger i = location ; i < baseParts.count ; ++i)
+	{
+		path = [path stringByAppendingString:@"../"];
+	}
+
+	for (NSUInteger i = location ; i < fileParts.count ; ++i)
+	{
+		path = [path stringByAppendingFormat:@"%@/", [fileParts objectAtIndex:i]];
+	}
+
+	return path;
+}
+
+
+
+- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
+{
+	NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
+	absolutePath = [absolutePath stringByStandardizingPath];
+	return absolutePath;
+}
+
+
+
+- (void)updateProject:(Project *)project
+{
+	// Convert the project to the latest version
+
+	NSInteger cv = [self compareVersion:currentProject.projectVersion :kCurrentProjectVersionString];
+
+	if (cv == kLower)
+	{
+		// Project should be updated
+
+		cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+
+		if (cv == kLower)
+		{
+			// For upgrades from 1.0-2.0 -> 2.1
+			// Add oldProjectPath property
+
+			project.oldProjectPath = project.projectPath;
+
+			// Convert saved paths to relative paths
+
+			project.projectAgentCodePath = [self getRelativeFilePath:project.projectPath :project.projectAgentCodePath];
+			project.projectDeviceCodePath = [self getRelativeFilePath:project.projectPath :project.projectDeviceCodePath];
+
+			[self updatePaths:project.projectDeviceLibraries :project.projectPath];
+			[self updatePaths:project.projectDeviceFiles :project.projectPath];
+			[self updatePaths:project.projectAgentLibraries :project.projectPath];
+			[self updatePaths:project.projectAgentFiles :project.projectPath];
+		}
+
+		// Mark the project as needing to be saved, and up the version
+
+		project.projectHasChanged = YES;
+		project.projectVersion = kCurrentProjectVersionString;
+
+		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" project file updated to version %@", project.projectName, project.projectVersion] :YES];
+	}
+
+	// Finally, set the status light
+
+	[saveLight setLight:YES];
+	[saveLight setFull:!currentProject.projectHasChanged];
+}
+
+
+
+- (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath
+{
+	NSArray *keys = [set allKeys];
+
+	for (NSUInteger i = 0 ; i < keys.count ; ++i)
+	{
+		NSString *key = [keys objectAtIndex:i];
+		NSString *path = [set objectForKey:key];
+		path = [self getRelativeFilePath:relPath :path];
+		[set setObject:path forKey:key];
+	}
+}
+
+
+
 #pragma mark - Check EI Libs Methods
 
 
@@ -7947,7 +8726,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 	if (task == eiLibListTask)
 	{
-		if ([ide getConnectionCount] < 1)
+		if (ide.numberOfConnections < 1)
 		{
 			// Only hide the connection indicator if 'ide' has no live connections
 
@@ -8007,33 +8786,39 @@ didReceiveResponse:(NSURLResponse *)response
 			if (library.length > 2)
 			{
 				NSArray *libParts = [library componentsSeparatedByString:@","];
-				NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
-				NSString *libVer = [libParts objectAtIndex:1];
 
-				for (NSArray *eiLib in currentProject.projectImpLibs)
+				if (libParts.count == 2)
 				{
-					NSString *eiLibName = [[eiLib objectAtIndex:0] lowercaseString];
-					NSString *eiLibVer = [eiLib objectAtIndex:1];
+					// Watch out for single-line entries in .csv file
 
-					if ([eiLibName compare:libName] == NSOrderedSame)
+					NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
+					NSString *libVer = [libParts objectAtIndex:1];
+
+					for (NSArray *eiLib in currentProject.projectImpLibs)
 					{
-						// Local EI lib record and download lib record match
-						// First check for deprecation
-						if ([libVer compare:@"dep"] == NSOrderedSame)
-						{
-							// Library is marked as deprecated
+						NSString *eiLibName = [[eiLib objectAtIndex:0] lowercaseString];
+						NSString *eiLibVer = [eiLib objectAtIndex:1];
 
-							NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
-							[self writeToLog:mString :YES];
-							allOKFlag = NO;
-						}
-						else if ([eiLibVer compare:libVer] != NSOrderedSame)
+						if ([eiLibName compare:libName] == NSOrderedSame)
 						{
-							// Library versions are not the same, so report the discrepancy
+							// Local EI lib record and download lib record match
+							// First check for deprecation
+							if ([libVer compare:@"dep"] == NSOrderedSame)
+							{
+								// Library is marked as deprecated
 
-							NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLibVer];
-							[self writeToLog:mString :YES];
-							allOKFlag = NO;
+								NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
+								[self writeToLog:mString :YES];
+								allOKFlag = NO;
+							}
+							else if ([eiLibVer compare:libVer] != NSOrderedSame)
+							{
+								// Library versions are not the same, so report the discrepancy
+
+								NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLibVer];
+								[self writeToLog:mString :YES];
+								allOKFlag = NO;
+							}
 						}
 					}
 				}
@@ -8047,23 +8832,6 @@ didReceiveResponse:(NSURLResponse *)response
 	}
 }
 
-
-
-/*
-
- - (IBAction)showHelpSheet:(id)sender
- {
-	// NOTE This method is now redundant - replaced by Help System pages
-
-	[self clearLog:nil];
-
- NSString *helpString = @"\nSquinter provides an easy way to manage the Squirrel code you are writing for your Electric Imp project, specifically the easy addition of multiple local library files to your Agent and Device code.\n\nSquinter expects application code files to be named in the standard Electric Imp schema: ‘*.agent.nut’ and ‘*.device.nut’ for, respectively, your agent and device code. The two identifiers (represented here by the wildcard *) need not be identical, but when creating a new project from source code files, Squinter will use the agent code filename as the basis for the project’s name.\n\nLocal library files should be entered into your Agent and Device source code using the following syntax:\n\n#import \"library_filepath\\library_filename\"\n\nThe name of the library file is arbitrary, but ‘*.class.nut’ and ‘*.library.nut’ are the recommended forms. You may include a full Unix filepath; if you only provide a filename, Squinter currently expects the file to reside in the same folder as the project file. New projects are saved in Squinter’s working directory, which you can set in the Preferences.\n\nProject files can be identified by the ‘.squirrelproj’ extension. Save these for future easy access to specific projects.\n\nMultiple projects may be open at the same time; open projects are listed in the ‘Project’ menu. From here, you may also open the project’s source and library files in your preferred text editor, or any other application registered to open ‘.nut’ files.\n\nProject code files may also include Electric Imp libraries. These are listed in the library menus alongside local libraries. Selecting one opens the Libraries page on the Electric Imp Dev Center site.\n\nYou can zero a project - remove its code, libraries and model association - by selecting ‘Clean’ from the ‘Project’ menu.\n\nClicking the ‘Compile’ toolbar button, or selecting ‘Compile’ from the ‘Project’ menu, will process the current project’s agent and/or device code source files, replacing #import statements with the local library code from the named file(s). The source files remain unchanged to facilitate editing. When compilation is complete, the ‘compiled’ code is ready for you to copy to the clipboard and paste it into the Electric Imp IDE — or to upload it directly to the Electric Imp server if you have access via API key. API keys can be obtained by logging in to the IDE and selecting ‘Build API Keys’ from the username menu. You can also view the compiled code in Squinter’s log - see the ‘View’ menu.\n\nSquinter can check the Electric Imp Cloud for your existing models and any devices they may be associated with. Once you have obtained list of current models and selected one (via the ‘Models’ menu’s ‘Current Models’ sub-menu), you can upload compiled code directly to it. You can also link a project with a specific model so that changes made to it will be uploaded to the correct model.\n\nIf you select a device (associated devices are listed under each model) you can use the ‘Devices’ menu item ‘Restart’ to reboot it once new code has been uploaded. The ‘Restart Devices’ toolbar item will restart all the devices associated with the selected model. The ‘Device’ menu contains the option ‘Show Device Info’ to inform you of the device’s online status, ID and agent URL. Devices with a dot after their name are currently online; those without are offline. You can select ‘Update Devices Status’ from the ‘Devices” menu to refresh this information.\n\nAccess to model and device lists, and to the code upload facility, requires an API key. API keys can be obtained by logging in to the IDE and selecting ‘Build API Keys’ from the username menu. Enter your key into the space provided in the Preferences panel.\n";
-
- [self writeToLog:helpString :NO];
- [logClipView scrollToPoint:NSMakePoint(0.0, 0.0)];
- }
-
- */
 
 
 

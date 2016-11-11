@@ -15,7 +15,7 @@
 @synthesize projectDeviceFiles, projectAgentFiles;
 @synthesize projectDeviceCode, projectAgentCode, projectVersion;
 @synthesize projectSquinted, projectHasChanged, projectModelID, projectImpLibs;
-@synthesize projectAgentCodeBookmark, projectDeviceCodeBookmark, projectBookmark;
+@synthesize oldProjectPath;
 
 
 - (instancetype)init
@@ -24,7 +24,7 @@
     {
         projectSquinted = 0;
         projectHasChanged = NO;
-        projectVersion = @"2.0";
+        projectVersion = @"2.1";
 		projectModelID = nil;
     }
 
@@ -54,8 +54,7 @@
 
 		if (projectVersion.floatValue > 2.0)
 		{
-			projectDeviceCodeBookmark = [aDecoder decodeObjectForKey:@"project_device_bookmark"];
-			projectAgentCodeBookmark = [aDecoder decodeObjectForKey:@"project_agent_bookmark"];
+			oldProjectPath = [aDecoder decodeObjectForKey:@"project_old_path"];
 		}
 
 		// Set up other, unsaved properties
@@ -88,8 +87,7 @@
 
 	if (projectVersion.floatValue > 2.0)
 	{
-		[aCoder encodeObject:projectDeviceCodeBookmark forKey:@"project_device_bookmark"];
-		[aCoder encodeObject:projectAgentCodeBookmark forKey:@"project_agent_bookmark"];
+		[aCoder encodeObject:oldProjectPath forKey:@"project_old_path"];
 	}
 }
 
@@ -119,8 +117,7 @@
 	
 	if (projectVersion.floatValue > 2.0)
 	{
-		projectCopy.projectDeviceCodeBookmark = self.projectDeviceCodeBookmark;
-		projectCopy.projectAgentCodeBookmark = self.projectAgentCodeBookmark;
+		projectCopy.oldProjectPath = [self.oldProjectPath mutableCopy];
 	}
     
     return projectCopy;

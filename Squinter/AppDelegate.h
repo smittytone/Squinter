@@ -9,6 +9,7 @@
 #include <Security/Security.h>
 #include <Foundation/Foundation.h>
 #include <Sparkle/Sparkle.h>
+#include <math.h>
 #import "Constants.h"
 #import "StatusLight.h"
 #import "Project.h"
@@ -129,7 +130,7 @@
     
     NSOpenPanel *openDialog;
     IBOutlet NSView *accessoryView;
-    IBOutlet NSButton *accessoryViewCheckbox;
+    IBOutlet NSButton *accessoryViewNewProjectCheckbox;
 
     IBOutlet NSButton *newProjectAccessoryViewFilesCheckbox;
     IBOutlet NSButton *newProjectAccessoryViewOpenCheckbox;
@@ -153,6 +154,10 @@
     IBOutlet NSTextField *newProjectTextField;
     IBOutlet NSTextField *newProjectLabel;
     IBOutlet NSTextField *newProjectDirLabel;
+
+	IBOutlet NSPanel *renameProjectSheet;
+	IBOutlet NSTextField *renameProjectTextField;
+	IBOutlet NSTextField *renameProjectLabel;
     
     // About
     
@@ -175,6 +180,7 @@
 	IBOutlet NSButton *autoSelectDeviceCheckbox;
 	IBOutlet NSButton *autoUpdateCheckCheckbox;
 	IBOutlet NSButton *boldTestCheckbox;
+	IBOutlet NSPopUpButton *locationMenu;
 
 	// Assign Device
 
@@ -191,7 +197,7 @@
     IBOutlet NSPopUpButton *renameMenu;
     IBOutlet NSTextField *renameName;
 
-    // Connection Variables
+	// Connection Variables
     
     BuildAPIAccess *ide;
     NSString *errorMessage;
@@ -212,7 +218,7 @@
 
 	// Project variables
 
-	NSMutableArray *projectArray, *projectIncludes;
+	NSMutableArray *projectArray;
 	NSMutableDictionary *projectDefines;
 	Project *currentProject;
 	NSString *currentAgentCode, *currentDeviceCode, *toDelete, *itemToCreate;
@@ -224,10 +230,10 @@
     NSUInteger filesMenuAgentStart, filesMenuDevStart, logPaddingLength;
 	BOOL noProjectsFlag, noLibsFlag, sureSheetResult, newModelFlag, autoRenameFlag, showCodeFlag;
 	BOOL streamFlag, menuValid, restartFlag, fromDeviceSelectFlag, saveProjectSubFilesFlag;
-    BOOL isLightThemeFlag, selectDeviceFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
-	BOOL checkModelsFlag;
+    BOOL isLightThemeFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
+	BOOL checkModelsFlag, newProjectFlag;
 
-    NSMutableArray *foundLibs, *foundFiles, *colors, *logColors;
+    NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors;
 
     NSDateFormatter *def;
 
@@ -262,8 +268,24 @@
 - (IBAction)openProject:(id)sender;
 - (IBAction)selectFile:(id)sender;
 - (IBAction)selectFileForProject:(id)sender;
-- (void)openFile:(NSInteger)openActionType;
-- (BOOL)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
+- (void)presentOpenFilePanel:(NSInteger)openActionType;
+
+- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
+- (void)processAddedFiles:(NSArray *)urls :(NSUInteger)count;
+- (void)processAddedDeviceFile:(NSString *)filePath;
+- (void)processAddedAgentFile:(NSString *)filePath;
+- (void)processAddedNewProject;
+- (void)processAddedNewProjectStageTwo;
+- (void)renameProject;
+- (IBAction)closeRenameProjectSheet:(id)sender;
+- (IBAction)saveRenameProjectSheet:(id)sender;
+
+- (void)openSquirrelProjects:(NSArray *)urls :(NSInteger)count;
+- (NSInteger)compareVersion:(NSString *)newVersion :(NSString *)oldVersion;
+- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName;
+- (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
+- (BOOL)checkFile:(NSString *)filePath;
+- (void)presentUpdateAlert:(NSArray *)urls :(NSInteger)count :(Project *)aProject;
 
 // Save Project Methods
 
@@ -303,7 +325,7 @@
 - (void)addFileToMenu:(NSString *)filename;
 - (NSString *)getLibraryTitle:(id)item;
 - (void)launchLibsPage;
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle;
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
 
 // Pasteboard Methods
 
@@ -325,7 +347,7 @@
 - (IBAction)refreshDevices:(id)sender;
 - (void)listDevices;
 - (IBAction)chooseDevice:(id)sender;
-- (void)setCurrentDeviceFromSelection:(id)sender;
+// - (void)setCurrentDeviceFromSelection:(id)sender;
 - (IBAction)restartDevice:(id)sender;
 - (IBAction)restartDevices:(id)sender;
 - (void)restarted;
@@ -350,6 +372,8 @@
 
 - (IBAction)getLogs:(id)sender;
 - (void)listLogs:(NSNotification *)note;
+- (void)logLogs:(NSString *)logLine;
+- (void)parseLog;
 - (IBAction)printLog:(id)sender;
 - (void)printDone;
 - (IBAction)streamLogs:(id)sender;
@@ -362,7 +386,9 @@
 // Squinter Log Methods
 
 - (IBAction)getProjectInfo:(id)sender;
+- (NSString *)getDisplayPath:(NSString *)path;
 - (IBAction)showDeviceInfo:(id)sender;
+- (void)printInfoInLog:(NSMutableArray *)lines;
 - (IBAction)showModelInfo:(id)sender;
 - (IBAction)logDeviceCode:(id)sender;
 - (IBAction)logAgentCode:(id)sender;
@@ -435,6 +461,13 @@
 - (void)checkElectricImpLibs;
 - (void)compareElectricImpLibs;
 
+// File Path Methods
+
+- (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
+- (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
+- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
+- (void)updateProject:(Project *)project;
+- (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath;
 
 
 @end
