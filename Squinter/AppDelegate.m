@@ -2183,7 +2183,7 @@
 			data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
 			BOOL dSuccess = NO;
 
-			if (version > kPreviousProjectVersion)
+			if (version != kLower)
 			{
 				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectDeviceCodePath];
 				dSuccess = [fm createFileAtPath:path contents:data attributes:nil];
@@ -7300,6 +7300,7 @@
 - (IBAction)setPrefs:(id)sender
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	BOOL changeFlag = NO;
 
     workingDirectory = workingDirectoryField.stringValue;
 
@@ -7346,7 +7347,15 @@
         // Keychain
 
         PDKeychainBindings *pk = [PDKeychainBindings sharedKeychainBindings];
-        [pk setObject:[ide encodeBase64String:akTextField.stringValue] forKey:@"com.bps.Squinter.ak.notional.tally"];
+		NSString *t = [ide decodeBase64String:[pk stringForKey:@"com.bps.Squinter.ak.notional.tally"]];
+
+		if ([t compare:akTextField.stringValue] != NSOrderedSame)
+		{
+			// API key changed
+
+			[pk setObject:[ide encodeBase64String:akTextField.stringValue] forKey:@"com.bps.Squinter.ak.notional.tally"];
+			changeFlag = YES;
+		}
 	}
     else
     {
@@ -7426,6 +7435,20 @@
 	// Close the sheet
 
     [_window endSheet:preferencesSheet];
+
+	if (changeFlag)
+	{
+		// API key changed, so refresh lists
+
+		[self writeToLog:@"API Key changed - getting fresh list of models from the server..." :YES];
+		[ide.devices removeAllObjects];
+		[ide.models removeAllObjects];
+		currentDevice = -1;
+		currentModel = -1;
+
+		[self updateMenus];
+		[self getApps];
+	}
 }
 
 
