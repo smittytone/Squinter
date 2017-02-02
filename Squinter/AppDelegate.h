@@ -228,6 +228,7 @@
 	
 	NSUInteger reDeviceIndex, reModelIndex;
     NSUInteger filesMenuAgentStart, filesMenuDevStart, logPaddingLength;
+
 	BOOL noProjectsFlag, noLibsFlag, sureSheetResult, newModelFlag, autoRenameFlag, showCodeFlag;
 	BOOL streamFlag, menuValid, restartFlag, fromDeviceSelectFlag, saveProjectSubFilesFlag;
     BOOL isLightThemeFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
