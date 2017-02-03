@@ -373,6 +373,7 @@
     // Turn the opened file’s path into an NSURL an add to the array that openFileHandler: expects
 
     NSArray *array = [NSArray arrayWithObjects:[NSURL fileURLWithPath:filename], nil];
+	// NSLog([NSString stringWithFormat:@"Loading %@", filename]);
     [self openFileHandler:array :kOpenActionSquirrelProj];
 	return YES;
 }
@@ -651,7 +652,8 @@
 		for (NSDictionary *model in ide.models)
 		{
             NSString *modelName = [model objectForKey:@"name"];
-            if ([modelName compare:projectName] == NSOrderedSame)
+
+			if ([modelName compare:projectName] == NSOrderedSame)
 			{
 				// The project has the same name as a known model
 
@@ -671,14 +673,15 @@
     {
         // Make a new project
 
-        itemToCreate = nil;
         currentProject = [[Project alloc] init];
         currentProject.projectName = projectName;
-        currentDeviceLibCount = 0;
-        currentAgentLibCount = 0;
-
+		currentProject.projectHasChanged = YES;
         [projectArray addObject:currentProject];
-		
+
+		itemToCreate = nil;
+		currentDeviceLibCount = 0;
+		currentAgentLibCount = 0;
+
 		// Add the new project to the project menu. We've already checked for a name clash,
 		// so we needn't care about the return value.
 		
@@ -2183,7 +2186,7 @@
 			data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
 			BOOL dSuccess = NO;
 
-			if (version > kPreviousProjectVersion)
+			if (version != kLower)
 			{
 				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectDeviceCodePath];
 				dSuccess = [fm createFileAtPath:path contents:data attributes:nil];
@@ -5268,28 +5271,10 @@
 
 	rawName = item.title;
 
-	//dName = [rawName substringToIndex:item.title.length - kStatusIndicatorWidth];    // For offline bullet
-
 	// Extract the device name from the menu title
 
 	NSArray *nameItems = [rawName componentsSeparatedByString:@" "];
 	dName = [nameItems objectAtIndex:0];
-
-
-	/*
-
-	 NSRange oRange = [rawName rangeOfString:kOfflineTag];
-
-	 if (oRange.location != NSNotFound)
-	 {
-		dName = [rawName substringToIndex:oRange.location];
-	 }
-	 else
-	 {
-		dName = rawName;
-	 }
-
-	 */
 
 	for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
 	{
@@ -5320,8 +5305,6 @@
 					NSMenuItem *sdev = [smenu itemAtIndex:j];
 					sdev.state = NSOffState;
 					NSString *sName = @"";
-
-					// [sdev.title substringToIndex:item.title.length - kStatusIndicatorWidth]; // For offline bullet
 
 					NSRange oRange = [sdev.title rangeOfString:dName];
 
@@ -5436,7 +5419,6 @@
 
 	// Update Menus etc
 
-	[self setDeviceMenu];
 	[self updateMenus];
 	[self setToolbar];
 }
@@ -5456,7 +5438,6 @@
 	
 	restartFlag = YES;
 	reDeviceIndex = currentDevice;
-	
 	[ide restartDevice:[self getDeviceID:currentDevice]];
 }
 
@@ -5471,13 +5452,15 @@
     }
 
     NSMenuItem *mItem = [modelsMenu itemAtIndex:currentModel];
+
     if (mItem.submenu == nil)
     {
         [self writeToLog:@"[ERROR] You have selected a model with no assigned devices." :YES];
         return;
     }
 
-    [ide restartDevices:[self getModelID:currentModel]];
+	reModelIndex = currentModel;
+	[ide restartDevices:[self getModelID:currentModel]];
 }
 
 
@@ -5486,18 +5469,18 @@
 {
     // This method should ONLY be called by the BuildAPI instance AFTER loading a list of models
 
-	if (restartFlag == YES)
+	if (restartFlag)
 	{
 		NSDictionary *dDict = [ide.devices objectAtIndex:reDeviceIndex];
 		[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" restarted.", [dDict objectForKey:@"name"]] :YES];
 		restartFlag = NO;
 		reDeviceIndex = -1;
-		
 	}
 	else
 	{
-   		NSMenuItem *mItem = [modelsMenu itemAtIndex:currentModel];
+   		NSMenuItem *mItem = [modelsMenu itemAtIndex:reModelIndex];
     	[self writeToLog:[NSString stringWithFormat:@"Devices assigned to model \"%@\" have restarted.", mItem.title] :YES];
+		reModelIndex = -1;
 	}
 }
 
@@ -5608,6 +5591,15 @@
     NSString *deviceName = [[ide.devices objectAtIndex:reDeviceIndex] objectForKey:@"name"];
 	NSString *modelName = [[ide.models objectAtIndex:reModelIndex] objectForKey:@"name"];
 	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" now assigned to model \"%@\".", deviceName, modelName] :YES];
+
+	// If the model being assigned a device is the current one, and there's no current device,
+	// make the reassigned device current
+
+	if ((reModelIndex == currentModel) && (currentDevice == -1))
+	{
+		currentDevice = reDeviceIndex;
+		[self updateMenus];
+	}
 }
 
 
@@ -7300,6 +7292,7 @@
 - (IBAction)setPrefs:(id)sender
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	BOOL changeFlag = NO;
 
     workingDirectory = workingDirectoryField.stringValue;
 
@@ -7346,7 +7339,15 @@
         // Keychain
 
         PDKeychainBindings *pk = [PDKeychainBindings sharedKeychainBindings];
-        [pk setObject:[ide encodeBase64String:akTextField.stringValue] forKey:@"com.bps.Squinter.ak.notional.tally"];
+		NSString *t = [ide decodeBase64String:[pk stringForKey:@"com.bps.Squinter.ak.notional.tally"]];
+
+		if ([t compare:akTextField.stringValue] != NSOrderedSame)
+		{
+			// API key changed
+
+			[pk setObject:[ide encodeBase64String:akTextField.stringValue] forKey:@"com.bps.Squinter.ak.notional.tally"];
+			changeFlag = YES;
+		}
 	}
     else
     {
@@ -7426,6 +7427,20 @@
 	// Close the sheet
 
     [_window endSheet:preferencesSheet];
+
+	if (changeFlag)
+	{
+		// API key changed, so refresh lists
+
+		[self writeToLog:@"API Key changed - getting fresh list of models from the server..." :YES];
+		[ide.devices removeAllObjects];
+		[ide.models removeAllObjects];
+		currentDevice = -1;
+		currentModel = -1;
+
+		[self updateMenus];
+		[self getApps];
+	}
 }
 
 
@@ -7801,15 +7816,7 @@
         externalOpenFileItem.title = [NSString stringWithFormat:@"View “%@” Linked Files in Editor", currentProject.projectName];
 
 		checkElectricImpLibrariesItem.title = [NSString stringWithFormat:@"Check “%@” Electric Imp Libraries", currentProject.projectName];
-
-		if (currentProject.projectImpLibs.count > 0)
-		{
-			checkElectricImpLibrariesItem.enabled = YES;
-		}
-		else
-		{
-			checkElectricImpLibrariesItem.enabled = NO;
-		}
+		checkElectricImpLibrariesItem.enabled = (currentProject.projectImpLibs.count > 0) ? YES : NO;
 		
 		copyAgentCodeItem.enabled = (currentProject.projectSquinted > 1);
 		copyDeviceCodeItem.enabled = (currentProject.projectSquinted == 1 || currentProject.projectSquinted == 3);
