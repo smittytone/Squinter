@@ -8176,7 +8176,7 @@
         openAllItem.enabled = YES;
 		copyAgentItem.enabled = YES;
 		copyDeviceItem.enabled = YES;
-
+		
 		// Display Upload button only if we have a linked model
 
 		if (currentProject.projectModelID != nil)
