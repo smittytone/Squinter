@@ -5504,6 +5504,8 @@
 	currentProject.projectModelID = [model objectForKey:@"id"];
 	currentProject.projectHasChanged = YES;
 	[saveLight setFull:!currentProject.projectHasChanged];
+	[self updateMenus];
+	[self setToolbar];
 }
 
 
@@ -5599,6 +5601,7 @@
 	{
 		currentDevice = reDeviceIndex;
 		[self updateMenus];
+		[self setToolbar];
 	}
 }
 
