@@ -5504,6 +5504,8 @@
 	currentProject.projectModelID = [model objectForKey:@"id"];
 	currentProject.projectHasChanged = YES;
 	[saveLight setFull:!currentProject.projectHasChanged];
+	[self updateMenus];
+	[self setToolbar];
 }
 
 
@@ -5599,6 +5601,7 @@
 	{
 		currentDevice = reDeviceIndex;
 		[self updateMenus];
+		[self setToolbar];
 	}
 }
 
@@ -8176,7 +8179,7 @@
         openAllItem.enabled = YES;
 		copyAgentItem.enabled = YES;
 		copyDeviceItem.enabled = YES;
-
+		
 		// Display Upload button only if we have a linked model
 
 		if (currentProject.projectModelID != nil)
