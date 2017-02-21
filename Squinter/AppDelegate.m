@@ -8579,8 +8579,8 @@
 
 			// Convert saved paths to relative paths
 
-			project.projectAgentCodePath = [self getRelativeFilePath:project.projectPath :project.projectAgentCodePath];
-			project.projectDeviceCodePath = [self getRelativeFilePath:project.projectPath :project.projectDeviceCodePath];
+			if (project.projectAgentCodePath.length > 0) project.projectAgentCodePath = [self getRelativeFilePath:project.projectPath :project.projectAgentCodePath];
+			if (project.projectDeviceCodePath.length > 0) project.projectDeviceCodePath = [self getRelativeFilePath:project.projectPath :project.projectDeviceCodePath];
 
 			[self updatePaths:project.projectDeviceLibraries :project.projectPath];
 			[self updatePaths:project.projectDeviceFiles :project.projectPath];
