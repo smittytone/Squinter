@@ -6,9 +6,9 @@ A macOS GUI application for managing Squirrel programming projects, particularly
 
 ## Copyright Notice
 
-Squinter is copyright 2015-2016 Tony Smith.
-BuildAPIAccess is copyright 2015-2016 Tony Smith.
-The Build API is copyright 2015-2016 Electric Imp, Inc.
+Squinter is copyright 2015-2017 Tony Smith.
+BuildAPIAccess is copyright 2015-2017 Tony Smith.
+The Build API is copyright 2015-2017 Electric Imp, Inc.
 
 ## Licence
 
