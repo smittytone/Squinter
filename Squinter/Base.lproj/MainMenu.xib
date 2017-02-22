@@ -809,7 +809,7 @@
                         <rect key="frame" x="-1" y="40" width="902" height="490"/>
                         <clipView key="contentView" id="DPZ-Ai-vv0">
                             <rect key="frame" x="1" y="1" width="900" height="488"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7">
                                     <rect key="frame" x="0.0" y="-1" width="900" height="488"/>
