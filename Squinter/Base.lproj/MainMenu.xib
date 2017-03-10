@@ -29,7 +29,7 @@
                 <outlet property="author01" destination="5sk-hX-9AU" id="trS-oy-PiN"/>
                 <outlet property="author02" destination="8IP-2a-Phr" id="nI9-ST-v2M"/>
                 <outlet property="author03" destination="veC-o7-7n2" id="RRL-w9-9PS"/>
-                <outlet property="author04" destination="sWG-4E-su6" id="Dom-hB-e89"/>
+                <outlet property="author04" destination="eih-N9-HjR" id="54w-Up-gUy"/>
                 <outlet property="author05" destination="VcO-Va-ZZc" id="Uqs-L9-MbQ"/>
                 <outlet property="author06" destination="tuL-Jl-lsM" id="cfp-0b-LNx"/>
                 <outlet property="autoCompileCheckbox" destination="ebC-Zl-yYK" id="Ehu-ec-epf"/>
@@ -83,6 +83,7 @@
                 <outlet property="newProjectLabel" destination="U3B-fn-OIu" id="tuc-Pf-yVL"/>
                 <outlet property="newProjectSheet" destination="D74-Fr-OkO" id="tXq-XY-bOp"/>
                 <outlet property="newProjectTextField" destination="wBs-gc-5Tg" id="qyj-nC-hPd"/>
+                <outlet property="oaoSheet" destination="LbV-eq-awI" id="Zyq-lg-Mgm"/>
                 <outlet property="openAgentCode" destination="QLz-UA-e6J" id="sta-iD-ldw"/>
                 <outlet property="openAgentURLMenuItem" destination="pFc-je-W9B" id="a9B-Sw-Glb"/>
                 <outlet property="openAllItem" destination="qP6-Nj-CWs" id="D2K-V2-XEe"/>
@@ -149,6 +150,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="showAboutSheet:" target="Voe-Tx-rLC" id="viE-bf-Tsl"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Squinter Source Code" id="eih-N9-HjR">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showAuthor:" target="Voe-Tx-rLC" id="gWy-Nx-Vc9"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
@@ -670,7 +677,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Acknowledgements" id="Shr-UV-6Wh">
                                     <items>
-                                        <menuItem title="Third-party Software" id="7AL-TT-pqN">
+                                        <menuItem title="Third-party Software" enabled="NO" id="7AL-TT-pqN">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem title="PDKeychainBindings – Carl Brown" id="5sk-hX-9AU">
@@ -698,17 +705,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Duw-2H-NcK"/>
-                                        <menuItem title="Electric Imp Software" id="Rez-15-sQE">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="Build API Documentation" id="sWG-4E-su6">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="LMO-KY-BAJ"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="WK8-D0-ycx"/>
-                                        <menuItem title="Fonts" id="kaV-4a-4a8">
+                                        <menuItem title="Fonts" enabled="NO" id="kaV-4a-4a8">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem title="Source Code Pro - Adobe" id="VcO-Va-ZZc">
@@ -2157,6 +2154,55 @@ Gw
                 </constraints>
             </view>
             <point key="canvasLocation" x="381.5" y="252.5"/>
+        </window>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="LbV-eq-awI" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="139" y="81" width="620" height="404"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <view key="contentView" id="yte-yX-UHY">
+                <rect key="frame" x="0.0" y="0.0" width="620" height="404"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="580" translatesAutoresizingMaskIntoConstraints="NO" id="dRM-LI-Evp">
+                        <rect key="frame" x="18" y="61" width="584" height="323"/>
+                        <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" id="pRr-9z-Xi8">
+                            <font key="font" metaFont="system"/>
+                            <mutableString key="title">Dear Squinter User,
+
+This is the last release of Squinter in its current form. There are exciting improvements now being made to Electric Imp’s code, device and product management tools, but Squinter is not compatible with these changes. Squinter’s integration with the Electric Imp impCloud™ will therefore shortly come to an end.  I’d like to thank all the developers of imp-enabled devices who have tried Squinter over the past few years, especially those of you who have submitted feedback and bug reports.  Squinter will still work to integrate local Squirrel libraries and files into agent and device code source files, which can then be pasted into Electric Imp’s online tools — this was the task for which it was originally developed. The debut of Electric Imp’s Build API allowed Squinter to communicate directly with the impCloud, but the Build API is now deprecated and set to be replaced by a much more sophisticated API. Squinter may adopt the new API, we shall see...  In the meantime, best regards and thanks for being a Squinter supporter.  Tony (@smittytone)</mutableString>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YbF-Jt-A0T">
+                        <rect key="frame" x="281" y="13" width="59" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="rhz-sr-wMa"/>
+                            <constraint firstAttribute="width" constant="47" id="wEu-yv-3ct"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="k1h-nX-QiM">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="closeOaO:" target="Voe-Tx-rLC" id="LKb-sw-fLh"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="dRM-LI-Evp" firstAttribute="leading" secondItem="yte-yX-UHY" secondAttribute="leading" constant="20" id="3Do-HX-fW3"/>
+                    <constraint firstAttribute="trailing" secondItem="dRM-LI-Evp" secondAttribute="trailing" constant="20" id="6nJ-hZ-3PC"/>
+                    <constraint firstAttribute="bottom" secondItem="YbF-Jt-A0T" secondAttribute="bottom" constant="20" id="RfL-aQ-7ga"/>
+                    <constraint firstItem="dRM-LI-Evp" firstAttribute="top" secondItem="yte-yX-UHY" secondAttribute="top" constant="20" id="T2e-QK-XqP"/>
+                    <constraint firstItem="YbF-Jt-A0T" firstAttribute="top" secondItem="dRM-LI-Evp" secondAttribute="bottom" constant="20" id="jc0-NC-qh9"/>
+                    <constraint firstItem="YbF-Jt-A0T" firstAttribute="centerX" secondItem="yte-yX-UHY" secondAttribute="centerX" id="tLE-vs-md0"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="254" y="279"/>
         </window>
     </objects>
     <resources>

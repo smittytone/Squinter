@@ -200,9 +200,9 @@
 
     // Set up Key and Value arrays as template for Defaults
 
-    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", @"com.bps.squinter.displaypath", nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", @"com.bps.squinter.displaypath", @"com.bps.squinter.showoao", nil];
 
-    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithInteger:1], nil];
+    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithInteger:1], [NSNumber numberWithBool:NO], nil];
 
     // Drop the arrays into the Defauts
 
@@ -416,6 +416,8 @@
 	// Check for updates if that is requested
 	
 	if ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) [sparkler checkForUpdatesInBackground];
+
+	[self openOaO];
 }
 
 
@@ -7584,7 +7586,7 @@
     if (sender == author01) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/carlbrown/PDKeychainBindingsController"]];
     if (sender == author02) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/bdkjones/VDKQueue"]];
     if (sender == author03) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/uliwitness/UliKit"]];
-    if (sender == author04) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/buildapi/"]];
+    if (sender == author04) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/smittytone/Squinter"]];
 	if (sender == author05) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/adobe-fonts/source-code-pro"]];
 	if (sender == author06) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"]];
 }
@@ -8843,6 +8845,18 @@ didReceiveResponse:(NSURLResponse *)response
 }
 
 
+- (void)openOaO
+{
+	BOOL show = [[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.shownoao"];
+	if (!show) [_window beginSheet:oaoSheet completionHandler:nil];
+}
+
+
+- (IBAction)closeOaO:(id)sender
+{
+	[_window endSheet:oaoSheet];
+	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"com.bps.squinter.shownoao"];
+}
 
 
 @end

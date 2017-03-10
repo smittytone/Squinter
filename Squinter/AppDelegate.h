@@ -197,6 +197,10 @@
     IBOutlet NSPopUpButton *renameMenu;
     IBOutlet NSTextField *renameName;
 
+	// OaO
+
+	IBOutlet NSPanel *oaoSheet;
+
 	// Connection Variables
     
     BuildAPIAccess *ide;
@@ -470,5 +474,9 @@
 - (void)updateProject:(Project *)project;
 - (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath;
 
+// OaO
+
+- (void)openOaO;
+- (IBAction)closeOaO:(id)sender;
 
 @end
