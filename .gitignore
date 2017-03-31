@@ -8,6 +8,7 @@ SquinterTests/*
 Squinter/*.pem
 Squinter/Images.xcassets/*
 Squinter/*.icns
+*.txt
 
 #Podfile.lock
 #Podfile
