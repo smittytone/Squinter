@@ -20,7 +20,7 @@
 #import "PDKeychainBindings.h"
 
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSOpenSavePanelDelegate, NSFileManagerDelegate, VDKQueueDelegate, NSToolbarDelegate, NSURLSessionDataDelegate, NSURLSessionTaskDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSOpenSavePanelDelegate, NSFileManagerDelegate, VDKQueueDelegate, NSToolbarDelegate, NSURLSessionDataDelegate, NSURLSessionTaskDelegate, NSDockTilePlugIn>
 {
     // Main UI element outlets
     
@@ -123,6 +123,8 @@
     IBOutlet SquinterToolbarItem *openAgentCode;
     IBOutlet StreamToolbarItem *streamLogsItem;
 	IBOutlet SquinterToolbarItem *refreshModelsItem;
+
+	NSMenu *dockMenu;
 
 	// Sheets, dialogs and windows
     
@@ -259,6 +261,8 @@
 
 @property (assign) IBOutlet NSWindow *window;
 
+
+- (void)dockMenuRelay:(id)sender;
 
 // New Project Methods
 

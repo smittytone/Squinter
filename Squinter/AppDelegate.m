@@ -42,6 +42,7 @@
 	eiLibListData = nil;
 	eiLibListTask = nil;
 	eiLibListTime = nil;
+	dockMenu = nil;
 
     // Initialize colours
 
@@ -418,6 +419,88 @@
 	if ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) [sparkler checkForUpdatesInBackground];
 
 	[self openOaO];
+}
+
+
+
+- (NSMenu *)applicationDockMenu:(NSApplication *)sender
+{
+	if (dockMenu == nil)
+	{
+		dockMenu = [[NSMenu alloc] init];
+
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Squinter Information" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 1;
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Squirrel Documentation" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 2;
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Forum" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 3;
+		[dockMenu addItem:item];
+
+		item = [NSMenuItem separatorItem];
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Open Squinter Working Directory" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 99;
+		[dockMenu addItem:item];
+	}
+
+	return dockMenu;
+}
+
+
+
+- (void)dockMenuRelay:(id)sender
+{
+	NSMenuItem *item = (NSMenuItem *)sender;
+
+	if (item.tag != -1)
+	{
+		switch(item.tag)
+		{
+			case 1:
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter2/"]];
+				break;
+
+			case 2:
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/squirrel/squirrelcrib/"]];
+				break;
+
+			case 3:
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://forums.electricimp.com/"]];
+				break;
+
+			default:
+				[[NSWorkspace sharedWorkspace] openFile:workingDirectory withApplication:nil andDeactivate:YES];
+
+		}
+	}
+}
+
+
+- (NSMenu *)dockMenu
+{
+	if (dockMenu == nil)
+	{
+		dockMenu = [[NSMenu alloc] init];
+
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Squinter Information" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 1;
+		[dockMenu addItem:item];
+
+		item = [NSMenuItem separatorItem];
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Open Squinter Working Directory" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 99;
+		[dockMenu addItem:item];
+	}
+
+	return dockMenu;
 }
 
 
@@ -7589,6 +7672,7 @@
     if (sender == author04) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/smittytone/Squinter"]];
 	if (sender == author05) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/adobe-fonts/source-code-pro"]];
 	if (sender == author06) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"]];
+	if (sender == nil) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
 }
 
 
@@ -8518,7 +8602,7 @@
 
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath
 {
-	NSUInteger location;
+	NSUInteger location = 0;
 	NSArray *fileParts = [filePath componentsSeparatedByString:@"/"];
 	NSArray *baseParts = [basePath componentsSeparatedByString:@"/"];
 
