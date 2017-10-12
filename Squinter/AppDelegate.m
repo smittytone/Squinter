@@ -111,7 +111,7 @@
 
     // Toolbar
 
-    squintItem.onImageName = @"compile";
+    squintItem.onImageName = @"compile2";
     squintItem.offImageName = @"compile_grey";
 	squintItem.toolTip = @"Compile libraries and files into agent and device code for uploading.";
     newProjectItem.onImageName = @"new";
@@ -201,9 +201,9 @@
 
     // Set up Key and Value arrays as template for Defaults
 
-    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", @"com.bps.squinter.displaypath", @"com.bps.squinter.showoao", nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", @"com.bps.squinter.displaypath", nil];
 
-    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithInteger:1], [NSNumber numberWithBool:NO], nil];
+    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithInteger:1], nil];
 
     // Drop the arrays into the Defauts
 
@@ -410,6 +410,8 @@
 	[self updateMenus];
 	[self setToolbar];
 
+	// _window.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
+
     [_window makeKeyAndOrderFront:nil];
 
     if ([defaults boolForKey:@"com.bps.squinter.autoload"]) [self getApps];
@@ -417,8 +419,6 @@
 	// Check for updates if that is requested
 	
 	if ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) [sparkler checkForUpdatesInBackground];
-
-	[self openOaO];
 }
 
 
@@ -1919,7 +1919,8 @@
 	{
 		// Project didn't load for some reason so warn the user
 
-		[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
+		[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\". Is it a Squinter 2.0 file?", [filePath lastPathComponent]] :YES];
+		[self writeToLog:@"Squinter 1.0 files can be opened in Squinter 2.0, but not vice versa." :YES];
 		[self openSquirrelProjects:urls :count + 1];
 	}
 }
@@ -3584,8 +3585,6 @@
                     // Found at least one / so there must be directory info here,
                     // even if it's just ~/lib.class.nut
 
-					/*
-
 					// What it if is ../lib.class.nut? This indicates relativity - but relative to what?
 					// We can only assume it's the project file.
 
@@ -3614,9 +3613,7 @@
 						libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					}
 
-					*/
-
-                    // Get the path component from the source file's library name info
+					// Get the path component from the source file's library name info
 
 					libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					libPath = [libName stringByStandardizingPath];
@@ -7352,6 +7349,7 @@
 
     // Show the sheet
 
+	//preferencesSheet.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
     [_window beginSheet:preferencesSheet completionHandler:nil];
 
     // Save request for credentials until after the sheet has appeared
@@ -8928,19 +8926,6 @@ didReceiveResponse:(NSURLResponse *)response
 	}
 }
 
-
-- (void)openOaO
-{
-	BOOL show = [[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.shownoao"];
-	if (!show) [_window beginSheet:oaoSheet completionHandler:nil];
-}
-
-
-- (IBAction)closeOaO:(id)sender
-{
-	[_window endSheet:oaoSheet];
-	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"com.bps.squinter.shownoao"];
-}
 
 
 @end

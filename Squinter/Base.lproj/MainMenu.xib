@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
         <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
-        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -150,12 +149,6 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="showAboutSheet:" target="Voe-Tx-rLC" id="viE-bf-Tsl"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Squinter Source Code" id="eih-N9-HjR">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="showAuthor:" target="Voe-Tx-rLC" id="gWy-Nx-Vc9"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
@@ -723,8 +716,8 @@
             </items>
             <point key="canvasLocation" x="-726" y="67"/>
         </menu>
-        <window title="Squinter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" appearanceType="aqua" animationBehavior="default" id="QvC-M9-y7g">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
+        <window title="Squinter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="900" height="529"/>
@@ -806,9 +799,9 @@
                         <rect key="frame" x="-1" y="40" width="902" height="490"/>
                         <clipView key="contentView" id="DPZ-Ai-vv0">
                             <rect key="frame" x="1" y="1" width="900" height="488"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7">
+                                <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7">
                                     <rect key="frame" x="0.0" y="-1" width="900" height="488"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -969,7 +962,7 @@
                     <outlet property="delegate" destination="Voe-Tx-rLC" id="zhA-ZK-2Wc"/>
                 </connections>
             </toolbar>
-            <point key="canvasLocation" x="761" y="363.5"/>
+            <point key="canvasLocation" x="231" y="177"/>
         </window>
         <window title="New Project" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="D74-Fr-OkO" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
@@ -1189,7 +1182,7 @@ DQ
                             <font key="font" metaFont="system"/>
                             <string key="title">Utility for integrating libraries into Squirrel code for the Electric Imp platform.
 
-Developed by Tony Smith © 2014-16</string>
+Developed by Tony Smith © 2014-17</string>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -1379,7 +1372,7 @@ Gw
                         <rect key="frame" x="13" y="51" width="586" height="401"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
-                            <tabViewItem label="General" identifier="1" id="evn-9T-0q2">
+                            <tabViewItem label="General" identifier="1" image="compile" id="evn-9T-0q2">
                                 <view key="view" id="dVn-Xe-jNr">
                                     <rect key="frame" x="10" y="33" width="566" height="355"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1555,7 +1548,7 @@ Gw
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Log Text" identifier="2" id="Y7C-jA-NpV">
+                            <tabViewItem label="Log Text" identifier="2" image="refresh" id="Y7C-jA-NpV">
                                 <view key="view" id="NBx-iW-M9L">
                                     <rect key="frame" x="10" y="33" width="566" height="355"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2204,6 +2197,12 @@ DQ
             </view>
             <point key="canvasLocation" x="254" y="279"/>
         </window>
+        <menuItem title="Squinter Source Code" id="eih-N9-HjR">
+            <modifierMask key="keyEquivalentModifierMask"/>
+            <connections>
+                <action selector="showAuthor:" target="Voe-Tx-rLC" id="gWy-Nx-Vc9"/>
+            </connections>
+        </menuItem>
     </objects>
     <resources>
         <image name="bfi" width="32" height="30.5"/>

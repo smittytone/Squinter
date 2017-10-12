@@ -168,7 +168,7 @@
     
     // Prefs
     
-    IBOutlet id preferencesSheet;
+    IBOutlet NSPanel *preferencesSheet;
     IBOutlet NSTextField *workingDirectoryField;
     NSString *workingDirectory;
     IBOutlet NSButton *preserveCheckbox;
@@ -198,10 +198,6 @@
     IBOutlet NSTextField *renameLabel;
     IBOutlet NSPopUpButton *renameMenu;
     IBOutlet NSTextField *renameName;
-
-	// OaO
-
-	IBOutlet NSPanel *oaoSheet;
 
 	// Connection Variables
     
