@@ -20,7 +20,7 @@
 #import "PDKeychainBindings.h"
 
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSOpenSavePanelDelegate, NSFileManagerDelegate, VDKQueueDelegate, NSToolbarDelegate, NSURLSessionDataDelegate, NSURLSessionTaskDelegate, NSDockTilePlugIn>
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSOpenSavePanelDelegate, NSFileManagerDelegate, VDKQueueDelegate, NSToolbarDelegate, NSURLSessionDataDelegate, NSURLSessionTaskDelegate>
 {
     // Main UI element outlets
     

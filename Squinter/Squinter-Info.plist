@@ -62,7 +62,7 @@
 	<key>NSAllowsArbitraryLoads</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2015-16 Tony Smith. All rights reserved.</string>
+	<string>Copyright © 2015-17 Tony Smith. All rights reserved.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

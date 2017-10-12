@@ -433,7 +433,7 @@
 		item.tag = 1;
 		[dockMenu addItem:item];
 
-		item = [[NSMenuItem alloc] initWithTitle:@"Squirrel Documentation" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Dev Center" action:@selector(dockMenuRelay:) keyEquivalent:@""];
 		item.tag = 2;
 		[dockMenu addItem:item];
 
@@ -463,11 +463,11 @@
 		switch(item.tag)
 		{
 			case 1:
-				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter2/"]];
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/"]];
 				break;
 
 			case 2:
-				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/squirrel/squirrelcrib/"]];
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
 				break;
 
 			case 3:
@@ -488,7 +488,7 @@
 	{
 		dockMenu = [[NSMenu alloc] init];
 
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Squinter Information" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Squinter Documentation" action:@selector(dockMenuRelay:) keyEquivalent:@""];
 		item.tag = 1;
 		[dockMenu addItem:item];
 
