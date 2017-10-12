@@ -474,9 +474,4 @@
 - (void)updateProject:(Project *)project;
 - (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath;
 
-// OaO
-
-- (void)openOaO;
-- (IBAction)closeOaO:(id)sender;
-
 @end
