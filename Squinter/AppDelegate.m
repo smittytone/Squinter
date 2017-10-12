@@ -2014,7 +2014,7 @@
 
 - (BOOL)checkFile:(NSString *)filePath
 {
-	if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:NO] == YES)
+	if ([[NSFileManager defaultManager] fileExistsAtPath:filePath] == YES)
 	{
 		[fileWatchQueue addPath:filePath
 				 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
@@ -2797,12 +2797,12 @@
 					else
 					{
 						bLibName = [bLib objectAtIndex:0];
-
-						if ([bLibName compare:libName] == NSOrderedSame)
-						{
-							match = [bLib objectAtIndex:1];
-							break;
-						}
+					}
+					
+					if ([libName compare:bLibName] == NSOrderedSame)
+					{
+						match = [bLib objectAtIndex:1];
+						break;
 					}
 				}
 			}
@@ -6709,7 +6709,7 @@
 	// If the device is unassigned, it will have a null model id
 
 	NSString *mId = [device objectForKey:@"model_id"];
-	NSString *modelName = nil;
+	NSString *modelName = @"This device is not assigned to a model.";
 
 	if ((NSNull *)mId != [NSNull null])
 	{
@@ -6718,10 +6718,6 @@
 			NSDictionary *model = [ide.models objectAtIndex:i];
 			if ([[model objectForKey:@"id"] compare:mId] == NSOrderedSame) modelName = [NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]];
 		}
-	}
-	else
-	{
-		modelName = @"This device is not assigned to a model.";
 	}
 
 	[lines addObject:modelName];
