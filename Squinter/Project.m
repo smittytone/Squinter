@@ -37,25 +37,26 @@
 {
     if (self = [super init])
 	{
-        projectVersion = [aDecoder decodeObjectForKey:@"project_version"];
-        if (projectVersion == nil) projectVersion = @"1.0";
+       	projectVersion = [aDecoder decodeObjectForKey:@"project_version"];
+        	if (projectVersion == nil) projectVersion = @"1.0";
+
+		// Can't load a 3.0 file
+
+		if (projectVersion.floatValue >= 3.0) return nil;
 
 		projectName = [aDecoder decodeObjectForKey:@"project_name"];
-        projectAgentCodePath = [aDecoder decodeObjectForKey:@"project_agent_path"];
-        projectDeviceCodePath = [aDecoder decodeObjectForKey:@"project_device_path"];
-        projectDeviceLibraries = [aDecoder decodeObjectForKey:@"project_device_libraries"];
-        projectAgentLibraries = [aDecoder decodeObjectForKey:@"project_agent_libraries"];
+		projectAgentCodePath = [aDecoder decodeObjectForKey:@"project_agent_path"];
+		projectDeviceCodePath = [aDecoder decodeObjectForKey:@"project_device_path"];
+		projectDeviceLibraries = [aDecoder decodeObjectForKey:@"project_device_libraries"];
+		projectAgentLibraries = [aDecoder decodeObjectForKey:@"project_agent_libraries"];
 		projectDeviceFiles = [aDecoder decodeObjectForKey:@"project_device_files"];
 		projectAgentFiles = [aDecoder decodeObjectForKey:@"project_agent_files"];
 		projectModelID = [aDecoder decodeObjectForKey:@"project_model_number"];
-        projectImpLibs = [aDecoder decodeObjectForKey:@"project_imp_libraries"];
+		projectImpLibs = [aDecoder decodeObjectForKey:@"project_imp_libraries"];
 
 		// Add Version 2.1+ entities
 
-		if (projectVersion.floatValue > 2.0)
-		{
-			oldProjectPath = [aDecoder decodeObjectForKey:@"project_old_path"];
-		}
+		if (projectVersion.floatValue > 2.0) oldProjectPath = [aDecoder decodeObjectForKey:@"project_old_path"];
 
 		// Set up other, unsaved properties
 		

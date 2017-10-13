@@ -124,6 +124,8 @@
     IBOutlet StreamToolbarItem *streamLogsItem;
 	IBOutlet SquinterToolbarItem *refreshModelsItem;
 
+	NSMenu *dockMenu;
+
 	// Sheets, dialogs and windows
     
     // Open
@@ -166,7 +168,7 @@
     
     // Prefs
     
-    IBOutlet id preferencesSheet;
+    IBOutlet NSPanel *preferencesSheet;
     IBOutlet NSTextField *workingDirectoryField;
     NSString *workingDirectory;
     IBOutlet NSButton *preserveCheckbox;
@@ -255,6 +257,8 @@
 
 @property (assign) IBOutlet NSWindow *window;
 
+
+- (void)dockMenuRelay:(id)sender;
 
 // New Project Methods
 
@@ -469,6 +473,5 @@
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
 - (void)updateProject:(Project *)project;
 - (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath;
-
 
 @end

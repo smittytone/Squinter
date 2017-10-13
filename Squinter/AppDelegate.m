@@ -42,6 +42,7 @@
 	eiLibListData = nil;
 	eiLibListTask = nil;
 	eiLibListTime = nil;
+	dockMenu = nil;
 
     // Initialize colours
 
@@ -110,7 +111,7 @@
 
     // Toolbar
 
-    squintItem.onImageName = @"compile";
+    squintItem.onImageName = @"compile2";
     squintItem.offImageName = @"compile_grey";
 	squintItem.toolTip = @"Compile libraries and files into agent and device code for uploading.";
     newProjectItem.onImageName = @"new";
@@ -409,6 +410,8 @@
 	[self updateMenus];
 	[self setToolbar];
 
+	// _window.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
+
     [_window makeKeyAndOrderFront:nil];
 
     if ([defaults boolForKey:@"com.bps.squinter.autoload"]) [self getApps];
@@ -416,6 +419,88 @@
 	// Check for updates if that is requested
 	
 	if ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) [sparkler checkForUpdatesInBackground];
+}
+
+
+
+- (NSMenu *)applicationDockMenu:(NSApplication *)sender
+{
+	if (dockMenu == nil)
+	{
+		dockMenu = [[NSMenu alloc] init];
+
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Squinter Information" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 1;
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Dev Center" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 2;
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Forum" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 3;
+		[dockMenu addItem:item];
+
+		item = [NSMenuItem separatorItem];
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Open Squinter Working Directory" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 99;
+		[dockMenu addItem:item];
+	}
+
+	return dockMenu;
+}
+
+
+
+- (void)dockMenuRelay:(id)sender
+{
+	NSMenuItem *item = (NSMenuItem *)sender;
+
+	if (item.tag != -1)
+	{
+		switch(item.tag)
+		{
+			case 1:
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/"]];
+				break;
+
+			case 2:
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
+				break;
+
+			case 3:
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://forums.electricimp.com/"]];
+				break;
+
+			default:
+				[[NSWorkspace sharedWorkspace] openFile:workingDirectory withApplication:nil andDeactivate:YES];
+
+		}
+	}
+}
+
+
+- (NSMenu *)dockMenu
+{
+	if (dockMenu == nil)
+	{
+		dockMenu = [[NSMenu alloc] init];
+
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Squinter Documentation" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 1;
+		[dockMenu addItem:item];
+
+		item = [NSMenuItem separatorItem];
+		[dockMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Open Squinter Working Directory" action:@selector(dockMenuRelay:) keyEquivalent:@""];
+		item.tag = 99;
+		[dockMenu addItem:item];
+	}
+
+	return dockMenu;
 }
 
 
@@ -1834,7 +1919,8 @@
 	{
 		// Project didn't load for some reason so warn the user
 
-		[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
+		[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\". Is it a Squinter 2.0 file?", [filePath lastPathComponent]] :YES];
+		[self writeToLog:@"Squinter 1.0 files can be opened in Squinter 2.0, but not vice versa." :YES];
 		[self openSquirrelProjects:urls :count + 1];
 	}
 }
@@ -1928,7 +2014,7 @@
 
 - (BOOL)checkFile:(NSString *)filePath
 {
-	if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:NO] == YES)
+	if ([[NSFileManager defaultManager] fileExistsAtPath:filePath] == YES)
 	{
 		[fileWatchQueue addPath:filePath
 				 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
@@ -2711,12 +2797,12 @@
 					else
 					{
 						bLibName = [bLib objectAtIndex:0];
-
-						if ([bLibName compare:libName] == NSOrderedSame)
-						{
-							match = [bLib objectAtIndex:1];
-							break;
-						}
+					}
+					
+					if ([libName compare:bLibName] == NSOrderedSame)
+					{
+						match = [bLib objectAtIndex:1];
+						break;
 					}
 				}
 			}
@@ -3499,8 +3585,6 @@
                     // Found at least one / so there must be directory info here,
                     // even if it's just ~/lib.class.nut
 
-					/*
-
 					// What it if is ../lib.class.nut? This indicates relativity - but relative to what?
 					// We can only assume it's the project file.
 
@@ -3529,9 +3613,7 @@
 						libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					}
 
-					*/
-
-                    // Get the path component from the source file's library name info
+					// Get the path component from the source file's library name info
 
 					libName = [self getAbsolutePath:currentProject.projectPath :libName];
 					libPath = [libName stringByStandardizingPath];
@@ -6627,7 +6709,7 @@
 	// If the device is unassigned, it will have a null model id
 
 	NSString *mId = [device objectForKey:@"model_id"];
-	NSString *modelName = nil;
+	NSString *modelName = @"This device is not assigned to a model.";
 
 	if ((NSNull *)mId != [NSNull null])
 	{
@@ -6636,10 +6718,6 @@
 			NSDictionary *model = [ide.models objectAtIndex:i];
 			if ([[model objectForKey:@"id"] compare:mId] == NSOrderedSame) modelName = [NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]];
 		}
-	}
-	else
-	{
-		modelName = @"This device is not assigned to a model.";
 	}
 
 	[lines addObject:modelName];
@@ -7267,6 +7345,7 @@
 
     // Show the sheet
 
+	//preferencesSheet.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
     [_window beginSheet:preferencesSheet completionHandler:nil];
 
     // Save request for credentials until after the sheet has appeared
@@ -7584,9 +7663,10 @@
     if (sender == author01) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/carlbrown/PDKeychainBindingsController"]];
     if (sender == author02) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/bdkjones/VDKQueue"]];
     if (sender == author03) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/uliwitness/UliKit"]];
-    if (sender == author04) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/buildapi/"]];
+    if (sender == author04) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/smittytone/Squinter"]];
 	if (sender == author05) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/adobe-fonts/source-code-pro"]];
 	if (sender == author06) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"]];
+	if (sender == nil) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
 }
 
 
@@ -8516,7 +8596,7 @@
 
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath
 {
-	NSUInteger location;
+	NSUInteger location = 0;
 	NSArray *fileParts = [filePath componentsSeparatedByString:@"/"];
 	NSArray *baseParts = [basePath componentsSeparatedByString:@"/"];
 
@@ -8841,7 +8921,6 @@ didReceiveResponse:(NSURLResponse *)response
 		}
 	}
 }
-
 
 
 
