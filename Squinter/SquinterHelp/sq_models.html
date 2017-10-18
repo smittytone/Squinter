@@ -25,29 +25,46 @@
 				</td>
 			</tr>
 			</table>
-			<ul><li><a href="sq_libraries.html">Incorporating Libraries Into Your Code</a></li>
-			<li><a href="sq_projects.html">Working With Projects</a></li>
-			<li><b>Working With Models</b></li>
+			<ul>
+			<li><a href="sq_projects.html">Working With Projects and Products</a></li>
+			<li>Working With Device Groups</li>
 			<li><a href="sq_devices.html">Working With Devices</a></li>
+			<li><a href="sq_libraries.html">Including Libraries In Your Code</a></li>
 			<li><a href="sq_debugging.html">Debugging Code</a></li>
 			<li><a href="sq_configure.html">Configuring Squinter</a></li></ul>
 		</td>
 		<td width="10">&nbsp;</td>
 		<td valign="top" align="left">
-			<h2>Working With Models</h2>
+			<h2>Working With Device Groups</h2>
 
-			<p>Squinter lists all of the models registered to your Electric Imp account, and you can bind these to existing
-			projects or use them as the basis for new ones. You can delete or rename your models, or by creating a new project,
-			create a new model too. You’ll find these options in the ‘Models’ menu.</p>
+			<p>Squinter lists all of the Device Groups that belong to a given Project. When you select a Project,
+			its Device Groups, if any, are listed in the ‘Project’s Device Groups’ submenu in the ‘Device Groups’
+			menu. Initially the first Device Group, listed alphabetically, is selected when you select a Project.
+			Only the Device Groups that belong to the currently selected Project are listed, so to view a Device
+			Group from another Project, just select or open that project.</p>
 
-			<p><img src="gfx/models.png" width="600" height="443" /></p>
+			<p><img src="gfx/models.png" width="632" /></p>
 
-			<p>Selecting a project will automatically select the model it has been bound to, if it has such a link. You can connect
-			a model to the currently selected project using actions in the ‘Project’ and ‘Models’ menus.</p>
+            <p>If any devices have been assigned to a Device Group, they are listed as submenus off each Device Group
+            listed in the ‘Project’s Device Groups’ submenu. Selecting a device causes its parent Device Group to be
+            selected too.</p>
 
-			<p>You can assign or re-assign a device to any model at any time using a ‘Models’ menu option.</p>
+            <p>When you select a Project or one of its Device Groups, the ‘Device Groups’ menu provides a number
+            on the selected Device Group. This includes editing its name and/or description, getting information
+            about the code deployed to it, and event deleting the Device Group from your Project and the impCloud.
+            However, you can’t delete a Device Group that has devices assigned to it. You can restart simultaneously
+            all of the devices assigned to the selected Device Group here too.</p>
 
-			<p><img src="gfx/assign.png" width="600" height="180" /></p>
+            <p>Because the code you work on will be uploaded to a given Device Group rather than to a Project
+            (as was the case with Squinter 1.0), you will find the commands that allow you to access a Device Group’s
+            source code files (and any libraries or other Squirrel files they contain) from submenus included
+            in the ‘Device Groups’ menu.</p>
+
+            <p><img src="gfx/assign.png" width="612" /></p>
+
+            <p>You can add a new Device Group to a Project either by selecting the option from the ‘Project’s Device Groups’
+            submenu, or by choosing ‘Add source files to Project’ from the ‘Files’ menu. This can be used to add agent and/or
+            device code files to an existing Device Group, or to add them to a new Device Group created specially.</p>
 
 			<p align="right">Next: <a href="sq_devices.html">Working With Devices</a></p>
 		</td>

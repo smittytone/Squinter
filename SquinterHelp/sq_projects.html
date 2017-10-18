@@ -3,21 +3,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<title>Squinter Help</title>
+	<title>Squinter 2.0 Help</title>
 	<meta name="AppleTitle" content="Squinter Help" />
 	<meta name="AppleIcon" content="SquinterHelp/gfx/icon_16.png" />
 	<meta name="robots" content="anchors" />
 	<link href="css/main.css" rel="stylesheet" media="all" />
 </head>
 <body>
-	<table width="100%" border ="0" align="center" cellspacing="0" cellpadding="0">
-	<tr >
-		<td width="20">&nbsp;</td>
-		<td valign="top" align="left" width="250">
+	<table width="100%" border="0" align="center" cellspacing="0" cellpadding="0">
+	<tr>
+		<td width="5">&nbsp;</td>
+		<td valign="top" align="left" width="300">
 			<table width="100%" border="0" align="center" cellspacing="0" cellpadding="0">
 			<tr>
 				<td valign="top" align="center">
-					<h1>Squinter</h1>
+					<h1>Squinter 2.0 Beta</h1>
 					<p>“A Squirrel Integrator”</p>
 					<p><img src="gfx/icon.png" height="200" width="200" /></p>
 					<p>&nbsp;</p>
@@ -25,35 +25,49 @@
 				</td>
 			</tr>
 			</table>
-			<ul><li><a href="sq_libraries.html">Incorporating Libraries Into Your Code</a></li>
-			<li><b>Working With Projects</b></li>
-			<li><a href="sq_models.html">Working With Models</a></li>
+			<ul><li><b>Working With Projects and Products</b></li>
+			<li><a href="sq_models.html">Working With Device Groups</a></li>
 			<li><a href="sq_devices.html">Working With Devices</a></li>
+			<li><a href="sq_libraries.html">Including Libraries In Your Code</a></li>
 			<li><a href="sq_debugging.html">Debugging Code</a></li>
 			<li><a href="sq_configure.html">Configuring Squinter</a></li></ul>
 		</td>
-		<td width="10">&nbsp;</td>
+		<td width="5">&nbsp;</td>
 		<td valign="top" align="left">
-			<h2>Working With Projects</h2>
+			<h2>Working With Projects and Products</h2>
 
-			<p>Squinter works primarily through project files. These record which agent and device code files comprise a given model,
-			and which libraries they use. Project files are identified by the <code>.squirrelproj</code> extension. Squinter lets you
-			create new projects, either from scratch or from existing agent and device code files. You can also create projects from
-			your existing models stored in the Electric Imp Cloud.</p>
+			<p>Squinter works with Projects, each of which is stored as a project file on disk. Projects record which agent
+			and device code files comprise a given model, and which external libraries and files, and Electric Imp libraries
+			they use. Project files are identified by the <code>.squirrelproj</code> file extension. Squinter lets you
+			create new projects, either from scratch or from existing Products in the Electric Imp impCloud.</p>
 
-			<p><img src="gfx/new.png" width="600" height="263" /></p>
+			<p><img src="gfx/new.png" width="600" /></p>
 
-			<p>Projects are listed in the ‘Currently Open Projects’ submenu in the ‘Project’ menu, which also presents actions you can
-			perform with the currently selected project. You can also select a project from the ‘Current Project’ popup menu in
+			<p>Projects are listed in the ‘Open Projects’ submenu in the ‘Projects’ menu, which also presents actions you can
+			perform with the currently selected project. You can also select a project from the ‘Current Project’ popup in
 			Squinter’s main window.</p>
 
-			<p><img src="gfx/projects.png" width="600" height="240" /></p>
+			<p>New projects are saved initially to Squinter’s working directory, which you can set in the Preferences. To create
+			a new Project, click on appropriate toolbar button or select the relevant option from the ‘Files’ menu. This menu also
+			lists recently opened projects &mdash; as does Squinter’s dock icon. You can also save your current Project to a new
+			file if you wish.</p>
 
-			<p>New projects are saved in Squinter’s working directory, which you can set in the Preferences.</p>
+			<p><img src="gfx/projects.png" width="526" /></p>
 
-			<p align="right">Next: <a href="sq_models.html">Working With Models</a></p>
+            <p>The ‘Projects’ menu also presents a list of Products associated with your Electric Imp account in the impCloud.
+			Each Project maintains a one-to-one mapping with a uniquely named Product. New Projects are uploaded to the
+			impCloud as Products, and existing Products can be downloaded as Projects, complete with any Device Groups
+			they contain.</p>
+
+			<p><img src="gfx/products.png" width="554" /></p>
+
+			<p>Squinter also allows you to perform tasks on a selected Product, including linking it to an existing project,
+			or deleting it from the impCloud. Only Products that contain Device Groups with no assigned devices (or no Device
+			Groups at all) can be deleted.</p>
+
+			<p align="right">Next: <a href="sq_models.html">Working With Device Groups</a></p>
 		</td>
-		<td width="20">&nbsp;</td>
+		<td width="5">&nbsp;</td>
 	</tr>
 	</table>
 </body>
