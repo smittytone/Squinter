@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/09/2014.
-//  Copyright (c) 2014-15 Tony Smith. All rights reserved.
+//  Copyright (c) 2014-17 Tony Smith. All rights reserved.
 
 
 #import <Cocoa/Cocoa.h>
@@ -11,14 +11,17 @@
 @interface StatusLight : NSView
 
 {
-    BOOL fullFlag, isLightOn, isForeground;
+    BOOL isLightFull, isLightOn, isForeground;
 }
 
 
 @property (nonatomic, strong) NSImage *theCurrentImage;
 
-
+- (void)show;
+- (void)hide;
 - (void)setLight:(BOOL)onOrOff;
+
+- (void)needSave:(BOOL)yesOrNo;
 - (void)setFull:(BOOL)fullOrOutline;
 
 - (void)appWillBecomeActive;

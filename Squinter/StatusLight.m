@@ -16,9 +16,9 @@
 {
     if (self = [super initWithFrame:frame])
 	{
-        fullFlag = YES;
+        isLightFull = NO;
         isLightOn = NO;
-        if (theCurrentImage == nil) theCurrentImage = [NSImage imageNamed:@"light_full"];
+        if (theCurrentImage == nil) theCurrentImage = [NSImage imageNamed:@"light_outline"];
 
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(appWillResignActive)
@@ -44,13 +44,14 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
 	float alpha = 0.2;
-    if (isLightOn == YES) alpha = 1.0;
+
+	if (isLightOn == YES) alpha = 1.0;
 
     theCurrentImage = nil;
 
 	if (isForeground)
 	{
-		if (fullFlag)
+		if (isLightFull)
 		{
 			theCurrentImage = [NSImage imageNamed:@"light_full"];
 		}
@@ -61,7 +62,7 @@
 	}
 	else
 	{
-		if (fullFlag)
+		if (isLightFull)
 		{
 			theCurrentImage = [NSImage imageNamed:@"light_full_grey"];
 		}
@@ -79,6 +80,19 @@
 
 
 
+- (void)show
+{
+	[self setLight:YES];
+}
+
+
+
+- (void)hide
+{
+	[self setLight:NO];
+}
+
+
 - (void)setLight:(BOOL)onOrOff
 {
 	// Controls the save? icon's opacity: full when there is at least one project open
@@ -90,11 +104,18 @@
 
 
 
+- (void)needSave:(BOOL)yesOrNo
+{
+	[self setFull:!yesOrNo];
+}
+
+
+
 - (void)setFull:(BOOL)fullOrOutline
 {
 	// Controls the save? icon's image: full for no changes; outline for changes
 
-	fullFlag = fullOrOutline;
+	isLightFull = fullOrOutline;
     [self setNeedsDisplay:YES];
 }
 
