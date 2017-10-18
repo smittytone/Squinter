@@ -11,9 +11,9 @@ Squinter/*.icns
 *.txt
 *.pages
 
-Podfile.lock
-Podfile
-Pods/*
+#Podfile.lock
+#Podfile
+#Pods/*
 Squinter.xcodeproj/*
 Squinter.xcworkspace/*
 
