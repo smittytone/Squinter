@@ -1,40 +1,37 @@
 
 
 //  Created by Tony Smith on 15/09/2014.
-//  Copyright (c) 2014-16 Tony Smith. All rights reserved.
+//  Copyright (c) 2014-17 Tony Smith. All rights reserved.
 
 
 #import <Foundation/Foundation.h>
+#import "Constants.h"
 
 
 @interface Project : NSObject <NSCoding>
 
-// Data structure for Projects which is NSCoding-compliant for saving
+
+- (void)setDefaults;
+
+
+// Data structure for Projects, which is NSCoding-compliant for saving
 
 // Properties that ARE saved
 
-@property (nonatomic, strong) NSString *projectVersion;                     // Project Object Version (used for release checking)
-@property (nonatomic, strong) NSString *projectName;                        // Project's name
-@property (nonatomic, strong) NSString *projectAgentCodePath;               // Location of the core agent code file (inc. filename)
-@property (nonatomic, strong) NSString *projectDeviceCodePath;              // Location of the core device code file (inc. filename)
-@property (nonatomic, strong) NSString *projectModelID;                     // ID of project's associated model
-@property (nonatomic, strong) NSMutableDictionary *projectDeviceLibraries;  // Names, paths of local libraries #imported into device code
-@property (nonatomic, strong) NSMutableDictionary *projectAgentLibraries;   // Names, paths of local libraries #imported into agent code
-@property (nonatomic, strong) NSMutableDictionary *projectDeviceFiles;      // Names, paths of local files #imported into device code
-@property (nonatomic, strong) NSMutableDictionary *projectAgentFiles;       // Names, paths of local files #imported into agent code
-@property (nonatomic, strong) NSMutableArray *projectImpLibs;               // Names of EI libraries #required by either agent or device
-
-// Version 2.1 properties
-
-@property (nonatomic, strong) NSString *oldProjectPath;						// Saved path to project file
+@property (nonatomic, strong) NSString *name;						// Project's name
+@property (nonatomic, strong) NSString *description;				// Project description
+@property (nonatomic, strong) NSString *pid;						// ID of project's parent Product
+@property (nonatomic, strong) NSString *version;					// Project version number
+@property (nonatomic, strong) NSString *updated;					// The project was created/updated at...
+@property (nonatomic, strong) NSMutableArray *devicegroups;			// The project's device groups
+@property (nonatomic, strong) NSString *path;						// Project’s ABSOLUTE location on local storage
+@property (nonatomic, strong) NSString *filename;					// Project’s filename on local storage
+																	// NOTE path + / + filename = full path string
 
 // Properties that are NOT saved
 
-@property (nonatomic, strong) NSString *projectPath;                        // Project’s location on local storage
-@property (nonatomic, strong) NSString *projectAgentCode;                   // Compiled agent code
-@property (nonatomic, strong) NSString *projectDeviceCode;                  // Compiled device code
-@property (nonatomic, assign) char projectSquinted;                         // Bitfield indicating compilation status
-@property (nonatomic, assign) bool projectHasChanged;                       // Has the project changed in any way, ie. does it need saving?
-
+@property (nonatomic, assign) NSInteger devicegroupIndex;			// Currently selected devicegroup
+@property (nonatomic, assign) BOOL haschanged;						// Has the project changed in any way, ie. does it need saving?
+@property (nonatomic, assign) NSInteger count;						// Used for uploading/downloading projects
 
 @end

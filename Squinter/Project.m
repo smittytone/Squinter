@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/09/2014.
-//  Copyright (c) 2014-16 Tony Smith. All rights reserved.
+//  Copyright (c) 2014-17 Tony Smith. All rights reserved.
 
 
 #import "Project.h"
@@ -10,25 +10,40 @@
 @implementation Project
 
 
-@synthesize projectName, projectPath, projectAgentCodePath, projectDeviceCodePath;
-@synthesize projectDeviceLibraries, projectAgentLibraries;
-@synthesize projectDeviceFiles, projectAgentFiles;
-@synthesize projectDeviceCode, projectAgentCode, projectVersion;
-@synthesize projectSquinted, projectHasChanged, projectModelID, projectImpLibs;
-@synthesize oldProjectPath;
+@synthesize name, description, pid, version, updated, devicegroups;
+@synthesize path, filename, haschanged, devicegroupIndex, count;
 
 
 - (instancetype)init
 {
     if (self = [super init])
     {
-        projectSquinted = 0;
-        projectHasChanged = NO;
-        projectVersion = @"2.1";
-		projectModelID = nil;
+		[self setDefaults];
     }
 
     return self;
+}
+
+
+- (void)setDefaults
+{
+	version = kSquinterCurrentVersion;
+	name = @"";
+	description = @"";
+	pid = @"";
+	devicegroups = nil;
+	path = @"";
+	filename = @"";
+	
+	haschanged = NO;
+	devicegroupIndex = -1;
+	count = 0;
+
+	// Set the update time
+	
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+	[dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
+	updated = [dateFormatter stringFromDate:[NSDate date]];
 }
 
 
@@ -37,58 +52,93 @@
 {
     if (self = [super init])
 	{
-        projectVersion = [aDecoder decodeObjectForKey:@"project_version"];
-        if (projectVersion == nil) projectVersion = @"1.0";
+		// Set the loaded project's default values
 
-		projectName = [aDecoder decodeObjectForKey:@"project_name"];
-        projectAgentCodePath = [aDecoder decodeObjectForKey:@"project_agent_path"];
-        projectDeviceCodePath = [aDecoder decodeObjectForKey:@"project_device_path"];
-        projectDeviceLibraries = [aDecoder decodeObjectForKey:@"project_device_libraries"];
-        projectAgentLibraries = [aDecoder decodeObjectForKey:@"project_agent_libraries"];
-		projectDeviceFiles = [aDecoder decodeObjectForKey:@"project_device_files"];
-		projectAgentFiles = [aDecoder decodeObjectForKey:@"project_agent_files"];
-		projectModelID = [aDecoder decodeObjectForKey:@"project_model_number"];
-        projectImpLibs = [aDecoder decodeObjectForKey:@"project_imp_libraries"];
+		[self setDefaults];
 
-		// Add Version 2.1+ entities
+		// Read in the saved project version, so check if the project is old and thus needs special handling
+		// NOTE Special cases are 'projectVersion' < 3.0 and 'projectVersion' is nil
 
-		if (projectVersion.floatValue > 2.0)
+ 		NSString *projectVersion = [aDecoder decodeObjectForKey:@"project_version"];
+		NSInteger major = 1;
+		NSInteger minor = 0;
+
+		if (projectVersion != nil)
 		{
-			oldProjectPath = [aDecoder decodeObjectForKey:@"project_old_path"];
+			NSArray *parts = [projectVersion componentsSeparatedByString:@"."];
+			major = [[parts objectAtIndex:0] integerValue];
+			minor = [[parts objectAtIndex:1] integerValue];
+
+			if (major == 3)
+			{
+				// Project is a 3.x project so load it up
+
+				version = projectVersion;
+				name = [aDecoder decodeObjectForKey:@"project_name"];
+				description = [aDecoder decodeObjectForKey:@"project_desc"];
+				pid = [aDecoder decodeObjectForKey:@"project_pid"];
+				devicegroups = [aDecoder decodeObjectForKey:@"project_devicegroups"];
+				path = [aDecoder decodeObjectForKey:@"project_path"];
+				filename = [aDecoder decodeObjectForKey:@"project_filename"];
+				updated = [aDecoder decodeObjectForKey:@"project_updated"];
+
+				// Set up other, unsaved properties
+
+				haschanged = NO;
+
+				// And return the loaded project
+				
+				return self;
+			}
 		}
 
-		// Set up other, unsaved properties
-		
-		projectSquinted = 0;
-        projectDeviceCode = nil;
-        projectAgentCode = nil;
-        projectHasChanged = NO;
+		// Project is pre-Squinter 3.0, so must be converted.
+		// Read in what data we can that makes sense to do so: the agent and device
+		// code paths, which can be added to a model as its own code path. The model
+		// is added to a new device group
+
+		NSString *projectAgentCodePath = [aDecoder decodeObjectForKey:@"project_agent_path"];
+		NSString *projectDeviceCodePath = [aDecoder decodeObjectForKey:@"project_device_path"];
+
+		name = [aDecoder decodeObjectForKey:@"project_name"];
+		devicegroups = [[NSMutableArray alloc] init];
+		devicegroupIndex = -1;
+
+		NSInteger files = 0;
+
+		if (projectAgentCodePath != nil)
+		{
+			[devicegroups addObject:projectAgentCodePath];
+			files = 2;
+		}
+
+		if (projectDeviceCodePath != nil)
+		{
+			[devicegroups addObject:projectDeviceCodePath];
+			files = files + 1;
+		}
+
+		description = [NSString stringWithFormat:@"%li", (long)files];
+		version = [NSString stringWithFormat:@"%li.%li", (long)major, (long)minor];
+		pid = @"old";
     }
-    
-    return self;
+
+	return self;
 }
 
 
 
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
-    [aCoder encodeObject:projectVersion forKey:@"project_version"];
-    [aCoder encodeObject:projectName forKey:@"project_name"];
-    [aCoder encodeObject:projectAgentCodePath forKey:@"project_agent_path"];
-    [aCoder encodeObject:projectDeviceCodePath forKey:@"project_device_path"];
-    [aCoder encodeObject:projectDeviceLibraries forKey:@"project_device_libraries"];
-    [aCoder encodeObject:projectAgentLibraries forKey:@"project_agent_libraries"];
-	[aCoder encodeObject:projectDeviceFiles forKey:@"project_device_files"];
-	[aCoder encodeObject:projectAgentFiles forKey:@"project_agent_files"];
-	[aCoder encodeObject:projectModelID forKey:@"project_model_number"];
-	[aCoder encodeObject:projectImpLibs forKey:@"project_imp_libraries"];
+    [aCoder encodeObject:version forKey:@"project_version"];
+    [aCoder encodeObject:name forKey:@"project_name"];
+    [aCoder encodeObject:description forKey:@"project_desc"];
+    [aCoder encodeObject:pid forKey:@"project_pid"];
+    [aCoder encodeObject:devicegroups forKey:@"project_devicegroups"];
+	[aCoder encodeObject:updated forKey:@"project_updated"];
+	[aCoder encodeObject:filename forKey:@"project_filename"];
+	[aCoder encodeObject:path forKey:@"project_path"];
 
-	// Add Version 2.1+ entities
-
-	if (projectVersion.floatValue > 2.0)
-	{
-		[aCoder encodeObject:oldProjectPath forKey:@"project_old_path"];
-	}
 }
 
 
@@ -97,30 +147,19 @@
 {
     Project *projectCopy = [[Project allocWithZone:zone] init];
     
-    projectCopy.projectName = [self.projectName mutableCopy];
-    projectCopy.projectVersion = [self.projectVersion mutableCopy];
-    projectCopy.projectPath = [self.projectPath mutableCopy];
-    projectCopy.projectAgentCodePath = [self.projectAgentCodePath mutableCopy];
-    projectCopy.projectDeviceCodePath = [self.projectDeviceCodePath mutableCopy];
-    projectCopy.projectDeviceLibraries = [self.projectDeviceLibraries mutableCopy];
-    projectCopy.projectAgentLibraries = [self.projectAgentLibraries mutableCopy];
-    projectCopy.projectDeviceFiles = [self.projectDeviceFiles mutableCopy];
-    projectCopy.projectAgentFiles = [self.projectAgentFiles mutableCopy];
-    projectCopy.projectAgentCode = [self.projectAgentCode mutableCopy];
-    projectCopy.projectDeviceCode = [self.projectDeviceCode mutableCopy];
-	projectCopy.projectImpLibs = [self.projectImpLibs mutableCopy];
-    projectCopy.projectSquinted = self.projectSquinted;
-    projectCopy.projectHasChanged = self.projectHasChanged;
-	projectCopy.projectModelID = self.projectModelID;
+	projectCopy.version = [self.version mutableCopy];
+	projectCopy.updated = [self.updated mutableCopy];
+	projectCopy.name = [self.name mutableCopy];
+	projectCopy.description = [self.description mutableCopy];
+	projectCopy.pid = [self.pid mutableCopy];
+	projectCopy.path = [self.path mutableCopy];
+	projectCopy.devicegroups = [self.devicegroups mutableCopy];
+    projectCopy.filename = [self.filename mutableCopy];
+    projectCopy.haschanged = self.haschanged;
+	projectCopy.devicegroupIndex = self.devicegroupIndex;
+	projectCopy.count = self.count;
 
-	// Add Version 2.1+ entities
-	
-	if (projectVersion.floatValue > 2.0)
-	{
-		projectCopy.oldProjectPath = [self.oldProjectPath mutableCopy];
-	}
-    
-    return projectCopy;
+	return projectCopy;
 }
 
 
