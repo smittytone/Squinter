@@ -9,12 +9,13 @@ Squinter/*.pem
 Squinter/Images.xcassets/*
 Squinter/*.icns
 *.txt
+*.pages
 
-#Podfile.lock
-#Podfile
-#Pods/*
-#Squinter.xcodeproj/*
-#Squinter.xcworkspace/*
+Podfile.lock
+Podfile
+Pods/*
+Squinter.xcodeproj/*
+Squinter.xcworkspace/*
 
 ## From GitHub
 ## Build generated
@@ -41,3 +42,5 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+.DS_Store
+*.nut
