@@ -9,16 +9,23 @@
 /* Begin PBXBuildFile section */
 		195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9470FB833A59D9C952E82 /* libPods-Squinter.a */; };
 		3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */; };
+		3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B124BFC1F97AA9B00D8E4AD /* Token.m */; };
 		3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */; };
+		3B311E8F1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B311E8E1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m */; };
 		3B36D1C31970A0990029CEC0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B36D1C21970A0990029CEC0 /* Cocoa.framework */; };
 		3B36D1CD1970A0990029CEC0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1CB1970A0990029CEC0 /* InfoPlist.strings */; };
 		3B36D1CF1970A0990029CEC0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B36D1CE1970A0990029CEC0 /* main.m */; };
 		3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B36D1D51970A0990029CEC0 /* AppDelegate.m */; };
 		3B36D1D91970A0990029CEC0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1D71970A0990029CEC0 /* MainMenu.xib */; };
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
+		3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */; };
 		3B6AF0DB197127B10083744C /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6AF0DA197127B10083744C /* Project.m */; };
 		3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7ACF801CFF0A980080C3DB /* Connexion.m */; };
 		3B82AA0E1CB663EA0098A959 /* SquinterHelp in Resources */ = {isa = PBXBuildFile; fileRef = 3B82AA0D1CB663EA0098A959 /* SquinterHelp */; };
+		3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */; };
+		3B8B8E131E952C1D009363C8 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E121E952C1D009363C8 /* Model.m */; };
+		3B8B8E161E952E5A009363C8 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E151E952E5A009363C8 /* File.m */; };
+		3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BD74E461D423D6A00565B0E /* SourceCodePro-Regular.otf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -26,7 +33,18 @@
 		3BE6C4DD19B76AA200D228AF /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE6C4DC19B76AA200D228AF /* Security.framework */; };
 		3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE897541B0608F100645092 /* SquinterToolbarItem.m */; };
 		3BF464121CF87C720094EF59 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 3BF464111CF87C720094EF59 /* dsa_pub.pem */; };
+		3BF5BBCD1ECCF12A000C30DD /* SquinterDockTilePlugIn.docktileplugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B311E871ECCDEFC0076B066 /* SquinterDockTilePlugIn.docktileplugin */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3BF5BBCB1ECCF118000C30DD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3B36D1B71970A0990029CEC0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3B311E861ECCDEFC0076B066;
+			remoteInfo = SquinterDockTilePlugIn;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		3BD74E451D423D6200565B0E /* CopyFiles */ = {
@@ -41,10 +59,11 @@
 		};
 		3BF4640F1CF875A50094EF59 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolderSpec = 13;
 			files = (
+				3BF5BBCD1ECCF12A000C30DD /* SquinterDockTilePlugIn.docktileplugin in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,10 +74,19 @@
 		29F9470FB833A59D9C952E82 /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B05B2581D05C91F00AA89F4 /* StreamToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StreamToolbarItem.h; sourceTree = "<group>"; };
 		3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StreamToolbarItem.m; sourceTree = "<group>"; };
+		3B06F88B1F8BBE930072A898 /* docpic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = docpic.png; path = Squinter/Images.xcassets/docpic.imageset/docpic.png; sourceTree = SOURCE_ROOT; };
+		3B06F88C1F8BBE930072A898 /* docpic@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@2x.png"; path = "Squinter/Images.xcassets/docpic.imageset/docpic@2x.png"; sourceTree = SOURCE_ROOT; };
+		3B06F88D1F8BBE930072A898 /* docpic@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@3x.png"; path = "Squinter/Images.xcassets/docpic.imageset/docpic@3x.png"; sourceTree = SOURCE_ROOT; };
+		3B124BFB1F97AA9B00D8E4AD /* Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Token.h; path = ../../BuildAPIAccess/Token.h; sourceTree = "<group>"; };
+		3B124BFC1F97AA9B00D8E4AD /* Token.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Token.m; path = ../../BuildAPIAccess/Token.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
 		3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccess.h; path = ../../BuildAPIAccess/BuildAPIAccess.h; sourceTree = "<group>"; };
 		3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BuildAPIAccess.m; path = ../../BuildAPIAccess/BuildAPIAccess.m; sourceTree = "<group>"; };
 		3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccessConstants.h; path = ../../BuildAPIAccess/BuildAPIAccessConstants.h; sourceTree = "<group>"; };
+		3B311E871ECCDEFC0076B066 /* SquinterDockTilePlugIn.docktileplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SquinterDockTilePlugIn.docktileplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B311E891ECCDEFC0076B066 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3B311E8D1ECCDF8C0076B066 /* SquinterDockTilePlugIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquinterDockTilePlugIn.h; sourceTree = "<group>"; };
+		3B311E8E1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquinterDockTilePlugIn.m; sourceTree = "<group>"; };
 		3B36D1BF1970A0990029CEC0 /* Squinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Squinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B36D1C21970A0990029CEC0 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		3B36D1C51970A0990029CEC0 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -75,11 +103,21 @@
 		3B36D1E81970A0990029CEC0 /* SquinterTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SquinterTests-Info.plist"; sourceTree = "<group>"; };
 		3B36D1EA1970A0990029CEC0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3B36D1EC1970A0990029CEC0 /* SquinterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SquinterTests.m; sourceTree = "<group>"; };
+		3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginToolbarItem.h; sourceTree = "<group>"; };
+		3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginToolbarItem.m; sourceTree = "<group>"; };
 		3B6AF0D9197127B10083744C /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Project.h; sourceTree = "<group>"; };
 		3B6AF0DA197127B10083744C /* Project.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Project.m; sourceTree = "<group>"; };
 		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Connexion.h; path = ../../BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
 		3B7ACF801CFF0A980080C3DB /* Connexion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Connexion.m; path = ../BuildAPIAccess/Connexion.m; sourceTree = SOURCE_ROOT; };
 		3B82AA0D1CB663EA0098A959 /* SquinterHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SquinterHelp; sourceTree = SOURCE_ROOT; };
+		3B8B8E0E1E9527D6009363C8 /* Devicegroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Devicegroup.h; sourceTree = "<group>"; };
+		3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Devicegroup.m; sourceTree = "<group>"; };
+		3B8B8E111E952C1D009363C8 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
+		3B8B8E121E952C1D009363C8 /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
+		3B8B8E141E952E5A009363C8 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
+		3B8B8E151E952E5A009363C8 /* File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = File.m; sourceTree = "<group>"; };
+		3B9DF2B91ED2D4EB00B682BA /* LogStreamEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LogStreamEvent.h; path = ../../BuildAPIAccess/LogStreamEvent.h; sourceTree = "<group>"; };
+		3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LogStreamEvent.m; path = ../../BuildAPIAccess/LogStreamEvent.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusLight.h; sourceTree = "<group>"; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusLight.m; sourceTree = "<group>"; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -92,11 +130,16 @@
 		3BF464111CF87C720094EF59 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Squinter.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Squinter/Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
 		8E33BEB63E05FCF7A4BBAEDA /* libPods-SquinterTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SquinterTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A5C032FB364E5FA2602FF8D9 /* Pods-SquinterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SquinterTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SquinterTests/Pods-SquinterTests.release.xcconfig"; sourceTree = "<group>"; };
-		A8E6F869989F78D5B34535E6 /* Pods-SquinterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SquinterTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SquinterTests/Pods-SquinterTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3B311E841ECCDEFC0076B066 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3B36D1BC1970A0990029CEC0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -116,8 +159,12 @@
 				3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */,
 				3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */,
 				3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */,
+				3B124BFB1F97AA9B00D8E4AD /* Token.h */,
+				3B124BFC1F97AA9B00D8E4AD /* Token.m */,
 				3B7ACF7F1CFF0A980080C3DB /* Connexion.h */,
 				3B7ACF801CFF0A980080C3DB /* Connexion.m */,
+				3B9DF2B91ED2D4EB00B682BA /* LogStreamEvent.h */,
+				3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */,
 			);
 			name = BuildAPIAccess;
 			sourceTree = "<group>";
@@ -131,14 +178,28 @@
 			name = "Third-Party";
 			sourceTree = "<group>";
 		};
+		3B311E881ECCDEFC0076B066 /* SquinterDockTilePlugIn */ = {
+			isa = PBXGroup;
+			children = (
+				3B06F88B1F8BBE930072A898 /* docpic.png */,
+				3B06F88C1F8BBE930072A898 /* docpic@2x.png */,
+				3B06F88D1F8BBE930072A898 /* docpic@3x.png */,
+				3B311E891ECCDEFC0076B066 /* Info.plist */,
+				3B311E8D1ECCDF8C0076B066 /* SquinterDockTilePlugIn.h */,
+				3B311E8E1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m */,
+			);
+			path = SquinterDockTilePlugIn;
+			sourceTree = "<group>";
+		};
 		3B36D1B61970A0990029CEC0 = {
 			isa = PBXGroup;
 			children = (
 				3B36D1C81970A0990029CEC0 /* Squinter */,
-				3B36D1E61970A0990029CEC0 /* SquinterTests */,
+				3B311E881ECCDEFC0076B066 /* SquinterDockTilePlugIn */,
 				3B36D1C01970A0990029CEC0 /* Products */,
 				AA37379CAA499F6C763B7D77 /* Pods */,
 				9D21E7CE86082310D04E5080 /* Frameworks */,
+				3B36D1E61970A0990029CEC0 /* SquinterTests */,
 			);
 			sourceTree = "<group>";
 			usesTabs = 1;
@@ -147,6 +208,7 @@
 			isa = PBXGroup;
 			children = (
 				3B36D1BF1970A0990029CEC0 /* Squinter.app */,
+				3B311E871ECCDEFC0076B066 /* SquinterDockTilePlugIn.docktileplugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -176,8 +238,8 @@
 			isa = PBXGroup;
 			children = (
 				3B7ACF7E1CFEEBEA0080C3DB /* Core Classes */,
-				3B7ACF7D1CFEEBC10080C3DB /* UI Classes */,
 				3B3015471CFE05C900596CF2 /* BuildAPIAccess */,
+				3B7ACF7D1CFEEBC10080C3DB /* UI Classes */,
 				3B3015481CFE05E400596CF2 /* Third-Party */,
 				3B7ACF821CFF0B7B0080C3DB /* Bundled Entities */,
 				3B36D1C11970A0990029CEC0 /* Frameworks */,
@@ -224,6 +286,8 @@
 				3BE897541B0608F100645092 /* SquinterToolbarItem.m */,
 				3B05B2581D05C91F00AA89F4 /* StreamToolbarItem.h */,
 				3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */,
+				3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */,
+				3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -236,6 +300,12 @@
 				3B36D1D51970A0990029CEC0 /* AppDelegate.m */,
 				3B6AF0D9197127B10083744C /* Project.h */,
 				3B6AF0DA197127B10083744C /* Project.m */,
+				3B8B8E0E1E9527D6009363C8 /* Devicegroup.h */,
+				3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */,
+				3B8B8E111E952C1D009363C8 /* Model.h */,
+				3B8B8E121E952C1D009363C8 /* Model.m */,
+				3B8B8E141E952E5A009363C8 /* File.h */,
+				3B8B8E151E952E5A009363C8 /* File.m */,
 			);
 			name = "Core Classes";
 			sourceTree = "<group>";
@@ -267,8 +337,6 @@
 			children = (
 				72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */,
 				08A885A53D3FD2441B2836EF /* Pods-Squinter.release.xcconfig */,
-				A8E6F869989F78D5B34535E6 /* Pods-SquinterTests.debug.xcconfig */,
-				A5C032FB364E5FA2602FF8D9 /* Pods-SquinterTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -276,6 +344,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3B311E861ECCDEFC0076B066 /* SquinterDockTilePlugIn */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3B311E8C1ECCDEFC0076B066 /* Build configuration list for PBXNativeTarget "SquinterDockTilePlugIn" */;
+			buildPhases = (
+				3B311E831ECCDEFC0076B066 /* Sources */,
+				3B311E841ECCDEFC0076B066 /* Frameworks */,
+				3B311E851ECCDEFC0076B066 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SquinterDockTilePlugIn;
+			productName = SquinterDockTilePlugIn;
+			productReference = 3B311E871ECCDEFC0076B066 /* SquinterDockTilePlugIn.docktileplugin */;
+			productType = "com.apple.product-type.bundle";
+		};
 		3B36D1BE1970A0990029CEC0 /* Squinter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B36D1F01970A0990029CEC0 /* Build configuration list for PBXNativeTarget "Squinter" */;
@@ -292,6 +377,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3BF5BBCC1ECCF118000C30DD /* PBXTargetDependency */,
 			);
 			name = Squinter;
 			productName = Squinter;
@@ -304,9 +390,14 @@
 		3B36D1B71970A0990029CEC0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Tony Smith";
 				TargetAttributes = {
+					3B311E861ECCDEFC0076B066 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = Y5J3K52DNA;
+						ProvisioningStyle = Automatic;
+					};
 					3B36D1BE1970A0990029CEC0 = {
 						DevelopmentTeam = Y5J3K52DNA;
 						ProvisioningStyle = Automatic;
@@ -327,11 +418,19 @@
 			projectRoot = "";
 			targets = (
 				3B36D1BE1970A0990029CEC0 /* Squinter */,
+				3B311E861ECCDEFC0076B066 /* SquinterDockTilePlugIn */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3B311E851ECCDEFC0076B066 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3B36D1BD1970A0990029CEC0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -354,13 +453,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Squinter-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		D1E3EA12F37DFE2BD4939FF8 /* [CP] Embed Pods Frameworks */ = {
@@ -369,9 +471,14 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Squinter/Pods-Squinter-frameworks.sh",
+				"${PODS_ROOT}/Sparkle/Sparkle.framework",
+				"${PODS_ROOT}/Sparkle/Sparkle.framework.dSYM",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework",
+				"${DWARF_DSYM_FOLDER_PATH}/Sparkle.framework.dSYM",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -396,23 +503,45 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3B311E831ECCDEFC0076B066 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3B311E8F1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3B36D1BB1970A0990029CEC0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
 				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
+				3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */,
 				3B6AF0DB197127B10083744C /* Project.m in Sources */,
 				3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */,
+				3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */,
+				3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */,
+				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
+				3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3BF5BBCC1ECCF118000C30DD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3B311E861ECCDEFC0076B066 /* SquinterDockTilePlugIn */;
+			targetProxy = 3BF5BBCB1ECCF118000C30DD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		3B36D1CB1970A0990029CEC0 /* InfoPlist.strings */ = {
@@ -442,6 +571,52 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		3B311E8A1ECCDEFC0076B066 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Y5J3K52DNA;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				INFOPLIST_FILE = SquinterDockTilePlugIn/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bps.SquinterDockTilePlugIn;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = docktileplugin;
+			};
+			name = Debug;
+		};
+		3B311E8B1ECCDEFC0076B066 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = Y5J3K52DNA;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				INFOPLIST_FILE = SquinterDockTilePlugIn/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bps.SquinterDockTilePlugIn;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = docktileplugin;
+			};
+			name = Release;
+		};
 		3B36D1EE1970A0990029CEC0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -450,14 +625,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -481,8 +662,9 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "$(inherited)";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -495,14 +677,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -520,7 +708,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_LDFLAGS = "$(inherited)";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -542,7 +731,17 @@
 				GCC_PREFIX_HEADER = "Squinter/Squinter-Prefix.pch";
 				INFOPLIST_FILE = "Squinter/Squinter-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"PDKeychainBindingsController\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"Sparkle\"",
+					"-I\"SquinterDockTilePlugIn\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.bps.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -566,7 +765,17 @@
 				GCC_PREFIX_HEADER = "Squinter/Squinter-Prefix.pch";
 				INFOPLIST_FILE = "Squinter/Squinter-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"PDKeychainBindingsController\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"Sparkle\"",
+					"-I\"SquinterDockTilePlugIn\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.bps.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -576,6 +785,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3B311E8C1ECCDEFC0076B066 /* Build configuration list for PBXNativeTarget "SquinterDockTilePlugIn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3B311E8A1ECCDEFC0076B066 /* Debug */,
+				3B311E8B1ECCDEFC0076B066 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3B36D1BA1970A0990029CEC0 /* Build configuration list for PBXProject "Squinter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

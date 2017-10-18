@@ -44,3 +44,9 @@ xcuserdata/
 *.dSYM
 .DS_Store
 *.nut
+
+*.lock
+
+Podfile.lock
+
+Pods/Manifest.lock
