@@ -53,6 +53,7 @@
                 <outlet property="deviceMenu" destination="0MT-tI-nbd" id="uAM-1l-f4h"/>
                 <outlet property="devicegroupInfoItem" destination="JWE-8V-DcR" id="Ugj-1h-8KL"/>
                 <outlet property="devicesPopUp" destination="oez-pq-fUm" id="SxW-O6-qLI"/>
+                <outlet property="downloadProductItem" destination="Gli-ag-yLt" id="f7n-Jg-rV3"/>
                 <outlet property="downloadProductMenuItem" destination="iOg-yB-9JE" id="0Yr-Ch-HzI"/>
                 <outlet property="externalFilesMenu" destination="7KM-vt-Cui" id="r5K-kH-etD"/>
                 <outlet property="externalLibsMenu" destination="NBx-Sf-dPM" id="wPd-hJ-nN2"/>
@@ -194,10 +195,6 @@
                 <outlet property="workingDirectoryField" destination="EQt-Hf-Xj6" id="Ovq-6v-pzP"/>
             </connections>
         </customObject>
-        <viewController id="3pn-BC-GMs" customClass="DevicegroupInfoViewController"/>
-        <viewController id="fkt-FE-mx6" customClass="CodeInfoViewController"/>
-        <viewController id="r5v-JS-rb5" customClass="DeviceInfoViewController"/>
-        <viewController id="xOK-Kw-4HD" customClass="ModelInfoViewController"/>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <customObject id="hbL-Me-gGI" customClass="SUUpdater"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
@@ -1030,6 +1027,23 @@
             </view>
             <toolbar key="toolbar" implicitIdentifier="B3EC3009-665A-4008-AF07-80CBA64DA7FB" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="TRV-z7-UZS">
                 <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="9A66F936-1D08-43E1-A73E-7567C2B63ED3" label="New Project" paletteLabel="New Project" tag="108" image="plus" autovalidates="NO" id="ucm-fZ-jVY" customClass="SquinterToolbarItem">
+                        <connections>
+                            <action selector="newProject:" target="Voe-Tx-rLC" id="uWZ-bl-IAF"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="6086223A-371A-4693-9E9B-83FC585A4AA4" label="Project Info" paletteLabel="Project Info" tag="104" image="info" autovalidates="NO" id="5z3-es-brQ" customClass="SquinterToolbarItem">
+                        <size key="minSize" width="32" height="32"/>
+                        <size key="maxSize" width="96" height="96"/>
+                        <connections>
+                            <action selector="showProjectInfo:" target="Voe-Tx-rLC" id="aGd-1B-uJA"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="FDDE3D1E-ACFC-41D5-9207-9E80CD4BDC53" label="Download" paletteLabel="Download Product" tag="124" image="download" id="Gli-ag-yLt" customClass="SquinterToolbarItem">
+                        <connections>
+                            <action selector="downloadProduct:" target="Voe-Tx-rLC" id="pMb-1d-WKR"/>
+                        </connections>
+                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="ECF95776-ACEA-454D-B143-BD2B27DAD1B0" label="New Group" paletteLabel="New Device Group" tag="120" image="plus" autovalidates="NO" id="lpo-Dq-zYF" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="newDevicegroup:" target="Voe-Tx-rLC" id="JRr-Ho-vmd"/>
@@ -1062,6 +1076,23 @@
                             <action selector="getCommits:" target="Voe-Tx-rLC" id="H69-7W-EoE"/>
                         </connections>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="A43ECB5B-832C-4F16-9A6F-82D4305D92C4" label="View Files" paletteLabel="View Device Group Files in Editor" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
+                        <size key="minSize" width="32" height="32"/>
+                        <size key="maxSize" width="96" height="0.0"/>
+                        <connections>
+                            <action selector="externalOpenAll:" target="Voe-Tx-rLC" id="6hj-9j-NvH"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="7A460075-36EA-499F-B670-DF84D1396EA9" label="View Device Code" paletteLabel="View Device Code in Editor" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
+                        <connections>
+                            <action selector="externalOpen:" target="Voe-Tx-rLC" id="97h-h9-GxD"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="D79E91F4-BF93-43BF-8547-E9A6BB9588FB" label="View Agent Code" paletteLabel="View Agent Code in Editor" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
+                        <connections>
+                            <action selector="externalOpen:" target="Voe-Tx-rLC" id="9Om-l5-zor"/>
+                        </connections>
+                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="7CF0E1D6-B254-4125-9EB2-FF8E81722024" label="Copy Device Code" paletteLabel="Copy Device Code" tag="101" image="copy" autovalidates="NO" id="eYq-bK-nxW" customClass="SquinterToolbarItem">
                         <size key="minSize" width="32" height="32"/>
                         <size key="maxSize" width="96" height="96"/>
@@ -1074,42 +1105,6 @@
                         <size key="maxSize" width="96" height="96"/>
                         <connections>
                             <action selector="copyAgentCodeToPasteboard:" target="Voe-Tx-rLC" id="2Ig-P3-r5t"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="9BCCB3FB-67B8-4896-86FE-48022057E690" label="New Project" paletteLabel="New Project" tag="108" image="plus" autovalidates="NO" id="ucm-fZ-jVY" customClass="SquinterToolbarItem">
-                        <connections>
-                            <action selector="newProject:" target="Voe-Tx-rLC" id="uWZ-bl-IAF"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="81B07563-C77B-4CFA-90A6-D2715C11FFA8" label="Project Info" paletteLabel="Project Info" tag="104" image="info" autovalidates="NO" id="5z3-es-brQ" customClass="SquinterToolbarItem">
-                        <size key="minSize" width="32" height="32"/>
-                        <size key="maxSize" width="96" height="96"/>
-                        <connections>
-                            <action selector="showProjectInfo:" target="Voe-Tx-rLC" id="aGd-1B-uJA"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="5D97B240-8704-4B9F-98E4-5F07B949CD79" label="Clear" paletteLabel="Clear Window" tag="103" image="clear" autovalidates="NO" id="ZWk-Ol-4mW" customClass="SquinterToolbarItem">
-                        <size key="minSize" width="32" height="32"/>
-                        <size key="maxSize" width="96" height="96"/>
-                        <connections>
-                            <action selector="clearLog:" target="Voe-Tx-rLC" id="evB-Iv-YiJ"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="F3C94946-1F1B-47D4-91EC-0CA388F41F85" label="View Device Code" paletteLabel="View Device Code in Editor" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
-                        <connections>
-                            <action selector="externalOpen:" target="Voe-Tx-rLC" id="97h-h9-GxD"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="E1D3BDB7-6D26-467A-8C4A-8AA3EDC72ADB" label="View Agent Code" paletteLabel="View Agent Code in Editor" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
-                        <connections>
-                            <action selector="externalOpen:" target="Voe-Tx-rLC" id="9Om-l5-zor"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="6B829CE9-BC16-4749-A015-B4B5E96A1BFF" label="View Files" paletteLabel="View Device Group Files in Editor" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
-                        <size key="minSize" width="32" height="32"/>
-                        <size key="maxSize" width="96" height="0.0"/>
-                        <connections>
-                            <action selector="externalOpenAll:" target="Voe-Tx-rLC" id="6hj-9j-NvH"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="1FF6D5A1-2BCA-4F55-9B1F-227F03356EFC" label="Restart" paletteLabel="Restart Assigned Devices" tag="110" image="restart" autovalidates="NO" id="evO-uk-7On" customClass="SquinterToolbarItem">
@@ -1139,6 +1134,13 @@
                             <action selector="printLog:" target="Voe-Tx-rLC" id="57D-mY-ls5"/>
                         </connections>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="E6F53FA3-EEDE-4171-8C04-160EC6B613A0" label="Clear" paletteLabel="Clear Window" tag="103" image="clear" autovalidates="NO" id="ZWk-Ol-4mW" customClass="SquinterToolbarItem">
+                        <size key="minSize" width="32" height="32"/>
+                        <size key="maxSize" width="96" height="96"/>
+                        <connections>
+                            <action selector="clearLog:" target="Voe-Tx-rLC" id="evB-Iv-YiJ"/>
+                        </connections>
+                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarSeparatorItem" id="vIH-l8-9Id"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="hlu-sY-ttp"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="YmD-OV-Lst"/>
@@ -1150,14 +1152,14 @@
                     <toolbarItem reference="lpo-Dq-zYF"/>
                     <toolbarItem reference="JWE-8V-DcR"/>
                     <toolbarItem reference="IEm-mB-CAJ"/>
-                    <toolbarItem reference="gJg-UT-1px"/>
-                    <toolbarItem reference="evO-uk-7On"/>
+                    <toolbarItem reference="Fbm-8z-13S"/>
                     <toolbarItem reference="qP6-Nj-CWs"/>
+                    <toolbarItem reference="evO-uk-7On"/>
                     <toolbarItem reference="hlu-sY-ttp"/>
                     <toolbarItem reference="CjG-A6-aAx"/>
                     <toolbarItem reference="Ghp-MP-vpG"/>
-                    <toolbarItem reference="YmD-OV-Lst"/>
                     <toolbarItem reference="ZWk-Ol-4mW"/>
+                    <toolbarItem reference="YmD-OV-Lst"/>
                 </defaultToolbarItems>
                 <connections>
                     <outlet property="delegate" destination="Voe-Tx-rLC" id="zhA-ZK-2Wc"/>
@@ -3457,6 +3459,7 @@ Gw
         <image name="clear" width="32" height="32"/>
         <image name="commits_grey" width="32" height="32"/>
         <image name="copy" width="32" height="32"/>
+        <image name="download" width="32" height="32"/>
         <image name="info" width="32" height="32"/>
         <image name="login" width="32" height="32"/>
         <image name="open" width="32" height="32"/>
