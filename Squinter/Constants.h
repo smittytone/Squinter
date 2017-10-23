@@ -59,5 +59,11 @@
 #define kAgentCodeSquinted					0x02
 #define kBothCodeSquinted					0x03
 
+// StreamToolbarItem
+
+#define kStreamToolbarItemStateOff			0
+#define kStreamToolbarItemStateMid			1
+#define kStreamToolbarItemStateOn			2
+
 
 #endif
