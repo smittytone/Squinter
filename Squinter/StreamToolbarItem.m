@@ -8,7 +8,8 @@
 
 
 @implementation StreamToolbarItem
-@synthesize onImageName, offImageName, offImageNameGrey, onImageNameGrey, isOn;
+@synthesize onImageName, offImageName, offImageNameGrey, onImageNameGrey;
+@synthesize state, midImageName, midImageNameGrey;
 
 
 
@@ -33,10 +34,12 @@
                                                    object:nil];
 
         isForeground = YES;
-		onImageName = @"compile";
-		offImageName = @"compile";
-		onImageNameGrey = @"compile_grey";
-		offImageNameGrey = @"compile_grey";
+		onImageName = @"log_flagged";
+		offImageName = @"streamon";
+		midImageName = @"log_flagging";
+		midImageNameGrey = @"log_flagging_grey";
+		onImageNameGrey = @"log_flagged_grey";
+		offImageNameGrey = @"streamon_grey";
 	}
 
 	return self;
@@ -46,56 +49,38 @@
 
 - (void)validate
 {
-	NSImage *itemIcon = [[NSImage alloc] initWithSize:NSMakeSize(self.image.size.height, self.image.size.width)];
-
 	if (isForeground)
 	{
-		// App in foreground, so draw in green
+		switch (state)
+		{
+			case kStreamToolbarItemStateOff:
+				[self setImage:[NSImage imageNamed:offImageName]];
+				break;
 
-		if (isOn)
-		{
-			NSImage *icon = [NSImage imageNamed:offImageName];
-			NSImage *flag = [NSImage imageNamed:onImageName];
-			NSRect iRect = NSMakeRect(0, 0, itemIcon.size.width, itemIcon.size.height);
-			[itemIcon lockFocus];
-			[icon drawInRect:iRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-			[flag drawInRect:iRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-			[itemIcon unlockFocus];
-		}
-		else
-		{
-			NSImage *icon = [NSImage imageNamed:offImageName];
-			NSRect iRect = NSMakeRect(0, 0, itemIcon.size.width, itemIcon.size.height);
-			[itemIcon lockFocus];
-			[icon drawInRect:iRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-			[itemIcon unlockFocus];
+			case kStreamToolbarItemStateMid:
+				[self setImage:[NSImage imageNamed:midImageName]];
+				break;
+
+			default:
+				[self setImage:[NSImage imageNamed:onImageName]];
 		}
 	}
 	else
 	{
-		// App in background, draw in grey
+		switch (state)
+		{
+			case kStreamToolbarItemStateOff:
+				[self setImage:[NSImage imageNamed:offImageNameGrey]];
+				break;
 
-		if (isOn)
-		{
-			NSImage *icon = [NSImage imageNamed:offImageNameGrey];
-			NSImage *flag = [NSImage imageNamed:onImageNameGrey];
-			NSRect iRect = NSMakeRect(0, 0, itemIcon.size.width, itemIcon.size.height);
-			[itemIcon lockFocus];
-			[icon drawInRect:iRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-			[flag drawInRect:iRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-			[itemIcon unlockFocus];
-		}
-		else
-		{
-			NSImage *icon = [NSImage imageNamed:offImageNameGrey];
-			NSRect iRect = NSMakeRect(0, 0, itemIcon.size.width, itemIcon.size.height);
-			[itemIcon lockFocus];
-			[icon drawInRect:iRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-			[itemIcon unlockFocus];
+			case kStreamToolbarItemStateMid:
+				[self setImage:[NSImage imageNamed:midImageNameGrey]];
+				break;
+
+			default:
+				[self setImage:[NSImage imageNamed:onImageNameGrey]];
 		}
 	}
-
-	[self setImage:itemIcon];
 }
 
 
@@ -132,6 +117,8 @@
 	copiedItem->offImageName = [self.onImageName copyWithZone:zone];
 	copiedItem->onImageNameGrey = [self.onImageNameGrey copyWithZone:zone];
 	copiedItem->offImageNameGrey = [self.offImageNameGrey copyWithZone:zone];
+	copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
+	copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
 	return copiedItem;
 }
 
