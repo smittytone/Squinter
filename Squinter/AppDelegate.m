@@ -11356,17 +11356,18 @@
 	[colors addObject:[NSColor cyanColor]];
 	[colors addObject:[NSColor magentaColor]];
 	[colors addObject:[NSColor yellowColor]];
-	[colors addObject:[NSColor orangeColor]];
-	[colors addObject:[NSColor brownColor]];
 	[colors addObject:[NSColor purpleColor]];
-	[colors addObject:[NSColor greenColor]];
+	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green)
 	[colors addObject:[NSColor blueColor]];
-	[colors addObject:[NSColor redColor]];
+	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry
+	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine
+	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green)
 	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:1.0 blue:1.0 alpha:1.0]]; // White
 	[colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:1.0]]; // Black
 	[colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.5 blue:0.5 alpha:1.0]]; // Mid-grey
 	[colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1.0]]; // Light-grey
 	[colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.3 blue:0.3 alpha:1.0]]; // Dark-grey
+	[colors addObject:[NSColor brownColor]];
 }
 
 
