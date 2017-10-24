@@ -87,6 +87,7 @@
                 <outlet property="loginAndOutItem" destination="RR8-L2-okd" id="JuJ-af-Mqo"/>
                 <outlet property="loginMenuItem" destination="yZG-eW-Kuh" id="JVj-at-FE8"/>
                 <outlet property="loginSheet" destination="N7Z-aG-iXH" id="JOL-Qi-vbz"/>
+                <outlet property="maxLogCountMenu" destination="NGx-Z2-dEs" id="mUQ-G5-ETx"/>
                 <outlet property="newDevicegroupCheckbox" destination="vHb-2J-W3L" id="JY9-H8-Xhq"/>
                 <outlet property="newDevicegroupDescCountField" destination="Jhn-eD-Iyl" id="5SI-F7-Thn"/>
                 <outlet property="newDevicegroupDescTextField" destination="jVS-FX-XRr" id="ULO-t7-fdr"/>
@@ -963,7 +964,7 @@
                         <rect key="frame" x="-1" y="39" width="902" height="491"/>
                         <clipView key="contentView" id="DPZ-Ai-vv0">
                             <rect key="frame" x="1" y="1" width="900" height="489"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7">
                                     <rect key="frame" x="0.0" y="-1" width="900" height="489"/>
@@ -1598,6 +1599,37 @@ Gw
                 <rect key="frame" x="0.0" y="0.0" width="612" height="445"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2cn-dv-g74">
+                        <rect key="frame" x="516" y="13" width="82" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="inQ-dV-1t1"/>
+                            <constraint firstAttribute="height" constant="21" id="irk-pc-ZRV"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atT-lF-uoJ">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="setPrefs:" target="Voe-Tx-rLC" id="J30-GD-E8b"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="K2T-L6-2Zn">
+                        <rect key="frame" x="434" y="13" width="82" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="H5s-OZ-pA2"/>
+                            <constraint firstAttribute="height" constant="21" id="VYF-Nd-ue9"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oGp-Wd-oeQ">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="cancelPrefs:" target="Voe-Tx-rLC" id="ngw-Xu-agB"/>
+                        </connections>
+                    </button>
                     <tabView fixedFrame="YES" allowsTruncatedLabels="NO" initialItem="evn-9T-0q2" translatesAutoresizingMaskIntoConstraints="NO" id="WwI-84-sAM">
                         <rect key="frame" x="13" y="51" width="586" height="380"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1902,9 +1934,45 @@ Gw
                                             </popUpButtonCell>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="05Y-TQ-Ihn">
-                                            <rect key="frame" x="29" y="151" width="195" height="17"/>
+                                            <rect key="frame" x="29" y="150" width="197" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Number of Recent Project Files" id="0kE-l3-h7u">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Number of Recent Project Files:" id="0kE-l3-h7u">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NGx-Z2-dEs">
+                                            <rect key="frame" x="230" y="114" width="86" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <popUpButtonCell key="cell" type="push" title="50" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="50" imageScaling="proportionallyDown" inset="2" selectedItem="B4V-Ge-lKH" id="aXk-81-L0c">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" id="07H-7G-lrN">
+                                                    <items>
+                                                        <menuItem title="50" tag="50" id="B4V-Ge-lKH">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="100" tag="100" id="zob-NM-Zdq">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="200" state="on" tag="200" id="ylr-MC-naz"/>
+                                                        <menuItem title="400" tag="400" id="Qlu-xL-Pbv"/>
+                                                        <menuItem title="600" tag="600" id="Byz-YR-AXA"/>
+                                                        <menuItem title="800" tag="800" id="zNf-jC-rkK">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="1000" tag="1000" id="LNm-7q-CKg">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                        </popUpButton>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DGm-4D-cGG">
+                                            <rect key="frame" x="27" y="119" width="199" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Maximum number of list Items:" id="ae3-Fc-LkR">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1915,37 +1983,6 @@ Gw
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2cn-dv-g74">
-                        <rect key="frame" x="516" y="13" width="82" height="32"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="inQ-dV-1t1"/>
-                            <constraint firstAttribute="height" constant="21" id="irk-pc-ZRV"/>
-                        </constraints>
-                        <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atT-lF-uoJ">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="setPrefs:" target="Voe-Tx-rLC" id="J30-GD-E8b"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="K2T-L6-2Zn">
-                        <rect key="frame" x="434" y="13" width="82" height="32"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="H5s-OZ-pA2"/>
-                            <constraint firstAttribute="height" constant="21" id="VYF-Nd-ue9"/>
-                        </constraints>
-                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oGp-Wd-oeQ">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                            <string key="keyEquivalent" base64-UTF8="YES">
-Gw
-</string>
-                        </buttonCell>
-                        <connections>
-                            <action selector="cancelPrefs:" target="Voe-Tx-rLC" id="ngw-Xu-agB"/>
-                        </connections>
-                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="K2T-L6-2Zn" secondAttribute="bottom" constant="20" id="Msr-nI-tC4"/>
@@ -3029,7 +3066,7 @@ Gw
                         <rect key="frame" x="20" y="61" width="572" height="220"/>
                         <clipView key="contentView" id="c85-gn-qg4">
                             <rect key="frame" x="0.0" y="0.0" width="572" height="220"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" rowSizeStyle="automatic" viewBased="YES" id="XO0-WA-HCG">
                                     <rect key="frame" x="0.0" y="0.0" width="572" height="220"/>
