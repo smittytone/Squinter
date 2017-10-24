@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 09/02/2015.
-//  Copyright (c) 2015 Tony Smith. All rights reserved.
+//  Copyright (c) 2015-17 Tony Smith. All rights reserved.
 
 
 #import <Cocoa/Cocoa.h>
@@ -13,14 +13,25 @@
 #import "Constants.h"
 #import "StatusLight.h"
 #import "Project.h"
+#import "Devicegroup.h"
+#import "Model.h"
+#import "File.h"
 #import "BuildAPIAccess.h"
 #import "VDKQueue.h"
 #import "SquinterToolbarItem.h"
 #import "StreamToolbarItem.h"
+#import "LoginToolbarItem.h"
 #import "PDKeychainBindings.h"
 
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSOpenSavePanelDelegate, NSFileManagerDelegate, VDKQueueDelegate, NSToolbarDelegate, NSURLSessionDataDelegate, NSURLSessionTaskDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate,
+								   NSOpenSavePanelDelegate,
+                                   NSFileManagerDelegate,
+                                   VDKQueueDelegate,
+                                   NSToolbarDelegate,
+                                   NSURLSessionDataDelegate,
+                                   NSURLSessionTaskDelegate,
+                                   NSTextFieldDelegate>
 {
     // Main UI element outlets
     
@@ -34,59 +45,75 @@
 
 	// File Menu outlets
 	
+	IBOutlet NSMenu *fileMenu;
 	IBOutlet NSMenuItem *fileSaveMenuItem;
 	IBOutlet NSMenuItem *fileSaveAsMenuItem;
+	IBOutlet NSMenuItem *fileAddFilesMenuItem;
+	IBOutlet NSMenu *openRecentMenu;
     
     // Project Menu outlets
 
-    IBOutlet NSMenu *projectMenu;
-    IBOutlet NSMenuItem *squintMenuItem;
-    IBOutlet NSMenuItem *uploadMenuItem;
-    IBOutlet NSMenuItem *cleanMenuItem;
-    IBOutlet NSMenuItem *projectLinkMenuItem;
-    IBOutlet NSMenuItem *externalOpenMenuItem;
-    IBOutlet NSMenuItem *externalOpenDeviceItem;
-    IBOutlet NSMenuItem *externalOpenAgentItem;
-    IBOutlet NSMenuItem *externalOpenBothItem;
-    IBOutlet NSMenuItem *externalOpenLibItem;
-    IBOutlet NSMenuItem *externalOpenFileItem;
-    IBOutlet NSMenu *projectsMenu;
-    IBOutlet NSMenu *externalLibsMenu;
-    IBOutlet NSMenu *externalCodeMenu;
-    IBOutlet NSMenu *externalFilesMenu;
-	IBOutlet NSMenuItem *copyAgentCodeItem;
-	IBOutlet NSMenuItem *copyDeviceCodeItem;
-	IBOutlet NSMenuItem *checkElectricImpLibrariesItem;
+	IBOutlet NSMenu *projectsMenu;
+	IBOutlet NSMenu *openProjectsMenu;
+	IBOutlet NSMenuItem *renameProjectMenuItem;
+	IBOutlet NSMenuItem *syncProjectMenuItem;
+	IBOutlet NSMenuItem *showProjectInfoMenuItem;
+	IBOutlet NSMenuItem *showProjectFinderMenuItem;
+	IBOutlet NSMenu *productsMenu;
+	IBOutlet NSMenuItem *downloadProductMenuItem;
+	IBOutlet NSMenuItem *linkProductMenuItem;
+	IBOutlet NSMenuItem *deleteProductMenuItem;
+	IBOutlet NSMenuItem *renameProductMenuItem;
 
-    // Models Menu
+    // Device Groups Menu outlets
 
-    IBOutlet NSMenu *mainModelsMenu;
-    IBOutlet NSMenu *modelsMenu;
-    IBOutlet NSMenuItem *showModelInfoMenuItem;
-    IBOutlet NSMenuItem *showModelCodeMenuItem;
-    IBOutlet NSMenuItem *deleteModelMenuItem;
-    IBOutlet NSMenuItem *saveModelProjectMenuItem;
-    IBOutlet NSMenuItem *linkMenuItem;
-    IBOutlet NSMenuItem *renameModelMenuItem;
-    IBOutlet NSMenuItem *assignDeviceModelMenuItem;
-	IBOutlet NSMenuItem *restartDevicesModelMenuItem;
+	IBOutlet NSMenu *deviceGroupsMainMenu;
+	IBOutlet NSMenu *deviceGroupsMenu;
+	IBOutlet NSMenuItem *showDeviceGroupInfoMenuItem;
+	IBOutlet NSMenuItem *listCommitsMenuItem;
+	IBOutlet NSMenuItem *showModelFilesFinderMenuItem;
+	IBOutlet NSMenuItem *restartDeviceGroupMenuItem;
+	IBOutlet NSMenuItem *deleteDeviceGroupMenuItem;
+	IBOutlet NSMenuItem *renameDeviceGroupMenuItem;
+	IBOutlet NSMenuItem *compileMenuItem;
+	IBOutlet NSMenuItem *uploadMenuItem;
+	IBOutlet NSMenuItem *uploadExtraMenuItem;
+	IBOutlet NSMenuItem *removeFilesMenuItem;
+	IBOutlet NSMenuItem *externalOpenMenuItem;
+	IBOutlet NSMenu *externalSourceMenu;
+	IBOutlet NSMenuItem *externalOpenDeviceItem;
+	IBOutlet NSMenuItem *externalOpenAgentItem;
+	IBOutlet NSMenuItem *externalOpenBothItem;
+	IBOutlet NSMenuItem *externalOpenLibsItem;
+	IBOutlet NSMenu *externalLibsMenu;
+	IBOutlet NSMenuItem *externalOpenFileItem;
+	IBOutlet NSMenu *externalFilesMenu;
+	IBOutlet NSMenu *impLibrariesMenu;
+	IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
 
-    // Device Menu outlet
+    // Device Menu outlets
 
-    IBOutlet NSMenu *deviceMenu;
-    IBOutlet NSMenuItem *streamLogsMenuItem;
-    IBOutlet NSMenuItem *refreshMenuItem;
-    IBOutlet NSMenuItem *showSelectedMenuItem;
-    IBOutlet NSMenuItem *copySelectedMenuItem;
-    IBOutlet NSMenuItem *unassignSelectedMenuItem;
-    IBOutlet NSMenuItem *removeSelectedMenuItem;
-    IBOutlet NSMenuItem *getLogsSelectedMenuItem;
-    IBOutlet NSMenuItem *restartSelectedMenuItem;
-	IBOutlet NSMenuItem *renameDeviceMenuItem;
+	IBOutlet NSMenu *deviceMenu;
+	IBOutlet NSMenuItem *showDeviceInfoMenuItem;
+	IBOutlet NSMenuItem *restartDeviceMenuItem;
+	IBOutlet NSMenuItem *copyAgentURLMenuItem;
 	IBOutlet NSMenuItem *openAgentURLMenuItem;
+	IBOutlet NSMenuItem *unassignDeviceMenuItem;
+	IBOutlet NSMenuItem *assignDeviceMenuItem;
+	IBOutlet NSMenuItem *getLogsMenuItem;
+	IBOutlet NSMenuItem *getHistoryMenuItem;
+	IBOutlet NSMenuItem *streamLogsMenuItem;
+	IBOutlet NSMenuItem *renameDeviceMenuItem;
+	IBOutlet NSMenuItem *updateDeviceStatusMenuItem;
+	IBOutlet NSMenuItem *deleteDeviceMenuItem;
+	IBOutlet NSMenu *unassignedDevicesMenu;
+
+	// Account Menu Outlets
+
+	IBOutlet NSMenuItem *loginMenuItem;
 
     // View Menu outlets
-    
+
     IBOutlet NSMenuItem *logDeviceCodeMenuItem;
     IBOutlet NSMenuItem *logAgentCodeMenuItem;
     IBOutlet NSMenuItem *showHideToolbarMenuItem;
@@ -123,8 +150,23 @@
     IBOutlet SquinterToolbarItem *openAgentCode;
     IBOutlet StreamToolbarItem *streamLogsItem;
 	IBOutlet SquinterToolbarItem *refreshModelsItem;
+	IBOutlet SquinterToolbarItem *newDevicegroupItem;
+	IBOutlet SquinterToolbarItem *devicegroupInfoItem;
+	IBOutlet LoginToolbarItem *loginAndOutItem;
+	IBOutlet SquinterToolbarItem *uploadCodeExtraItem;
+	IBOutlet SquinterToolbarItem *listCommitsItem;
+	IBOutlet SquinterToolbarItem *downloadProductItem;
 
 	// Sheets, dialogs and windows
+
+	// Login
+
+	IBOutlet NSPanel *loginSheet;
+	IBOutlet NSTextField *usernameTextField;
+	IBOutlet NSSecureTextField *passwordTextField;
+	IBOutlet NSSecureTextFieldCell *passwordTextFieldCell;
+	IBOutlet NSButton *saveDetailsCheckbox;
+	IBOutlet NSButton *showPassCheckbox;
     
     // Open
     
@@ -132,12 +174,7 @@
     IBOutlet NSView *accessoryView;
     IBOutlet NSButton *accessoryViewNewProjectCheckbox;
 
-    IBOutlet NSButton *newProjectAccessoryViewFilesCheckbox;
-    IBOutlet NSButton *newProjectAccessoryViewOpenCheckbox;
-    IBOutlet NSButton *newProjectAccessoryViewAssociateCheckbox;
-    IBOutlet NSButton *newProjectAccessoryViewNewModel;
-
-	IBOutlet NSView *projectFromFilesAccessoryView;
+    IBOutlet NSView *projectFromFilesAccessoryView;
 	IBOutlet NSButton *projectFromFilesAccessoryViewCheckbox;
 	IBOutlet NSButton *projectFromFilesAccessoryViewLocCheckbox;
     
@@ -146,18 +183,47 @@
     NSSavePanel *saveProjectDialog;
     IBOutlet id saveChangesSheet;
     IBOutlet NSTextField *saveChangesSheetLabel;
-	BOOL closeProjectFlag;
+	IBOutlet NSView *saveDevicegroupFilesAccessoryView;
+	IBOutlet NSButton *saveDevicegroupFilesAccessoryViewCheckbox;
     
     // New Project
     
     IBOutlet NSPanel *newProjectSheet;
-    IBOutlet NSTextField *newProjectTextField;
+    IBOutlet NSTextField *newProjectNameTextField;
+	IBOutlet NSTextField *newProjectNameCountField;
+	IBOutlet NSTextField *newProjectDescTextField;
+	IBOutlet NSTextField *newProjectDescCountField;
     IBOutlet NSTextField *newProjectLabel;
-    IBOutlet NSTextField *newProjectDirLabel;
+	IBOutlet NSButton *newProjectAssociateCheckbox;
+	IBOutlet NSButton *newProjectNewProductCheckbox;
+
+	// Rename Project/Device Group
 
 	IBOutlet NSPanel *renameProjectSheet;
-	IBOutlet NSTextField *renameProjectTextField;
 	IBOutlet NSTextField *renameProjectLabel;
+	IBOutlet NSTextField *renameProjectTextField;
+	IBOutlet NSTextField *renameProjectCountField;
+	IBOutlet NSTextField *renameProjectDescTextField;
+	IBOutlet NSTextField *renameProjectDescCountField;
+	IBOutlet NSButton *renameProjectLinkCheckbox;
+	IBOutlet NSTextField *renameProjectHintField;
+
+	// Sync Project
+
+	IBOutlet NSPanel *syncProjectSheet;
+	IBOutlet NSProgressIndicator *syncProjectProgress;
+	IBOutlet NSTextField *syncProjectLabel;
+
+	// New Device Group
+
+	IBOutlet NSPanel *newDevicegroupSheet;
+	IBOutlet NSTextField *newDevicegroupLabel;
+	IBOutlet NSTextField *newDevicegroupNameTextField;
+	IBOutlet NSTextField *newDevicegroupNameCountField;
+	IBOutlet NSTextField *newDevicegroupDescTextField;
+	IBOutlet NSTextField *newDevicegroupDescCountField;
+	IBOutlet NSButton *newDevicegroupCheckbox;
+	IBOutlet NSPopUpButton *newDevicegroupTypeMenu;
     
     // About
     
@@ -168,19 +234,21 @@
     
     IBOutlet id preferencesSheet;
     IBOutlet NSTextField *workingDirectoryField;
-    NSString *workingDirectory;
     IBOutlet NSButton *preserveCheckbox;
 	IBOutlet NSButton *autoCompileCheckbox;
-	IBOutlet NSSecureTextField *akTextField;
 	IBOutlet NSButton *loadModelsCheckbox;
+	IBOutlet NSButton *loadDevicesCheckbox;
     IBOutlet NSPopUpButton *fontsMenu;
     IBOutlet NSPopUpButton *sizeMenu;
     IBOutlet NSColorWell *textColorWell;
     IBOutlet NSColorWell *backColorWell;
-	IBOutlet NSButton *autoSelectDeviceCheckbox;
 	IBOutlet NSButton *autoUpdateCheckCheckbox;
+	IBOutlet NSButton *autoLoadListsCheckbox;
 	IBOutlet NSButton *boldTestCheckbox;
 	IBOutlet NSPopUpButton *locationMenu;
+	IBOutlet NSPopUpButton *recentFilesCountMenu;
+	IBOutlet NSPopUpButton *maxLogCountMenu;
+	IBOutlet NSButton *azureCheckbox;
 
 	// Assign Device
 
@@ -196,137 +264,196 @@
     IBOutlet NSTextField *renameLabel;
     IBOutlet NSPopUpButton *renameMenu;
     IBOutlet NSTextField *renameName;
+	IBOutlet NSTextField *renameNameLength;
+
+	// Agent or Device?
+
+	IBOutlet NSPanel *sourceTypeSheet;
+	IBOutlet NSTextField *sourceTypeLabel;
+	IBOutlet NSButton *sourceTypeAgentButton;
+	IBOutlet NSButton *sourceTypeDeviceButton;
+
+	// Upload Code
+
+	IBOutlet NSPanel *uploadSheet;
+	IBOutlet NSTabView *uploadTab;
+	IBOutlet NSTextField *uploadCommitTextField;
+	IBOutlet NSTextField *uploadCommitCountField;
+	IBOutlet NSTextField *uploadOriginTextField;
+	IBOutlet NSTextField *uploadOriginCountField;
+	IBOutlet NSTextField *uploadTagsTextField;
+	IBOutlet NSTextField *uploadTagsCountField;
 
 	// Connection Variables
     
     BuildAPIAccess *ide;
-    NSString *errorMessage;
-    NSString *statusMessage;
 
-    // File tracking
-
-    VDKQueue *fileWatchQueue;
-
-	// Models
-
-	NSInteger currentModel, currentDevice;
-	Project *savingProject;
-	
-	// Update Tracking
+    // Update Tracking
 	
 	IBOutlet SUUpdater *sparkler; 
 
-	// Project variables
+	Project *currentProject, *creatingProject, *savingProject;
+	Devicegroup *currentDevicegroup;
 
-	NSMutableArray *projectArray;
-	NSMutableDictionary *projectDefines;
-	Project *currentProject;
-	NSString *currentAgentCode, *currentDeviceCode, *toDelete, *itemToCreate;
-    NSInteger currentDeviceLibCount, currentAgentLibCount;
-    
-	// Misc
-	
-	NSUInteger reDeviceIndex, reModelIndex;
-    NSUInteger filesMenuAgentStart, filesMenuDevStart, logPaddingLength;
+	VDKQueue *fileWatchQueue;
 
-	BOOL noProjectsFlag, noLibsFlag, sureSheetResult, newModelFlag, autoRenameFlag, showCodeFlag;
-	BOOL streamFlag, menuValid, restartFlag, fromDeviceSelectFlag, saveProjectSubFilesFlag;
-    BOOL isLightThemeFlag, unassignDeviceFlag, requiresAllowedAnywhereFlag;
-	BOOL checkModelsFlag, newProjectFlag;
+	NSOperatingSystemVersion sysVer;
 
-    NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors;
+	NSWorkspace *nswsw;
+	NSFileManager *nsfm;
+	NSNotificationCenter *nsncdc;
+	NSUserDefaults *defaults;
 
-    NSDateFormatter *def;
-
-    NSColor *backColour, *textColour;
+	NSDateFormatter *def, *logDef;
 
 	NSOperationQueue *extraOpQueue;
-	NSString *listString;
 
-	NSDictionary *cDevice, *cModel;
+	NSMenu *dockMenu;
+
+	NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
+	NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
+
+	NSMutableDictionary *selectedProduct, *selectedDevice;
 
 	NSURLSessionTask *eiLibListTask;
 	NSMutableData *eiLibListData;
 	NSDate *eiLibListTime;
 
-	NSOperatingSystemVersion sysVer;
+	NSColor *backColour, *textColour;
+
+	NSString *workingDirectory, *listString, *newDevicegroupName;
+
+	NSUInteger syncItemCount, logPaddingLength;
+
+	BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag;
+	BOOL loginFlag, renameProjectFlag, saveAsFlag, stale;
 }
 
 
 @property (assign) IBOutlet NSWindow *window;
 
+// Dock Menu Methods
+
+- (void)dockMenuAction:(id)sender;
+
+// Login Methods
+
+- (IBAction)loginOrOut:(id)sender;
+- (void)autoLogin;
+- (void)showLoginWindow;
+- (void)setLoginCreds;
+- (IBAction)cancelLogin:(id)sender;
+- (IBAction)login:(id)sender;
+- (IBAction)setSecureEntry:(id)sender;
 
 // New Project Methods
 
 - (IBAction)newProject:(id)sender;
 - (IBAction)newProjectSheetCancel:(id)sender;
 - (IBAction)newProjectSheetCreate:(id)sender;
+- (IBAction)newProjectCheckboxStateHandler:(id)sender;
 
-// Choose and Open Project Methods
+// Existing Project Methods
 
-- (void)chooseProject:(id)sender;
 - (IBAction)pickProject:(id)sender;
+- (void)chooseProject:(id)sender;
 - (IBAction)openProject:(id)sender;
-- (IBAction)selectFile:(id)sender;
-- (IBAction)selectFileForProject:(id)sender;
-- (void)presentOpenFilePanel:(NSInteger)openActionType;
-
-- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
-- (void)processAddedFiles:(NSArray *)urls :(NSUInteger)count;
-- (void)processAddedDeviceFile:(NSString *)filePath;
-- (void)processAddedAgentFile:(NSString *)filePath;
-- (void)processAddedNewProject;
-- (void)processAddedNewProjectStageTwo;
-- (void)renameProject;
+- (IBAction)closeProject:(id)sender;
+- (void)renameProject:(id)sender;
+- (IBAction)renameCurrentProject:(id)sender;
 - (IBAction)closeRenameProjectSheet:(id)sender;
 - (IBAction)saveRenameProjectSheet:(id)sender;
+- (IBAction)doSync:(id)sender;
+- (void)uploadProject:(Project *)project;
+- (void)syncProject:(Project *)project;
+- (IBAction)cancelSync:(id)sender;
+- (IBAction)openRecent:(id)sender;
+- (IBAction)clearRecent:(id)sender;
+- (void)openRecentAll;
+- (void)addToRecentMenu:(NSString *)filename :(NSString *)path;
 
-- (void)openSquirrelProjects:(NSArray *)urls :(NSInteger)count;
-- (NSInteger)compareVersion:(NSString *)newVersion :(NSString *)oldVersion;
-- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName;
+// Product Methods
+
+- (void)chooseProduct:(id)sender;
+- (IBAction)getProductsFromServer:(id)sender;
+- (IBAction)deleteProduct:(id)sender;
+- (IBAction)downloadProduct:(id)sender;
+- (IBAction)linkProjectToProduct:(id)sender;
+
+// New Device Group Methods
+
+- (IBAction)newDevicegroup:(id)sender;
+- (IBAction)newDevicegroupSheetCancel:(id)sender;
+- (IBAction)newDevicegroupSheetCreate:(id)sender;
+- (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype;
+- (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action;
+
+// Existing Device Group methods
+
+- (void)chooseDevicegroup:(id)sender;
+- (IBAction)deleteDevicegroup:(id)sender;
+- (IBAction)renameDevicegroup:(id)sender;
+- (IBAction)uploadCode:(id)sender;
+- (IBAction)uploadCodeExtraCancel:(id)sender;
+- (IBAction)uploadCodeExtraSkip:(id)sender;
+- (IBAction)uploadCodeExtraUpload:(id)sender;
+- (IBAction)removeSource:(id)sender;
+
+// Existing Device Methods
+
+- (void)selectDevice;
+- (IBAction)updateDevicesStatus:(id)sender;
+- (IBAction)restartDevice:(id)sender;
+- (IBAction)restartDevices:(id)sender;
+- (IBAction)unassignDevice:(id)sender;
+- (IBAction)assignDevice:(id)sender;
+- (IBAction)assignDeviceSheetCancel:(id)sender;
+- (IBAction)assignDeviceSheetAssign:(id)sender;
+- (IBAction)renameDevice:(id)sender;
+- (IBAction)closeRenameSheet:(id)sender;
+- (IBAction)saveRenameSheet:(id)sender;
+- (IBAction)chooseDevice:(id)sender;
+- (IBAction)deleteDevice:(id)sender;
+- (IBAction)getLogs:(id)sender;
+
+// File Location, Opening Methods
+
+- (void)presentOpenFilePanel:(NSInteger)openActionType;
+- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
+- (void)openSquirrelProjects:(NSMutableArray *)urls;
+
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
+- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orName;
+- (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName;
 - (BOOL)checkFile:(NSString *)filePath;
-- (void)presentUpdateAlert:(NSArray *)urls :(NSInteger)count :(Project *)aProject;
+
+- (IBAction)selectFile:(id)sender;
+- (IBAction)newDevicegroupCheckboxHander:(id)sender;
+- (void)processAddedFiles:(NSMutableArray *)urls;
+- (void)processAddedFilesStageTwo:(NSMutableArray *)urls :(NSString *)fileType;
+- (IBAction)endSourceTypeSheet:(id)sender;
+- (IBAction)cancelSourceTypeSheet:(id)sender;
 
 // Save Project Methods
 
+- (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName;
 - (IBAction)saveProjectAs:(id)sender;
 - (IBAction)saveProject:(id)sender;
-- (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName;
 - (IBAction)cancelChanges:(id)sender;
 - (IBAction)ignoreChanges:(id)sender;
 - (IBAction)saveChanges:(id)sender;
-
-// Close Project Methods
-
-- (IBAction)closeProject:(id)sender;
+- (void)saveModelFiles:(Project *)project;
+- (void)saveFiles:(NSMutableArray *)files;
 
 // Squint Methods
 
-- (IBAction)squint:(id)sender;
-- (void)squintr;
-- (void)processLibraries;
-- (void)addFileWatchPaths:(NSArray *)paths;
-- (NSString *)processSource:(NSString *)codePath :(NSUInteger)codeType :(BOOL)willReturnCode;
+- (void)compile:(Devicegroup *)devicegroup :(BOOL)doCheck;
+- (NSString *)processSource:(NSString *)codePath :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode;
+- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode;
 - (void)processRequires:(NSString *)sourceCode;
-- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(BOOL)willReturnCode;
-- (NSString *)processDefines:(NSString *)sourceCode :(NSInteger)codeType;
+- (void)processLibraries:(Model *)model;
 - (NSUInteger)getLineNumber:(NSString *)code :(NSInteger)index;
 - (NSString *)getLibraryVersionNumber:(NSString *)libcode;
-
-// Library and Project Menu Methods
-
-- (IBAction)cleanProject:(id)sender;
-- (void)cleanProjectTwo;
-- (void)updateLibraryMenu;
-- (void)libAdder:(NSArray *)keyArray;
-- (void)addLibraryToMenu:(NSString *)libName :(BOOL)isEILib;
-- (void)updateFilesMenu;
-- (void)fileAdder:(NSArray *)keyArray;
-- (void)addFileToMenu:(NSString *)filename;
-- (NSString *)getLibraryTitle:(id)item;
-- (void)launchLibsPage;
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
 
 // Pasteboard Methods
 
@@ -334,83 +461,118 @@
 - (IBAction)copyAgentCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentURL:(id)sender;
 
-// Model and Device Methods
+// API Response Handler Methods
 
-- (IBAction)getProjectsFromServer:(id)sender;
-- (void)getApps;
-- (void)listModels;
-- (void)chooseModel:(id)sender;
-- (IBAction)modelToProjectStageOne:(id)sender;
-- (void)modelToProjectStageTwo;
-- (void)createdModel;
-- (IBAction)uploadCode:(id)sender;
-- (void)uploadCodeStageTwo;
-- (IBAction)refreshDevices:(id)sender;
-- (void)listDevices;
-- (IBAction)chooseDevice:(id)sender;
-// - (void)setCurrentDeviceFromSelection:(id)sender;
-- (IBAction)restartDevice:(id)sender;
-- (IBAction)restartDevices:(id)sender;
-- (void)restarted;
-- (IBAction)assignProject:(id)sender;
-- (IBAction)assignDevice:(id)sender;
-- (IBAction)assignDeviceSheetCancel:(id)sender;
-- (IBAction)assignDeviceSheetAssign:(id)sender;
-- (void)reassigned;
-- (IBAction)deleteModel:(id)sender;
-- (void)deleteModelStageTwo;
-- (IBAction)deleteDevice:(id)sender;
-- (void)deleteDeviceStageTwo;
-- (IBAction)renameModel:(id)sender;
-- (void)renameModelStageTwo;
-- (IBAction)renameDevice:(id)sender;
-- (IBAction)closeRenameSheet:(id)sender;
-- (IBAction)saveRenameSheet:(id)sender;
-- (void)renameDeviceStageTwo;
-- (IBAction)unassignDevice:(id)sender;
+- (void)listProducts:(NSNotification *)note;
+- (void)productToProjectStageTwo:(NSNotification *)note;
+- (void)productToProjectStageThree:(NSNotification *)note;
+- (void)productToProjectStageFour:(Project *)project;
+- (void)createProductStageTwo:(NSNotification *)note;
+- (void)deleteProductStageTwo:(NSMutableDictionary *)dict;
+- (void)deleteProductStageThree:(NSNotification *)note;
+- (void)updateProductStageTwo:(NSNotification *)note;
+- (void)updateDevicegroupStageTwo:(NSNotification *)note;
+- (void)deleteDevicegroupStageTwo:(NSNotification *)note;
+- (void)listDevices:(NSNotification *)note;
+- (void)createDevicegroupStageTwo:(NSNotification *)note;
+- (void)uploadProjectStageThree:(Project *)project;
+- (void)restarted:(NSNotification *)note;
+- (void)reassigned:(NSNotification *)note;
+- (void)renameDeviceStageTwo:(NSNotification *)note;
+- (void)deleteDeviceStageTwo:(NSNotification *)note;
+- (void)uploadCodeStageTwo:(NSNotification *)note;
+- (void)loggedIn:(NSNotification *)note;
 
 // API Log methods
 
-- (IBAction)getLogs:(id)sender;
+- (void)listCommits:(NSNotification *)note;
 - (void)listLogs:(NSNotification *)note;
 - (void)logLogs:(NSString *)logLine;
 - (void)parseLog;
 - (IBAction)printLog:(id)sender;
-- (void)printDone;
+- (void)printDone:(NSPrintOperation *)printOperation  success:(BOOL)success  contextInfo:(void *)contextInfo;
 - (IBAction)streamLogs:(id)sender;
+- (void)loggingStarted:(NSNotification *)note;
+- (void)loggingStopped:(NSNotification *)note;
 - (void)presentLogEntry:(NSNotification *)note;
 - (void)endLogging:(NSNotification *)note;
-- (IBAction)showAppCode:(id)sender;
-- (void)listCode:(NSString *)code :(NSInteger)from :(NSInteger)to :(NSInteger)at;
 - (void)logCode;
 
 // Squinter Log Methods
 
-- (IBAction)getProjectInfo:(id)sender;
-- (NSString *)getDisplayPath:(NSString *)path;
+- (IBAction)showProjectInfo:(id)sender;
+- (IBAction)showDeviceGroupInfo:(id)sender;
+- (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines;
+- (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines;
 - (IBAction)showDeviceInfo:(id)sender;
-- (void)printInfoInLog:(NSMutableArray *)lines;
-- (IBAction)showModelInfo:(id)sender;
 - (IBAction)logDeviceCode:(id)sender;
 - (IBAction)logAgentCode:(id)sender;
-- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp;
-- (void)writeStreamToLog:(NSAttributedString *)string;
 - (IBAction)clearLog:(id)sender;
-- (void)displayError;
-- (void)listCodeErrors:(NSString *)code :(NSString *)codeKind;
+- (void)printInfoInLog:(NSMutableArray *)lines;
+- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp;
+- (void)writeErrorToLog:(NSString *)string :(BOOL)addTimestamp;
+- (void)writeStyledToLog:(NSAttributedString *)string :(BOOL)addTimestamp;
+- (void)showCodeErrors:(NSNotification *)note;
+- (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
 
-// Model and Device ID Look-up Methods
 
-- (NSString *)getDeviceID:(NSInteger)index;
-- (NSString *)getModelID:(NSInteger)index;
+- (NSString *)getDisplayPath:(NSString *)path;
+- (void)writeStreamToLog:(NSAttributedString *)string;
 
-// External Editor Methods
 
-- (IBAction)externalOpen:(id)sender;
-- (IBAction)externalLibOpen:(id)sender;
-- (IBAction)externalFileOpen:(id)sender;
-- (IBAction)externalOpenAll:(id)sender;
-- (IBAction)openAgentURL:(id)sender;
+- (void)displayError:(NSNotification *)note;
+
+// UI Update Methods
+
+- (void)refreshProjectsMenu;
+- (void)refreshOpenProjectsMenu;
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
+- (void)refreshProductsMenu;
+- (void)refreshDevicegroupMenu;
+- (void)refreshMainDevicegroupsMenu;
+- (void)defaultExternalMenus;
+- (void)refreshDevicesMenus;
+- (void)refreshDeviceMenu;
+- (void)refreshDevicesPopup;
+- (void)refreshUnassignedDevicesMenu;
+- (void)refreshViewMenu;
+- (void)updateDeviceLists;
+- (void)refreshRecentFilesMenu;
+
+// Imported Library and File List Methods
+
+- (void)refreshLibraryMenus;
+- (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib;
+- (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive;
+- (NSString *)menuString:(NSMutableDictionary *)device;
+- (void)refreshFilesMenu;
+- (void)fileAdder:(NSMutableArray *)models;
+- (void)addFileToMenu:(NSString *)filename :(BOOL)isActive;
+- (void)launchLibsPage;
+
+// Toolbar Update Methods
+
+- (void)setToolbar;
+
+// Logging Area Methods
+
+- (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
+- (void)setColours;
+- (void)setLoggingColours;
+- (NSInteger)perceivedBrightness:(NSColor *)colour;
+
+// Progress Methods
+
+- (void)startProgress;
+- (void)stopProgress;
+
+// About and Help Sheet Methods
+
+- (IBAction)showAboutSheet:(id)sender;
+- (IBAction)viewSquinterSite:(id)sender;
+- (IBAction)closeAboutSheet:(id)sender;
+- (IBAction)showHideToolbar:(id)sender;
+- (IBAction)showAuthor:(id)sender;
 
 // Preferences Methods
 
@@ -423,52 +585,40 @@
 - (void)showPanelForText;
 - (void)showPanelForBack;
 
-// About and Help Sheet Methods
-
-- (IBAction)showAboutSheet:(id)sender;
-- (IBAction)closeAboutSheet:(id)sender;
-- (IBAction)showHideToolbar:(id)sender;
-- (IBAction)showAuthor:(id)sender;
-
-// UI Update Methods
-
-- (void)updateMenus;
-- (void)setDeviceMenu;
-- (void)setModelsMenu;
-- (void)setProjectMenu;
-- (void)setViewMenu;
-- (void)setProjectLists;
-- (void)updateDeviceLists;
-- (NSString *)menuString:(NSString *)deviceID;
-- (void)setToolbar;
-- (void)setColours;
-- (void)setLoggingColours;
-- (NSInteger)perceivedBrightness:(NSColor *)colour;
-- (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
-
-// Progress Methods
-
-- (void)startProgress;
-- (void)stopProgress;
-
-// Misc
-
-- (NSData *)bookmarkForURL:(NSURL *)url;
-- (NSURL *)urlForBookmark:(NSData *)bookmark;
-
 // Library Checking
 
 - (IBAction)checkElectricImpLibraries:(id)sender;
 - (void)checkElectricImpLibs;
 - (void)compareElectricImpLibs;
 
+// External Editor Methods
+
+- (IBAction)externalOpen:(id)sender;
+- (void)switchToEditor:(Model *)model;
+- (IBAction)externalLibOpen:(id)sender;
+- (IBAction)externalFileOpen:(id)sender;
+- (IBAction)externalOpenAll:(id)sender;
+- (IBAction)openAgentURL:(id)sender;
+- (IBAction)showProjectInFinder:(id)sender;
+- (IBAction)showModelFilesInFinder:(id)sender;
+
 // File Path Methods
 
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
+- (NSInteger)numberOfFoldersInPath:(NSString *)path;
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
-- (void)updateProject:(Project *)project;
 - (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath;
+- (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath;
+
+// Utility Methods
+
+- (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;
+- (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
+- (Project *)getParentProject:(Devicegroup *)devicegroup;
+- (NSDate *)convertTimestring:(NSString *)dateString;
+- (NSString *)getErrorMessage:(NSUInteger)index;
+- (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces;
 
 
 @end

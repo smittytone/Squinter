@@ -11,37 +11,53 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
 {
+	//NSDocumentController *sc = [NSDocumentController sharedDocumentController];
+	//[sc clearRecentDocuments:self];
+
 	// Set up stock date formatter
 
     def = [[NSDateFormatter alloc] init];
-    def.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+    def.dateFormat = @"yyyy-MM-dd HH:mm:ss ZZZZZ";
+	def.timeZone = [NSTimeZone localTimeZone];
+
+	logDef = [[NSDateFormatter alloc] init];
+	logDef.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZZ"; // @"yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'";
+	logDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
 
     // Initialize app properties
+	// NOTE 'currentXXX' indicates a selected Squinter object
+	//      'selectedXXX' indicates a selected API object
 
+	currentProject = nil;
+	currentDevicegroup = nil;
+	selectedProduct = nil;
+	selectedDevice = nil;
+	projectArray = nil;
+	devicesArray = nil;
+	productsArray = nil;
+	downloads = nil;
 	ide = nil;
-	reDeviceIndex = -1;
-    reModelIndex = -1;
-    currentDevice = -1;
-    currentModel = -1;
-	logPaddingLength = 0;
-    sureSheetResult = NO;
-    newModelFlag = NO;
-    streamFlag = NO;
-    autoRenameFlag = NO;
-    showCodeFlag = NO;
-    restartFlag = NO;
-    fromDeviceSelectFlag = NO;
-    projectArray = nil;
-    currentProject = nil;
-    noProjectsFlag = YES;
-    noLibsFlag = YES;
-	saveProjectSubFilesFlag = NO;
-    unassignDeviceFlag = NO;
-	requiresAllowedAnywhereFlag = NO;
-	checkModelsFlag = NO;
+	dockMenu = nil;
+
 	eiLibListData = nil;
 	eiLibListTask = nil;
 	eiLibListTime = nil;
+
+	newDevicegroupName = nil;
+
+	newDevicegroupFlag = NO;
+	deviceSelectFlag = NO;
+	renameProjectFlag = NO;
+	saveAsFlag = YES;
+	stale = NO;
+
+	syncItemCount = 0;
+	logPaddingLength = 0;
+
+	nswsw = NSWorkspace.sharedWorkspace;
+	nsfm = NSFileManager.defaultManager;
+	nsncdc = NSNotificationCenter.defaultCenter;
+	defaults = NSUserDefaults.standardUserDefaults;
 
     // Initialize colours
 
@@ -60,128 +76,143 @@
 
 	// Hide the Dictation and Emoji items in the Edit menu
 	
-	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"NSDisabledDictationMenuItem"];
-	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"NSDisabledCharacterPaletteMenuItem"];
-	
+	[defaults setBool:YES forKey:@"NSDisabledDictationMenuItem"];
+	[defaults setBool:YES forKey:@"NSDisabledCharacterPaletteMenuItem"];
+
+	// File Menu
+
+	fileMenu.autoenablesItems = NO;
+	openRecentMenu.autoenablesItems = NO;
+
+	[self refreshRecentFilesMenu];
+
 	// Projects Menu
 
-    projectMenu.autoenablesItems = NO;
-    squintMenuItem.enabled = NO;
-    uploadMenuItem.enabled = NO;
-    cleanMenuItem.enabled = NO;
-    projectLinkMenuItem.enabled = NO;
-    externalCodeMenu.autoenablesItems = NO;
-    externalOpenAgentItem.enabled = NO;
-    externalOpenDeviceItem.enabled = NO;
-    externalOpenBothItem.enabled = NO;
-	copyAgentCodeItem.enabled = NO;
-	copyDeviceCodeItem.enabled = NO;
+    projectsMenu.autoenablesItems = NO;
 
-    // Models Menu
+	[self refreshOpenProjectsMenu];
+	[self refreshProjectsMenu];
+	[self refreshProductsMenu];
 
-    mainModelsMenu.autoenablesItems = NO;
-    modelsMenu.autoenablesItems = NO;
-    linkMenuItem.enabled = NO;
-    saveModelProjectMenuItem.enabled = NO;
-    showModelInfoMenuItem.enabled = NO;
-    deleteModelMenuItem.enabled = NO;
-    assignDeviceModelMenuItem.enabled = NO;
-    renameModelMenuItem.enabled = NO;
-    showModelCodeMenuItem.enabled = NO;
-	restartDevicesModelMenuItem.enabled = NO;
-    
-    [modelsMenu removeAllItems];
-    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
-    [modelsMenu addItem:item];
-    item.enabled = NO;
+	// Device Groups Menu
 
-    // Device Menu
+	externalSourceMenu.autoenablesItems = NO;
 
-    refreshMenuItem.enabled = YES;
+	[self refreshDevicegroupMenu];
+	[self refreshMainDevicegroupsMenu];
+	[self refreshLibraryMenus];
+	[self refreshFilesMenu];
+
+	// Device Menu
+
 	deviceMenu.autoenablesItems = NO;
 
-    for (item in deviceMenu.itemArray) item.enabled = NO;
+	[self refreshDeviceMenu];
+	[self refreshDevicesPopup];
+
+	// NOTE refreshDevicegroupMenu: calls refreshDevicesMenus:
+	// NOTE refreshDevicesPopup: calls refreshUnassignedDevices:
 
     // View Menu
 
     showHideToolbarMenuItem.title = @"Hide Toolbar";
-    logDeviceCodeMenuItem.enabled = NO;
-    logAgentCodeMenuItem.enabled = NO;
+	// NOTE refreshMainDevicegroupsMenu: calls refreshViewMenu:
 
     // Toolbar
 
-    squintItem.onImageName = @"compile";
-    squintItem.offImageName = @"compile_grey";
+    squintItem.onImageName = @"black_compile";
+    squintItem.offImageName = @"black_compile_grey";
 	squintItem.toolTip = @"Compile libraries and files into agent and device code for uploading.";
-    newProjectItem.onImageName = @"new";
-    newProjectItem.offImageName = @"new_grey";
+
+	newProjectItem.onImageName = @"plus";
+    newProjectItem.offImageName = @"plus_grey";
 	newProjectItem.toolTip = @"Create a new Squinter project.";
-    infoItem.onImageName = @"info";
+
+	infoItem.onImageName = @"info";
     infoItem.offImageName = @"info_grey";
 	infoItem.toolTip = @"Display detailed project information.";
-    openAllItem.onImageName = @"open";
+
+	openAllItem.onImageName = @"open";
     openAllItem.offImageName = @"open_grey";
-	openAllItem.toolTip = @"View the project's code and library files in your external editor.";
-    viewDeviceCode.onImageName = @"open";
+	openAllItem.toolTip = @"View the device group's code and library files in your external editor.";
+
+	viewDeviceCode.onImageName = @"open";
     viewDeviceCode.offImageName = @"open_grey";
-	viewDeviceCode.toolTip = @"Display the compiled device code.";
-    viewAgentCode.onImageName = @"open";
+	viewDeviceCode.toolTip = @"Display the device group's compiled device code.";
+
+	viewAgentCode.onImageName = @"open";
     viewAgentCode.offImageName = @"open_grey";
-	viewAgentCode.toolTip = @"Display the compiled agent code.";
-    uploadCodeItem.onImageName = @"upload";
-    uploadCodeItem.offImageName = @"upload_grey";
-	uploadCodeItem.toolTip = @"Upload the compiled project code to the Electric Imp Cloud.";
-    restartDevicesItem.onImageName = @"restart";
+	viewAgentCode.toolTip = @"Display the device group's compiled agent code.";
+
+	uploadCodeItem.onImageName = @"upload2";
+    uploadCodeItem.offImageName = @"upload2_grey";
+	uploadCodeItem.toolTip = @"Upload the device group's compiled code to the impCloud.";
+
+	uploadCodeExtraItem.onImageName = @"uploadplus";
+	uploadCodeExtraItem.offImageName = @"uploadplus_grey";
+	uploadCodeExtraItem.toolTip = @"Upload the device group's compiled code and commit information to the impCloud.";
+
+	restartDevicesItem.onImageName = @"restart";
     restartDevicesItem.offImageName = @"restart_grey";
-	restartDevicesItem.toolTip = @"Force all devices running the project code to reboot.";
-    clearItem.onImageName = @"clear";
+	restartDevicesItem.toolTip = @"Force all devices running the device group's code to reboot.";
+
+	clearItem.onImageName = @"clear";
     clearItem.offImageName = @"clear_grey";
 	clearItem.toolTip = @"Clear the log window.";
-    copyAgentItem.onImageName = @"copy";
+
+	copyAgentItem.onImageName = @"copy";
     copyAgentItem.offImageName = @"copy_grey";
-	copyAgentItem.toolTip = @"Copy the compiled agent code to the clipboard.";
-    copyDeviceItem.onImageName = @"copy";
+	copyAgentItem.toolTip = @"Copy the device group's compiled agent code to the clipboard.";
+
+	copyDeviceItem.onImageName = @"copy";
     copyDeviceItem.offImageName = @"copy_grey";
-	copyDeviceItem.toolTip = @"Copy the compiled device code to the clipboard.";
-    printItem.onImageName = @"print";
+	copyDeviceItem.toolTip = @"Copy the device group's compiled device code to the clipboard.";
+
+	printItem.onImageName = @"print";
     printItem.offImageName = @"print_grey";
-	printItem.toolTip = @"Print the contents of thelog window.";
+	printItem.toolTip = @"Print the contents of the log window.";
+
 	refreshModelsItem.onImageName = @"refresh";
 	refreshModelsItem.offImageName = @"refresh_grey";
-	refreshModelsItem.toolTip = @"Refresh the lists of models and devices from the server";
+	refreshModelsItem.toolTip = @"Refresh the list of devices from the impCloud.";
 
-	streamLogsItem.onImageName = @"flag";
-    streamLogsItem.offImageName = @"streamon";
-	streamLogsItem.onImageNameGrey = @"flag_grey";
-	streamLogsItem.offImageNameGrey = @"streamon_grey";
+	newDevicegroupItem.onImageName = @"plus";
+	newDevicegroupItem.offImageName = @"plus_grey";
+	newDevicegroupItem.toolTip = @"Create a new device group for your selected project.";
+
+	devicegroupInfoItem.onImageName = @"info";
+	devicegroupInfoItem.offImageName = @"info_grey";
+	devicegroupInfoItem.toolTip = @"Display detailed device group information";
+
+	//streamLogsItem.onImageName = @"flag";
+    //streamLogsItem.offImageName = @"streamon";
+	//streamLogsItem.onImageNameGrey = @"flag_grey";
+	//streamLogsItem.offImageNameGrey = @"streamon_grey";
     streamLogsItem.toolTip = @"Enable or disable live log streaming for the current device.";
-	streamLogsItem.isOn = NO;
+	streamLogsItem.state = kStreamToolbarItemStateOff;
+
+	loginAndOutItem.openImageName = @"logout";
+	loginAndOutItem.lockedImageName = @"login";
+	loginAndOutItem.openImageNameGrey = @"logout_grey";
+	loginAndOutItem.lockedImageNameGrey = @"login_grey";
+	loginAndOutItem.toolTip = @"Login or logout of your Electric Imp account";
+	loginAndOutItem.isLocked = YES;
+
+	listCommitsItem.onImageName = @"commits";
+	listCommitsItem.offImageName = @"commits_grey";
+	listCommitsItem.toolTip = @"List the commits made to the current device group.";
+
+	downloadProductItem.onImageName = @"download";
+	downloadProductItem.offImageName = @"download_grey";
+	downloadProductItem.toolTip = @"Download the selected product as a project.";
 
 	// Other UI Items
     
     connectionIndicator.hidden = YES;
 	
-	[projectsMenu removeAllItems];
-    [externalLibsMenu removeAllItems];
-
-    [projectsPopUp removeAllItems];
-    [projectsPopUp addItemWithTitle:@"None"];
-    projectsPopUp.enabled = NO;
-
-    [devicesPopUp removeAllItems];
-    [devicesPopUp addItemWithTitle:@"None"];
-    devicesPopUp.enabled = NO;
-
-    item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
-    [externalLibsMenu addItem:item];
-    [item setEnabled:NO];
-
-    item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
-    [projectsMenu addItem:item];
-    [item setEnabled:NO];
-
-    [saveLight setFull:YES];
-    [saveLight setLight:NO];
+	[saveLight hide];
+    [saveLight needSave:NO];
+	[_window setDocumentEdited:NO];
 
 	// Set the log NSTextView only to check for embedded URLs
 
@@ -189,25 +220,77 @@
 
     // Set initial working directory to user's Documents folder - this may be changed when we read in the defaults
 
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSURL *dirURL = [fm URLForDirectory:NSDocumentDirectory
-                               inDomain:NSUserDomainMask
-                      appropriateForURL:nil
-                                 create:NO
-                                  error:nil];
+    NSURL *dirURL = [nsfm URLForDirectory:NSDocumentDirectory
+								 inDomain:NSUserDomainMask
+						appropriateForURL:nil
+								   create:NO
+									error:nil];
 
     workingDirectory = [dirURL path];
 
     // Set up Key and Value arrays as template for Defaults
 
-    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory", @"com.bps.squinter.windowsize", @"com.bps.squinter.preservews", @"com.bps.squinter.autocompile", @"com.bps.squinter.ak.count", @"com.bps.squinter.autoload", @"com.bps.squinter.toolbarstatus", @"com.bps.squinter.toolbarsize", @"com.bps.squinter.toolbarmode", @"com.bps.squinter.fontNameIndex", @"com.bps.squinter.fontSizeIndex", @"com.bps.squinter.text.red", @"com.bps.squinter.text.blue", @"com.bps.squinter.text.green", @"com.bps.squinter.back.red", @"com.bps.squinter.back.blue", @"com.bps.squinter.back.green", @"com.bps.squinter.autoselectdevice", @"com.bps.squinter.autocheckupdates", @"com.bps.squinter.showboldtext", @"com.bps.squinter.useazure", @"com.bps.squinter.displaypath", nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory",
+						 @"com.bps.squinter.windowsize",
+						 @"com.bps.squinter.preservews",
+						 @"com.bps.squinter.autocompile",
+						 @"com.bps.squinter.ak.notional.tally",
+						 @"com.bps.Squinter.ak.notional.telly",
+						 @"com.bps.squinter.autoload",
+						 @"com.bps.squinter.toolbarstatus",
+						 @"com.bps.squinter.toolbarsize",
+						 @"com.bps.squinter.toolbarmode",
+						 @"com.bps.squinter.fontNameIndex",
+						 @"com.bps.squinter.fontSizeIndex",
+						 @"com.bps.squinter.text.red",
+						 @"com.bps.squinter.text.blue",
+						 @"com.bps.squinter.text.green",
+						 @"com.bps.squinter.back.red",
+						 @"com.bps.squinter.back.blue",
+						 @"com.bps.squinter.back.green",
+						 @"com.bps.squinter.autoselectdevice",
+						 @"com.bps.squinter.autocheckupdates",
+						 @"com.bps.squinter.showboldtext",
+						 @"com.bps.squinter.useazure",
+						 @"com.bps.squinter.displaypath",
+						 @"com.bps.squinter.autoloadlists",
+						 @"com.bps.squinter.autoloaddevlists",
+						 @"com.bps.squinter.recentFiles",
+						 @"com.bps.squinter.recentFilesCount",
+						 @"com.bps.squinter.logListCount",nil];
 
-    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory, [NSString stringWithString:NSStringFromRect(_window.frame)], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], @"xxxxxxxxxxxxx", [NSNumber numberWithBool:NO], [NSNumber numberWithBool:YES], [NSNumber numberWithInteger:NSToolbarSizeModeRegular], [NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel], [NSNumber numberWithInteger:1], [NSNumber numberWithInteger:12], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithFloat:1.0], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], [NSNumber numberWithInteger:1], nil];
+    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
+							[NSString stringWithString:NSStringFromRect(_window.frame)],
+							[NSNumber numberWithBool:NO],
+							[NSNumber numberWithBool:NO],
+							@"xxxxxxxxxxxxxxxxx",
+							@"xxxxxxxxxxxxxxxxx",
+							[NSNumber numberWithBool:NO],
+							[NSNumber numberWithBool:YES],
+							[NSNumber numberWithInteger:NSToolbarSizeModeRegular],
+							[NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel],
+							[NSNumber numberWithInteger:1],
+							[NSNumber numberWithInteger:12],
+							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:1.0],
+							[NSNumber numberWithFloat:1.0],
+							[NSNumber numberWithFloat:1.0],
+							[NSNumber numberWithBool:YES],
+							[NSNumber numberWithBool:NO],
+							[NSNumber numberWithBool:NO],
+							[NSNumber numberWithBool:NO],
+							[NSNumber numberWithInteger:1],
+							[NSNumber numberWithBool:NO],
+							[NSNumber numberWithBool:NO],
+							[[NSArray alloc] init],
+							[NSNumber numberWithInteger:5],
+							[NSNumber numberWithInteger:200],nil];
 
     // Drop the arrays into the Defauts
 
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjects:objectArray forKeys:keyArray];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults registerDefaults:appDefaults];
 
     // Prepare the main window
@@ -266,93 +349,160 @@
     [logTextView setTextColor:textColour];
     [logClipView setBackgroundColor:backColour];
 
+	// Set the recent files menu
+
+	recentFiles = [NSMutableArray arrayWithArray:[defaults objectForKey:@"com.bps.squinter.recentFiles"]];
+
+	[self refreshRecentFilesMenu];
+
 	// Set up AppDelegate's observation of error, start and stop indication notifications
 
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nsncdc	addObserver:self
+		   selector:@selector(displayError:)
+			   name:@"BuildAPIError"
+			 object:ide];
 
-    [nc	addObserver:self
-           selector:@selector(displayError)
-               name:@"BuildAPIError"
-             object:ide];
+	[nsncdc addObserver:self
+		   selector:@selector(loggedIn:)
+			   name:@"BuildAPILoggedIn"
+			 object:ide];
 
-    [nc	addObserver:self
-           selector:@selector(startProgress)
-               name:@"BuildAPIProgressStart"
-             object:ide];
+	[nsncdc	addObserver:self
+		   selector:@selector(listProducts:)
+			   name:@"BuildAPIGotProductsList"
+			 object:ide];
 
-    [nc	addObserver:self
-           selector:@selector(stopProgress)
-               name:@"BuildAPIProgressStop"
-             object:ide];
+	[nsncdc	addObserver:self
+		   selector:@selector(createProductStageTwo:)
+			   name:@"BuildAPIProductCreated"
+			 object:ide];
 
-	[nc	addObserver:self
+	[nsncdc	addObserver:self
+		   selector:@selector(deleteProductStageThree:)
+			   name:@"BuildAPIProductDeleted"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(updateProductStageTwo:)
+			   name:@"BuildAPIProductUpdated"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(createDevicegroupStageTwo:)
+			   name:@"BuildAPIDeviceGroupCreated"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(updateDevicegroupStageTwo:)
+			   name:@"BuildAPIDeviceGroupUpdated"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(deleteDevicegroupStageTwo:)
+			   name:@"BuildAPIDeviceGroupDeleted"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(restarted:)
+			   name:@"BuildAPIDeviceGroupRestarted"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(listDevices:)
+			   name:@"BuildAPIGotDevicesList"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(reassigned:)
+			   name:@"BuildAPIDeviceUnassigned"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(reassigned:)
+			   name:@"BuildAPIDeviceAssigned"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(renameDeviceStageTwo:)
+			   name:@"BuildAPIDeviceUpdated"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(restarted:)
+			   name:@"BuildAPIDeviceRestarted"
+			 object:ide];
+
+	[nsncdc addObserver:self
+		   selector:@selector(deleteDeviceStageTwo:)
+			   name:@"BuildAPIDeviceDeleted"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(uploadCodeStageTwo:)
+			   name:@"BuildAPIDeploymentCreated"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(startProgress)
+			   name:@"BuildAPIProgressStart"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(stopProgress)
+			   name:@"BuildAPIProgressStop"
+			 object:ide];
+
+	[nsncdc addObserver:self
+		   selector:@selector(showCodeErrors:)
+			   name:@"BuildAPICodeErrors"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(productToProjectStageTwo:)
+			   name:@"BuildAPIGotDeviceGroupsList"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(productToProjectStageThree:)
+			   name:@"BuildAPIGotDeployment"
+			 object:ide];
+
+	[nsncdc addObserver:self
+		   selector:@selector(loggingStarted:)
+			   name:@"BuildAPIDeviceAddedToStream"
+			 object:ide];
+
+	[nsncdc addObserver:self
+		   selector:@selector(loggingStopped:)
+			   name:@"BuildAPIDeviceRemovedFromStream"
+			 object:ide];
+
+	[nsncdc	addObserver:self
+		   selector:@selector(presentLogEntry:)
+			   name:@"BuildAPILogEntryReceived"
+			 object:nil];
+
+	[nsncdc	addObserver:self
 		   selector:@selector(listLogs:)
 			   name:@"BuildAPIGotLogs"
 			 object:ide];
-	
-	[nc	addObserver:self
-           selector:@selector(presentLogEntry:)
-               name:@"BuildAPILogStream"
-             object:ide];
-	
-	[nc	addObserver:self
+
+	[nsncdc	addObserver:self
+			   selector:@selector(listCommits:)
+				   name:@"BuildAPIGotDeploymentsList"
+				 object:ide];
+
+	[nsncdc	addObserver:self
+			   selector:@selector(updateCodeStageTwo:)
+				   name:@"BuildAPIGotDevicegroup"
+				 object:ide];
+
+
+	// **************
+
+	[nsncdc	addObserver:self
 		   selector:@selector(endLogging:)
 			   name:@"BuildAPILogStreamEnd"
-			 object:ide];
-
-	[nc	addObserver:self
-		   selector:@selector(listModels)
-			   name:@"BuildAPIGotModelsList"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(listDevices)
-			   name:@"BuildAPIGotDevicesList"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(uploadCodeStageTwo)
-			   name:@"BuildAPIPostedCode"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(modelToProjectStageTwo)
-			   name:@"BuildAPIGotCodeRev"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(createdModel)
-			   name:@"BuildAPIModelCreated"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(renameModelStageTwo)
-			   name:@"BuildAPIModelUpdated"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(deleteModelStageTwo)
-			   name:@"BuildAPIModelDeleted"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(renameDeviceStageTwo)
-			   name:@"BuildAPIDeviceUpdated"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(deleteDeviceStageTwo)
-			   name:@"BuildAPIDeviceDeleted"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(restarted)
-			   name:@"BuildAPIDeviceRestarted"
-			 object:ide];
-	
-	[nc	addObserver:self
-		   selector:@selector(reassigned)
-			   name:@"BuildAPIDeviceAssigned"
 			 object:ide];
 
 	// Get macOS version
@@ -373,8 +523,8 @@
     // Turn the opened file’s path into an NSURL an add to the array that openFileHandler: expects
 
     NSArray *array = [NSArray arrayWithObjects:[NSURL fileURLWithPath:filename], nil];
-	// NSLog([NSString stringWithFormat:@"Loading %@", filename]);
-    [self openFileHandler:array :kOpenActionSquirrelProj];
+	NSLog(@"Squinter loading %@", filename);
+    [self openFileHandler:array :kActionOpenSquirrelProject];
 	return YES;
 }
 
@@ -387,16 +537,15 @@
     // as it would have been if the user launched Squinter with a .squirrelproj file double-click
 
     if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
-    projectDefines = [[NSMutableDictionary alloc] init];
 
 	// Instantiate an IDE-access object
 	
-	ide = [[BuildAPIAccess alloc] initForNSURLSession];
-    //ide = [[BuildAPIAccess alloc] initForNSURLConnection];
-	
+	ide = [[BuildAPIAccess alloc] init];
+	ide.maxListCount = [defaults stringForKey:@"com.bps.squinter.logListCount"].integerValue;
+	ide.pageSize = 50;
+
 	// Load in working directory, reading in the location from the defaults in case it has been changed by a previous launch
 
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     workingDirectory = [defaults stringForKey:@"com.bps.squinter.workingdirectory"];
 
 	// Set up parallel operation queue and limit it to serial operation
@@ -406,16 +555,30 @@
 
 	// Update UI
 
-	[self updateMenus];
 	[self setToolbar];
-
+	[_window setTitle:@"Squinter Beta"];
     [_window makeKeyAndOrderFront:nil];
 
-    if ([defaults boolForKey:@"com.bps.squinter.autoload"]) [self getApps];
-	
 	// Check for updates if that is requested
 	
 	if ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) [sparkler checkForUpdatesInBackground];
+
+	// Login
+
+	if ([defaults boolForKey:@"com.bps.squinter.autoload"])
+	{
+		// User wants to auto login on launch, ie. not display the login window
+		// NOTE window will appear if there are no credentials stored
+
+		[self autoLogin];
+	}
+	else
+	{
+		// Recommend logging in by showing the log in window
+		// NOTE may remove this and leave users to select it from menu
+
+		[self showLoginWindow];
+	}
 }
 
 
@@ -440,7 +603,7 @@
     
     for (Project *aProject in projectArray)
     {
-        if (aProject.projectHasChanged == YES) ++unsavedProjectCount;
+		if (aProject.haschanged) ++unsavedProjectCount;
     }
     
     if (unsavedProjectCount == 0)
@@ -455,11 +618,11 @@
 
 		if (unsavedProjectCount == 1)
         {
-            [saveChangesSheetLabel setStringValue:@"1 project has unsaved changes."];
+            [saveChangesSheetLabel setStringValue:@"1 Project has unsaved changes."];
         }
         else
         {
-            [saveChangesSheetLabel setStringValue:[NSString stringWithFormat:@"%li projects have unsaved changes.", (long)unsavedProjectCount]];
+            [saveChangesSheetLabel setStringValue:[NSString stringWithFormat:@"%li Projects have unsaved changes.", (long)unsavedProjectCount]];
         }
 
 		// Open the save sheet
@@ -474,98 +637,250 @@
 
 
 
-#pragma mark - Save Changes Sheet Methods
-
-
-- (IBAction)cancelChanges:(id)sender
-{
-    // The user doesn't care about the changes so close the sheet then tell the system to shut down the app
-
-    [_window endSheet:saveChangesSheet];
-
-    if (closeProjectFlag == NO)
-    {
-        [NSApp replyToApplicationShouldTerminate:NO];
-    }
-    else
-    {
-        closeProjectFlag = NO;
-    }
-}
-
-
-
-- (IBAction)ignoreChanges:(id)sender
-{
-    // The user doesn't care about the changes so close the sheet then tell the system to shut down the app
-    
-    [_window endSheet:saveChangesSheet];
-	
-	if (closeProjectFlag == NO)
-	{
-		[NSApp replyToApplicationShouldTerminate:YES];
-	}
-	else
-	{
-		currentProject.projectHasChanged = NO;
-		closeProjectFlag = NO;
-        [self closeProject:nil];
-	}
-}
-
-
-
-- (IBAction)saveChanges:(id)sender
-{
-    [_window endSheet:saveChangesSheet];
-	
-	if (closeProjectFlag)
-	{
-		// 'closeProjectFlag' is YES if this method has been called when the user
-		// wants to save a changed project before closing it or quitting the app
-
-		[self saveProject:nil];
-		closeProjectFlag = NO;
-		return;
-	}
-    
-    for (Project *aProject in projectArray)
-    {
-		// The user wants to save unsaved changes, so run through the projects to see which have unsaved changes
-
-		if (aProject.projectHasChanged == YES)
-        {
-            currentProject = aProject;
-            [self saveProject:nil];
-        }
-    }
-
-	// Projects saved (or not), we can now tell the app to quit
-
-    [NSApp replyToApplicationShouldTerminate:YES];
-}
-
-
-
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
 	// Stop watching for file-changes
 
     [fileWatchQueue removeAllPaths];
 
-	// Kill any connections
+	// Kill any connections to the API
 
 	[ide killAllConnections];
 
     // Record settings that are not set by the Prefs dialog
 
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
     [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
+	[defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
     // Stop watching for notifications
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [nsncdc removeObserver:self];
+}
+
+
+
+#pragma mark - Dock Menu Methods
+
+
+- (NSMenu *)applicationDockMenu:(NSApplication *)sender
+{
+	NSMenuItem *item;
+
+	if (dockMenu == nil)
+	{
+		dockMenu = [[NSMenu alloc] init];
+		dockMenu.autoenablesItems = NO;
+	}
+
+	// Clear the dock menu's list items because we may have new items to add
+
+	[dockMenu removeAllItems];
+
+	// Add the list of recently opened files
+	
+	if (recentFiles.count > 0)
+	{
+		for (NSDictionary *file in recentFiles)
+		{
+			item = [[NSMenuItem alloc] initWithTitle:[file objectForKey:@"name"] action:@selector(openRecent:) keyEquivalent:@""];
+			item.representedObject = file;
+			item.target = self;
+			//item.image = [NSImage imageNamed:@"docpic"];
+			//item.onStateImage = item.image;
+			//item.offStateImage = item.image;
+			//item.mixedStateImage = item.image;
+			item.tag = -1;
+			[dockMenu addItem:item];
+		}
+
+		item = [NSMenuItem separatorItem];
+		[dockMenu addItem:item];
+	}
+
+	// Add the fixed items: directory and web links
+
+	item = [[NSMenuItem alloc] initWithTitle:@"Open Working Directory" action:@selector(dockMenuAction:) keyEquivalent:@""];
+	[item setImage:[NSImage imageNamed:@"folder"]];
+	item.target = self;
+	item.tag = 99;
+	[dockMenu addItem:item];
+
+	item = [NSMenuItem separatorItem];
+	[dockMenu addItem:item];
+
+	item = [[NSMenuItem alloc] initWithTitle:@"Squinter Information" action:@selector(dockMenuAction:) keyEquivalent:@""];
+	item.tag = 1;
+	[dockMenu addItem:item];
+
+	item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Dev Center" action:@selector(dockMenuAction:) keyEquivalent:@""];
+	item.tag = 2;
+	[dockMenu addItem:item];
+
+	item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Forum" action:@selector(dockMenuAction:) keyEquivalent:@""];
+	item.tag = 3;
+	[dockMenu addItem:item];
+
+	return dockMenu;
+}
+
+
+
+- (void)dockMenuAction:(id)sender
+{
+	NSMenuItem *item = (NSMenuItem *)sender;
+
+	if (item.tag != -1)
+	{
+		switch(item.tag)
+		{
+			case 1:
+				[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/"]];
+				break;
+
+			case 2:
+				[nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
+				break;
+
+			case 3:
+				[nswsw openURL:[NSURL URLWithString:@"https://forums.electricimp.com/"]];
+				break;
+
+			default:
+				[nswsw openFile:workingDirectory withApplication:nil andDeactivate:YES];
+		}
+	}
+}
+
+
+
+#pragma mark - Login Methods
+
+
+- (IBAction)loginOrOut:(id)sender
+{
+	// We come here when the log in/out menu option is selected
+
+	if (!ide.isLoggedIn)
+	{
+		// We are not logged in, so show the log in sheet, but only if we're
+		// not already trying to log in
+
+		if (!loginFlag) [self showLoginWindow];
+	}
+	else
+	{
+		// We are logged in - or trying to log in - so log the user out
+
+		loginMenuItem.title = @"Log in to your account";
+
+		[ide logout];
+		[self setToolbar];
+		[self writeToLog:@"You are now logged out of the impCloud." :YES];
+	}
+}
+
+
+
+- (void)autoLogin
+{
+	[self setLoginCreds];
+
+	if (usernameTextField.stringValue.length == 0 || passwordTextField.stringValue.length == 0)
+	{
+		// We don't have a password or a username, so we'll need to show the login window
+
+		saveDetailsCheckbox.state = NSOnState;
+
+		[_window beginSheet:loginSheet completionHandler:nil];
+	}
+	else
+	{
+		// We've got the credentials so bypass the sheet and log straight in
+
+		saveDetailsCheckbox.state = NSOffState;
+
+		[self writeToLog:@"Automatically logging you into the impCloud. This can be disabled in Preferences." :YES];
+		[self login:nil];
+	}
+}
+
+
+
+- (void)showLoginWindow
+{
+	// Present the login sheet
+
+	saveDetailsCheckbox.state = NSOnState;
+
+	[self setLoginCreds];
+	[_window beginSheet:loginSheet completionHandler:nil];
+}
+
+
+
+- (void)setLoginCreds
+{
+	// Pull the login credentials from the keychain
+
+	PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
+	NSString *un = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
+	NSString *pw = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
+
+	// Set the login window fields with the data
+
+	usernameTextField.stringValue = (un == nil) ? @"" : [ide decodeBase64String:un];
+	passwordTextField.stringValue = (pw == nil) ? @"" : [ide decodeBase64String:pw];
+}
+
+
+
+- (IBAction)cancelLogin:(id)sender
+{
+	// Just hide the login sheet
+
+	[_window endSheet:loginSheet];
+}
+
+
+
+- (IBAction)login:(id)sender
+{
+	// If we pass in nil to 'sender' we have called this method manually
+	// so we don't need to remove the sheet from the window
+
+	if (sender != nil) [_window endSheet:loginSheet];
+
+	// Register that we're attempting a login
+
+	loginFlag = YES;
+
+	// Attempt to login with the current credentials
+
+	[ide login:usernameTextField.stringValue
+			  :passwordTextField.stringValue
+			  :NO];
+
+	// Pick up the action in 'loggedIn:' or 'displayError:', depending on success or failure
+}
+
+
+
+- (IBAction)setSecureEntry:(id)sender
+{
+	if (showPassCheckbox.state == NSOnState)
+	{
+		NSString *text = passwordTextField.stringValue;
+		passwordTextField.cell = [[NSTextFieldCell alloc] init];
+		passwordTextField.stringValue = text;
+	}
+	else
+	{
+		NSString *text = passwordTextField.stringValue;
+		passwordTextField.cell = [[NSSecureTextFieldCell alloc] initTextCell:text];
+		passwordTextField.stringValue = text;
+	}
+
 }
 
 
@@ -593,19 +908,45 @@
 
 - (IBAction)newProject:(id)sender
 {
-    newProjectDirLabel.stringValue = [@"Working directory: " stringByAppendingString:workingDirectory];
-    newProjectAccessoryViewNewModel.enabled = YES;
-
-	if (currentModel == -1)
+    if (selectedProduct != nil)
 	{
-        // Can't associate the project with a model if one hasn't been selected so disable this checkbox
+        // If we have a selected product, we can potentially associate it with the new project...
 
-        newProjectAccessoryViewAssociateCheckbox.enabled = NO;
+        newProjectAssociateCheckbox.enabled = YES;
+		newProjectAssociateCheckbox.title = [NSString stringWithFormat:@"Associate Project with Product \"%@\"", [self getValueFrom:selectedProduct withKey:@"name"]];
 	}
 	else
 	{
-        newProjectAccessoryViewAssociateCheckbox.enabled = YES;
+		// ...otherwise we can't
+
+		newProjectAssociateCheckbox.enabled = NO;
+		newProjectAssociateCheckbox.title = @"Associate Project with currently selected Product";
 	}
+
+	// Set the associate product default state to unchecked
+
+	newProjectAssociateCheckbox.state = NSOffState;
+
+	if (ide.isLoggedIn)
+	{
+		// If we are logged in, we can offer to create a product, which we'll set as the default...
+
+		newProjectNewProductCheckbox.enabled = YES;
+		newProjectNewProductCheckbox.state = NSOnState;
+		//if (productsArray == nil || productsArray.count == 0) [self getProductsFromServer:nil];
+	}
+	else
+	{
+		// ...otherwise we can't
+
+		newProjectNewProductCheckbox.enabled = NO;
+		newProjectNewProductCheckbox.state = NSOffState;
+	}
+
+	// Clear the fields
+
+	newProjectNameTextField.stringValue = @"";
+	newProjectDescTextField.stringValue = @"";
 
     [_window beginSheet:newProjectSheet completionHandler:nil];
 }
@@ -621,149 +962,182 @@
 
 - (IBAction)newProjectSheetCreate:(id)sender
 {
-    NSString *projectName = newProjectTextField.stringValue;
-    BOOL rerunPanelFlag = NO;
+	// The handler for creating a new project, which may or may not (user choice)
+	// involve the creation of a product. It does NOT involve the creation of any
+	// device groups - the user has to add these later, as required
+
+	NSString *pName = newProjectNameTextField.stringValue;
+	NSString *pDesc = newProjectDescTextField.stringValue;
+	BOOL makeNewProduct = newProjectNewProductCheckbox.state;
+	BOOL associateProduct = newProjectAssociateCheckbox.state;
     
     [_window endSheet:newProjectSheet];
-    
-    if (projectArray.count > 0)
+
+	if (pName.length > 80)
+	{
+		// Project name is too long — go back and ask for another
+		// NOTE the textfield checking should prevent this in any case
+
+		newProjectLabel.stringValue = @"That name is too long. Please choose another name, or cancel.";
+		[_window beginSheet:newProjectSheet completionHandler:nil];
+		return;
+	}
+
+	if (pName.length == 0)
+	{
+		// Project name is too short - go back and ask for another
+
+		newProjectLabel.stringValue = @"You must enter a name. Please choose another name, or cancel.";
+		[NSThread sleepForTimeInterval:1.0];
+		[_window beginSheet:newProjectSheet completionHandler:nil];
+		return;
+	}
+
+	if (pDesc.length > 255)
+	{
+		// Project description is too long — go back and ask for another
+		// NOTE the textfield checking should prevent this in any case
+
+		newProjectLabel.stringValue = @"That description is too long. Please enter another one, or cancel.";
+		[_window beginSheet:newProjectSheet completionHandler:nil];
+		return;
+	}
+
+	if (projectArray.count > 0)
     {
-        // We only need to check the new name against open ones when there *are* open projects
+        // We only need to check the new name against open ones when there ARE open projects
         
-        for (Project *aProject in projectArray)
+        for (Project *project in projectArray)
         {
-            if ([aProject.projectName compare:projectName] == NSOrderedSame)
+			if ([project.name compare:pName] == NSOrderedSame)
             {
                 // The name already exists, so re-run the New Project sheet with a suitable message
                 
-                rerunPanelFlag = YES;
-                [newProjectLabel setStringValue:@"A project with that name is already open. Please choose another name, or cancel."];
+                newProjectLabel.stringValue = @"A project with that name is already open. Please choose another name, or cancel.";
+				[_window beginSheet:newProjectSheet completionHandler:nil];
+				return;
             }
         }
     }
 
-	if (newProjectAccessoryViewNewModel.state == YES && !rerunPanelFlag)
+	if ((makeNewProduct || !associateProduct) && productsArray != nil && productsArray.count > 0)
 	{
-		// We only need to check the new name against existing models if this box is checked
-        // This can only be selected if we're logged in, ie. we have a list of models
+		// User wants to make a new product or doesn't want to associate with an exitsting one
+		// so compare the new product's name against existing product names
 
-        // TODO Really should view the server as the source of truth, but ide.models is close
-
-		for (NSDictionary *model in ide.models)
+        for (NSDictionary *product in productsArray)
 		{
-            NSString *modelName = [model objectForKey:@"name"];
+			NSString *aName = [self getValueFrom:product withKey:@"name"];
 
-			if ([modelName compare:projectName] == NSOrderedSame)
+			if ([aName compare:pName] == NSOrderedSame)
 			{
-				// The project has the same name as a known model
-
-				rerunPanelFlag = YES;
-				[newProjectLabel setStringValue:@"A model with that name already exists. Please choose another project name, or cancel."];
+				[newProjectLabel setStringValue:@"A product with that name already exists. Please choose another project name, or cancel."];
+				[_window beginSheet:newProjectSheet completionHandler:nil];
+				return;
 			}
 		}
 	}
 
-    if (rerunPanelFlag)
-    {
-        // Rerun the New Project sheet to get a new name, or process Cancel
+	// Make the new project
 
-        [self newProject:nil];
-    }
-    else
-    {
-        // Make a new project
+	currentProject = [[Project alloc] init];
+	currentProject.name = pName;
+	currentProject.description = pDesc;
+	currentProject.path = workingDirectory;
+	currentProject.filename = [pName stringByAppendingString:@".squirrelproj"];
+	currentProject.haschanged = YES;
+	currentProject.devicegroupIndex = -1;
+	currentDevicegroup = nil;
 
-        currentProject = [[Project alloc] init];
-        currentProject.projectName = projectName;
-		currentProject.projectHasChanged = YES;
-        [projectArray addObject:currentProject];
+	[projectArray addObject:currentProject];
 
-		itemToCreate = nil;
-		currentDeviceLibCount = 0;
-		currentAgentLibCount = 0;
+	if (makeNewProduct)
+	{
+		// User wants to create a new product for this project. We will pick up saving
+		// this project AFTER the product has been created (to make sure it is created)
 
-		// Add the new project to the project menu. We've already checked for a name clash,
-		// so we needn't care about the return value.
-		
-		[self addProjectMenuItem:projectName :currentProject];
+		[self writeToLog:@"Creating Project's Product on the server..." :YES];
 
-        // Enable project-related UI items
-		
-		[self updateMenus];
-        [self setToolbar];
-		
-		// Clear the external libraries menu - the new project by definition has none
-		
-        [externalLibsMenu removeAllItems];
+		NSDictionary *dict = @{ @"action" : @"newproject",
+								@"project" : currentProject };
 
-		// Mark the status light as empty, ie. in need of saving
+		[ide createProduct:pName :pDesc :dict];
+		return;
 
-        [saveLight setLight:YES];
-		[saveLight setFull:NO];
+		// We need to handle the result of this at 'createProductStageTwo:'
+	}
 
-		// User wants to view the auto-generated agent and device code files, so make sure they're generated
+	// Finally, check whether we're connecting this project to a product (new or selected)
 
-		if (newProjectAccessoryViewFilesCheckbox.state == NSOnState) saveProjectSubFilesFlag = YES;
+	if (associateProduct)
+	{
+		// User wants to associate the new project with the selected product, so set 'pid'
+		// NOTE user can't select this if there is no 'selectedProduct'
 
-		if (newProjectAccessoryViewAssociateCheckbox.state == NSOnState)
-		{
-            // If the 'associate new project with current model' is checked
+		currentProject.pid = [self getValueFrom:selectedProduct withKey:@"id"];
+	}
 
-			if (currentModel != -1)
-			{
-				// Associate the project with the currently selected model
+	// Add the new project to the project menu. We've already checked for a name clash,
+	// so we needn't care about the return value
 
-				NSDictionary *model = [ide.models objectAtIndex:currentModel];
-				currentProject.projectModelID = [model objectForKey:@"id"];
-			}
-			else
-			{
-				// There is no selected model to associate project with
-                // TODO check whether we can even get here (checkbox should be disabled)
+	[self addProjectMenuItem:pName :currentProject];
 
-				if (newProjectAccessoryViewNewModel.state == YES)
-				{
-					// So create a new model
+	// Enable project-related UI items
 
-					newModelFlag = YES;
-					itemToCreate = currentProject.projectName;
-					[ide createNewModel:currentProject.projectName];
+	[self refreshOpenProjectsMenu];
+	[self refreshProjectsMenu];
+	[self refreshDevicegroupMenu];
+	[self refreshMainDevicegroupsMenu];
+	[self refreshDeviceMenu];
+	[self setToolbar];
 
-					// This will pass control to ide, which will asynchronously call createdModel:
-				}
-			}
-		}
-        else if (newProjectAccessoryViewNewModel.state == YES)
-        {
-            // Create a new model (note this can't be selected unless we're logged in,
-            // so we don't need to check that we *can* make a model at this point)
+	// Mark the status light as empty, ie. in need of saving
 
-            newModelFlag = YES;
-            itemToCreate = currentProject.projectName;
-			[ide createNewModel:currentProject.projectName];
-        }
+	[saveLight show];
+	[saveLight needSave:YES];
+	[_window setDocumentEdited:YES];
 
-		// Save project. We save it because we have created files. Or should we? TBD
-        // No need to save projectPath here - it will be done by savePrep: (which bypasses dialog)
-		
-		savingProject = currentProject;
-		[self saveProjectAs:nil];
+	// Save the new project - this gives the user the chance to re-locate it
 
-		noProjectsFlag = NO;
-    }
+	savingProject = currentProject;
+	[self saveProjectAs:nil];
 }
 
 
 
-#pragma mark - Choose and Open Project Methods
+- (IBAction)newProjectCheckboxStateHandler:(id)sender
+{
+	// This method responds to attempts to select a new project dialog checkbox
+	// to make sure contradictory responses are not permitted
+
+	// TO DO - WARN USER
+
+	if (sender == newProjectAssociateCheckbox)
+	{
+		// If user is checking the associate product box, we can't have the new product box checked
+
+		if (newProjectAssociateCheckbox.state == NSOnState) newProjectNewProductCheckbox.state = NSOffState;
+	}
+
+	if (sender == newProjectNewProductCheckbox)
+	{
+		// If user is checking the new product box, we can't have the associate product box checked
+
+		if (newProjectNewProductCheckbox.state == NSOnState) newProjectAssociateCheckbox.state = NSOffState;
+	}
+}
+
+
+
+#pragma mark - Existing Project Methods
 
 
 - (IBAction)pickProject:(id)sender
 {
-	// Stub to handle UI interaction and call chooseProject: which actually
-	// handles project selection
+	// Selecting a project from the 'openProjectsMenu' calls 'chooseProject:' directly because we know
+	// which project was selected. This is called by any click on 'projectsPopup'
 
-	[self chooseProject:nil];
+	[self chooseProject:projectsPopUp];
 }
 
 
@@ -774,27 +1148,22 @@
     
 	NSMenuItem *item;
 	NSUInteger itemNumber = 0;
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-	if (sender == currentProject)
-	{
-		// Is this ever reached? Needs fixing if it is
+	// 'item' will become the open projects menu item that has been selected, either
+	// directly (via 'sender') or by the projects popup's tag value
 
-		item = [projectsMenu itemWithTitle:currentProject.projectName];
-	}
-	else if (sender != nil)
+	if (sender != projectsPopUp)
 	{
-		// The user has selected a projects from the 'projectsMenu' submenu
+		// The user has selected a projects from the 'openProjectsMenu' submenu
 
 		item = (NSMenuItem *)sender;
 	}
 	else
 	{
-		// 'sender' is nil if the project was selected using 'projectsPopUp',
-		// which is set to action 'pickProject:'
+		// 'sender' is 'projectsPopUp',
 
 		NSInteger tag = projectsPopUp.selectedItem.tag;
-		item = [projectsMenu itemAtIndex:tag];
+		item = [openProjectsMenu itemAtIndex:tag];
 	}
 
 	Project *chosenProject = nil;
@@ -802,15 +1171,17 @@
 	if (item.representedObject != nil)
 	{
 		chosenProject = item.representedObject;
-		itemNumber = [projectsMenu indexOfItem:item];
+		itemNumber = [openProjectsMenu indexOfItem:item];
 	}
 	else
 	{
-	    for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
+		// Just in case we didn't set the represented object for some reason
+
+		for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
     	{
         	chosenProject = [projectArray objectAtIndex:i];
 
-			if ([chosenProject.projectName compare:item.title] == NSOrderedSame)
+			if ([chosenProject.name compare:item.title] == NSOrderedSame)
 			{
 				itemNumber = i;
 				break;
@@ -818,99 +1189,85 @@
 		}
 	}
 
-	// Compare the name of the menu item to the projects' names until we find
-	// the one we want to make current
-	
-	currentProject = chosenProject;
-	currentDeviceLibCount = 0;
-	currentAgentLibCount = 0;
+	// Have we chosen the already selected project? Bail
 
-	// Enable or disable code view menu options whether we have code to view
-	
-	if (currentProject.projectDeviceCode != nil)
+	if (currentProject == chosenProject) return;
+
+	// Switch in the newly chosen project
+
+	currentProject = chosenProject;
+	currentDevicegroup = (currentProject.devicegroupIndex != -1) ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
+
+	// If we have
+
+	if (currentDevicegroup != nil)
 	{
-		[logDeviceCodeMenuItem setEnabled:YES];
+		[self selectDevice];
 	}
 	else
 	{
-		[logDeviceCodeMenuItem setEnabled:NO];
+		// If we don't have a selected device group but we do have device groups in
+		// this project, select the first one on the list
+
+		if (currentProject.devicegroups.count > 0)
+		{
+			currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
+			currentProject.devicegroupIndex = 0;
+
+			[self selectDevice];
+		}
 	}
-	
-	if (currentProject.projectAgentCode != nil)
-	{
-		[logAgentCodeMenuItem setEnabled:YES];
-	}
-	else
-	{
-		[logAgentCodeMenuItem setEnabled:NO];
-	}
-	
-	// Update the external library and file menus
-	
-	[self updateLibraryMenu];
-	[self updateFilesMenu];
 
 	// Update the save? indicator
 
-	[saveLight setFull:!currentProject.projectHasChanged];
+	[saveLight needSave:currentProject.haschanged];
+	[_window setDocumentEdited:currentProject.haschanged];
 
-	// Is the project associated with a model? If so, select it
-	
-	if (ide.models.count != 0)
+	// Is the project associated with a product? If so, select it
+
+	if (currentProject.pid.length > 0)
 	{
-		for (NSInteger j = 0 ; j < ide.models.count ; ++j)
+		if (productsArray.count > 0)
 		{
-			NSDictionary *model = [ide.models objectAtIndex:j];
-			NSString *modelCode = [model objectForKey:@"id"];
-			
-			if ([modelCode compare:currentProject.projectModelID] == NSOrderedSame)
+			for (NSMenuItem *item in productsMenu.itemArray)
 			{
-				NSMenuItem *mitem = [modelsMenu itemAtIndex:j];
-				[self chooseModel:mitem];
+				// TODO CHECK Do we need to cast item.representedObject
+
+				NSDictionary *product = (NSDictionary *)item.representedObject;
+				NSString *pid = [self getValueFrom:product withKey:@"id"];
+				NSString *anid = currentProject.pid;
+				item.state = NSOffState;
+
+				if ([pid compare:anid] == NSOrderedSame)
+				{
+					// Call 'chooseProduct:' solely to set the UI
+
+					[self chooseProduct:item];
+				}
 			}
 		}
 	}
 
     // We've made the selected project the current one, so adjust the project menu's tick marks
     
-    for (NSUInteger i = 0; i < projectsMenu.numberOfItems ; ++i)
+    for (NSUInteger i = 0; i < openProjectsMenu.numberOfItems ; ++i)
     {
         // Turn off all the menu items except the current one
         
-        item = [projectsMenu itemAtIndex:i];
-        
-        if (i == itemNumber)
-        {
-            [item setState:NSOnState];
-        }
-        else
-        {
-            [item setState:NSOffState];
-        }
+        item = [openProjectsMenu itemAtIndex:i];
+		item.state = (i == itemNumber) ? NSOnState : NSOffState;
     }
 
 	// Update the Project list popup
 
-	NSUInteger index = [projectsPopUp indexOfItemWithTag:itemNumber];
-	[projectsPopUp selectItemAtIndex:index];
+	[projectsPopUp selectItemAtIndex:[projectsPopUp indexOfItemWithTag:itemNumber]];
 
 	// Update the Menus and the Toolbar (left until now in case models etc are selected)
 
-    [self updateMenus];
-	[self setToolbar];
-
-    // Check the preferences in case we need to compile the project we're switching to
-
-	if ([defaults boolForKey:@"com.bps.squinter.autocompile"])
-	{
-        if (currentProject.projectSquinted == 0)
-        {
-            // Only compile if necessary
-
-            [self writeToLog:@"Auto-compiling project. This can be disabled in Preferences." :YES];
-            [self squint:nil];
-        }
-	}
+	[self refreshProjectsMenu];
+	[self refreshDevicegroupMenu];
+	[self refreshMainDevicegroupsMenu];
+    [self setToolbar];
 }
 
 
@@ -933,538 +1290,220 @@
     // Hide the accessory view - though it's not shown, openFileHandler: checks its state
     
     openDialog.accessoryView = nil;
-    [self presentOpenFilePanel:kOpenActionSquirrelProj];
+
+    [self presentOpenFilePanel:kActionOpenSquirrelProject];
 }
 
 
 
-#pragma mark - File Location and Opening Methods
 
-
-- (IBAction)selectFile:(id)sender
+- (IBAction)closeProject:(id)sender
 {
-	// Called by 'Add Files to Project...' File menu item
-	// If no current project is selected, this should go into project create mode,
-	// ie. go to selectFileForProject:
+	if (projectArray.count == 0) return;
 
 	if (currentProject == nil)
 	{
-		// There's no current project, so assume the user wants to create one
-
-		[self selectFileForProject:sender];
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
-	// Set up an open panel
-    
-    openDialog = [NSOpenPanel openPanel];
-    openDialog.message = @"Select a Squirrel source code files...";
-    openDialog.allowedFileTypes = [NSArray arrayWithObjects:@"nut", nil];
-    openDialog.allowsMultipleSelection = YES;
-    
-    // Set the panel's accessory view checkbox to OFF - ie. don't create a new project
-    
-    accessoryViewNewProjectCheckbox.state = NSOffState;
-    
-    // Add the accessory view to the panel
-    
-    openDialog.accessoryView = accessoryView;
-	if (sysVer.majorVersion >= 10 & sysVer.minorVersion >= 11) openDialog.accessoryViewDisclosed = YES;
-    [self presentOpenFilePanel:kOpenActionAddFiles];
-}
-
-
-
-- (IBAction)selectFileForProject:(id)sender
-{
-	// Called by 'New Projec with Files...' File menu item OR
-	// via selectFile: when there is no current project
-
-	// Set up an open panel
-    
-    openDialog = [NSOpenPanel openPanel];
-    openDialog.message = @"Select Agent and Device Squirrel source code files...";
-    openDialog.allowedFileTypes = [NSArray arrayWithObjects:@"nut", nil];
-    openDialog.allowsMultipleSelection = YES;
-
-	// Set the accessory view new project checkbox to ON - ie. create a new project
-	// even though it won't be shown as we check this state later
-
-	accessoryViewNewProjectCheckbox.state = NSOnState;
-
-	projectFromFilesAccessoryViewCheckbox.state = NSOnState;
-    openDialog.accessoryView = projectFromFilesAccessoryView;
-	if (sysVer.majorVersion >= 10 & sysVer.minorVersion >= 11) openDialog.accessoryViewDisclosed = YES;
-    [self presentOpenFilePanel:kOpenActionNewFiles];
-}
-
-
-
-- (void)presentOpenFilePanel:(NSInteger)openActionType
-{
-    // Complete the open file dialog settings with generic preferences
-    
-    openDialog.canChooseFiles = YES;
-    openDialog.canChooseDirectories = NO;
-	openDialog.delegate = self;
-
-	// Start off at the working directory
-
-	openDialog.directoryURL = [NSURL fileURLWithPath:workingDirectory isDirectory:YES];
-    
-    // Run the NSOpenPanel
-    
-    [openDialog beginSheetModalForWindow:_window
-                       completionHandler:^(NSInteger result)
-     {
-         // Close sheet first to stop it hogging the event queue
-         
-         [NSApp stopModal];
-         [NSApp endSheet:openDialog];
-         [openDialog orderOut:self];
-         
-         if (result == NSFileHandlingPanelOKButton) [self openFileHandler:[openDialog URLs] :openActionType];
-     }
-     ];
-    
-    [NSApp runModalForWindow:openDialog];
-    [openDialog makeKeyWindow];
-}
-
-
-
-- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType
-{
-	// This is where we open/add all files selected by the open file dialog
-
-	if (openActionType == kOpenActionSquirrelProj)
+	if (sender == closeAllMenuItem)
 	{
-		[self openSquirrelProjects:urls :0];
-		return;
-	}
-	else
-	{
-		// We are opening one or two source code files to add to a project, which may be new
-		// Check the number of files selected. If we are using source files to create a project, it should never be more than two
-		
-		if (urls.count > 2)
-		{
-			[self writeToLog:@"[ERROR] Too many source files selected for project." :YES];
-			[self writeToLog:[NSString stringWithFormat:@"Projects contain only two files: *.agent.nut and *.device.nut. You selected %lu files.", (long)urls.count] :YES];
-			return;
-		}
-		
-		// Clear 'foundLibs' and 'foundFiles' ahead of loading in any new source code
-		// Need to do this here as we bypass 'squintr:' (as we don't want to compile)
+		// We need to close multiple projects at once, so iterate through
+		// all of them, recursively calling closeProject:, sending nil as
+		// the sender so this block is not re-run. NOTE this should exit
+		// with just one remaining project, which the rest of the method
+		// will deal with
 
-		if (foundLibs != nil) foundLibs = nil;
-		if (foundFiles != nil) foundFiles = nil;
-		foundFiles = [[NSMutableArray alloc] init];
-		foundLibs = [[NSMutableArray alloc] init];
-
-		if (accessoryViewNewProjectCheckbox.state == NSOnState)
+		if (projectArray.count > 1)
 		{
-			// This will be set if we have one or two source code files from which the user wants to make a project.
-			// So create a new project and make it current
-			
-			currentProject = [[Project alloc] init];
-		}
-		else
-		{
-			if (currentProject == nil)
+			do
 			{
-				// We shouldn't be able to reach this point because we headed this off at the pass in selectFile:
+				// Close the current project
+				// NOTE closeProject: sets the current project
 
-				return;
+				[self closeProject:nil];
+			}
+			while (projectArray.count > 1);
+		}
+	}
+
+	// Close the current project
+
+	if (currentProject.haschanged)
+	{
+		// The project has unsaved changes, so warn the user before closing
+
+		[saveChangesSheetLabel setStringValue:@"Project has unsaved changes."];
+		[_window beginSheet:saveChangesSheet completionHandler:nil];
+		closeProjectFlag = YES;
+		return;
+	}
+
+	// Stop watching all of the current project's files: each device group's models,
+	// and then each model's various local libraries and files
+
+	NSString *pPath = currentProject.path;
+
+	if (currentProject.devicegroups.count > 0)
+	{
+		for (Devicegroup *devicegroup in currentProject.devicegroups)
+		{
+			if (devicegroup.models.count > 0)
+			{
+				for (Model *model in devicegroup.models)
+				{
+					NSString *path = [model.path stringByAppendingFormat:@"/%@", model.filename];
+
+					if (path.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:pPath :path]];
+
+					if (model.libraries.count > 0)
+					{
+						for (File *file in model.libraries)
+						{
+							NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
+
+							if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:pPath :fpath]];
+						}
+					}
+
+					if (model.files.count > 0)
+					{
+						for (File *file in model.files)
+						{
+							NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
+
+							if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:pPath :fpath]];
+						}
+					}
+				}
 			}
 		}
-
-		// Process the first of the added files
-
-		[self processAddedFiles:urls :0];
-		return;
 	}
 
-	return;
-}
+	NSString *closedName = currentProject.name;
 
-
-
-- (void)processAddedFiles:(NSArray *)urls :(NSUInteger)count
-{
-	// Each pass through this method, we process the 'count' item in the array 'urls'
-	// NOTE we always come here to exit the file handling process via the following line
-
-	if (count == urls.count)
+	if (projectArray.count == 1)
 	{
-		// We've processed all the input files. If we created a new project we have to
-		// check that then end the process - of just end it
+		// If there is only one open project, which we're about to close,
+		// we can clear everything project-related in the UI
 
-		if (accessoryViewNewProjectCheckbox.state == NSOnState) [self processAddedNewProject];
+		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no open Projects.", closedName] :YES];
+		[projectArray removeAllObjects];
+		[fileWatchQueue kill];
+		fileWatchQueue = nil;
+		currentProject = nil;
 
-		// Now update the UI
+		// Fade the status light
 
-		if (currentProject.projectHasChanged || accessoryViewNewProjectCheckbox.state == NSOnState)
-		{
-			[self processAddedFilesUIUpdate];
-		}
-
-		return;
-	}
-
-	BOOL isDeviceCodeFile = NO;
-	BOOL isAgentCodeFile = NO;
-
-	NSString *filePath = [[urls objectAtIndex:count] path];
-	NSString *fileName = [filePath lastPathComponent];
-
-	[self writeToLog:[NSString stringWithFormat:@"Processing file: \"%@\".", filePath] :YES];
-
-	// Is the file a *.device.nut file?
-
-	NSRange range = [fileName rangeOfString:@"device.nut"];
-
-	if (range.location != NSNotFound)
-	{
-		// Filename contains 'device.nut'
-
-		isDeviceCodeFile = YES;
+		[saveLight hide];
+		[saveLight needSave:NO];
+		[_window setDocumentEdited:NO];
 	}
 	else
 	{
-		// Filename doesn't contain 'device.nut', so check for 'agent.nut'
+		// There's at least one other project open, so just remove the current one
 
-		range = [fileName rangeOfString:@"agent.nut"];
+		[projectArray removeObjectAtIndex:[projectArray indexOfObject:currentProject]];
 
-		if (range.location != NSNotFound)
+		// Set the first project to the current one, and update the UI
+
+		currentProject = [projectArray objectAtIndex:0];
+
+		currentDevicegroup = nil;
+		currentProject.devicegroupIndex = -1;
+
+		if (currentProject.devicegroups.count > 0)
 		{
-			// Filename contains 'agent.nut'
-
-			isAgentCodeFile = YES;
+			currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
+			currentProject.devicegroupIndex = 0;
 		}
-		else
+
+		NSString *confirmMessage = [NSString stringWithFormat:@"Project \"%@\" closed.", closedName];
+
+		if (sender != closeAllMenuItem)
 		{
-			// Filename contains neither 'agent.nut', 'device.nut' or '.squirrelproj' so is unknown
-			// Just warn the user but take no other action - ie. end up with an empty file
+			confirmMessage = [confirmMessage stringByAppendingFormat:@" %@ is now the current Project.", currentProject.name];
 
-			range = [fileName rangeOfString:@".class"];
-
-			if (range.location != NSNotFound)
+			if (projectArray.count == 1)
 			{
-				[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
+				confirmMessage = [confirmMessage stringByAppendingString:@" There are no other open Projects."];
 			}
 			else
 			{
-				range = [fileName rangeOfString:@".lib"];
-
-				if (range.location != NSNotFound)
-				{
-					[self writeToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
-				}
-				else
-				{
-					// Filename doesn't indicate code type valid at all
-
-					[self writeToLog:[NSString stringWithFormat:@"[WARNING] It is unclear whether the file \"%@\" contains agent or device code.", fileName] :YES];
-				}
+				confirmMessage = [confirmMessage stringByAppendingFormat:@" There are %li open Projects.", projectArray.count];
 			}
+
+			[self writeToLog:confirmMessage :YES];
 		}
+
+		[saveLight needSave:currentProject.haschanged];
+		[_window setDocumentEdited:currentProject.haschanged];
 	}
 
-	// If we identified agent or device code from the filename(s), save the path(s) to those file(s)
+	// Update the UI whether we've closed one of x projects, or the last one
 
-	if (isDeviceCodeFile == YES)
-	{
-		if (currentProject.projectDeviceCodePath != nil)
-		{
-			// We already have a device code file reference, so ask if the user wants the new one
-
-			NSAlert *alert = [[NSAlert alloc] init];
-			alert.messageText = [NSString stringWithFormat:@"Project \"%@\" already has device code. Do you wish to replace it?", currentProject.projectName];
-			[alert addButtonWithTitle:@"Yes"];
-			[alert addButtonWithTitle:@"No"];
-			[alert beginSheetModalForWindow:_window
-						  completionHandler:^(NSModalResponse response)
-			 {
-				 if (response == NSAlertFirstButtonReturn)
-				 {
-					 // User wants to replace the existing device code file
-
-					 [self processAddedDeviceFile:filePath];
-				 }
-
-				 // We may still have files to process, so go on to the next one
-
-				 [self processAddedFiles:urls :count + 1];
-			 }
-			];
-		}
-		else
-		{
-			// Add the file to the project record
-
-			[self processAddedDeviceFile:filePath];
-
-			// We may still have files to process, so move on to the next one
-
-			[self processAddedFiles:urls :count + 1];
-		}
-	}
-	else if (isAgentCodeFile == YES)
-	{
-		if (currentProject.projectAgentCodePath != nil)
-		{
-			NSAlert *alert = [[NSAlert alloc] init];
-			alert.messageText = [NSString stringWithFormat:@"Project \"%@\" already has agent code. Do you wish to replace it?", currentProject.projectName];
-			[alert addButtonWithTitle:@"Yes"];
-			[alert addButtonWithTitle:@"No"];
-			[alert beginSheetModalForWindow:_window
-						  completionHandler:^(NSModalResponse response)
-			 {
-				 if (response == NSAlertFirstButtonReturn) [self processAddedAgentFile:filePath];
-				 [self processAddedFiles:urls :count + 1];
-			 }
-			 ];
-		}
-		else
-		{
-			[self processAddedAgentFile:filePath];
-			[self processAddedFiles:urls :count + 1];
-		}
-	}
-	else
-	{
-		// The file we processed was neither an agent file nor a device file,
-		// but we may have more on the list, so re-invoke the method to check
-
-		[self processAddedFiles:urls :count + 1];
-	}
-}
-
-
-
-- (void)processAddedDeviceFile:(NSString *)filePath
-{
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
-
-	if (cv != kLower)
-	{
-		currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
-	}
-	else
-	{
-		currentProject.projectDeviceCodePath = filePath;
-	}
-
-	currentProject.projectHasChanged = YES;
-	externalOpenMenuItem.enabled = YES;
-	externalOpenDeviceItem.enabled = YES;
-	externalOpenBothItem.enabled = YES;
-	squintMenuItem.enabled = YES;
-	[fileWatchQueue addPath:filePath];
-	[self processSource:filePath :kCodeTypeDevice :NO];
-}
-
-
-
-- (void)processAddedAgentFile:(NSString *)filePath
-{
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
-
-	if (cv != kLower)
-	{
-		currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
-	}
-	else
-	{
-		currentProject.projectAgentCodePath = filePath;
-	}
-
-	currentProject.projectHasChanged = YES;
-	externalOpenMenuItem.enabled = YES;
-	externalOpenAgentItem.enabled = YES;
-	externalOpenBothItem.enabled = YES;
-	squintMenuItem.enabled = YES;
-	[fileWatchQueue addPath:filePath];
-	[self processSource:filePath :kCodeTypeAgent :NO];
-}
-
-
-
-- (void)processAddedFilesUIUpdate
-{
-	// Update libraries menu with updated list of libraries
-
-	[self updateMenus];
-	[self processLibraries];
-	[self updateLibraryMenu];
-	[self setProjectLists];
-	[self updateFilesMenu];
+	[self refreshProjectsMenu];
+	[self refreshOpenProjectsMenu];
+	[self refreshDevicegroupMenu];
+	[self refreshMainDevicegroupsMenu];
 	[self setToolbar];
-
-	// Did we change the current project at all? Signal if we did
-
-	[saveLight setFull:!currentProject.projectHasChanged];
-	[saveLight setLight:YES];
-
-	if (currentProject.projectAgentCodePath == nil && currentProject.projectDeviceCodePath == nil)
-	{
-		// Project has no agent or device code references to clear the open menu item
-
-		[externalOpenBothItem setEnabled:NO];
-	}
 }
 
 
 
-- (void)processAddedNewProject
+- (IBAction)renameCurrentProject:(id)sender
 {
-	// The method is use to process a newly created project - and should only be called in that circumstance
-
-	// Give the project a name based on the loaded source code files, if any
-
-	if (currentProject.projectAgentCodePath != nil)
+	if (currentProject == nil)
 	{
-		currentProject.projectName = [[currentProject.projectAgentCodePath lastPathComponent] stringByReplacingOccurrencesOfString:@".agent.nut" withString:@""];
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
 	}
-	else if (currentProject.projectDeviceCodePath != nil)
+
+	[self renameProject:sender];
+}
+
+
+
+- (void)renameProject:(id)sender
+{
+	// Present the sheet, adapting it according to sender ('rename Peroject' or 'rename Device Group')
+
+	renameProjectFlag = (sender == renameProjectMenuItem) ? YES : NO;
+
+	NSString *desc = (renameProjectFlag) ? currentProject.description : currentDevicegroup.description;
+	NSString *name = (renameProjectFlag) ? currentProject.name : currentDevicegroup.name;
+
+	renameProjectLabel.stringValue = (renameProjectFlag) ? @"Enter a new Project name or update the description:" : @"Enter a new Device Group name or update the description:";
+
+	renameProjectLinkCheckbox.title = (renameProjectFlag) ? @"Also update the Product linked to this Project" : @"Also update the Device Group in the impCloud";
+
+	if (renameProjectFlag)
 	{
-		currentProject.projectName = [[currentProject.projectDeviceCodePath lastPathComponent] stringByReplacingOccurrencesOfString:@".device.nut" withString:@""];
+		renameProjectLinkCheckbox.enabled = (currentProject.pid != nil && currentProject.pid.length > 0 && ide.isLoggedIn) ? YES : NO;
+		renameProjectHintField.stringValue = @"If this checkbox is greyed out, the project isn’t associated with a product in the impCloud, or you are not logged in to your account.";
 	}
 	else
 	{
-		// There were no loaded source code files, so use 'Untitled'
-
-		NSInteger count = 0;
-
-		if (projectArray.count > 0)
-		{
-			for (Project *aProject in projectArray)
-			{
-				NSRange uRange = [aProject.projectName rangeOfString:@"Untitled"];
-
-				if (uRange.location != NSNotFound)
-				{
-					// At least one project called 'Unititled' so add one to the count
-
-					++count;
-				}
-			}
-		}
-
-		if (count == 0)
-		{
-			currentProject.projectName = @"Untitled";
-		}
-		else
-		{
-			currentProject.projectName = [NSString stringWithFormat:@"Untitled %li", (long)count];
-		}
+		renameProjectLinkCheckbox.enabled = (currentDevicegroup.did != nil && currentDevicegroup.did.length > 0 && ide.isLoggedIn) ? YES : NO;
+		renameProjectHintField.stringValue = @"If this checkbox is greyed out, the device group isn’t associated with a device group in the impCloud, or you are not logged in to your account.";
 	}
 
-	[self processAddedNewProjectStageTwo];
-}
+	renameProjectLinkCheckbox.state = (renameProjectLinkCheckbox.enabled) ? NSOnState : NSOffState;
 
-
-
-- (void)processAddedNewProjectStageTwo
-{
-	// Is the project already open?
-
-	if ([self checkProjectNames:currentProject :nil])
+	if (desc.length > 0)
 	{
-		// The project is open, so warn the user and ask for an action
-
-		// Adjust project record to prevent updating the UI too early
-
-		currentProject.projectHasChanged = NO;
-		accessoryViewNewProjectCheckbox.state = NSOffState;
-
-		NSAlert *alert = [[NSAlert alloc] init];
-		alert.messageText = [NSString stringWithFormat:@"A project named \"%@\" is already open. Do you want to rename the new project?", currentProject.projectName];
-	    alert.informativeText = @"If you select ‘Cancel’, the new project will not be saved.";
-		[alert addButtonWithTitle:@"Rename"];
-		[alert addButtonWithTitle:@"Cancel"];
-		[alert beginSheetModalForWindow:_window
-					  completionHandler:^(NSModalResponse response)
-		 {
-			 if (response == NSAlertFirstButtonReturn)
-			 {
-				 // User wants to rename the project
-
-				 newProjectFlag = YES;
-				 [self renameProject];
-			 }
-			 else
-			 {
-				 // Zap the existing project
-
-				 currentProject = nil;
-
-				 if (projectArray.count > 0) currentProject = [projectArray objectAtIndex:0];
-			 }
-		 }
-		 ];
+		renameProjectDescTextField.stringValue = desc;
+		renameProjectDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)currentProject.description.length];
 	}
 	else
 	{
-		// The new project is not already open, so we can save it
-		// Remember, we're only here because the project is new
-
-		// Add project to project array
-
-		[projectArray addObject:currentProject];
-
-		if (projectFromFilesAccessoryViewCheckbox.state == NSOnState)
-		{
-			// The 'auto-save project' checkbox is ticked
-
-			savingProject = currentProject;
-
-			if (projectFromFilesAccessoryViewLocCheckbox.state == NSOnState)
-			{
-				// User wants to save the project to the working directory
-
-				[self savePrep:[NSURL URLWithString:workingDirectory] :savingProject.projectName];
-			}
-			else
-			{
-				// User wants to save the project to the source file directory
-
-				NSURL *url;
-
-				if (currentProject.projectAgentCodePath != nil)
-				{
-					url = [NSURL URLWithString:[savingProject.projectAgentCodePath stringByDeletingLastPathComponent]];
-				}
-				else if (currentProject.projectDeviceCodePath != nil)
-				{
-					url = [NSURL URLWithString:[savingProject.projectDeviceCodePath stringByDeletingLastPathComponent]];
-				}
-				else
-				{
-					// Just in case
-
-					[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" contains no source files. Saving in the working directory.", savingProject.projectName] :YES];
-					url = [NSURL URLWithString:workingDirectory];
-				}
-
-				[self savePrep:url :savingProject.projectName];
-			}
-		}
+		renameProjectDescTextField.stringValue = @"";
+		renameProjectDescCountField.stringValue = @"0/255";
 	}
-}
 
-
-
-- (void)renameProject
-{
-	// Present the sheet
-
-	if (newProjectFlag)
-	{
-		renameProjectLabel.stringValue = @"Enter a new project name:";
-	}
+	renameProjectTextField.stringValue = name;
+	renameProjectCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)name.length];
 
 	[_window beginSheet:renameProjectSheet completionHandler:nil];
 }
@@ -1480,47 +1519,2545 @@
 
 - (IBAction)saveRenameProjectSheet:(id)sender
 {
+	NSString *newName = renameProjectTextField.stringValue;
+	NSString *newDesc = renameProjectDescTextField.stringValue;
+
 	[_window endSheet:renameProjectSheet];
 
-	if (newProjectFlag)
+	if (newName.length == 0)
 	{
-		newProjectFlag = NO;
-		currentProject.projectName = renameProjectTextField.stringValue;
-		[self processAddedNewProjectStageTwo];
+		renameProjectLabel.stringValue = @"You must enter a name. Please choose another name, or cancel.";
+		[_window beginSheet:renameProjectSheet completionHandler:nil];
+		return;
+	}
+
+	if (newName.length > 80)
+	{
+		renameProjectLabel.stringValue = @"That name is too long. Please choose another name, or cancel.";
+		[_window beginSheet:renameProjectSheet completionHandler:nil];
+		return;
+	}
+
+	if (newDesc.length > 255)
+	{
+		renameProjectLabel.stringValue = @"That description is too long. Please choose another name, or cancel.";
+		[_window beginSheet:renameProjectSheet completionHandler:nil];
+		return;
+	}
+
+	if (renameProjectFlag)
+	{
+		// Check name and if necessary go back and ask again for a new one
+
+		if ([self checkProjectNames:currentProject :newName])
+		{
+			renameProjectLabel.stringValue = @"That name is in use. Please choose another name, or cancel.";
+			[_window beginSheet:renameProjectSheet completionHandler:nil];
+			return;
+		}
+
+		if (renameProjectLinkCheckbox.state == NSOnState)
+		{
+			// Update the source product before doing anything else, so that if there is an
+			// error, we don't affect the local version either
+
+			BOOL changed = NO;
+
+			NSMutableArray *keys = [[NSMutableArray alloc] init];
+			NSMutableArray *values = [[NSMutableArray alloc] init];
+
+			if ([currentProject.name compare:newName] != NSOrderedSame)
+			{
+				[keys addObject:@"name"];
+				[values addObject:newName];
+				changed = YES;
+			}
+
+			if ([currentProject.description compare:newDesc] != NSOrderedSame)
+			{
+				[keys addObject:@"description"];
+				[values addObject:newDesc];
+				changed = YES;
+			}
+
+			if (changed)
+			{
+				NSDictionary *dict = @{ @"action" : @"projectchanged",
+										@"project" : currentProject };
+
+				[ide updateProduct:currentProject.pid :(NSArray *)keys :(NSArray *)values :dict];
+
+				// Pick up the action at 'updateProductStageTwo:'
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
+			}
+		}
+		else
+		{
+			// Do all the work here because we're not making an async operation
+
+			if ([currentProject.name compare:newName] != NSOrderedSame)
+			{
+				currentProject.name = newName;
+				currentProject.haschanged = YES;
+
+				// Update the UI only if the name has changed
+
+				[self refreshOpenProjectsMenu];
+				[self refreshProjectsMenu];
+				[self refreshDevicegroupMenu];
+				[self refreshMainDevicegroupsMenu];
+			}
+
+			if ([currentProject.description compare:newDesc] != NSOrderedSame)
+			{
+				currentProject.description = newDesc;
+				currentProject.haschanged = YES;
+				[self refreshOpenProjectsMenu];
+			}
+
+			if (!currentProject.haschanged) [self writeToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
+
+			// Update the save indicator if anything has changed
+
+			[saveLight needSave:currentProject.haschanged];
+			[_window setDocumentEdited:currentProject.haschanged];
+		}
 	}
 	else
 	{
-		NSString *newName = renameProjectTextField.stringValue;
+		// Check name and if necessary go back and ask again for a new one
 
-		// Check name and if necessary go back and ask again
+		if ([self checkDevicegroupNames:currentDevicegroup :newName])
+		{
+			renameProjectLabel.stringValue = @"That name is in use. Please choose another name, or cancel.";
+			[_window beginSheet:renameProjectSheet completionHandler:nil];
+			return;
+		}
 
-		[self checkProjectNames:nil :newName];
+		if (renameProjectLinkCheckbox.state == NSOnState)
+		{
+			// Update the source device group before doing anything else, so that if there is an
+			// error, we don't affect the local version either
+
+			BOOL changed = NO;
+
+			NSMutableArray *keys = [[NSMutableArray alloc] init];
+			NSMutableArray *values = [[NSMutableArray alloc] init];
+
+			if ([currentDevicegroup.name compare:newName] != NSOrderedSame)
+			{
+				[keys addObject:@"name"];
+				[values addObject:newName];
+				changed = YES;
+			}
+
+			if ([currentDevicegroup.description compare:newDesc] != NSOrderedSame)
+			{
+				[keys addObject:@"description"];
+				[values addObject:newDesc];
+				changed = YES;
+			}
+
+			if (changed)
+			{
+				NSDictionary *dict = @{ @"action" : @"devicegroupchanged",
+										@"devicegroup" : currentDevicegroup };
+
+				[ide updateDevicegroup:currentDevicegroup.did :(NSArray *)keys :(NSArray *)values :dict];
+
+				// Pick up the action at 'updateDevicegroupStageTwo:'
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
+			}
+		}
+		else
+		{
+			// The device group lacks a device group ID, so it has no equivalent on the
+			// server, so we can process the changes immediately
+
+			if ([currentDevicegroup.name compare:newName] != NSOrderedSame)
+			{
+				currentDevicegroup.name = newName;
+				currentProject.haschanged = YES;
+
+				// Update the UI; in the above code the UI will be updated
+				// in response to notification from the server
+
+				[self refreshOpenProjectsMenu];
+				[self refreshDevicegroupMenu];
+				[self refreshMainDevicegroupsMenu];
+			}
+
+			if ([currentDevicegroup.description compare:newDesc] != NSOrderedSame)
+			{
+				currentDevicegroup.description = newDesc;
+				currentProject.haschanged = YES;
+				[self refreshOpenProjectsMenu];
+			}
+
+			if (!currentProject.haschanged) [self writeToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
+
+			// Update the save indicator if anything has changed
+
+			[saveLight needSave:currentProject.haschanged];
+			[_window setDocumentEdited:currentProject.haschanged];
+		}
 	}
 }
 
 
 
-- (void)openSquirrelProjects:(NSArray *)urls :(NSInteger)count
+- (IBAction)doSync:(id)sender
 {
-	// We are opening one Squirrel project files from a list ('urls')
-	// We will re-call this method with an incremented 'count' in order to open the next file,
-	// or bail if we've processed all of the files
+	// This is an start point for the UI to trigger a project sync
+	// NOTE this may yet be merged with 'syncProject:'
 
-	if (count == urls.count) return;
+	if (currentProject == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
+	}
 
-	Project *newProject;
-	NSString *fileName, *newName, *filePath;
-	NSString *currentAgentPath, *currentDevicePath;
+	[self uploadProject:currentProject];
+}
+
+
+
+- (void)uploadProject:(Project *)project
+{
+	// We can't sync if we're not logged in
+
+	if (!ide.isLoggedIn)
+	{
+		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You cannot upload this Project until you have logged in." :YES];
+		return;
+	}
+
+	if (project.pid == nil || project.pid.length == 0)
+	{
+		// Project has no PID so just create a new product
+
+		[self writeToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
+
+		// Start by creating the product
+
+		NSDictionary *dict = @{ @"action" : @"uploadproject",
+								@"project" : project };
+
+		[ide createProduct:project.name :project.description :dict];
+
+		// Pick up in 'createProductStageTwo:'
+
+		return;
+	}
+	else
+	{
+		// Project has a PID, but has it been orphaned?
+
+		if (productsArray == nil)
+		{
+			// We don't have the products list populated yet, so we need to get it first
+
+			[self writeToLog:@"Retrieving a list of your Products" :YES];
+
+			NSDictionary *dict = @{ @"action" : @"uploadproject",
+									@"project" : currentProject };
+
+			[ide getProducts:dict];
+
+			// Pick up the action at 'listProducts:'
+		}
+		else if (productsArray.count > 0)
+		{
+			BOOL deadpid = YES;
+
+			for (NSDictionary *product in productsArray)
+			{
+				NSString *pid = [product objectForKey:@"id"];
+
+				if ([currentProject.pid compare:pid] == NSOrderedSame)
+				{
+					[self writeErrorToLog:@"[ERROR] This Project already exists as a Product in the impCloud." :YES];
+					deadpid = NO;
+					break;
+				}
+			}
+
+			if (deadpid)
+			{
+				// We have an orphan project - its product has been deleted and its PID is dead
+				// so clear the pid and proceed with the upload.
+
+				[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Project \"%@\" is linked to a deleted Product. Deleting the link.", project.name] :YES];
+
+				project.pid = @"";
+
+				NSDictionary *dict = @{ @"action" : @"uploadproject",
+										@"project" : project };
+
+				[ide createProduct:project.name :project.description :dict];
+
+				// Pick up in 'createProductStageTwo:'
+
+				return;
+			}
+
+			// Project PID is still valid, so do a sync
+
+			// [self syncProject:project];
+		}
+		else
+		{
+			// We've got a list of products and there aren't any, so just upload
+
+			NSDictionary *dict = @{ @"action" : @"uploadproject",
+									@"project" : project };
+
+			[ide createProduct:project.name :project.description :dict];
+
+			// Pick up in 'createProductStageTwo:'
+		}
+	}
+}
+
+
+
+- (void)syncProject:(Project *)project
+{
+	// We can't sync if we're not logged in
+
+	if (!ide.isLoggedIn)
+	{
+		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You cannot uploade or sync this Project until you have logged in." :YES];
+		return;
+	}
+
+	if (project.pid != nil && project.pid.length > 0)
+	{
+		if (productsArray == nil)
+		{
+			// We need to get the list of products to match because we have no such list yet
+
+			[self writeToLog:@"Retrieving a list of your Products" :YES];
+
+			NSDictionary *dict = @{ @"action" : @"syncproject",
+									@"project" : project };
+
+			[ide getProducts:dict];
+
+			// Pick up the action at 'listProducts:'
+
+			return;
+		}
+
+		NSDictionary *syncProduct = nil;
+
+		for (NSDictionary *product in productsArray)
+		{
+			NSString *pid = [self getValueFrom:product withKey:@"id"];
+
+			if ([project.pid compare:pid] == NSOrderedSame)
+			{
+				syncProduct = product;
+				break;
+			}
+		}
+
+		if (syncProduct != nil)
+		{
+			NSString *updated = [self getValueFrom:syncProduct withKey:@"updated_at"];
+
+			if (updated == nil) updated = [self getValueFrom:syncProduct withKey:@"created_at"];
+
+			NSDate *pdDate = [self convertTimestring:updated];
+			NSDate *prDate = [self convertTimestring:currentProject.updated];
+
+			if ([prDate earlierDate:pdDate] == pdDate)
+			{
+				// Product is older than the project
+
+				NSDictionary *dict = @{ @"action" : @"none",
+										@"project" : project };
+
+				//[ide updateProduct:project.pid :@"name" :project.name :dict];
+
+				dict = @{ @"action" : @"syncproject",
+						  @"project" : project };
+
+				//[ide updateProduct:project.pid :@"description" :project.description :dict];
+
+				// Pick up the action at 'updateProductStageTwo:'
+			}
+			else
+			{
+				// Project is older than the product
+
+				project.name = [self getValueFrom:syncProduct withKey:@"name"];
+				project.description = [self getValueFrom:syncProduct withKey:@"description"];
+
+				// Now we need to compare device groups
+
+				NSDictionary *dict = @{ @"action" : @"syncproject",
+										@"project" : project };
+
+				[ide getDevicegroupsWithFilter:@"product.id" :[self getValueFrom:syncProduct withKey:@"id"] :dict];
+
+				// Pick up the action in 'listDevicegroups:'
+			}
+		}
+		else
+		{
+			// WHOOPS
+		}
+	}
+	else
+	{
+		// Just in case...
+
+		[self uploadProject:project];
+	}
+}
+
+
+
+- (IBAction)cancelSync:(id)sender
+{
+	[ide killAllConnections];
+}
+
+
+
+- (IBAction)openRecent:(id)sender
+{
+	// Open a project from the recent projects menu
+	// The menu item title is the name of the file; its represented object is the file location
+
+	NSMenuItem *item = (NSMenuItem *)sender;
+	NSDictionary *data = item.representedObject;
+	NSData *bookmark = [data valueForKey:@"bookmark"];
+	NSString *filename = [data valueForKey:@"name"];
+
+	// Check that the file exists at the recoreded location
+	// We do this here (it will be checked in 'openSquirrelProject:' too) so that we can update the
+	// recent files list and menu if the file has gone missing
+
+	NSURL *url = [self urlForBookmark:bookmark];
+
+	if (url == nil)
+	{
+		// The file is AWOL so warn the user and remove it from the list
+
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" has been moved or deleted. Removing it from the recent files list", item.title] :YES];
+
+		[recentFiles removeObject:data];
+		[self refreshRecentFilesMenu];
+	}
+	else
+	{
+		if (stale)
+		{
+			// The project's bookmark is stale, ie. it has changed location.
+			// 'url' contains the new location
+
+			stale = NO;
+
+			// Update recent files list and UI
+
+			NSDictionary *newDict = @{ @"name" : filename,
+									   @"path" : [url.path stringByDeletingLastPathComponent],
+									   @"bookmark" : [self bookmarkForURL:url] };
+
+			[recentFiles removeObject:data];
+			[recentFiles insertObject:newDict atIndex:0];
+			[self refreshRecentFilesMenu];
+		}
+
+		NSMutableArray *urls = [NSMutableArray arrayWithObject:url];
+		[self openSquirrelProjects:urls];
+	}
+}
+
+
+
+- (void)openRecentAll
+{
+	if (recentFiles.count > 0)
+	{
+		NSMutableArray *urls = [[NSMutableArray alloc] init];
+		NSMutableArray *newRecentFiles = [[NSMutableArray alloc] init];
+
+		for (NSDictionary *recent in recentFiles)
+		{
+			stale = NO;
+			NSURL *url = [self urlForBookmark:[recent valueForKey:@"bookmark"]];
+
+			if (stale)
+			{
+				if (url != nil)
+				{
+					[self writeToLog:[NSString stringWithFormat:@"Updating location of Project file \"%@\".", [recent valueForKey:@"name"]] :YES];
+
+					NSDictionary *newRecent = @{ @"name" : [recent valueForKey:@"name"],
+												 @"path" : [url.path stringByDeletingLastPathComponent],
+												 @"bookmark" : [self bookmarkForURL:url] };
+
+					[newRecentFiles addObject:newRecent];
+				}
+				else
+				{
+					[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" has been moved or deleted. Removing it from the recent files list", [recent valueForKey:@"name"]] :YES];
+					break;
+				}
+			}
+			else
+			{
+				[newRecentFiles addObject:recent];
+			}
+
+			[urls addObject:url];
+		}
+
+		// newRecentFiles contains all the files we have found; use it to replace recentFiles
+
+		if (recentFiles.count != newRecentFiles.count)
+		{
+			// We removed one or more files from recentFiles, so re-process this menu
+
+			[self refreshRecentFilesMenu];
+		}
+
+		recentFiles = newRecentFiles;
+		
+		if (urls.count > 0) [self openSquirrelProjects:urls];
+	}
+}
+
+
+
+- (IBAction)clearRecent:(id)sender
+{
+	// The user has clicked on the recent files menu's 'clear menu' option
+
+	if (recentFiles != nil)
+	{
+		// If we have any recent files (the menu option won't be selectable otherwise)
+		// then clear the file list and then the menu
+
+		[recentFiles removeAllObjects];
+		[self refreshRecentFilesMenu];
+	}
+}
+
+
+
+- (void)addToRecentMenu:(NSString *)filename :(NSString *)path
+{
+	// Following the creation of a new project or opening a project file, add it to the recent files list
+
+	// First, check whether the newly opened file is already on the list
+
+	NSDictionary *got = nil;
+
+	if (recentFiles == nil) recentFiles = [[NSMutableArray alloc] init];
+
+	if (recentFiles.count > 0)
+	{
+		for (NSDictionary *recent in recentFiles)
+		{
+			// Check both the filename and the path - we may be dealing with the same filename
+			// in different locations. Presumably they are different (eg. have different project names)
+
+			if ([filename compare:[recent objectForKey:@"name"]] == NSOrderedSame && [path compare:[recent objectForKey:@"path"]] == NSOrderedSame)
+			{
+				got = recent;
+				break;
+			}
+		}
+	}
+
+	if (got == nil)
+	{
+		// Create a new file entry and add it to the top of the list
+		// Each 'recent file' is a dictionry with the following keys:
+		// 'name' - the filename (string)
+		// 'path' - the file's path (string)
+		// 'bookmark' - a bookmark (data)
+
+		NSInteger max = [[defaults objectForKey:@"com.bps.squinter.recentFilesCount"] integerValue];
+
+		NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@", path, filename]];
+		NSData *bookmark = [self bookmarkForURL:url];
+
+		NSDictionary *newEntry = @{ @"name" : filename,
+									@"path" : path,
+									@"bookmark" : bookmark };
+
+		// Always add the new entry to the top of the list
+
+		[recentFiles insertObject:newEntry atIndex:0];
+
+		// Is the list too long? If so prune it
+
+		while (recentFiles.count > max) [recentFiles removeLastObject];
+ 	}
+	else
+	{
+		// We have the opened file in the list already, so just move it to the top
+
+		[recentFiles removeObject:got];
+		[recentFiles insertObject:got atIndex:0];
+	}
+
+	// Rebuild the menu
+
+	[self refreshRecentFilesMenu];
+}
+
+
+
+#pragma mark - Product Methods
+
+
+- (void)chooseProduct:(id)sender
+{
+	// We only need to update the Projects menu's product-specific entries when a product is chosen
+
+	NSMenuItem *item = (NSMenuItem *)sender;
+	if (item.representedObject != nil) selectedProduct = item.representedObject;
+
+	[self refreshProductsMenu];
+	[self refreshProjectsMenu];
+	[self setToolbar];
+}
+
+
+
+- (IBAction)getProductsFromServer:(id)sender
+{
+	// Get a list of the host account's products to populate the products sub-menu
+
+	if (!ide.isLoggedIn)
+	{
+		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to restart devices." :YES];
+		return;
+	}
+
+	[self writeToLog:@"Getting a list of Products from the impCloud..." :YES];
+	[ide getProducts];
+
+	// Pick up the action in 'listProducts:'
+}
+
+
+
+- (IBAction)deleteProduct:(id)sender
+{
+	if (selectedProduct == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
+		return;
+	}
+
+	BOOL flag = NO;
+
+	// If the product is linked to a projetc, re-flight the deletion
+	// by checking the product's device groups for assigned devices
+
+	if (projectArray.count > 0)
+	{
+		for (Project *project in projectArray)
+		{
+			NSString *apid = [self getValueFrom:selectedProduct withKey:@"id"];
+
+			if ([project.pid compare:apid] == NSOrderedSame)
+			{
+				// This product has a matching project
+
+				if (devicesArray.count > 0)
+				{
+					for (Devicegroup *devicegroup in project.devicegroups)
+					{
+						if (devicegroup.devices.count > 0)
+						{
+							flag = YES;
+							break;
+						}
+					}
+				}
+			}
+
+			if (flag) break;
+		}
+	}
+
+	if (!flag)
+	{
+		// The selected product is not associated with an open project -
+		// or if it is, its device groups are all empty
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert addButtonWithTitle:@"No"];
+		[alert addButtonWithTitle:@"Yes"];
+		[alert setMessageText:[NSString stringWithFormat:@"You are about to delete the Product \"%@\". Are you sure you want to proceed?", [self getValueFrom:selectedProduct withKey:@"name"]]];
+		[alert setInformativeText:@"Selecting ‘Yes’ will permanently delete the Product — but only if its Device Groups have no devices assigned to any of them."];
+		[alert setAlertStyle:NSWarningAlertStyle];
+		[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+
+			if (returnCode == 1001)
+			{
+				// Proceed with the deletion
+
+				NSMutableDictionary *dp = [[NSMutableDictionary alloc] init];
+				[dp setObject:selectedProduct forKey:@"product"];
+				[dp setObject:[NSNumber numberWithInteger:0] forKey:@"count"];
+
+				// First, get a list of the product's device groups
+
+				NSDictionary *dict = @{ @"action" : @"deleteproduct",
+										@"product" : dp };
+
+				[self writeToLog:[NSString stringWithFormat:@"Deleting Product \"%@\" - checking its Device Groups...", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+
+				[ide getDevicegroupsWithFilter:@"product.id" :[selectedProduct objectForKey:@"id"] :dict];
+
+				// Pick up the action in 'productToProjectStageTwo:'
+			}
+		}];
+	}
+	else
+	{
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Cannot delete Project \"%@\" as it appears to have Device Groups with assigned devices", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+	}
+}
+
+
+
+- (IBAction)downloadProduct:(id)sender
+{
+	if (selectedProduct == nil)
+	{
+		[self writeErrorToLog:@"[ERROR] You have not selected a Product as the new project's source." :YES];
+		return;
+	}
+
+	[self writeToLog:[NSString stringWithFormat:@"Retrieving Device Groups and source code for Product \"%@\".", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+	[self writeToLog:@"This may take a moment or two..." :YES];
+
+	Project *newProject = [[Project alloc] init];
+
+	// Set new project's name, id and desc to match that of the source product
+
+	newProject.pid = [self getValueFrom:selectedProduct withKey:@"id"];
+	newProject.description = [self getValueFrom:selectedProduct withKey:@"description"];
+	newProject.path = workingDirectory;
+	newProject.devicegroups = [[NSMutableArray alloc] init];
+
+	NSInteger count = 1;
+	BOOL done = YES;
+	NSString *name = [self getValueFrom:selectedProduct withKey:@"name"];
+
+	// Update the name if it matches - the user can change this at the saving stage
+
+	do
+	{
+		for (Project *project in projectArray)
+		{
+			if ([name compare:project.name] == NSOrderedSame)
+			{
+				name = [project.name stringByAppendingFormat:@" %li", (long)count];
+				++count;
+				done = NO;
+				break;
+			}
+			else
+			{
+				done = YES;
+			}
+		}
+	}
+	while (!done);
+
+	newProject.name = name;
+
+	NSDictionary *dict = @{ @"action" : @"downloadproduct",
+							@"project" : newProject };
+
+	// Add the project to the list of current downloading products
+	// TODO Do we need this? Probably not (we can refresh list at the end
+
+	if (downloads == nil) downloads = [[NSMutableArray alloc] init];
+
+	[downloads addObject:newProject];
+
+	// Now retrieve the device groups for this specific product id
+
+	[ide getDevicegroupsWithFilter:@"product.id" :newProject.pid :dict];
+
+	// At this point the we have to wait for the async call to 'productToProjectStageTwo'
+}
+
+
+
+- (IBAction)linkProjectToProduct:(id)sender
+{
+	if (selectedProduct == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
+		return;
+	}
+
+	if (currentProject == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
+	}
+
+	NSString *pid = [selectedProduct objectForKey:@"id"];
+
+	if (currentProject.pid != nil && [currentProject.pid compare:pid] == NSOrderedSame)
+	{
+		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is already linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+	}
+	else
+	{
+		currentProject.pid = pid;
+		currentProject.haschanged = YES;
+		[self refreshOpenProjectsMenu];
+
+		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+	}
+
+	// Update UI
+
+	[saveLight needSave:YES];
+	[_window setDocumentEdited:YES];
+}
+
+
+
+#pragma mark - New Device Group Mehods
+
+
+- (IBAction)newDevicegroup:(id)sender
+{
+	if (currentProject == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
+	}
+
+	if (sender != nil)
+	{
+		newDevicegroupLabel.stringValue = @"What would you like to call the new Device Group?";
+		newDevicegroupNameTextField.stringValue = @"";
+		newDevicegroupDescTextField.stringValue = @"";
+	}
+
+	// Set the 'add files' checkbox according to how we're calling up this dialog:
+	// It should be off and deactivated if we're coming from adding new files to project, otherwise it's active
+
+	if (newDevicegroupFlag)
+	{
+		newDevicegroupCheckbox.state = NSOffState;
+		newDevicegroupCheckbox.enabled = NO;
+	}
+	else
+	{
+		newDevicegroupCheckbox.state = NSOnState;
+		newDevicegroupCheckbox.enabled = YES;
+	}
+
+	[_window beginSheet:newDevicegroupSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)newDevicegroupSheetCancel:(id)sender
+{
+	[_window endSheet:newDevicegroupSheet];
+
+	if (newDevicegroupFlag)
+	{
+		// We are cancelling after adding files so check the user is sure
+
+		NSAlert *ays = [[NSAlert alloc] init];
+		[ays addButtonWithTitle:@"No"];
+		[ays addButtonWithTitle:@"Yes"];
+		[ays setMessageText:@"If you cancel, you will not add the selected file(s). Are you sure you want to proceed?"];
+		[ays setAlertStyle:NSWarningAlertStyle];
+		[ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+			if (returnCode == 1001)
+			{
+				// Proceed with the cancellation - currentDevicegroup indicates the new device group
+
+				[currentProject.devicegroups removeObject:currentDevicegroup];
+
+				if (currentProject.devicegroups.count > 0)
+				{
+					// We have other device groups in the project - select the first
+
+					currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
+					currentProject.devicegroupIndex = 0;
+				}
+				else
+				{
+					currentDevicegroup.models = nil;
+					currentDevicegroup = nil;
+					currentProject.devicegroupIndex = -1;
+				}
+
+				[self refreshMainDevicegroupsMenu];
+				[self refreshDevicegroupMenu];
+
+				saveUrls = nil;
+			}
+			else
+			{
+				// Cancel the cancellation. Make sure we pass in nil so that
+				// the fields are not cleared
+
+				[self newDevicegroup:nil];
+			}
+		}];
+	}
+}
+
+
+
+- (IBAction)newDevicegroupSheetCreate:(id)sender
+{
+	NSString *dgname = newDevicegroupNameTextField.stringValue;
+	NSString *dgdesc = newDevicegroupDescTextField.stringValue;
+	BOOL makeNewFiles = newDevicegroupCheckbox.state;
+
+	[_window endSheet:newDevicegroupSheet];
+
+	if (dgname.length > 80)
+	{
+		// Device Group name is too long
+
+		newDevicegroupLabel.stringValue = @"The name you chose is too long. Please choose another name, or cancel.";
+		[NSThread sleepForTimeInterval:2.0];
+		[self newDevicegroup:nil];
+		return;
+	}
+
+	if (dgdesc.length > 255)
+	{
+		// Device Group description is too long
+
+		newDevicegroupLabel.stringValue = @"The description you chose is too long. Please choose another name, or cancel.";
+		[NSThread sleepForTimeInterval:2.0];
+		[self newDevicegroup:nil];
+		return;
+	}
+
+	if (dgname.length == 0)
+	{
+		// Device Group name is too short
+
+		newDevicegroupLabel.stringValue = @"You must choose a Device Group name. Please choose a name, or cancel.";
+		[NSThread sleepForTimeInterval:2.0];
+		[self newDevicegroup:nil];
+		return;
+	}
+
+	Devicegroup *newdg = (newDevicegroupFlag == YES) ? currentDevicegroup : [[Devicegroup alloc] init];
+
+	if (currentProject.devicegroups == nil) currentProject.devicegroups = [[NSMutableArray alloc] init];
+
+	// Check we're not matching an existing name
+
+	if (currentProject.devicegroups.count > 0)
+	{
+		for (Devicegroup *adg in currentProject.devicegroups)
+		{
+			if ([adg.name compare:dgname] == NSOrderedSame)
+			{
+				newDevicegroupLabel.stringValue = @"The current Project already has a Device Group with that name. Please choose another, or cancel.";
+				[NSThread sleepForTimeInterval:2.0];
+				[self newDevicegroup:nil];
+				return;
+			}
+		}
+	}
+
+	newdg.name = dgname;
+	newdg.description = dgdesc;
+	newdg.type = [self convertDevicegroupType:newDevicegroupTypeMenu.selectedItem.title :YES];
+	newdg.type = @"development_devicegroup";
+
+	if (currentProject.pid != nil && currentProject.pid.length > 0)
+	{
+		// The current project is associated with a product so we can create the device group on the server
+
+		NSDictionary *dict = @{ @"action" : @"newdevicegroup",
+							    @"devicegroup" : newdg,
+								@"project" : currentProject,
+								@"files" : [NSNumber numberWithBool:makeNewFiles] };
+
+		[self writeToLog:[NSString stringWithFormat:@"Uploading Device Group \"%@\" to the impCloud.", newdg.name] :YES];
+
+		NSDictionary *details;
+
+		if (![newdg.type containsString:@"factoryfixture"])
+		{
+			details = @{ @"name" : newdg.name,
+						 @"description" : newdg.description,
+						 @"productid" : currentProject.pid,
+						 @"type" : newdg.type };
+
+			[ide createDevicegroup:details :dict];
+
+			// We will handle the addition of the device group and UI updates later - it will call
+			// the following code separately in 'createDevicegroupStageTwo:'
+		}
+		else
+		{
+			// TODO Need to specify a target production device group
+
+			// POPUP and ask
+		}
+	}
+	else
+	{
+		// The project is local only so far
+
+		// If we were adding source files, head back to that flow
+
+		if (newDevicegroupFlag)
+		{
+			[self processAddedFiles:saveUrls];
+			return;
+		}
+
+		// Select the new Device Group
+
+		if (currentDevicegroup != newdg)
+		{
+			[currentProject.devicegroups addObject:newdg];
+			currentDevicegroup = newdg;
+			currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+		}
+
+		// Update the UI
+
+		[self refreshDevicegroupMenu];
+		[self refreshMainDevicegroupsMenu];
+		[self setToolbar];
+
+		currentProject.haschanged = YES;
+		[saveLight needSave:YES];
+		[_window setDocumentEdited:YES];
+		[self refreshOpenProjectsMenu];
+
+		// Create the new device group's files as requested
+
+		if (makeNewFiles) [self createFilesForDevicegroup:newdg.name :@"agent"];
+	}
+}
+
+
+
+- (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype
+{
+	// We come here if we have to create source code files for a new device group
+
+	// Configure the NSSavePanel
+
+	saveProjectDialog = [NSSavePanel savePanel];
+	[saveProjectDialog setNameFieldStringValue:[filename stringByAppendingFormat:@".%@.nut", filetype]];
+	[saveProjectDialog setCanCreateDirectories:YES];
+	[saveProjectDialog setDirectoryURL:[NSURL fileURLWithPath:currentProject.path isDirectory:YES]];
+
+	if ([filetype compare:@"agent"] == NSOrderedSame)
+	{
+		saveProjectDialog.accessoryView = saveDevicegroupFilesAccessoryView;
+		saveDevicegroupFilesAccessoryViewCheckbox.state = NSOnState;
+	}
+	else
+	{
+		saveProjectDialog.accessoryView = nil;
+		saveDevicegroupFilesAccessoryViewCheckbox.state = NSOffState;
+	}
+
+	[saveProjectDialog beginSheetModalForWindow:_window
+							  completionHandler:^(NSInteger result)
+	 {
+		 // Close sheet first to stop it hogging the event queue
+
+		 [NSApp stopModal];
+		 [NSApp endSheet:saveProjectDialog];
+		 [saveProjectDialog orderOut:self];
+
+		 if (result == NSFileHandlingPanelOKButton)
+		 {
+			 if (saveDevicegroupFilesAccessoryViewCheckbox.state == NSOnState)
+			 {
+				 [self saveDevicegroupfiles:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]: kActionNewDGBothFiles];
+			 }
+			 else
+			 {
+				 if (saveProjectDialog.accessoryView == saveDevicegroupFilesAccessoryView)
+				 {
+					 [self saveDevicegroupfiles:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]: kActionNewDGAgentFile];
+				 }
+				 else
+				 {
+					 [self saveDevicegroupfiles:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]: kActionNewDGDeviceFile];
+				 }
+			 }
+		 }
+	 }
+	 ];
+
+	[NSApp runModalForWindow:saveProjectDialog];
+}
+
+
+
+- (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action
+{
+	// Save the savingProject project. This may be a newly created project and may not currentProject
+
+	BOOL success = NO;
+	NSString *savePath = [[saveDirectory path] stringByAppendingFormat:@"/%@", newFileName];
+	NSString *dataString = nil;
+
+	if (action == kActionNewDGBothFiles)
+	{
+		// The user wants the two files in the same place, so write the agent file now
+		// then recall this method to write the device file
+
+		if (newFileName == nil) newFileName = @"untitled.agent.nut";
+		dataString = @"// Agent Code\n\n";
+	}
+	else
+	{
+		if (newFileName == nil && action == kActionNewDGAgentFile) newFileName = @"untitled.agent.nut";
+		if (newFileName == nil && action == kActionNewDGDeviceFile) newFileName = @"untitled.device.nut";
+
+		dataString = (action == kActionNewDGDeviceFile) ? @"// Device Code\n\n" : @"// Agent Code\n\n";
+	}
+
+	NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
+
+	if ([nsfm fileExistsAtPath:savePath])
+	{
+		// The file already exists. We can safely overwrite it because that's what the user intended:
+		// They asked for it implicitly with a Save command, or told the Save As... dialog to replace the file
+
+		// Write the new version to a separate file
+
+		NSString *altPath = [savePath stringByAppendingString:@".new"];
+		success = [nsfm createFileAtPath:altPath contents:data attributes:nil];
+
+		if (success)
+		{
+			// We have successfully written the new file, so we can replace the old one with the new one
+
+			NSError *error;
+			NSURL *url;
+			success = [nsfm replaceItemAtURL:[NSURL fileURLWithPath:savePath]
+							 withItemAtURL:[NSURL fileURLWithPath:altPath]
+							backupItemName:nil
+								   options:NSFileManagerItemReplacementUsingNewMetadataOnly
+						  resultingItemURL:&url
+									 error:&error];
+		}
+	}
+	else
+	{
+		// The file doesn't already exist at this location so just write it out
+
+		success = [nsfm createFileAtPath:savePath contents:data attributes:nil];
+	}
+
+	if (success == YES)
+	{
+		// The new file was successfully written, so make a new model for it
+
+		Model *newModel = [[Model alloc] init];
+		newModel.filename = [savePath lastPathComponent];
+		newModel.path = [self getRelativeFilePath:currentProject.path :[savePath stringByDeletingLastPathComponent]];
+
+		if (currentDevicegroup.models == nil) currentDevicegroup.models = [[NSMutableArray alloc] init];
+
+		if (action == kActionNewDGBothFiles)
+		{
+			// We have just written the agent code file, so now go and write the device file in the same place
+
+			newModel.type = @"agent";
+			newFileName = [currentDevicegroup.name stringByAppendingString:@".device.nut"];
+			[currentDevicegroup.models addObject:newModel];
+			[self saveDevicegroupfiles:saveDirectory :newFileName :kActionNewDGDeviceFile];
+		}
+		else if (action == kActionNewDGAgentFile)
+		{
+			// User wants to save the device file separately, so add the model
+			// then re-present the save dialog
+
+			newModel.type = @"agent";
+			[currentDevicegroup.models addObject:newModel];
+
+			// Now go and pick the (different) device code file location
+
+			[self createFilesForDevicegroup:currentDevicegroup.name :@"device"];
+		}
+		else
+		{
+			newModel.type = @"device";
+			[currentDevicegroup.models addObject:newModel];
+
+			// Update the UI
+
+			[self refreshMainDevicegroupsMenu];
+		}
+	}
+	else
+	{
+		[self writeErrorToLog:@"[ERROR] The file could not be saved." :YES];
+	}
+}
+
+
+
+#pragma mark - Existing Device Group Methods
+
+- (void)chooseDevicegroup:(id)sender
+{
+	// User has selected a device group
+	// So we need to set 'currentDevicegroup' to the chosen device group
+	// And, depending on prefs, select the first device, if there is one
+	// then update the UI
+
+	NSMenuItem *item = (NSMenuItem *)sender;
+	currentDevicegroup = item.representedObject;
+	currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+
+	// Switch off unselected menus - and submenus
+
+	for (NSMenuItem *dgitem in deviceGroupsMenu.itemArray)
+	{
+		if (dgitem != item)
+		{
+			dgitem.state = NSOffState;
+
+			if (dgitem.submenu != nil)
+			{
+				for (NSMenuItem *sitem in dgitem.submenu.itemArray)
+				{
+					sitem.state = NSOffState;
+				}
+			}
+		}
+		else
+		{
+			dgitem.state = NSOnState;
+
+			// Use the flag to make sure we don't reselect the device
+			// after coming here from 'chooseDevice:'
+
+			if (!deviceSelectFlag)
+			{
+				if (dgitem.submenu != nil)
+				{
+					NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
+
+					// Select the device using 'chooseDevice:' as this manages 'selectedDevice'
+
+					[self chooseDevice:sitem];
+				}
+			}
+		}
+	}
+
+	deviceSelectFlag = NO;
+
+	// Update the UI: the Device Groups menu and the View menu (in case
+	// the selected device group has compiled code)
+
+	[self refreshLibraryMenus];
+	[self refreshDevicegroupMenu];
+	[self refreshMainDevicegroupsMenu];
+	[self setToolbar];
+}
+
+
+
+- (IBAction)deleteDevicegroup:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	if (currentDevicegroup.did != nil && currentDevicegroup.did.length > 0)
+	{
+		if (!ide.isLoggedIn)
+		{
+			// The user is not logged in, but the device group is associated with a device group on the server.
+
+			[self writeToLog:[NSString stringWithFormat:@"You are not logged in to the impCloud. You must be logged in to delete Device Group \"%@\".", currentDevicegroup.name] :YES];
+			return;
+		}
+
+		if (devicesArray.count > 0)
+		{
+			// We have a list of device so we can check if the the device group is populated or not
+
+			for (NSDictionary *device in devicesArray)
+			{
+				NSDictionary *dvdg = [self getValueFrom:device withKey:@"devicegroup"];
+				NSString *dvdgid = [dvdg objectForKey:@"id"];
+
+				if (dvdgid != nil && [dvdgid compare:currentDevicegroup.did] == NSOrderedSame)
+				{
+					// The device group has at least one device assigned to it so we can't delete
+
+					NSAlert *alert = [[NSAlert alloc] init];
+					alert.messageText = [NSString stringWithFormat:@"Device Group \"%@\" can’t be deleted.", currentDevicegroup.name];
+					alert.informativeText = [NSString stringWithFormat:@"Device Group \"%@\" has devices assigned to it. A Device Group can’t be deleted until all of its devices have been re-assigned.", currentDevicegroup.name];
+					[alert addButtonWithTitle:@"OK"];
+					[alert beginSheetModalForWindow:_window
+								  completionHandler:^(NSModalResponse response)
+								 {
+
+								 }
+					 ];
+
+					return;
+				}
+			}
+		}
+
+		// If we are here, the device group has no devices assigned, or we can't check at this time.
+		// So just try to delete it anyway - the server will warn if the group can't be deleted
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = [NSString stringWithFormat:@"Are you sure you wish to delete Device Group \"%@\"?", currentDevicegroup.name];
+		[alert addButtonWithTitle:@"No"];
+		[alert addButtonWithTitle:@"Yes"];
+		[alert beginSheetModalForWindow:_window
+					  completionHandler:^(NSModalResponse response)
+		 {
+			 if (response != NSAlertFirstButtonReturn)
+			 {
+				 // User wants to delete the device group
+
+				 NSDictionary *dict = @{ @"action" : @"deletedevicegroup",
+										 @"devicegroup" : currentDevicegroup };
+
+				 [ide deleteDevicegroup:currentDevicegroup.did :dict];
+
+				 // We will pick up this thread in 'deleteDevicegroupStageTwo:'
+			 }
+		 }
+		 ];
+
+		return;
+	}
+	else
+	{
+		// Device group in an unassociated project, so it can't have device associated with it.
+		// Remove it and select the project's first device group if it has one
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = [NSString stringWithFormat:@"Are you sure you wish to delete Device Group \"%@\"?", currentDevicegroup.name];
+		[alert addButtonWithTitle:@"No"];
+		[alert addButtonWithTitle:@"Yes"];
+		[alert beginSheetModalForWindow:_window
+					  completionHandler:^(NSModalResponse response)
+		 {
+			 if (response != NSAlertFirstButtonReturn)
+			 {
+				 // User wants to delete the device group
+
+				 [currentProject.devicegroups removeObject:currentDevicegroup];
+
+				 currentDevicegroup = currentProject.devicegroups.count > 0 ? [currentProject.devicegroups objectAtIndex:0] : nil;
+				 currentProject.devicegroupIndex = currentDevicegroup != nil ? [currentProject.devicegroups indexOfObject:currentDevicegroup] : -1;
+				 currentProject.haschanged = YES;
+
+				 [saveLight needSave:YES];
+				 [_window setDocumentEdited:YES];
+
+				 [self refreshOpenProjectsMenu];
+				 [self refreshMainDevicegroupsMenu];
+				 [self refreshDevicegroupMenu];
+			 }
+		 }
+		 ];
+	}
+}
+
+
+
+- (IBAction)renameDevicegroup:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	[self renameProject:sender];
+}
+
+
+
+- (IBAction)uploadCode:(id)sender
+{
+	if (!ide.isLoggedIn)
+	{
+		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to upload code." :YES];
+		return;
+	}
+
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	if (currentDevicegroup.did == nil || currentDevicegroup.did.length == 0)
+	{
+		[self writeErrorToLog:@"[ERROR] Cannot upload: the selected Device Group is not associated with a Device Group in the impCloud." :YES];
+		return;
+	}
+
+	if (currentDevicegroup.models.count == 0)
+	{
+		[self writeErrorToLog:@"[ERROR] The selected Device Group contains no code to upload." :YES];
+		return;
+	}
+
+	NSString *agentCode, *deviceCode;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if (!model.squinted)
+		{
+			[self writeErrorToLog:@"[ERROR] The selected Device Group contains uncompiled code. Please compile before uploading." :YES];
+			return;
+		}
+
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			agentCode = model.code;
+		}
+		else
+		{
+			deviceCode = model.code;
+		}
+	}
+
+	if (sender == uploadExtraMenuItem || sender == uploadCodeExtraItem)
+	{
+		// The user seleted the alterntive menu to upload extra info so do that and bail from here
+
+		uploadCommitTextField.stringValue = @"";
+		uploadOriginTextField.stringValue = @"";
+		uploadTagsTextField.stringValue = @"";
+
+		[_window beginSheet:uploadSheet completionHandler:nil];
+
+		return;
+	}
+
+	// We're doing a direct upload, so just prep the deployment data and send it
+
+	NSString *dt = [def stringFromDate:[NSDate date]];
+
+	NSDictionary *dg = @{ @"type" : currentDevicegroup.type,
+						  @"id" : currentDevicegroup.did };
+
+	NSDictionary *relationships = @{ @"devicegroup" : dg };
+	NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
+
+	[attributes setObject:(deviceCode != nil ? deviceCode : @"") forKey:@"device_code"];
+	[attributes setObject:(agentCode != nil ? agentCode : @"") forKey:@"agent_code"];
+	[attributes setObject:[NSString stringWithFormat:@"Uploaded from Squinter 2.0 at %@", dt] forKey:@"description"];
+
+	NSDictionary *deployment = @{ @"type" : @"deployment",
+								  @"attributes" : [NSDictionary dictionaryWithDictionary:attributes],
+								  @"relationships" : relationships };
+
+	NSDictionary *data = @{ @"data" : deployment };
+
+	NSDictionary *dict = @{ @"action" : @"uploadcode",
+							@"devicegroup" : currentDevicegroup };
+
+	[ide createDeployment:data :dict];
+
+	// Pick up the action at
+}
+
+
+
+- (IBAction)uploadCodeExtraCancel:(id)sender
+{
+	// The user wants to cancel, so just close the sheet
+
+	[_window endSheet:uploadSheet];
+}
+
+
+
+- (IBAction)uploadCodeExtraSkip:(id)sender
+{
+	// The user wants to skip uploading extra data, so just go and do a basic upload
+
+	[_window endSheet:uploadSheet];
+
+	[self uploadCode:nil];
+}
+
+
+
+- (IBAction)uploadCodeExtraUpload:(id)sender
+{
+	// Process the extra information from the dialog box and upload it with the model
+	// code as a new deployment
+
+	NSString *description = uploadCommitTextField.stringValue;
+	NSString *origin = uploadOriginTextField.stringValue;
+	NSString *tags = uploadTagsTextField.stringValue;
+	NSMutableArray *tagArray = [[NSMutableArray alloc] init];
+
+	[_window endSheet:uploadSheet];
+
+	if (description == nil) description = @"";
+	if (origin == nil) origin = @"";
+	if (tags == nil) tags = @"";
+
+	// Check tags for illegal characters
+
+	if (tags.length > 0)
+	{
+		NSError *err;
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: @"^[A-Za-z0-9_-*.]$"
+																			   options: NSRegularExpressionCaseInsensitive
+																				 error: &err];
+		NSArray *parts = [tags componentsSeparatedByString:@","];
+		NSInteger indices[parts.count];
+
+		for (NSUInteger i = 0 ; i < parts.count ; ++i)
+		{
+			indices[i] = 1;
+		}
+
+		if (!err)
+		{
+			for (NSUInteger i = 0 ; i < parts.count ; ++i)
+			{
+				NSString *part = [parts objectAtIndex:i];
+
+				NSTextCheckingResult *result = [regex firstMatchInString: part
+																 options: 0
+																   range: NSMakeRange(0, part.length)];
+
+				if (result == nil)
+				{
+					[self writeToLog:[NSString stringWithFormat:@"Tag \"%@\" is illegal and will be removed.", part] :YES];
+
+					indices[i] = 0;
+				}
+				else
+				{
+					indices[i] = 1;
+				}
+			}
+		}
+
+		for (NSUInteger i = 0 ; i < parts.count ; ++i)
+		{
+			if (indices[i] != 0)
+			{
+				NSString *part = [parts objectAtIndex:i];
+
+				// Top and tail whitespace from the tag
+
+				part = [part stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+				// Add the tag back to the 'tags' string
+
+				if (part.length != 0) [tagArray addObject:part];
+			}
+		}
+	}
+
+	NSString *agentCode, *deviceCode;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			agentCode = model.code;
+		}
+		else
+		{
+			deviceCode = model.code;
+		}
+	}
+
+	NSDictionary *dg = @{ @"type" : currentDevicegroup.type,
+						  @"id" : currentDevicegroup.did };
+
+	NSDictionary *relationships = @{ @"devicegroup" : dg };
+
+	NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
+
+	if (deviceCode != nil) [attributes setObject:deviceCode forKey:@"device_code"];
+	if (agentCode != nil) [attributes setObject:agentCode forKey:@"agent_code"];
+	if (description != nil && description.length > 0) [attributes setObject:description forKey:@"description"];
+	if (origin != nil && origin.length > 0) [attributes setObject:origin forKey:@"origin"];
+	if (tagArray != nil && tagArray.count > 0) [attributes setObject:tagArray forKey:@"tags"];
+
+	NSDictionary *deployment = @{ @"type" : @"deployment",
+								  @"attributes" : [NSDictionary dictionaryWithDictionary:attributes],
+								  @"relationships" : relationships };
+
+	NSDictionary *data = @{ @"data" : deployment };
+
+	NSDictionary *dict = @{ @"action" : @"uploadcode",
+							@"devicegroup" : currentDevicegroup };
+
+	[ide createDeployment:data :dict];
+}
+
+
+
+- (IBAction)removeSource:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	NSAlert *alert = [[NSAlert alloc] init];
+	alert.messageText = @"Are you sure you wish to remove the source code files from this Device Group?";
+	alert.informativeText = @"This will remove all source code files from the Device Group but not delete them. You can re-add source code files to the Device Group at any time.";
+	[alert addButtonWithTitle:@"No"];
+	[alert addButtonWithTitle:@"Yes"];
+	[alert beginSheetModalForWindow:_window
+				  completionHandler:^(NSModalResponse response)
+	 {
+		 if (response != NSAlertFirstButtonReturn)
+		 {
+			 if (currentDevicegroup.models.count > 0) [currentDevicegroup.models removeAllObjects];
+
+			 currentProject.haschanged = YES;
+			 [saveLight needSave:YES];
+			 [_window setDocumentEdited:YES];
+			 [self refreshOpenProjectsMenu];
+			 [self refreshMainDevicegroupsMenu];
+		 }
+	 }
+	 ];
+}
+
+
+
+- (IBAction)getCommits:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"getcommits",
+							@"devicegroup" : currentDevicegroup };
+
+	[ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
+
+	// Pick up the action in getCommitsStageTwo:
+}
+
+
+
+- (IBAction)updateCode:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"updatecode",
+							@"devicegroup" : currentDevicegroup };
+
+	[ide getDevicegroup:currentDevicegroup.did :dict];
+
+	// Pick up the action in updateCodeStageTwo:
+}
+
+
+
+#pragma mark - Existing Device Methods
+
+
+- (void)selectDevice
+{
+	// Select the first device in the current device group
+
+	if (currentDevicegroup.devices.count > 0 && devicesArray.count > 0)
+	{
+		NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
+
+		for (NSDictionary *device in devicesArray)
+		{
+			NSString *aDevId = [self getValueFrom:device withKey:@"name"];
+
+			if ([aDevId compare:devId] == NSOrderedSame)
+			{
+				selectedDevice = (NSMutableDictionary *)device;
+				[self refreshDevicesPopup];
+				[self refreshDeviceMenu];
+				break;
+			}
+		}
+	}
+}
+
+
+
+- (IBAction)updateDevicesStatus:(id)sender
+{
+	if (!ide.isLoggedIn)
+	{
+		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to update devices' status information." :YES];
+		return;
+	}
+
+	[self writeToLog:@"Updating devices’ status information - this may take a moment..." :YES];
+
+	// Get all the devices from development device groups and unassigned devices
+
+	NSDictionary *dict = @{ @"action" : @"getdevices" };
+
+	[ide getDevices:dict];
+}
+
+
+
+- (IBAction)restartDevice:(id)sender
+{
+	if (!ide.isLoggedIn)
+	{
+		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to restart devices." :YES];
+		return;
+	}
+
+	if (selectedDevice == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		return;
+	}
+
+	[self writeToLog:[NSString stringWithFormat:@"Restarting \"%@\"", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
+
+	NSDictionary *dict = @{ @"action" : @"restartdevice",
+							@"device" : selectedDevice };
+
+	[ide restartDevice:[self getValueFrom:selectedDevice withKey:@"id"] :dict];
+
+	// Pick up the action at 'restarted:'
+}
+
+
+
+- (IBAction)restartDevices:(id)sender
+{
+	if (!ide.isLoggedIn)
+	{
+		[self writeWarningToLog:@"[WARNING] You are not logged in to the impCloud. You must be logged in to restart devices." :YES];
+		return;
+	}
+
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"restartdevices",
+							@"devicegroup" : currentDevicegroup };
+
+	[ide restartDevices:currentDevicegroup.did :dict];
+
+	// Pick up the action at 'restarted:'
+}
+
+
+
+- (IBAction)unassignDevice:(id)sender
+{
+	if (!ide.isLoggedIn)
+	{
+		[self writeWarningToLog:@"[WARNING] You are not logged in to the impCloud. You must be logged in to unassign a device." :YES];
+		return;
+	}
+
+	if (selectedDevice == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		return;
+	}
+
+	NSMutableDictionary *devicegroup = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
+
+	if (devicegroup == nil)
+	{
+		[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Device \"%@\" is already unassigned.", [self getValueFrom:selectedDevice withKey:@"name"]]:YES];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"unassign",
+							@"device" : selectedDevice };
+
+	[ide unassignDevice:selectedDevice :dict];
+
+	// Pick up the action at 'reassigned:'
+}
+
+
+
+- (IBAction)assignDevice:(id)sender
+{
+	// Remember, we assign a device to a device group of the right type, not to a product
+	// For now we are only assigning development devices to devicegroups we know about
+
+	if (!ide.isLoggedIn)
+	{
+		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to assign a device." :YES];
+		return;
+	}
+
+	if (devicesArray == nil || devicesArray.count == 0)
+	{
+		// We have no device(s) to assign
+
+		[self writeErrorToLog:@"[ERROR] You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
+		return;
+	}
+
+	if (projectArray == nil || projectArray.count == 0)
+	{
+		// We have no projects open - so we can't assign a device to an open device group
+
+		[self writeErrorToLog:@"[ERROR] You have no Projects open. You will need to create or open a Project and add a Device Group to assign a device." :YES];
+		return;
+	}
+
+	[assignDeviceMenuDevices removeAllItems];
+	[assignDeviceMenuModels removeAllItems];
+
+	assignDeviceMenuModels.autoenablesItems = NO;
+
+	// Assemble the devices list
+
+	for (NSDictionary *device in devicesArray)
+	{
+		[assignDeviceMenuDevices addItemWithTitle:[self getValueFrom:device withKey:@"name"]];
+		NSMenuItem *item = [assignDeviceMenuDevices.itemArray lastObject];
+		item.representedObject = device;
+	}
+
+	// Assemble the projects list with device groups
+
+	NSMenuItem *item;
+
+	for (Project *project in projectArray)
+	{
+		if (project.devicegroups.count > 0)
+		{
+			// Add the project name as a section header but disable it - it's a marker
+
+			[assignDeviceMenuModels addItemWithTitle:[NSString stringWithFormat:@"Project \"%@\":", project.name]];
+			item = [assignDeviceMenuModels.itemArray lastObject];
+			item.enabled = NO;
+			item.representedObject = nil;
+
+			// Add all the device groups' names
+
+			for (Devicegroup *dg in project.devicegroups)
+			{
+				[assignDeviceMenuModels addItemWithTitle:dg.name];
+				item = [assignDeviceMenuModels.itemArray lastObject];
+				item.representedObject = dg;
+			}
+		}
+	}
+
+	if (assignDeviceMenuModels.itemArray.count == 0)
+	{
+		// We have no device groups to assign
+
+		[self writeErrorToLog:@"[ERROR] None of your open Projects have any Device Groups. You will need to create a Device Group to assign a device." :YES];
+		return;
+	}
+
+	if (currentDevicegroup != nil)
+	{
+		// Select the current device group on the list
+
+		[assignDeviceMenuModels selectItemWithTitle:currentDevicegroup.name];
+	}
+	else
+	{
+		// There's no current device group, so select the first on the list
+		// This is at index 1 because index 0 will be the project name
+
+		[assignDeviceMenuModels selectItemAtIndex:1];
+	}
+
+	if (selectedDevice != nil)
+	{
+		// Select the current device on the list, otherwise the first device will be listed automatically
+
+		[assignDeviceMenuDevices selectItemAtIndex:[assignDeviceMenuDevices indexOfItemWithRepresentedObject:selectedDevice]];
+	}
+
+	[_window beginSheet:assignDeviceSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)assignDeviceSheetCancel:(id)sender
+{
+	[_window endSheet:assignDeviceSheet];
+}
+
+
+
+- (IBAction)assignDeviceSheetAssign:(id)sender
+{
+	// Get the referenced device group and device
+
+	NSInteger devIndex = [assignDeviceMenuDevices indexOfSelectedItem];
+	NSInteger dgIndex = [assignDeviceMenuModels indexOfSelectedItem];
+
+	NSMenuItem *item = [assignDeviceMenuDevices itemAtIndex:devIndex];
+	NSMutableDictionary *device = item.representedObject;
+
+	item = [assignDeviceMenuModels itemAtIndex:dgIndex];
+	Devicegroup *dg = item.representedObject;
+
+	// Remove the sheet
+
+	[_window endSheet:assignDeviceSheet];
+
+	if (dg.did == nil || dg.did.length == 0)
+	{
+		// The device group is not synced, so we can't proceed with the assignment
+
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Device \"%@\" not assigned because the chosen Device Group, \"%@\" is not yet associated with a Device Group in the impCloud.", [self getValueFrom:device withKey:@"name"], dg.name] :YES];
+		return;
+	}
+
+	// Assign the device to the device group
+
+	NSDictionary *dict = @{ @"action" : @"assign",
+							@"device" : device,
+							@"devicegroup" : dg };
+
+	[ide assignDevice:device :dg.did :dict];
+
+	// Pick up the action at 'reassigned:'
+}
+
+
+
+- (IBAction)renameDevice:(id)sender
+{
+	if (devicesArray == nil || devicesArray.count == 0)
+	{
+		// We have no device to rename
+
+		[self writeErrorToLog:@"[ERROR] You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
+		return;
+	}
+
+	// Assemble the devices list
+
+	[renameMenu removeAllItems];
+
+	for (NSMutableDictionary *device in devicesArray)
+	{
+		NSString *dname = [self getValueFrom:device withKey:@"name"];
+		[renameMenu addItemWithTitle:dname];
+		NSMenuItem *item = [renameMenu itemWithTitle:dname];
+		item.representedObject = device;
+	}
+
+	// If we have a device selected, makes sure it is also selected in the sheet pop-up
+
+	if (selectedDevice != nil) [renameMenu selectItemWithTitle:[self getValueFrom:selectedDevice withKey:@"name"]];
+
+	// Present the sheet
+
+	renameName.stringValue = @"";
+
+	[_window beginSheet:renameSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)closeRenameSheet:(id)sender
+{
+	[_window endSheet:renameSheet];
+}
+
+
+
+- (IBAction)saveRenameSheet:(id)sender
+{
+	// Get the selected device
+
+	NSString *newName = renameName.stringValue;
+	NSMutableDictionary *device = renameMenu.selectedItem.representedObject;
+
+	// Remove the sheet
+
+	[_window endSheet:renameSheet];
+
+	NSString *dname = [self getValueFrom:device withKey:@"name"];
+
+	// Has the name actually been changed?
+
+	if ([dname compare:newName] == NSOrderedSame)
+	{
+		// The user hasn't changed the name
+
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] The name of device \"%@\" remains unchanged.", newName] :YES];
+		return;
+	}
+
+	// Prep the relayed data in case we need it
+
+	NSDictionary *dict = @{ @"action" : @"rename",
+						    @"old" : dname,
+							@"new" : newName,
+							@"device" : device };
+
+	// Check for existing device name usage
+
+	BOOL used = NO;
+
+	for (NSMutableDictionary *aDevice in devicesArray)
+	{
+		dname = [self getValueFrom:aDevice withKey:@"name"];
+
+		if ([dname compare:newName] == NSOrderedSame) used = YES;
+	}
+
+	if (used)
+	{
+		// The device name is already in use. This is legal, but we should confirm with the user
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = [NSString stringWithFormat:@"The device name \"%@\" is already in use. Having multiple devices with the same name may cause confusion. Are you sure you want to rename this device?", newName];
+		[alert addButtonWithTitle:@"No"];
+		[alert addButtonWithTitle:@"Yes"];
+		[alert addButtonWithTitle:@"Cancel"];
+		[alert beginSheetModalForWindow:_window
+					  completionHandler:^(NSModalResponse response)
+		 {
+			 if (response == NSAlertFirstButtonReturn)
+			 {
+				 // User doesn't want wants to rename the device, but clicked 'No' so re-present the rename sheet
+
+				 [_window beginSheet:renameSheet completionHandler:nil];
+				 return;
+			 }
+
+			 if (response == NSAlertSecondButtonReturn)
+			 {
+				 // User does want to rename, so proceed
+
+				 [ide updateDevice:[self getValueFrom:device withKey:@"id"] :newName :dict];
+				 return;
+			 }
+
+			 // If we're here, the user click cancel, so we can just ignore everything
+		 }
+		 ];
+	}
+	else
+	{
+		// The new name is unused so process it
+
+		[ide updateDevice:[self getValueFrom:device withKey:@"id"] :newName :dict];
+
+		// Pick up the action at 'renameDeviceStageTwo:'
+	}
+}
+
+
+
+- (IBAction)chooseDevice:(id)sender
+{
+	// The user has selected a device from one of three places:
+	// - Device PopUp
+	// - Unassigned Devices submenu
+	// - Device Groups submenu
+
+	NSMenuItem *item;
+	BOOL isUnassigned = NO;
+	BOOL isAssigned = NO;
+	BOOL isPopup = NO;
+
+	if (sender == devicesPopUp)
+	{
+		// Device selected from the popup rather than the menu
+
+		item = devicesPopUp.selectedItem;
+
+		if ([item.title compare:@"None"] == NSOrderedSame)
+		{
+			item.enabled = NO;
+			return;
+		}
+
+		selectedDevice = item.representedObject;
+		isPopup = YES;
+	}
+	else
+	{
+		item = (NSMenuItem *)sender;
+
+		// We may be here from the Unassigned Device menu or from a Device Groups submenu
+
+		if (item.menu == unassignedDevicesMenu)
+		{
+			isUnassigned = YES;
+		}
+		else
+		{
+			isAssigned = YES;
+		}
+
+		selectedDevice = item.representedObject;
+	}
+
+	// Run through the Device Groups submenus and switch all the entries off
+	// EXCEPT the entry matching 'selectedDevice' IF we came here from this menu
+
+	for (NSMenuItem *dgitem in deviceGroupsMenu.itemArray)
+	{
+		if (dgitem.submenu != nil)
+		{
+			for (NSMenuItem *sitem in dgitem.submenu.itemArray)
+			{
+				sitem.state = NSOffState;
+
+				if (isAssigned || isPopup)
+				{
+					if (sitem.representedObject == selectedDevice)
+					{
+						sitem.state = NSOnState;
+						if (dgitem.representedObject != currentDevicegroup)
+						{
+							deviceSelectFlag = YES;
+							[self chooseDevicegroup:dgitem];
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Run through the Unassigned Devices menu and switch all the entries off
+	// EXCEPT the one matching 'selectedDevice' IF we came here from this menu
+
+	for (NSMenuItem *unitem in unassignedDevicesMenu.itemArray)
+	{
+		unitem.state = NSOffState;
+
+		if (isUnassigned || isPopup)
+		{
+			if (unitem.representedObject == selectedDevice)
+			{
+				unitem.state = NSOnState;
+			}
+		}
+	}
+
+	NSInteger index = [devicesArray indexOfObject:selectedDevice];
+	[devicesPopUp selectItemWithTag:index];
+
+	// Update the UI
+
+	[self refreshDevicegroupMenu];
+	[self refreshDeviceMenu];
+	[self setToolbar];
+}
+
+
+
+- (IBAction)deleteDevice:(id)sender
+{
+	if (selectedDevice == nil)
+	{
+		return;
+	}
+
+	NSAlert *alert = [[NSAlert alloc] init];
+	alert.messageText = [NSString stringWithFormat:@"You are about to remove device \"%@\" from your account. Are you sure?", [self getValueFrom:selectedDevice withKey:@"name"]];
+	alert.informativeText = @"You can always re-add the device using BlinkUp.";
+
+	[alert addButtonWithTitle:@"No"];
+	[alert addButtonWithTitle:@"Yes"];
+
+	[alert beginSheetModalForWindow:_window
+				  completionHandler:^(NSModalResponse response)
+		{
+			if (response != NSAlertFirstButtonReturn)
+			{
+				NSDictionary *dict = @{ @"action" : @"deletedevice",
+										@"device" : selectedDevice };
+
+				[ide deleteDevice:[selectedDevice objectForKey:@"id"] :dict];
+			}
+		}
+	];
+}
+
+
+
+- (IBAction)getLogs:(id)sender
+{
+	if (selectedDevice == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		return;
+	}
+
+	NSDictionary *dict;
+
+	if (sender == getLogsMenuItem)
+	{
+		dict = @{ @"action" : @"getlogs" ,
+				  @"device" : selectedDevice };
+
+		[ide getDeviceLogs:[self getValueFrom:selectedDevice withKey:@"id"] :dict];
+	}
+	else
+	{
+		dict = @{ @"action" : @"gethistory" ,
+				  @"device" : selectedDevice };
+
+		[ide getDeviceHistory:[self getValueFrom:selectedDevice withKey:@"id"] :dict];
+	}
+}
+
+
+
+- (IBAction)streamLogs:(id)sender
+{
+	if (selectedDevice == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		return;
+	}
+
+	NSString *devid = [self getValueFrom:selectedDevice withKey:@"id"];
+	NSString *devname = [self getValueFrom:selectedDevice withKey:@"name"];
+
+	if (![ide isDeviceLogging:devid])
+	{
+		if (ide.numberOfLogStreams == 0) [self setLoggingColours];
+
+		if (ide.numberOfLogStreams == 5)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = @"You are already logging five devices";
+			alert.informativeText = @"The impCentral API only supports logging for up to five devices simultaneously. To stream logs from another device, you will need to stop logging from one of the current streaming devices.";
+			[alert addButtonWithTitle:@"OK"];
+			[alert beginSheetModalForWindow:_window
+						  completionHandler:^(NSModalResponse response)
+			 {
+				 return;
+			 }
+			 ];
+
+			return;
+		}
+
+		streamLogsItem.state = 1;
+
+		[ide startLogging:devid :@{ @"device" : selectedDevice }];
+
+		if (devname.length > logPaddingLength) logPaddingLength = devname.length;
+	}
+	else
+	{
+		[ide stopLogging:devid];
+
+		// Reset the log padding to the longest logging device name
+
+		logPaddingLength = 0;
+
+		for (NSMutableDictionary *device in devicesArray)
+		{
+			devid = [self getValueFrom:device withKey:@"id"];
+
+			if ([ide isDeviceLogging:devid])
+			{
+				devname = [self getValueFrom:device withKey:@"name"];
+
+				if (devname.length > logPaddingLength) logPaddingLength = devname.length;
+			}
+		}
+
+		streamLogsItem.state = 1;
+	}
+
+	// Update the UI elements showing device names
+
+	[squinterToolbar validateVisibleItems];
+	[self refreshDevicesPopup];
+	[self refreshDevicegroupMenu];
+}
+
+
+
+#pragma mark - File Location and Opening Methods
+
+
+- (void)presentOpenFilePanel:(NSInteger)openActionType
+{
+	// Complete the open file dialog settings with generic preferences
+
+	openDialog.canChooseFiles = YES;
+	openDialog.canChooseDirectories = NO;
+	openDialog.delegate = self;
+
+	// Start off at the working directory
+
+	openDialog.directoryURL = [NSURL fileURLWithPath:workingDirectory isDirectory:YES];
+
+	// Run the NSOpenPanel
+
+	[openDialog beginSheetModalForWindow:_window
+					   completionHandler:^(NSInteger result)
+						 {
+							 // Close sheet first to stop it hogging the event queue
+
+							 [NSApp stopModal];
+							 [NSApp endSheet:openDialog];
+							 [openDialog orderOut:self];
+
+							 if (result == NSFileHandlingPanelOKButton) [self openFileHandler:[openDialog URLs] :openActionType];
+							 return;
+						 }
+	 ];
+
+	[NSApp runModalForWindow:openDialog];
+	[openDialog makeKeyWindow];
+}
+
+
+
+- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType
+{
+	// This is where we open/add all files selected by the open file dialog
+	// Multiple files may be passed in, as an array of URLs, and they will contain either
+	// project files OR source code files (as specified by 'openActionType'
+
+	if (openActionType == kActionOpenSquirrelProject)
+	{
+		// We're openning a Squirrel project, so pass on the array of URLs, converted to a mutable array
+
+		[self openSquirrelProjects:[NSMutableArray arrayWithArray:urls]];
+	}
+	else
+	{
+		// We are opening one or more source code files to add to a device group, which may be new
+		// Check the number of files selected. If we are using source files to create a project,
+		// it should never be more than two
+
+		if (urls.count > 2)
+		{
+			// The user has selected too many source files - they can't all be used - so present
+			// a warning and then bail back to the file selection start ('selectFile:');
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = @"You have selected too many source files";
+			alert.informativeText = [NSString stringWithFormat:@"Device Groups can contain only two source code files: one *.agent.nut and one *.device.nut, but you selected %lu files. Please select two source code files.", (long)urls.count];
+			[alert addButtonWithTitle:@"OK"];
+			[alert beginSheetModalForWindow:_window
+						  completionHandler:^(NSModalResponse response)
+							 {
+								 return;
+							 }
+			 ];
+
+			return;
+		}
+
+		if (accessoryViewNewProjectCheckbox.state == NSOnState)
+		{
+			// This will be set if we have one or two source code files from which the user wants to make a device group.
+			// NOTE this should only be possible if we have a current project, ie. we can assume 'currentProject' != nil
+
+			// Make a new device group, and set it to current
+			// TODO should we set it to a neutral variable in case it fails?
+
+			currentDevicegroup = [[Devicegroup alloc] init];
+			currentDevicegroup.models = [[NSMutableArray alloc] init];
+			[currentProject.devicegroups addObject:currentDevicegroup];
+			currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+
+			// This flag tracks the establishment of a newDeviceGroup, but it needs to be NO for now
+
+			newDevicegroupFlag = NO;
+		}
+
+		// Process the added file(s)
+
+		[self processAddedFiles:[NSMutableArray arrayWithArray:urls]];
+	}
+}
+
+
+
+#pragma mark Open Squirrel Projects
+
+
+- (void)openSquirrelProjects:(NSMutableArray *)urls
+{
+	// We are opening one Squirrel project files from an array ('urls')
+	// When a file has been opened (or rejected for some reason) it is removed
+	// from the array and 'openSquirrelProjects' is called recursively until there
+	// are no more urls left in the array
+
+	if (urls.count == 0) return;
+
+	Project *aProject;
+	NSString *fileName, *newName, *filePath, *oldPath;
+	NSURL *url;
+
 	BOOL nameMatch = NO;
 	BOOL pathMatch = NO;
 	BOOL gotFlag = NO;
+	BOOL projectMoved = NO;
 
-	filePath = [[urls objectAtIndex:count] path];
-	newProject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+	url = [urls objectAtIndex:0];
+	filePath = [url path];
+	[urls removeObjectAtIndex:0];
+	aProject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
 
-	if (newProject)
+	if (aProject != nil)
 	{
 		// Project opened successfully
+
+		// Check for an old project being opened - if it is convert it as best as we can
+
+		if ([aProject.pid compare:@"old"] == NSOrderedSame)
+		{
+			// NOTE .pid = 'old' is set when we open an pre-3.0 project using code in Project.m
+			// which uses 'devicegroups' to store old file location data and 'description' to
+			// hold the number and type of files
+
+			[self writeToLog:[NSString stringWithFormat:@"Converting an earlier Squirrel project file (%@) to a current one (%@)", aProject.version, kSquinterCurrentVersion] :YES];
+
+			NSString *agentPath, *devicePath;
+			Model *model;
+
+			NSInteger files = aProject.description.integerValue;
+
+			NSArray *parts = [aProject.version componentsSeparatedByString:@"."];
+			NSInteger major = [[parts objectAtIndex:0] integerValue];
+			NSInteger minor = [[parts objectAtIndex:1] integerValue];
+			BOOL absFlag = NO;
+
+			if (major < 2 || (major == 2 && minor < 1))
+			{
+				// If the old project is less than 2.1 CHECK, the paths will be absolute
+
+				absFlag = YES;
+			}
+
+			if (files > 0)
+			{
+				// The old Squinter project has associated model files, which we now need
+				// to put into a device group. We mark this as 'old' to ensure it gets uploaded later
+
+				Devicegroup *dg = [[Devicegroup alloc] init];
+				dg.models = [[NSMutableArray alloc] init];
+				dg.name = [aProject.name stringByAppendingString:@" Device Group"];
+				dg.did = @"old";
+
+				if (files > 1)
+				{
+					// We have agent code
+
+					agentPath = [aProject.devicegroups objectAtIndex:0];
+
+					if (absFlag) agentPath = [self getRelativeFilePath:[filePath stringByDeletingLastPathComponent] :agentPath];
+				}
+
+				if (files & 0x01)
+				{
+					// We have device code
+
+					files = (files > 1) ? 1 : 0;
+					devicePath = [aProject.devicegroups objectAtIndex:files];
+
+					if (absFlag) devicePath = [self getRelativeFilePath:[filePath stringByDeletingLastPathComponent] :devicePath];
+				}
+
+				// Clear out the saved file data
+
+				[aProject.devicegroups removeAllObjects];
+
+				if (agentPath.length > 0)
+				{
+					model = [[Model alloc] init];
+					model.path = agentPath;
+					model.filename = [model.path lastPathComponent];
+					model.path = [model.path stringByDeletingLastPathComponent];
+					model.type = @"agent";
+
+					[dg.models addObject:model];
+				}
+
+				if (devicePath.length > 0)
+				{
+					model = [[Model alloc] init];
+
+					model.path = devicePath;
+					model.filename = [model.path lastPathComponent];
+					model.path = [model.path stringByDeletingLastPathComponent];
+					model.type = @"device";
+
+					[dg.models addObject:model];
+				}
+
+				[aProject.devicegroups addObject:dg];
+			}
+
+			// Clear project settings used in conversion process
+
+			aProject.haschanged = YES;
+			aProject.version = @"3.0";
+			aProject.description = @"";
+
+			if (aProject.path == nil || aProject.path.length == 0) aProject.path = [filePath stringByDeletingLastPathComponent];
+
+			[self writeToLog:@"Project converted." :YES];
+		}
+
 		// Check for a change of project name via project filename
 
 		pathMatch = [self checkProjectPaths:nil :filePath];
@@ -1531,79 +4068,98 @@
 			// but we still need to check the name, in case we have to add '01' to the name
 
 			newName = [[filePath lastPathComponent] stringByDeletingPathExtension];
-			nameMatch = [self checkProjectNames:nil :newProject.projectName];
+			nameMatch = [self checkProjectNames:nil :aProject.name];
 
 			if (nameMatch)
 			{
-				// Name matches an existing open project from a different project file
+				// Name matches an existing open project from a non-matching project file (path different)
 
-				if ([newName compare:newProject.projectName] != NSOrderedSame)
+				NSString *aName = aProject.name;
+
+				if ([newName compare:aName] != NSOrderedSame)
 				{
-					// The project's name and its filename don't match, so try the filename
+					// The project's name and its filename don't match, so we may be able to list it by filename
+					// provided that's not already on the list too
 
 					if (![self checkProjectNames:nil :newName])
 					{
-						// Filename-derived project name doesn't match, so use that
+						// Filename-derived project name doesn't match an existing name, so use that
 
-						[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
-						newProject.projectName = newName;
-						newProject.projectHasChanged = YES;
-						newName = nil;
+						[self writeToLog:[NSString stringWithFormat:@"A Project called \"%@\" is already loaded so the new Project's filename, \"%@.squirrelproj\", will be used", aName, newName] :YES];
 					}
 					else
 					{
-						// Project name matches *and* filename-derived name
-						// TODO
+						// The project's name and its filename match, so we have to use the name
+						// but modify it with a numeric value (which may also be on the the list)
+
+						NSInteger projectCount = 0;
+
+						for (NSUInteger j = 0 ; j < openProjectsMenu.numberOfItems ; ++j)
+						{
+							NSString *mName = [[openProjectsMenu itemAtIndex:j] title];
+
+							if ([mName containsString:aName])
+							{
+								// The project menu contains a title which includes the new project's name
+
+								if (mName.length == aName.length)
+								{
+									// If they are the same length, we can just add a value to the new project's name
+
+									++projectCount;
+								}
+								else
+								{
+									// If they are a different length, we have to check that the difference is
+									// ONLY the addition of a number (watch for the space between name and number)
+
+									NSString *sub = [mName substringFromIndex:aName.length + 1];
+									if (sub.integerValue > 0) ++projectCount;
+								}
+							}
+						}
+
+						if (projectCount > 0) newName = [aName stringByAppendingFormat:@" %li", (long)(projectCount + 1)];
 					}
 				}
 				else
 				{
-					// We have a project with the same name as another
+					// The project's name and its filename do match, so we have to use the name
+					// but modify it with a numeric value (which may also be on the the list)
 
-					NSInteger c = 0;
+					NSInteger projectCount = 0;
 
-					for (NSUInteger j = 0 ; j < projectsMenu.numberOfItems ; ++j)
+					for (NSUInteger j = 0 ; j < openProjectsMenu.numberOfItems ; ++j)
 					{
-						NSString *aProject = [[projectsMenu itemAtIndex:j] title];
+						NSString *mName = [[openProjectsMenu itemAtIndex:j] title];
 
-						if ([aProject containsString:newProject.projectName])
+						if ([mName containsString:aName])
 						{
-							if (aProject.length == newProject.projectName.length)
+							// The project menu contains a title which includes the new project's name
+
+							if (mName.length == aName.length)
 							{
-								++c;
+								// If they are the same length, we can just add a value to the new project's name
+
+								++projectCount;
 							}
 							else
 							{
-								NSString *sub = [aProject substringFromIndex:newProject.projectName.length + 1];
+								// If they are a different length, we have to check that the difference is
+								// ONLY the addition of a number (watch for the space between name and number)
 
-								if (sub.integerValue > 0)
-								{
-									++c;
-								}
+								NSString *sub = [mName substringFromIndex:aName.length + 1];
+								if (sub.integerValue > 0) ++projectCount;
 							}
 						}
 					}
 
-					if (c > 0) newName = [newProject.projectName stringByAppendingFormat:@" %li", (long)(c + 1)];
+					if (projectCount > 0) newName = [aName stringByAppendingFormat:@" %li", (long)(projectCount + 1)];
 				}
 			}
 			else
 			{
 				// Name doesn't match an existing open project
-
-				if ([newName compare:newProject.projectName] != NSOrderedSame)
-				{
-					// The project's name and its filename don't match, so try the filename
-
-					if (![self checkProjectNames:nil :newName])
-					{
-						// Filename-derived project name doesn't match, so use that
-
-						[self writeToLog:[NSString stringWithFormat:@"Changing project name \"%@\" to match its filename, \"%@.squirrelproj\"", newProject.projectName, newName] :YES];
-						newProject.projectName = newName;
-						newProject.projectHasChanged = YES;
-					}
-				}
 
 				newName = nil;
 			}
@@ -1612,6 +4168,8 @@
 		{
 			// Full path (path + name) matches so user is trying to open an already open project
 
+			[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is already open.", aProject.name] :YES];
+			aProject = nil;
 			gotFlag = YES;
 		}
 
@@ -1619,280 +4177,434 @@
 		{
 			// Set the newly opened project to be the current one
 
-			currentProject = newProject;
-			currentProject.projectPath = [filePath stringByDeletingLastPathComponent];
+			currentProject = aProject;
+			currentDevicegroup = nil;
+			currentProject.devicegroupIndex = -1;
 
-			NSInteger versionComparison = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+			// Update the 'path' and 'filename' according to where we have just loaded the file from
+			// NOTE 'oldPath' points to where it was when previously opened, which may not be the same
 
-			[self writeToLog:[NSString stringWithFormat:@"Loading project \"%@\" from file \"%@\".", currentProject.projectName, filePath] :YES];
+			oldPath = currentProject.path;
+			currentProject.path = [filePath stringByDeletingLastPathComponent];
+			currentProject.filename = [filePath lastPathComponent];
+
+			[self writeToLog:[NSString stringWithFormat:@"Loading Project \"%@\" from file \"%@\".", currentProject.name, filePath] :YES];
+
+			// Are the loaded and stored paths different?
+
+			if ([oldPath compare:currentProject.path] != NSOrderedSame)
+			{
+				[self writeToLog:[NSString stringWithFormat:@"Project file has moved from %@ to %@ since it was last opened.", oldPath, currentProject.path] :YES];
+				projectMoved = YES;
+				//currentProject.haschanged = YES;
+			}
 
 			// Add the opened project to the array of open projects
 
 			[projectArray addObject:currentProject];
 
-			// Set up kernel queue to watch for file changes
+			// Is the project associated with a product? If so, select it
 
-			if (fileWatchQueue == nil)
+			if (currentProject.pid.length > 0 && productsArray.count > 0)
 			{
-				fileWatchQueue = [[VDKQueue alloc] init];
-				[fileWatchQueue setDelegate:self];
-			}
-
-			if (versionComparison != kLower)
-			{
-				// Projects of version 2.1 and up stored relative paths, so convert to temporary absolute path
-
-				currentAgentPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
-				currentDevicePath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
-			}
-			else
-			{
-				// Projects of version 2.0 and below stored absolute path, os use them unchanged
-
-				if (currentProject.projectAgentCodePath != nil) currentAgentPath = currentProject.projectAgentCodePath;
-				if (currentProject.projectDeviceCodePath != nil) currentDevicePath = currentProject.projectDeviceCodePath;
-			}
-
-			if (currentAgentPath != nil)
-			{
-				// Does the project's recorded agent code path point to a real file?
-
-				if ([self checkFile:currentAgentPath] == YES)
+				if ([currentProject.pid compare:@"old"] == NSOrderedSame)
 				{
-					// It does and the pointer indicates an extant file
+					// We have a converted project we probably need to upload becuase it won't
+					// be associated with a product yet, and its device group (see above) won't
+					// have an ID yet either
 
-					externalOpenMenuItem.enabled = YES;
-					externalOpenAgentItem.enabled = YES;
-					externalOpenBothItem.enabled = YES;
+					if (ide.isLoggedIn)
+					{
+						[self writeToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
+
+						// Run the transfer as a standard upload, though we bypass uploadProject: at first
+
+						NSDictionary *dict = @{ @"action" : @"uploadproject",
+												@"project" : currentProject };
+
+						[ide createProduct:currentProject.name :currentProject.description :dict];
+
+						// Asynchronous pick up in 'createProductStageTwo:' but we continue here
+					}
+					else
+					{
+						// We're not logged in so warn the user
+						// This is important so pop up an alert this time
+
+						NSAlert *alert = [[NSAlert alloc] init];
+						[alert addButtonWithTitle:@"OK"];
+						[alert setMessageText:@"You are not logged in to your account."];
+						[alert setInformativeText:[NSString stringWithFormat:@"You will need to upload project \"%@\" manually later, after you have logged in.", currentProject.name]];
+						[alert setAlertStyle:NSWarningAlertStyle];
+						[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) { }];
+					}
 				}
 				else
 				{
-					// There is no file where the pointer is indicating, so see if it's in the working directory
-
-					NSString *path = [currentAgentPath lastPathComponent];
-					path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
-
-					if ([self checkFile:path] == YES)
+					for (NSMenuItem *item in productsMenu.itemArray)
 					{
-						// File is in the working directory, so update the saved path
+						NSMutableDictionary *product = (NSMutableDictionary *)item.representedObject;
+						NSString *pid = [self getValueFrom:product withKey:@"id"];
 
-						currentAgentPath = path;
-						externalOpenMenuItem.enabled = YES;
-						externalOpenAgentItem.enabled = YES;
-						externalOpenBothItem.enabled = YES;
-						[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project’s agent code file has been moved to \"%@\".", path] :YES];
+						if (pid != nil && [pid compare:currentProject.pid] == NSOrderedSame)
+						{
+							[self chooseProduct:item];
+							break;
+						}
 					}
-					else
-					{
-						// Can't see the agent code file in the working directory so clear the pointer and warn the user
-
-						currentAgentPath = nil;
-						[self writeToLog:@"[WARNING] The project’s agent code file has been moved to an unknown location. You will need to add it back to the project." :YES];
-					}
-
-					currentProject.projectHasChanged = YES;
 				}
 			}
 
-			if (currentDevicePath != nil)
-			{
-				// As above per the agent code file, this time for the device code file
+			// Update the Project menu’s 'openProjectsMenu' sub-menu by adding the project's name
+			// (or 'newName' if we are using a temporary name because of a match)
 
-				if ([self checkFile:currentDevicePath] == YES)
+			[self addProjectMenuItem:(newName != nil ? newName : currentProject.name) :currentProject];
+
+			// Do we have any device groups in the project?
+
+			if (currentProject.devicegroups.count > 0)
+			{
+				// Choose the first device group in the list
+
+				currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
+				currentProject.devicegroupIndex = 0;
+
+				// Auto-compile all of the project's device groups, if required by the user
+
+				if ([defaults boolForKey:@"com.bps.squinter.autocompile"])
 				{
-					externalOpenMenuItem.enabled = YES;
-					externalOpenDeviceItem.enabled = YES;
-					externalOpenBothItem.enabled = YES;
+					[self writeToLog:@"Auto-compiling the Project's Device Groups. This can be disabled in Preferences." :YES];
+
+					for (Devicegroup *dg in currentProject.devicegroups)
+					{
+						if (dg.models.count > 0) [self compile:dg :NO];
+
+						// Duplicate the details of assigned devices in the device group
+
+						[self setDevicegroupDevices:dg];
+					}
+
+					[self selectDevice];
+
+					// Add the project's files to the watch list
+
+					[self watchfiles:currentProject];
 				}
 				else
 				{
-					NSString *path = [currentDevicePath lastPathComponent];
-					path = [workingDirectory stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
+					// We're not autocompiling the the project, so we just add the known files and libraries to the file-watch queue
 
-					if ([self checkFile:path] == YES)
-					{
-						currentDevicePath = path;
-						externalOpenMenuItem.enabled = YES;
-						externalOpenDeviceItem.enabled = YES;
-						externalOpenBothItem.enabled = YES;
-						[self writeToLog:[NSString stringWithFormat:@"[WARNING] The project’s device code file has been moved to \"%@\".", path] :YES];
-					}
-					else
-					{
-						currentDevicePath = nil;
-						[self writeToLog:@"[WARNING] The project’s device code file has been moved to an unknown location. You will need to add it back to the project." :YES];
-					}
+					NSString *modelAbsPath, *modelRelPath, *fileRelPath, *fileAbsPath;
+					BOOL result;
 
-					currentProject.projectHasChanged = YES;
+					for (Devicegroup *dg in currentProject.devicegroups)
+					{
+						// Add in the devices, if any
+
+						[self setDevicegroupDevices:dg];
+
+						if (dg.models.count > 0)
+						{
+							for (Model *md in dg.models)
+							{
+								// Get the model's expected location (this is relative to 'oldPath')
+
+								modelRelPath = [NSString stringWithFormat:@"%@/%@", md.path, md.filename];
+
+								NSRange range = [md.path rangeOfString:@"../"];
+
+								// Is the model file above or below the project file in the hiererchy (expected)
+
+								if (range.location != NSNotFound)
+								{
+									// Model file should be above the old project file, get it via old path,
+									// which will match the new path if the project hasn't moved
+
+									modelAbsPath = [self getAbsolutePath:oldPath :modelRelPath];
+								}
+								else
+								{
+									// Model file should be below the old project file, so is *probably* below the new one too,
+									// whether the project has moved or not
+
+									modelAbsPath = [self getAbsolutePath:currentProject.path :modelRelPath];
+								}
+
+#ifdef DEBUG
+	NSLog(@"M: %@", modelAbsPath);
+#endif
+								// Check that the file is where we think it is
+
+								result = [self checkFile:modelAbsPath];
+								modelAbsPath = [modelAbsPath stringByDeletingLastPathComponent];
+
+								if (!result)
+								{
+									// We can't locate the model file at the expected location, whether the project has moved or not
+
+									[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find source file \"%@\" at expected location %@.", md.filename, [self getPrintPath:currentProject.path :md.path]] :YES];
+
+									[self writeToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
+
+									md.hasMoved = YES;
+								}
+								else
+								{
+									// Update the model file location if the project has moved and we found the file using the old project path
+
+									if (projectMoved)
+									{
+										if (range.location != NSNotFound)
+										{
+											// Model file is still above the project - ie. we found it at oldPath - so recalculate relative path
+
+											md.path = [self getRelativeFilePath:currentProject.path :modelAbsPath];
+
+											[self writeToLog:[NSString stringWithFormat:@"Updating saved source file \"%@\" path to %@ - source or project file has moved.", md.filename, [self getPrintPath:currentProject.path :md.path]] :YES];
+
+											currentProject.haschanged = YES;
+										}
+									}
+
+									// Now check the subsidiary files
+									// NOTE These are just the known locations - they may not reflect what is actually
+									// in the file, which is which is why we compile on load as the default
+
+									if (md.libraries.count > 0)
+									{
+										for (File *fl in md.libraries)
+										{
+											// Get the path of the file, which is relative to 'oldPath'
+
+											fileRelPath = [NSString stringWithFormat:@"%@/%@", fl.path, fl.filename];
+
+											NSRange range = [fl.path rangeOfString:@"../"];
+
+											if (range.location != NSNotFound)
+											{
+												// File is above the project file in the hierarchy
+
+												fileAbsPath = [self getAbsolutePath:oldPath :fileRelPath];
+											}
+											else
+											{
+												// File is below the project file in the hierarchy
+
+												fileAbsPath = [self getAbsolutePath:currentProject.path :fileRelPath];
+											}
+
+#ifdef DEBUG
+	NSLog(@"R: %@-%@", fl.path, fl.filename);
+	NSLog(@"A: %@", fileAbsPath);
+#endif
+
+											result = [self checkFile:fileAbsPath];
+											fileAbsPath = [fileAbsPath stringByDeletingLastPathComponent];
+
+											if (!result)
+											{
+												[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find library \"%@\" at expected location %@ - source or project file has moved.", fl.filename, [self getPrintPath:currentProject.path :fl.path]] :YES];
+
+												[self writeToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
+
+												fl.hasMoved = YES;
+											}
+											else
+											{
+												if (projectMoved)
+												{
+													if (range.location != NSNotFound)
+													{
+														// File is still above the project - ie. we found it at oldPath - so recalculate relative path
+
+														fl.path = [self getRelativeFilePath:currentProject.path :fileAbsPath];
+
+														[self writeToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
+
+														currentProject.haschanged = YES;
+
+#ifdef DEBUG
+	NSLog(@"N: %@", fl.path);
+#endif
+
+													}
+												}
+											}
+										}
+									}
+
+									if (md.files.count > 0)
+									{
+										for (File *fl in md.files)
+										{
+											fileRelPath = [NSString stringWithFormat:@"%@/%@", fl.path, fl.filename];
+
+											NSRange range = [fl.path rangeOfString:@"../"];
+
+											if (range.location != NSNotFound)
+											{
+												fileAbsPath = [self getAbsolutePath:oldPath :fileRelPath];
+											}
+											else
+											{
+												fileAbsPath = [self getAbsolutePath:currentProject.path :fileRelPath];
+											}
+
+#ifdef DEBUG
+	NSLog(@"R: %@-%@", fl.path, fl.filename);
+	NSLog(@"A: %@", fileAbsPath);
+#endif
+
+											result = [self checkFile:fileAbsPath];
+											fileAbsPath = [fileAbsPath stringByDeletingLastPathComponent];
+
+											if (!result)
+											{
+												[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find file \"%@\" at expected location %@ - file or project has moved.", fl.filename, [self getPrintPath:currentProject.path :fl.path]] :YES];
+
+												[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
+
+												fl.hasMoved = YES;
+											}
+											else
+											{
+												if (projectMoved)
+												{
+													if (range.location != NSNotFound)
+													{
+														// File is still above the project - ie. we found it at oldPath - so recalculate relative path
+
+														fl.path = [self getRelativeFilePath:currentProject.path :fileAbsPath];
+
+														[self writeToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
+
+														currentProject.haschanged = YES;
+
+#ifdef DEBUG
+	NSLog(@"N: %@", fl.path);
+#endif
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
-
-			// Agent and/or Device code paths may have changed so record their latest values
-
-			if (versionComparison != kLower)
-			{
-				// Convert absolute paths back to relative
-
-				currentProject.projectAgentCodePath = [self getRelativeFilePath:currentProject.projectPath :currentAgentPath];
-				currentProject.projectDeviceCodePath = [self getRelativeFilePath:currentProject.projectPath :currentDevicePath];
-			}
 			else
 			{
-				currentProject.projectAgentCodePath = currentAgentPath;
-				currentProject.projectDeviceCodePath = currentDevicePath;
-			}
-
-			// Do we need to autocompile the project we have opened?
-
-			if ([[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autocompile"])
-			{
-				// NOTE squint: calls updateLibraryMenu: so we don't need to do it here
-
-				[self writeToLog:@"Auto-compiling project. This can be disabled in Preferences." :YES];
-				[self squint:nil];
-			}
-			else
-			{
-				[self updateLibraryMenu];
-				[self updateFilesMenu];
-			}
-
-			// Select the model associated with the project, if one has been
-
-			NSUInteger c = 0;
-
-			if (ide.models.count > 0)
-			{
-				// If we have loaded the models list, select the one which the project is linked to
-
-				for (NSDictionary *model in ide.models)
-				{
-					NSString *mID = [model objectForKey:@"id"];
-
-					if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
-					{
-						// Select the linked model
-
-						[self chooseModel:[modelsMenu itemAtIndex:c]];
-					}
-					else
-					{
-						++c;
-					}
-				}
-			}
-
-			// Update the Project menu’s projects sub-menu
-
-			if (newName)
-			{
-				[self addProjectMenuItem:newName :currentProject];
-			}
-			else
-			{
-				[self addProjectMenuItem:currentProject.projectName :currentProject];
+				currentDevicegroup = nil;
 			}
 
 			// Update the Menus and the Toolbar
 
-			[self updateMenus];
+			[self refreshOpenProjectsMenu];
+			[self refreshProjectsMenu];
+			[self refreshDevicegroupMenu];
+			[self refreshMainDevicegroupsMenu];
+			[self refreshDeviceMenu];
 			[self setToolbar];
 
-			// Mark that we have at least one open project
+			// Set the status light - light is YES to be not greyed out; full is YES (solid) or NO (empty)
 
-			noProjectsFlag = NO;
+			[saveLight show];
+			[saveLight needSave:currentProject.haschanged];
+			[_window setDocumentEdited:currentProject.haschanged];
 
-			// Finally, set the status light
-
-			[saveLight setLight:YES];
-			[saveLight setFull:!currentProject.projectHasChanged];
-
-			versionComparison = [self compareVersion:currentProject.projectVersion :kCurrentProjectVersionString];
-
-			if (versionComparison == kLower)
-			{
-				// Ask if we want to update the project
-
-				[self presentUpdateAlert:urls :count :currentProject];
-			}
-			else
-			{
-				// Select the next project file on the list
-
-				[self openSquirrelProjects:urls :count + 1];
-			}
-		}
-		else
-		{
-			// Got project, so warn the user
-
-			[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is already open.", newProject.projectName] :YES];
-			[self openSquirrelProjects:urls :count + 1];
+			// Add the newly opened project to the recent files list
+			
+			[self addToRecentMenu:currentProject.filename :currentProject.path];
 		}
 	}
 	else
 	{
 		// Project didn't load for some reason so warn the user
-
-		[self writeToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
-		[self openSquirrelProjects:urls :count + 1];
+		
+		[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
 	}
+
+	// Call the method again in case there are any URLs left to deal with
+
+	[self openSquirrelProjects:urls];
 }
 
 
 
-- (NSInteger)compareVersion:(NSString *)newVersion :(NSString *)oldVersion
+- (void)watchfiles:(Project *)project
 {
-	// Compare version strings:
-	// 1 - newVersion > oldVersion
-	// 0 - newVersion = oldVersion
-	// -1 - newVersion < oldVersion
+	// Work throgh project's files and add them to the queue
 
-	NSArray *va1 = [newVersion componentsSeparatedByString:@"."];
-	NSArray *va2 = [oldVersion componentsSeparatedByString:@"."];
+	if (fileWatchQueue == nil)
+	{
+		fileWatchQueue = [[VDKQueue alloc] init];
+		[fileWatchQueue setDelegate:self];
+	}
 
-	NSString *s1 = (NSString *)[va1 objectAtIndex:0];
-	NSString *s2 = (NSString *)[va2 objectAtIndex:0];
+	NSString *aPath = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
+	BOOL added = [self checkFile:aPath];
 
-	NSInteger i1 = s1.integerValue;
-	NSInteger i2 = s2.integerValue;
+	if (project.devicegroups.count > 0)
+	{
+		for (Devicegroup *dg in project.devicegroups)
+		{
+			if (dg.models.count > 0)
+			{
+				for (Model *md in dg.models)
+				{
+					aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", md.path, md.filename]];
+					added = [self checkFile:aPath];
 
-	if (i1 > i2) return kHigher;
-	if (i1 < i2) return kLower;
+					if (md.libraries.count > 0)
+					{
+						for (File *lib in md.libraries)
+						{
+							aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", lib.path, lib.filename]];
+							added = [self checkFile:aPath];
+						}
+					}
 
-	s1 = (NSString *)[va1 objectAtIndex:1];
-	s2 = (NSString *)[va2 objectAtIndex:1];
+					if (md.files.count > 0)
+					{
+						for (File *file in md.files)
+						{
+							aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", file.path, file.filename]];
+							added = [self checkFile:aPath];
+						}
+					}
+				}
+			}
+		}
+	}
 
-	i1 = s1.integerValue;
-	i2 = s2.integerValue;
-
-	if (i1 > i2) return kHigher;
-	if (i1 < i2) return kLower;
-
-	return kEqual;
+	if (!added) NSLog(@"Some files couldn't be added");
 }
 
 
-
-- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orProjectName
+- (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath
 {
 	// Method runs through the list of open projects and returns YES if the
-	// passed project matches one of them, otherwise NO
+	// passed project's full path matches one of them, otherwise NO
 
 	if (projectArray.count > 0)
 	{
-		if (byProject != nil)
+		for (Project *aProject in projectArray)
 		{
-			for (Project *aProject in projectArray)
+			NSString *aName = aProject.filename;
+			NSString *aPath = aProject.path;
+			aPath = [NSString stringWithFormat:@"%@/%@", aPath, aName];
+
+			if (orProjectPath != nil && [orProjectPath compare:aPath] == NSOrderedSame) return YES;
+
+			if (byProject != nil)
 			{
-				if ([byProject.projectName compare:aProject.projectName] == NSOrderedSame) return YES;
-			}
-		}
-		else if (orProjectName != nil)
-		{
-			for (Project *aProject in projectArray)
-			{
-				if ([orProjectName compare:aProject.projectName] == NSOrderedSame) return YES;
+				NSString *bName = byProject.filename;
+				NSString *bPath = byProject.path;
+				bPath = [NSString stringWithFormat:@"%@/%@", bPath, bName];
+
+				if ([bPath compare:aPath] == NSOrderedSame) return YES;
 			}
 		}
 	}
@@ -1902,25 +4614,70 @@
 
 
 
-- (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath
+- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orName
 {
 	// Method runs through the list of open projects and returns YES if the
-	// passed project's path matches one of them, otherwise NO
+	// passed project matches one of them, otherwise NO
 
 	if (projectArray.count > 0)
 	{
-		if (orProjectPath != nil)
+		for (Project *aProject in projectArray)
 		{
-			for (Project *aProject in projectArray)
+			if (byProject != nil && orName == nil)
 			{
-				NSString *aPath = [aProject.projectPath stringByAppendingPathComponent:[aProject.projectName stringByAppendingString:@".squirrelproj"]];
-				if ([orProjectPath compare:aPath] == NSOrderedSame) return YES;
+				// Caller has passed just a project
+
+				if ([byProject.name compare:aProject.name] == NSOrderedSame) return YES;
+			}
+			else if (byProject == nil && orName != nil)
+			{
+				// Caller has passed just a name string
+
+				if ([orName compare:aProject.name] == NSOrderedSame) return YES;
+			}
+			else
+			{
+				// Caller has passed a project AND a name, that if the name matches
+				// on projects that are NOT the passed one
+
+				if ([orName compare:aProject.name] == NSOrderedSame && byProject != aProject) return YES;
 			}
 		}
-
-
 	}
 
+	return NO;
+}
+
+
+
+- (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName
+{
+	if (currentProject.devicegroups.count > 0)
+	{
+		for (Devicegroup *adg in currentProject.devicegroups)
+		{
+			if (byDevicegroup != nil && orName == nil)
+			{
+				// Caller has passed just a project
+
+				if ([byDevicegroup.name compare:adg.name] == NSOrderedSame) return YES;
+			}
+			else if (byDevicegroup == nil && orName != nil)
+			{
+				// Caller has passed just a name string
+
+				if ([orName compare:adg.name] == NSOrderedSame) return YES;
+			}
+			else
+			{
+				// Caller has passed a project AND a name, that if the name matches
+				// on projects that are NOT the passed one
+
+				if ([orName compare:adg.name] == NSOrderedSame && byDevicegroup != adg) return YES;
+			}
+		}
+	}
+	
 	return NO;
 }
 
@@ -1928,49 +4685,354 @@
 
 - (BOOL)checkFile:(NSString *)filePath
 {
-	if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:NO] == YES)
+	// This method takes an ABSOLUTE file path and checks first that the file exists at that path
+	// If if doesn't, it returns NO, otherwise it attempts to add the file to the watch queue, in
+	// which case it returns YES
+
+	BOOL result = [nsfm fileExistsAtPath:filePath];
+
+	if (result)
 	{
 		[fileWatchQueue addPath:filePath
 				 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
-		return YES;
 	}
 
-	return NO;
+	return result;
 }
 
 
 
-- (IBAction)renameCurrentProject:(id)sender
+#pragma mark Add files to Device Groups
+
+
+- (IBAction)selectFile:(id)sender
 {
-	if (currentProject == nil) return;
+	// Called by 'Add Files to Device Group...' File menu item
+	// If no current project is selected, warn and bail - but we shouldn't
+	// do this because the menu will be disabled on 'currentProject' = nil
 
-	renameProjectLabel.stringValue = [NSString stringWithFormat:@"Enter a new name for project \"%@\":", currentProject.projectName];
+	if (currentProject == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
+	}
 
-	[self renameProject];
+	// Set up an open panel
+    
+    openDialog = [NSOpenPanel openPanel];
+    openDialog.message = @"Select Squirrel source code (*.agent.nut/*.device.nut) file(s)...";
+    openDialog.allowedFileTypes = [NSArray arrayWithObjects:@"nut", nil];
+    openDialog.allowsMultipleSelection = YES;
+    
+    // Set the panel's accessory view checkbox to OFF - ie. don't create a new device group
+	// Unless we don't have a current device group - ie. the current project has no groups yet
+    
+	if (currentDevicegroup != nil)
+	{
+		accessoryViewNewProjectCheckbox.state = NSOffState;
+		accessoryViewNewProjectCheckbox.title = [NSString stringWithFormat:@"Create a new Device Group with the file(s) – or uncheck to add the file(s) to Group \"%@\"", currentDevicegroup.name];
+	}
+	else
+	{
+		accessoryViewNewProjectCheckbox.state = NSOnState;
+		accessoryViewNewProjectCheckbox.title = @"Create a new Device Group with the file(s)";
+	}
+
+    // Add the accessory view to the panel
+    
+    openDialog.accessoryView = accessoryView;
+	if (sysVer.majorVersion >= 10 && sysVer.minorVersion >= 11) openDialog.accessoryViewDisclosed = YES;
+
+	// Show the panel
+
+    [self presentOpenFilePanel:kActionOpenWithAddFiles];
 }
 
 
 
-- (void)presentUpdateAlert:(NSArray *)urls :(NSInteger)count :(Project *)aProject
+- (IBAction)newDevicegroupCheckboxHander:(id)sender
 {
-	NSAlert *alert = [[NSAlert alloc] init];
-	alert.messageText = [NSString stringWithFormat:@"The Squinter file for project \"%@\" should be updated", aProject.projectName];
-	alert.informativeText = [NSString stringWithFormat:@"Click ‘Update’ to convert the project filetype from format %@ to format %@. Updated project files may not be compatible with older version of Squinter, but this version will read old project file formats", aProject.projectVersion, kCurrentProjectVersionString];
-	[alert addButtonWithTitle:@"Update"];
-	[alert addButtonWithTitle:@"Cancel"];
-	[alert beginSheetModalForWindow:_window
-				  completionHandler:^(NSModalResponse response)
-	 {
-		if (response == NSAlertFirstButtonReturn)
+	// This is called if the state of 'accessoryViewNewProjectCheckbox' changes
+
+	if (accessoryViewNewProjectCheckbox.state == NSOffState && currentDevicegroup == nil)
+	{
+		// There's no point adding files to a non-existent and non-created device group
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = @"You have no Device Group selected. To add files, you must create a new Device Group for the added files";
+		alert.informativeText = @"Alternatively, cancel the 'add files' process and create a new Device Group separately.";
+		[alert beginSheetModalForWindow:openDialog
+					  completionHandler:^(NSModalResponse response)
+						{
+							accessoryViewNewProjectCheckbox.state = NSOnState;
+						}
+		 ];
+	}
+}
+
+
+
+- (void)processAddedFiles:(NSMutableArray *)urls
+{
+	// Each pass through this method, we process reduce the number of urls in the array
+	// NOTE we always come here to exit the file handling process via the following line
+
+	if (urls.count == 0)
+	{
+		// All the selected files have been processed - what do we do now?
+
+		if (accessoryViewNewProjectCheckbox.state == NSOnState && !newDevicegroupFlag)
 		{
-			// User wants to rename the project
+			// User asked to create a new device group for the added files so we handle that first
+			// NOTE We only do this once, by checking 'newDevicegroupFlag' = NO
+			// NOTE 'urls' is retained even though its .count is 0 so that what this method
+			// is re-called, we come back here
 
-			[self updateProject:aProject];
+			newDevicegroupFlag = YES;
+			saveUrls = urls;
+
+			// Name the new device group
+			// NOTE it is already created and set to 'currentDevicegroup'
+
+			[self newDevicegroup:self];
+
+			// Pick up the action at 'newDevicegroup:' This will present the new device group dialog from which
+			// the user either cancels - and no files are added - or a new device group is created and to which
+			// the file URLs in 'saveUrls' are then added. Bail to prevent file URLs being processed in the meantime
+
+			return;
 		}
 
-		[self openSquirrelProjects:urls :count + 1];
-	 }
-	 ];
+		// We've processed all the input files. If we created a new device group we have to
+		// check that then end the process - or just end it
+
+		if (newDevicegroupFlag)
+		{
+			// We created a new device group while adding files, so we need to update the UI
+			// TODO probably don't need to do this as it's handled in the 'add devicegroup' phase
+
+			newDevicegroupFlag = NO;
+			saveUrls = nil;
+
+			currentProject.haschanged = YES;
+			[saveLight needSave:YES];
+			[_window setDocumentEdited:YES];
+		}
+
+		// Compile added files if required
+
+		if ([defaults boolForKey:@"com.bps.squinter.autocompile"]) [self compile:currentDevicegroup :NO];
+
+		// Update the UI
+
+		[self refreshOpenProjectsMenu];
+		[self refreshDevicegroupMenu];
+		[self refreshMainDevicegroupsMenu];
+		[self setToolbar];
+
+		return;
+	}
+
+	// Determine the type of file: device or agent
+
+	NSString *fileType = @"";
+	NSString *filePath = [[urls firstObject] path];
+	NSString *fileName = [filePath lastPathComponent];
+
+	[self writeToLog:[NSString stringWithFormat:@"Processing file: \"%@\".", filePath] :YES];
+
+	// Try and identify the source type: is the file a *.device.nut file?
+
+	NSRange range = [fileName rangeOfString:@"device.nut"];
+
+	if (range.location != NSNotFound)
+	{
+		// Filename contains 'device.nut'
+
+		fileType = @"device";
+	}
+	else
+	{
+		// Filename doesn't contain 'device.nut', so check for 'agent.nut'
+
+		range = [fileName rangeOfString:@"agent.nut"];
+
+		if (range.location != NSNotFound)
+		{
+			// Filename contains 'agent.nut'
+
+			fileType = @"agent";
+		}
+		else
+		{
+			// Filename contains neither 'agent.nut' or 'device.nut' so is unknown
+			// Just warn the user but take no other action - ie. end up with an empty file
+
+			range = [fileName rangeOfString:@".class"];
+
+			if (range.location != NSNotFound)
+			{
+				[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
+			}
+			else
+			{
+				range = [fileName rangeOfString:@".lib"];
+
+				if (range.location != NSNotFound)
+				{
+					[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] The file \"%@\" seems to be a class or library. It should be imported into your device or agent code using \'#import <filename>\'.", fileName] :YES];
+				}
+			}
+		}
+	}
+
+	if (fileType.length == 0)
+	{
+		// The file we processed couldn't be identified, so let's ask the user what it is
+		// TODO convert to an app-specific dialog to avoid default button?
+
+		saveUrls = urls;
+		sourceTypeLabel.stringValue = [NSString stringWithFormat:@"Does the source file “%@” contain agent or device code?", fileName];
+
+		[_window beginSheet:sourceTypeSheet completionHandler:nil];
+	}
+	else
+	{
+		// Move on to the next stage of file processing
+
+		[self processAddedFilesStageTwo:urls :fileType];
+	}
+}
+
+
+
+- (IBAction)endSourceTypeSheet:(id)sender
+{
+	// Triggered by clicking 'Agent Code' or 'Device Code' in the 'sourceTypeSheet' dialog
+
+	NSString *type = (sender == sourceTypeDeviceButton) ? @"device" : @"agent";
+
+	[_window endSheet:sourceTypeSheet];
+	[self processAddedFilesStageTwo:saveUrls :type];
+
+	saveUrls = nil;
+}
+
+
+
+- (IBAction)cancelSourceTypeSheet:(id)sender
+{
+	// User has cancelled
+	// TODO - Just this file or all of them?
+
+	[_window endSheet:sourceTypeSheet];
+
+	// Remove the current file and process the next
+
+	[saveUrls removeObjectAtIndex:0];
+	[self processAddedFiles:saveUrls];
+
+	saveUrls = nil;
+}
+
+
+
+- (void)processAddedFilesStageTwo:(NSMutableArray *)urls :(NSString *)fileType
+{
+	// This method takes the current list if URLs of files to be added, plus the type of the first
+	// (set via 'processAddedFiles:') and adds it to the current device group according to type.
+	// For each file, a model of the identified type is created (or updated, if a comparable model
+	// already exists (we check with the user first that they want to update the model)
+
+	NSString *filePath = [[urls firstObject] path];
+
+	// If we identified agent or device code from the filename(s), save the path(s) to those file(s)
+
+	if (currentDevicegroup.models == nil) currentDevicegroup.models = [[NSMutableArray alloc] init];
+
+	NSMutableArray *models = currentDevicegroup.models;
+
+	BOOL flag = NO;
+
+	if (models.count > 0)
+	{
+		for (Model *model in models)
+		{
+			if ([model.type compare:fileType] == NSOrderedSame)
+			{
+				flag = YES;
+
+				if (model.path != nil)
+				{
+					// We already have a source code file reference, so ask if the user wants to use the new one
+
+					NSAlert *alert = [[NSAlert alloc] init];
+					alert.messageText = [NSString stringWithFormat:@"Device Group \"%@\" already has %@ code. Do you wish to replace it?", currentDevicegroup.name, fileType];
+					[alert addButtonWithTitle:@"Yes"];
+					[alert addButtonWithTitle:@"No"];
+					[alert beginSheetModalForWindow:_window
+								  completionHandler:^(NSModalResponse response)
+									 {
+										 if (response == NSAlertFirstButtonReturn)
+										 {
+											 // User wants to replace the existing code file
+
+											 model.filename = [filePath lastPathComponent];
+											 model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
+											 currentProject.haschanged = YES;
+											 [saveLight needSave:YES];
+											 [_window setDocumentEdited:YES];
+										 }
+
+										 // We may still have files to process, so go on to the next one
+
+										 [urls removeObjectAtIndex:0];
+										 [self processAddedFiles:urls];
+									 }
+					 ];
+
+					// Bail so that we stop processing the current and later file URLs while the NSAlert is up
+
+					return;
+				}
+				else
+				{
+					// We have a model in this device group of the required type, but it has no path, so just add the file to the model
+
+					model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
+					model.filename = [filePath lastPathComponent];
+					break;
+				}
+			}
+		}
+
+		if (!flag)
+		{
+			// We haven't got a model of the required type, so create a new one for that type
+
+			Model *newModel = [[Model alloc] init];
+			newModel.type = fileType;
+			newModel.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
+			newModel.filename = [filePath lastPathComponent];
+			[currentDevicegroup.models addObject:newModel];
+		}
+	}
+	else
+	{
+		// The device group has no models at all, so we need to make one and set it to the required type
+
+		Model *newModel = [[Model alloc] init];
+		newModel.type = fileType;
+		newModel.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
+		newModel.filename = [filePath lastPathComponent];
+		[currentDevicegroup.models addObject:newModel];
+	}
+
+	// Having added the first file on the current list, we remove it from the list
+	// then re-call the method to proces the next file on the list
+
+	[urls removeObjectAtIndex:0];
+	[self processAddedFiles:urls];
 }
 
 
@@ -1978,36 +5040,187 @@
 #pragma mark - Save Project Methods
 
 
+
+- (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName
+{
+	// Save the savingProject project. This may be a newly created project and may not currentProject
+
+	BOOL success = NO;
+	BOOL nameChange = NO;
+	NSString *savePath = [saveDirectory path];
+
+	if (newFileName == nil)
+	{
+		// No filename passed in, so we have come from 'saveProject:'
+
+		if (savingProject.filename != nil)
+		{
+			// We have an existing filename - use it
+
+			newFileName = savingProject.filename;
+		}
+		else
+		{
+			// We have no saved filename and no passed in filename, so create one
+
+			newFileName = [savingProject.name stringByAppendingString:@".squirrelproj"];
+			nameChange = YES;
+		}
+	}
+	else
+	{
+		// We have come from 'saveProjectAs:'
+
+		// First add '.squirrelproj' to the file name if it has been removed
+
+		NSRange r = [newFileName rangeOfString:@".squirrelproj"];
+
+		if (r.location == NSNotFound) newFileName = [newFileName stringByAppendingString:@".squirrelproj"];
+
+		if (savingProject.filename != nil)
+		{
+			// We have an existing filename - is the new one different?
+
+			if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
+		}
+	}
+
+	savePath = [savePath stringByAppendingString:[NSString stringWithFormat:@"/%@", newFileName]];
+
+	// Set the time of the update
+
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+	[dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
+	savingProject.updated = [dateFormatter stringFromDate:[NSDate date]];
+
+	if ([nsfm fileExistsAtPath:savePath])
+	{
+		// The file already exists. We can safely overwrite it because that's what the user intended:
+		// They asked for it implicitly with a Save command, or told the Save As... dialog to replace the file
+
+		// Write the new version to a separate file
+
+		NSString *altPath = [savePath stringByAppendingString:@".new"];
+		success = [NSKeyedArchiver archiveRootObject:savingProject toFile:altPath];
+
+		if (success)
+		{
+			// We have successfully written the new file, so we can replace the old one with the new one
+
+			[fileWatchQueue removePath:savePath];
+
+			NSError *error;
+			NSURL *url;
+			success = [nsfm replaceItemAtURL:[NSURL fileURLWithPath:savePath]
+							 withItemAtURL:[NSURL fileURLWithPath:altPath]
+							backupItemName:nil
+								   options:NSFileManagerItemReplacementUsingNewMetadataOnly
+						  resultingItemURL:&url
+									 error:&error];
+
+			[fileWatchQueue addPath:savePath];
+		}
+	}
+	else
+	{
+		// The file doesn't already exist at this location so just write it out
+
+		success = [NSKeyedArchiver archiveRootObject:savingProject toFile:savePath];
+	}
+
+	if (success == YES)
+	{
+		// The new file was successfully written
+
+		savingProject.path = [savePath stringByDeletingLastPathComponent];
+		savingProject.filename = newFileName;
+		savingProject.haschanged = NO;
+
+		if (savingProject == currentProject)
+		{
+			// The saved project is the one on view in the UI, so update the save indicator
+
+			[saveLight needSave:NO];
+			[_window setDocumentEdited:NO];
+
+			// Add the project to the list
+			// Don't need to do this is just saving, only save as...
+
+			if (saveAsFlag) [self addToRecentMenu:savingProject.filename :savingProject.path];
+
+			saveAsFlag = NO;
+		}
+
+		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
+	}
+	else
+	{
+		[self writeErrorToLog:@"[ERROR] The Project could not be saved." :YES];
+	}
+
+	// Saved the project, but are there models to save, from a 'download product' operation?
+
+	Project *sp = nil;
+
+	for (Project *ap in downloads)
+	{
+		if (ap == savingProject) sp = ap;
+	}
+
+	// Done saving so clear 'savingProject'
+
+	savingProject = nil;
+
+	// Did we come here from a 'close project'? If so, re-run to actually close the project
+
+	if (closeProjectFlag) [self closeProject:nil];
+
+	// Save the model files if we have any
+
+	if (sp != nil) [self saveModelFiles:sp];
+}
+
+
+
 - (IBAction)saveProjectAs:(id)sender
 {
-    // Call this method to save the project referenced by savingProject to disk a new name and/or location
+    // This method can be called by menu, to save the current project,
+	// or directly if 'savingProject' is pre-set
 
-	// If the method is called directly by a menu, set savingProject to currentProject
-	
 	if (sender == fileSaveAsMenuItem || sender == fileSaveMenuItem) savingProject = currentProject;
-    if (savingProject == nil) return;
-    
-    // Configure the NSSavePanel.
-    
-    saveProjectDialog = [NSSavePanel savePanel];
-    [saveProjectDialog setNameFieldStringValue:[savingProject.projectName stringByAppendingString:@".squirrelproj"]];
-    [saveProjectDialog setCanCreateDirectories:YES];
-    [saveProjectDialog setDirectoryURL:[NSURL fileURLWithPath:workingDirectory isDirectory:YES]];
-    
-    [saveProjectDialog beginSheetModalForWindow:_window
-                              completionHandler:^(NSInteger result)
-     {
-         // Close sheet first to stop it hogging the event queue
-         
-         [NSApp stopModal];
-         [NSApp endSheet:saveProjectDialog];
-         [saveProjectDialog orderOut:self];
-         
-         if (result == NSFileHandlingPanelOKButton) [self savePrep:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]];
-     }
-     ];
-    
-    [NSApp runModalForWindow:saveProjectDialog];
+
+	if (savingProject == nil)
+	{
+		// Just in case...
+
+		[self writeWarningToLog:@"[WARNING] You have not selected a Project to save." :YES];
+		return;
+	}
+
+	if (savingProject == currentProject) saveAsFlag = YES;
+
+	// Configure the NSSavePanel.
+
+	saveProjectDialog = [NSSavePanel savePanel];
+	[saveProjectDialog setNameFieldStringValue:savingProject.filename];
+	[saveProjectDialog setCanCreateDirectories:YES];
+	[saveProjectDialog setDirectoryURL:[NSURL fileURLWithPath:workingDirectory isDirectory:YES]];
+
+	[saveProjectDialog beginSheetModalForWindow:_window
+							  completionHandler:^(NSInteger result)
+	 {
+		 // Close sheet first to stop it hogging the event queue
+
+		 [NSApp stopModal];
+		 [NSApp endSheet:saveProjectDialog];
+		 [saveProjectDialog orderOut:self];
+
+		 if (result == NSFileHandlingPanelOKButton) [self savePrep:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]];
+	 }
+	 ];
+
+	[NSApp runModalForWindow:saveProjectDialog];
+	[saveProjectDialog makeKeyWindow];
 }
 
 
@@ -2016,443 +5229,189 @@
 {
     // Call this method to save the current project by overwriting the previous version
     
-	// If the method is called directly by a menu, set savingProject to currentProject
-	
-	if (sender == fileSaveAsMenuItem || sender == fileSaveMenuItem || closeProjectFlag) savingProject = currentProject;
-	if (savingProject == nil) return;
-	
-	if (savingProject.projectPath == nil)
+	// This method should only be called by menu, to save the current project, which is added to the save list
+
+	if (sender == fileSaveMenuItem) savingProject = currentProject;
+
+	if (savingProject == nil)
+	{
+		[self writeWarningToLog:@"[WARNING] You have not selected a Project to save." :YES];
+		return;
+	}
+
+	// Do we need to save? If there have been no changes, then no
+
+	if (!savingProject.haschanged) return;
+
+	if (savingProject.path == nil)
     {
         // Current project has no saved path (ie. it hasn't yet been saved or opened)
         // so force a Save As...
         
-		[self saveProjectAs:nil];
+		[self saveProjectAs:sender];
         return;
     }
     
-    // Do we need to save? If there have been no changes, then no
-    
-    if (savingProject.projectHasChanged == NO) return;
-        
-    // Handle the save. Note projectPath property does not include the filename (we add it in savePrep:)
-    
-    [self savePrep:[NSURL fileURLWithPath:savingProject.projectPath] :nil];
+    // Handle the save. Note 'path' does not include the filename (we add it in savePrep:)
+
+	[self savePrep:[NSURL fileURLWithPath:savingProject.path] :nil];
 }
 
 
 
-- (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName
+
+- (IBAction)cancelChanges:(id)sender
 {
-	// Save the savingProject project. This may be a newly created project and may not currentProject
-	
-	BOOL success = NO;
-	NSInteger version = [self compareVersion:savingProject.projectVersion :kPathChangeProjectVersion];
-	NSFileManager *fm = [NSFileManager defaultManager];
-    NSString *savePath = [saveDirectory path];
-	NSString *oldName = savingProject.projectName;
+	// The user doesn't care about the changes so close the sheet then tell the system to shut down the app
 
-	if (newFileName == nil) newFileName = savingProject.projectName;
-	
-	NSRange range = [newFileName rangeOfString:@".squirrelproj"];
-	if (range.location == NSNotFound) newFileName = [newFileName stringByAppendingString:@".squirrelproj"];
-	savePath = [savePath stringByAppendingString:[NSString stringWithFormat:@"/%@", newFileName]];
-	
-	// Update the project's name - we do this in case the passed newFileName has a file extension, which it might
-	
-	range = [newFileName rangeOfString:@".squirrelproj"];
-	savingProject.projectName = [newFileName substringToIndex:range.location];
+	[_window endSheet:saveChangesSheet];
 
-	// Set the agent and device code paths. We need to do this here because they are saved with the project file
-	
-	if (saveProjectSubFilesFlag == YES)
+	if (!closeProjectFlag)
 	{
-        // 'saveProjectSubFilesFlag' is set by newProject: if the user has selected the option to create
-        // agent and device code files automatically
-
-		NSString *aFileName = [savingProject.projectName stringByAppendingString:@".agent.nut"];
-		NSString *dFileName = [savingProject.projectName stringByAppendingString:@".device.nut"];
-		NSString *aPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", aFileName];
-		NSString *dPathName = [[savePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", dFileName];
-
-		if (version != kLower)
-		{
-			savingProject.projectAgentCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :aPathName];
-			savingProject.projectDeviceCodePath = [self getRelativeFilePath:[savePath stringByDeletingLastPathComponent] :dPathName];
-		}
-		else
-		{
-			savingProject.projectAgentCodePath = aPathName;
-			savingProject.projectDeviceCodePath = dPathName;
-		}
-	}
-
-    if ([fm fileExistsAtPath:savePath])
-    {
-        // The file already exists. We can safely overwrite it because that's what the user intended:
-        // They asked for it implicitly with a Save command, or told the Save As... dialog to replace the file
-        
-        // Write the new version to a separate file
-        
-        NSString *altPath = [savePath stringByAppendingString:@".new"];
-        success = [NSKeyedArchiver archiveRootObject:savingProject toFile:altPath];
-        
-        if (success)
-        {
-            // We have successfully written the new file, so we can replace the old one with the new one
-            
-            NSError *error;
-            NSURL *url;
-            success = [fm replaceItemAtURL:[NSURL fileURLWithPath:savePath]
-                             withItemAtURL:[NSURL fileURLWithPath:altPath]
-                            backupItemName:nil
-                                   options:NSFileManagerItemReplacementUsingNewMetadataOnly
-                          resultingItemURL:&url
-                                     error:&error];
-		}
-    }
-    else
-    {
-        // The file doesn't already exist at this location so just write it out
-        
-        success = [NSKeyedArchiver archiveRootObject:savingProject toFile:savePath];
-    }
-	
-	if (success == YES)
-	{
-		// The new file was successfully written
-
-		savingProject.projectPath = [savePath stringByDeletingLastPathComponent];
-
-		if (version != kLower) savingProject.oldProjectPath = savingProject.projectPath;
-		
-		if (savingProject == currentProject) 
-		{
-			savingProject.projectHasChanged = NO;
-			[saveLight setFull:!savingProject.projectHasChanged];
-			
-			// Now it's safe to switch the project’s listing in the project menu, but since we
-			// may be coming here after saving a new project, compare the names first
-
-			if ([oldName compare:savingProject.projectName] != NSOrderedSame)
-			{
-				NSMenuItem *item = [projectsMenu itemWithTitle:oldName];
-				[projectsMenu removeItem:item];
-				[self addProjectMenuItem:savingProject.projectName :savingProject];
-				
-				NSInteger index = [projectsPopUp indexOfItemWithTitle:oldName];
-				[projectsPopUp removeItemAtIndex:index];
-				[projectsPopUp addItemWithTitle:savingProject.projectName];
-			}
-		}
-		
-		if (saveProjectSubFilesFlag == YES)
-		{
-			// We are saving a new project or one derived from a model, so we
-			// need to write out the agent.nut and device.nut files too
-			
-			NSString *dataString = nil;
-			
-			if (savingProject.projectAgentCode.length == 0)
-			{
-				dataString = @"// Agent Code\n\n";
-			}
-			else
-			{
-				dataString = savingProject.projectAgentCode;
-			}
-			
-			NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL aSuccess = NO;
-
-			if (version != kLower)
-			{
-				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectAgentCodePath];
-				aSuccess = [fm createFileAtPath:path contents:data attributes:nil];
-			}
-			else
-			{
-				aSuccess = [fm createFileAtPath:savingProject.projectAgentCodePath contents:data attributes:nil];
-			}
-
-			if (savingProject.projectDeviceCode.length == 0)
-			{
-				dataString = @"// Device Code\n\n";
-			}
-			else
-			{
-				dataString = savingProject.projectDeviceCode;
-			}
-			
-			data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
-			BOOL dSuccess = NO;
-
-			if (version != kLower)
-			{
-				NSString *path = [self getAbsolutePath:[savePath stringByDeletingLastPathComponent] :savingProject.projectDeviceCodePath];
-				dSuccess = [fm createFileAtPath:path contents:data attributes:nil];
-			}
-			else
-			{
-				dSuccess = [fm createFileAtPath:savingProject.projectDeviceCodePath contents:data attributes:nil];
-			}
-			
-			if (aSuccess == NO)
-			{
-				// Warn user of 'file already exists' error
-				
-				[self writeToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" could not be created: file already exists.", savingProject.projectAgentCodePath] :YES];
-			}
-			else
-			{
-				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectAgentCodePath, savingProject.projectName] :YES];
-
-				if (savingProject == currentProject)
-                {
-                    externalOpenBothItem.enabled = YES;
-                    externalOpenAgentItem.enabled = YES;
-                }
-			}
-			
-			if (dSuccess == NO)
-			{
-				[self writeToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" could not be created - file already exists.", savingProject.projectDeviceCodePath] :YES];
-			}
-			else
-			{
-				[self writeToLog:[NSString stringWithFormat:@"File \"%@\" created and added to project \"%@\".", savingProject.projectDeviceCodePath, savingProject.projectName] :YES];
-
-				if (savingProject == currentProject)
-                {
-                    externalOpenBothItem.enabled = YES;
-                    externalOpenDeviceItem.enabled = YES;
-                }
-			}
-			
-			// If the 'open files' checkbox is ticked, open the files we've just created
-			
-			if (newProjectAccessoryViewOpenCheckbox.state == YES)
-			{
-				[self externalOpenAll:self];
-				newProjectAccessoryViewOpenCheckbox.state = NO;
-			}
-		}
-		
-		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.projectName, savingProject.projectPath] :YES];
+		[NSApp replyToApplicationShouldTerminate:NO];
 	}
 	else
 	{
-		[self writeToLog:@"[ERROR] The project could not be saved." :YES];
+		closeProjectFlag = NO;
 	}
-	
-	// Whether we have saved the project or not, clear savingProject
-	
-	savingProject = nil;
-	saveProjectSubFilesFlag = NO;
-
-	// Did we come here from a 'close project'? If so, re-run to actually close the project
-
-	if (closeProjectFlag) [self closeProject:nil];
 }
 
 
 
-#pragma mark - Close Project Methods
-
-
-- (IBAction)closeProject:(id)sender
+- (IBAction)ignoreChanges:(id)sender
 {
-	// If no project currently selected so bail
-	
-	if (currentProject == nil) return;
-	
-	if (sender == closeAllMenuItem)
+	// The user doesn't care about the changes so close the sheet then tell the system to shut down the app
+
+	[_window endSheet:saveChangesSheet];
+
+	if (!closeProjectFlag)
 	{
-        // We need to close multiple projects at once, so iterate through
-        // all of them, recursively calling closeProject:, sending nil as
-        // the sender so this block is not re-run. NOTE this should exit
-        // with just one remaining project, which the rest of the method
-        // will deal with
-
-        if (projectArray.count > 1)
-		{
-			do
-			{
-                // Close the current project
-                // NOTE closeProject: sets the current project
-
-                [self closeProject:nil];
-			}
-			while (projectArray.count > 1);
-		}
+		[NSApp replyToApplicationShouldTerminate:YES];
 	}
-
-	// Close the current project
-
-	NSInteger index = [projectArray indexOfObject:currentProject];
-	
-	if (currentProject.projectHasChanged == YES)
+	else
 	{
-		// The project has unsaved changes, so warn the user before closing
-		
-		[saveChangesSheetLabel setStringValue:@"Project has unsaved changes."];
-		[_window beginSheet:saveChangesSheet completionHandler:nil];
-		closeProjectFlag = YES;
+		closeProjectFlag = NO;
+		currentProject.haschanged = NO;
+		[self closeProject:nil];
+	}
+}
+
+
+
+- (IBAction)saveChanges:(id)sender
+{
+	[_window endSheet:saveChangesSheet];
+
+	if (closeProjectFlag)
+	{
+		// 'closeProjectFlag' is YES if this method has been called when the user
+		// wants to save a changed project before closing it or quitting the app
+
+		[self saveProject:nil];
+		closeProjectFlag = NO;
 		return;
 	}
-	
-	// Stop watching the current project's files
 
-	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
+	for (Project *aProject in projectArray)
 	{
-		if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
-		if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
+		// The user wants to save unsaved changes, so run through the projects to see which have unsaved changes
 
-		NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
+		if (aProject.haschanged)
 		{
-			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
-		}
-
-		fileItems = [currentProject.projectAgentFiles allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-		{
-			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
-		}
-
-		fileItems = [currentProject.projectDeviceLibraries allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-		{
-			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
-		}
-
-		fileItems = [currentProject.projectDeviceFiles allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-		{
-			[fileWatchQueue removePath:[self getAbsolutePath:currentProject.projectPath :[fileItems objectAtIndex:i]]];
-		}
-	}
-	else
-	{
-		if (currentProject.projectDeviceCodePath != nil) [fileWatchQueue removePath:currentProject.projectDeviceCodePath];
-		if (currentProject.projectAgentCodePath != nil) [fileWatchQueue removePath:currentProject.projectAgentCodePath];
-
-		NSArray *fileItems = [currentProject.projectAgentLibraries allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-		{
-			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
-		}
-
-		fileItems = [currentProject.projectAgentFiles allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-		{
-			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
-		}
-
-		fileItems = [currentProject.projectDeviceLibraries allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-		{
-			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
-		}
-
-		fileItems = [currentProject.projectDeviceFiles allValues];
-		for (NSUInteger i = 0 ; i < fileItems.count ; ++i)
-		{
-			[fileWatchQueue removePath:[fileItems objectAtIndex:i]];
+			currentProject = aProject;
+			[self saveProject:fileSaveMenuItem];
 		}
 	}
 
-    if (projectArray.count == 1)
+	// Projects saved (or not), we can now tell the app to quit
+
+	[NSApp replyToApplicationShouldTerminate:YES];
+}
+
+
+
+- (void)saveModelFiles:(Project *)project
+{
+	// Save all the model files from a downloaded product
+
+	[downloads removeObject:project];
+
+	NSMutableArray *files = [[NSMutableArray alloc] init];
+
+	if (project.devicegroups.count > 0)
 	{
-		// If there is only one open project, which we're about to close,
-		// we can clear everything project-related in the UI
-		
-		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no other open projects.", currentProject.projectName] :YES];
-        [projectArray removeAllObjects];
-        [fileWatchQueue kill];
-		fileWatchQueue = nil;
-        currentProject = nil;
-        noProjectsFlag = YES;
-        noLibsFlag = YES;
-		
-		// Clear the projects submenu
-		
-		[projectsMenu removeAllItems];
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
-		[projectsMenu addItem:item];
-		item.enabled = NO;
-
-        // Clear the projects popup
-
-        [projectsPopUp removeAllItems];
-        [projectsPopUp addItemWithTitle:@"None"];
-        projectsPopUp.enabled = NO;
-
-		// Sort out the local library and files menus
-
-		[self updateLibraryMenu];
-		[self updateFilesMenu];
-
-        // Fade the status light
-		
-		[saveLight setFull:YES];
-        [saveLight setLight:NO];
-	}
-	else
-	{
-		// There's at least one other project open, so just remove the current one
-		
-		[projectArray removeObjectAtIndex:index];
-		
-		// Remove it from the Current Open Projects submenu
-		
-		NSMenuItem *item = [projectsMenu itemWithTitle:currentProject.projectName];
-		[projectsMenu removeItem:item];
-		
-		// And from the Current Project popup
-		
-		NSInteger old = [projectsPopUp indexOfSelectedItem];
-		[projectsPopUp selectItemWithTitle:currentProject.projectName];
-		[projectsPopUp removeItemAtIndex:old];
-		
-		NSString *confirmMessage = [NSString stringWithFormat:@"Project \"%@\" closed.", currentProject.projectName];
-		
-		// Set the first project to the current one, and update the UI
-		
-		currentProject = [projectArray objectAtIndex:0];
-        item = [projectsMenu itemWithTitle:currentProject.projectName];
-		item.state = NSOnState;
-		[self updateLibraryMenu];
-		[self updateFilesMenu];
-        [saveLight setFull:!currentProject.projectHasChanged];
-
-        currentDeviceLibCount = 0;
-		currentAgentLibCount = 0;
-
-		if (sender != closeAllMenuItem)
+		for (Devicegroup *dg in project.devicegroups)
 		{
-			confirmMessage = [confirmMessage stringByAppendingFormat:@" %@ is now the current project.", currentProject.projectName];
-		
-			if (projectArray.count == 1)
+			if (dg.models.count > 0)
 			{
-				confirmMessage = [confirmMessage stringByAppendingString:@" There are no other open projects."];
+				for (Model *model in dg.models)
+				{
+					// NOTE we save a model file even if it contains no code - the user may add code later
+					
+					model.path = project.path;
+					model.filename = [dg.name stringByAppendingFormat:@".%@.nut", model.type];
+
+					[files addObject:model];
+				}
 			}
-			else if (projectArray.count == 2)
-			{
-				confirmMessage = [confirmMessage stringByAppendingString:@" There is 1 other open project."];
-			}
-			else
-			{
-				confirmMessage = [confirmMessage stringByAppendingFormat:@" There are %li other open projects.", projectArray.count - 1];
-			}
-			
-			[self writeToLog:confirmMessage :YES];
 		}
 	}
-	
-	// Update Menus and the Toolbar
-	
-	[self updateMenus];
-	[self setToolbar];
+
+	if (files.count > 0) [self saveFiles:files];
+
+	// Load in the project
+
+	[projectArray addObject:project];
+	currentProject = project;
+
+	// Update the UI
+
+	[saveLight show];
+	[saveLight needSave:NO];
+	[_window setDocumentEdited:NO];
+
+	[self refreshOpenProjectsMenu];
+	[self refreshProjectsMenu];
+	[self refreshDevicegroupMenu];
+	[self refreshMainDevicegroupsMenu];
+
+	// We now need to re-save the project file, which now contains the locations
+	// of the various model files. We do this programmatically rather than indicate
+	// to the user that they need to (re)save the project
+
+	currentProject.haschanged = YES;
+	savingProject = currentProject;
+
+	[self saveProject:nil];
+}
+
+//<- String editing 
+
+- (void)saveFiles:(NSMutableArray *)files
+{
+	if (files.count == 0) return;
+
+	BOOL success = NO;
+	Model *file = [files firstObject];
+	NSData *data = [file.code dataUsingEncoding:NSUTF8StringEncoding];
+	NSString *path = [file.path stringByAppendingFormat:@"/%@", file.filename];
+
+	if ([nsfm fileExistsAtPath:path])
+	{
+		path = [path stringByAppendingString:@".new"];
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" exists in chosen location - renaming file \"%@.new\".", file.filename, file.filename] :YES];
+	}
+
+	success = [nsfm createFileAtPath:path contents:data attributes:nil];
+
+	if (success)
+	{
+		file.filename = [path lastPathComponent];
+		file.path = [self getRelativeFilePath:file.path :[path stringByDeletingLastPathComponent]];
+	}
+
+	[files removeObjectAtIndex:0];
+	[self saveFiles:files];
 }
 
 
@@ -2465,1165 +5424,541 @@
     // This method is a hangover from a previous version. 
 	// Now it simply calls the version which replaces it.
 	
-	[self squintr];
+	[self compile:currentDevicegroup :NO];
 }
 
 
 
-- (void)squintr
+- (void)compile:(Devicegroup *)devicegroup :(BOOL)justACheck
 {
-    // Squintr runs through the two prime source code files - agent and device - and (via subsidiary methods) 
+    // Compile runs through a device group's two prime source code files - agent and device - and (via subsidiary methods)
     // looks for #require, #import and #include directives. For the last two of these, it updates the project's
-    // lists of recorded libraries and files, and compiles the code into an upload-ready form (code stored in 
-	// current project's 'projectAgentCode' and 'projectDeviceCode' properties
+    // lists of recorded libraries and files, and compiles the code into an upload-ready form
 
-    // If we have no currently selected project, bail
+    // If we have no currently selected device group, bail
 
-    if (currentProject == nil)
+    if (devicegroup == nil)
     {
-        [self writeToLog:@"[ERROR] There are no open projects to compile." :YES];
+        [self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
-    // Clear the lists of local libraries and files found in this compile
-	// 'foundLibs' - all the libraries #imported or #included in the source files
-	// 'foundFiles' - all the non-libraries #imported or #included in the source files
-	// 'foundEILibs' - all the EI libraries #required in the source files
-
-    if (foundLibs != nil) foundLibs = nil;
-    if (foundFiles != nil) foundFiles = nil;
-	if (foundEILibs != nil) foundEILibs = nil;
-
-	foundFiles = [[NSMutableArray alloc] init];
-    foundLibs = [[NSMutableArray alloc] init];
-	foundEILibs = [[NSMutableArray alloc] init];
-
+	Project *thisProject;
 	BOOL agentDoneFlag = NO;
 	BOOL deviceDoneFlag = NO;
-	NSString *output, *aPath, *dPath;
-	
-    [self writeToLog:[NSString stringWithFormat:@"Processing project \"%@\"...", currentProject.projectName] :YES];
+	NSString *output, *aPath;
+	NSUInteger squinted = 0;
 
-    // Process 'agent.nut' then 'device.nut' if either or both exist
+	[self writeToLog:[NSString stringWithFormat:@"Processing device group \"%@\"...", devicegroup.name] :YES];
 
-	if (currentProject.projectVersion.floatValue > kPreviousProjectVersion)
+	if (devicegroup.models.count == 0 || devicegroup.models == nil)
 	{
-		aPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath];
-		dPath = [self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath];
-	}
-	else
-	{
-		aPath = currentProject.projectAgentCodePath;
-		dPath = currentProject.projectDeviceCodePath;
+		// This device group has no software - warn the user and bail
+
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Device group \"%@\" has no source code files - there is nothing to compile.", devicegroup.name] :YES];
+		return;
 	}
 
-	if (aPath != nil)
-	{
-		[self writeToLog:[NSString stringWithFormat:@"Processing agent code file: \"%@\"...", aPath.lastPathComponent] :YES];
-		output = [self processSource:aPath :kCodeTypeAgent :YES];
+	// Get the model's parent project
 
-		if (output == nil)
+	for (Project *project in projectArray)
+	{
+		NSMutableArray *dgs = project.devicegroups;
+
+		for (Devicegroup *dg in dgs)
 		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
+			if (dg == devicegroup)
+			{
+				thisProject = project;
+				break;
+			}
 		}
-		
-		output = [self processDefines:output :kCodeTypeAgent];
-
-		if (output == nil)
-		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in agent code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
-		}
-		
-		currentProject.projectAgentCode = output;
-		agentDoneFlag = YES;
 	}
 
-	if (dPath != nil)
+	// Process each of the device group's models in turn
+
+	for (Model *model in devicegroup.models)
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Processing device code file: \"%@\"...", dPath.lastPathComponent] :YES];
-		output = [self processSource:dPath :kCodeTypeDevice :YES];
+		// Clear the lists of local libraries and files found in the model
+		// 'foundLibs' - all the libraries #imported or #included in the source files, each stored as a File
+		// 'foundFiles' - all the non-libraries #imported or #included in the source files, each stored as a File
+		// 'foundEILibs' - all the EI libraries #required in the source files, each stored as a File, with the path set to the version
 
-		if (output == nil)
-		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
-		}
-		
-		output = [self processDefines:output :kCodeTypeDevice];
+		if (foundFiles != nil) foundFiles = nil;
+		if (foundLibs != nil) foundLibs = nil;
+		if (foundEILibs != nil) foundEILibs = nil;
 
-		if (output == nil)
-		{
-			[self writeToLog:@"Compilation halted: cannot continue due to errors in device code" :YES];
-			currentProject.projectSquinted = 0;
-			[self setProjectMenu];
-			return;
-		}
+		foundFiles = [[NSMutableArray alloc] init];
+		foundLibs = [[NSMutableArray alloc] init];
+		foundEILibs = [[NSMutableArray alloc] init];
+
+		output = nil;
 		
-		currentProject.projectDeviceCode = output;
-		deviceDoneFlag = YES;
+		NSInteger typeValue = ([model.type compare:@"agent"] == NSOrderedSame) ? kCodeTypeAgent : kCodeTypeDevice;
+
+		// Get the source code full file path - model paths should be relative to the project
+
+		aPath = [NSString stringWithFormat:@"%@/%@", model.path, model.filename];
+		aPath = [self getAbsolutePath:thisProject.path :aPath];
+
+		if (aPath != nil)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"Processing %@ code file: \"%@\"...", model.type, aPath.lastPathComponent] :YES];
+
+			output = [self processSource:aPath :typeValue :thisProject.path :model :!justACheck];
+
+			if (output == nil && !justACheck)
+			{
+				// This is a compile action, so we treat 'output == nil' as a failure
+
+				[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Compilation halted: cannot continue due to errors in %@ code", model.type] :YES];
+				model.squinted = NO;
+				return;
+			}
+
+			if (!justACheck)
+			{
+				// We are not just checking the code for libraries and includes, so
+				// save the compiled code into the model and set the compiled flags
+
+				model.code = output;
+				model.squinted = YES;
+
+				if (typeValue == kCodeTypeAgent)
+				{
+					agentDoneFlag = YES;
+					squinted = (squinted | 0x02);
+				}
+
+				if (typeValue == kCodeTypeDevice)
+				{
+					deviceDoneFlag = YES;
+					squinted = (squinted | 0x01);
+				}
+			}
+
+			// Wrangle the libraries and files found in this compilation
+
+			[self processLibraries:model];
+		}
 	}
 
-	if (agentDoneFlag || deviceDoneFlag)
+	if (!justACheck)
 	{
-		// Activate compilation-related UI items
+		// We are not just checking the code for libraries and includes,
+		// so update the UI as required
+
+		if (agentDoneFlag || deviceDoneFlag)
+		{
+			// Activate compilation-related UI items
+			
+			externalOpenMenuItem.enabled = agentDoneFlag;
+			externalOpenDeviceItem.enabled = deviceDoneFlag;
+			externalOpenBothItem.enabled = YES;
+			logDeviceCodeMenuItem.enabled = deviceDoneFlag;
+			logAgentCodeMenuItem.enabled = agentDoneFlag;
+		}
+			
+		// Update project's compilation status record, 'devicegroup.squinted'
 		
-		externalOpenMenuItem.enabled = YES;
-		externalOpenDeviceItem.enabled = YES;
-		externalOpenBothItem.enabled = YES;
-		logDeviceCodeMenuItem.enabled = deviceDoneFlag;
-		logAgentCodeMenuItem.enabled = agentDoneFlag;
+		NSString *resultString = @"";
+		
+		switch(squinted)
+		{
+			case 0:
+				resultString = [NSString stringWithFormat:@"Device group \"%@\" has no code to compile and upload.", devicegroup.name];
+				break;
+
+			case 1:
+				resultString = [NSString stringWithFormat:@"Device group \"%@\" source compiled - no agent code; device code ready to upload.", devicegroup.name];
+				break;
+
+			case 2:
+				resultString = [NSString stringWithFormat:@"Device group \"%@\" source compiled - no device code; agent code ready to upload.", devicegroup.name];
+				break;
+
+			case 3:
+				resultString = [NSString stringWithFormat:@"Device group \"%@\" source compiled - agent and device code ready to upload.", devicegroup.name];
+		}
+
+		[self writeToLog:resultString :YES];
+		devicegroup.squinted = squinted;
 	}
-	
-	// Sort out the libraries and files found in this compilation
-	
-	[self processLibraries];
-	
-	// Update project's compilation status record, 'projectSquinted'
-	
-	NSString *resultString = @"";
-	
-	if (currentProject.projectAgentCodePath != nil)
-    {
-        if (currentProject.projectDeviceCodePath != nil)
-        {
-            // Project has Device *and* Agent code
-
-            resultString = @"Project compiled - agent and device code ready to upload.";
-            currentProject.projectSquinted = 3;
-        }
-        else
-        {
-            // Project has only Agent code
-
-            resultString = @"Project compiled - agent code ready to upload.";
-            currentProject.projectSquinted = currentProject.projectSquinted | 2;
-        }
-    }
-    else
-    {
-        if (currentProject.projectDeviceCodePath != nil)
-        {
-            // Project has only Device code
-
-            resultString = @"Project compiled - device code ready to upload.";
-            currentProject.projectSquinted = currentProject.projectSquinted | 1;
-        }
-        else
-        {
-            // Project has no code
-
-            resultString = @"Project has no code to compile and upload.";
-        }
-    }
-
-    [self writeToLog:resultString :YES];
 	
 	// Update libraries menu with updated list of local, EI libraries and local files
-	
-	[self updateLibraryMenu];
-	[self updateFilesMenu];
-	[self setProjectMenu];
-	[saveLight setFull:!currentProject.projectHasChanged];
+
+	[self refreshMainDevicegroupsMenu];
+	[self refreshLibraryMenus];
+	[self refreshFilesMenu];
+	[self setToolbar];
+	[saveLight needSave:thisProject.haschanged];
+	[_window setDocumentEdited:thisProject.haschanged];
 }
 
 
 
-- (void)processLibraries
+- (NSString *)processSource:(NSString *)codePath :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode
 {
-	// This method wrangles the collection of current libraries found in the source code files
-	// It looks for Electric Imp links and for local files and libraries
-
-	// PROCESS EI LIBRARIES
-
-	// Do we have any Electric Imp libraries #required in the source code?
-
-	if (foundEILibs.count != currentProject.projectImpLibs.count) currentProject.projectHasChanged = YES;
-
-	if (foundEILibs.count == 0)
-	{
-		if (currentProject.projectImpLibs.count > 0)
-		{
-			if (currentProject.projectImpLibs.count == 1)
-			{
-				[self writeToLog:@"1 Electric Imp library no longer included." :YES];
-			}
-			else
-			{
-				[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included.", (long)currentProject.projectImpLibs.count] :YES];
-			}
-
-			[currentProject.projectImpLibs removeAllObjects];
-			currentProject.projectHasChanged = YES;
-		}
-		else
-		{
-			[self writeToLog:@"No Electric Imp libraries included." :YES];
-		}
-	}
-	else
-	{
-		NSInteger total = currentProject.projectImpLibs.count - foundEILibs.count;
-
-		if (total == 1)
-		{
-			[self writeToLog:@"1 Electric Imp library no longer included." :YES];
-		}
-		else if (total > 1)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included.", (long)total] :YES];
-		}
-
-		// First, run through the contents of 'foundEILibs' to see if there is a 1:1 match with
-		// the lists of known local librariess; if not, mark that the project has changed
-
-		total = 0;
-
-		for (NSUInteger i = 0 ; i < foundEILibs.count ; ++i)
-		{
-			NSArray *aLib = [foundEILibs objectAtIndex:i];
-			NSString *libName = [aLib objectAtIndex:0];
-			NSString *libVer = [aLib objectAtIndex:1];
-
-			NSString *match = nil;
-
-			if (currentProject.projectImpLibs.count > 0)
-			{
-				// Does the library name match an existing one?
-
-				for (NSUInteger j = 0 ; j < currentProject.projectImpLibs.count ; ++j)
-				{
-					NSString *bLibName = @"";
-
-					NSArray *bLib = [currentProject.projectImpLibs objectAtIndex:j];
-
-					if ([bLib isKindOfClass:[NSString class]])
-					{
-						bLibName = (NSString *)bLib;
-					}
-					else
-					{
-						bLibName = [bLib objectAtIndex:0];
-
-						if ([bLibName compare:libName] == NSOrderedSame)
-						{
-							match = [bLib objectAtIndex:1];
-							break;
-						}
-					}
-				}
-			}
-
-			if (match == nil)
-			{
-				currentProject.projectHasChanged = YES;
-				++total;
-			}
-			else
-			{
-				// The found library does match, but we should check if its version has changed.
-
-				if ([match compare:libVer] != NSOrderedSame)
-				{
-					// Names match but the bersion doesn't.
-
-					currentProject.projectHasChanged = YES;
-					[self writeToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", libName, match, libVer] :YES];
-				}
-			}
-		}
-
-		if (total == 1)
-		{
-			[self writeToLog:@"1 Electric Imp library added." :YES];
-		}
-		else if (total > 1)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries added.", (long)total] :YES];
-		}
-
-
-		// Now replace the recorded EI library list with the new one from 'foundEILibs'
-
-		currentProject.projectImpLibs = foundEILibs;
-	}
-
-	// PROCESS LOCAL LIBRARIES
-
-	// NOTE From file version 2.1 (kPathChangeProjectVersion) library file paths are relative to project file
-	//      Earlier versions use absolute paths (should not change unless project files is updated at load)
-
-	// Do we have any local libraries #included or #imported in the source code?
-	
-	// Check for a disparity between the number of known libraries and those found in the compilation
-	// If there is a disparity, the project has changed so set the 'need to save' flag. Note if there
-	// is no disparity, there may still have been changes made - we check for these below
-	
-	if (currentProject.projectAgentLibraries.count + currentProject.projectDeviceLibraries.count != foundLibs.count) currentProject.projectHasChanged = YES;
-	
-	// Local libraries #included or #imported in the source code will all be stored in 'foundLibs'
-	
-	if (foundLibs.count == 0)
-	{
-		// There are no libraries #included or #imported in the current code,
-		// so clear the counts and the lists stored in the project
-		
-		currentDeviceLibCount = 0;
-		currentAgentLibCount = 0;
-		
-		if (currentProject.projectAgentLibraries != nil && currentProject.projectAgentLibraries.count > 0)
-		{
-			if (currentProject.projectDeviceLibraries.count == 1)
-			{
-				[self writeToLog:@"1 local library no longer referenced in the project's agent code." :YES];
-			}
-			else
-			{
-				[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the project's agent code.", (long)currentProject.projectAgentLibraries.count] :YES];
-			}
-
-			[currentProject.projectAgentLibraries removeAllObjects];
-		}
-
-		if (currentProject.projectDeviceLibraries != nil && currentProject.projectDeviceLibraries.count > 0)
-		{
-			if (currentProject.projectDeviceLibraries.count == 1)
-			{
-				[self writeToLog:@"1 local library no longer referenced in the project's device code." :YES];
-			}
-			else
-			{
-				[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the project's device code.", (long)currentProject.projectDeviceLibraries.count] :YES];
-			}
-
-			[currentProject.projectDeviceLibraries removeAllObjects];
-		}
-	}
-	else
-	{
-		// Calculate and display the number of library references removed from the source
-
-		NSUInteger agentLibCount = 0;
-		NSUInteger deviceLibCount = 0;
-
-		for (NSDictionary *item in foundLibs)
-		{
-			NSNumber *codeNumber = [item objectForKey:@"libType"];
-			NSUInteger codeType = codeNumber.integerValue;
-
-			if (codeType == kCodeTypeAgent)
-			{
-				++agentLibCount;
-			}
-			else
-			{
-				++deviceLibCount;
-			}
-		}
-
-		NSInteger total = currentProject.projectAgentLibraries.count - agentLibCount;
-
-		if (total == 1)
-		{
-			[self writeToLog:@"1 local library no longer referenced in the project's agent code." :YES];
-		}
-		else if (total > 1)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the project's agent code.", (long)total] :YES];
-		}
-
-		total = currentProject.projectDeviceLibraries.count - deviceLibCount;
-
-		if (total == 1)
-		{
-			[self writeToLog:@"1 local library no longer referenced in the project's device code." :YES];
-		}
-		else if (total > 1)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the project's device code.", (long)total] :YES];
-		}
-
-		NSMutableDictionary *projectLibList;
-		NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
-		
-		// First, run through the contents of 'foundLibs' to see if there is a 1:1 match with
-		// the lists of known local librariess; if not, mark that the project has changed
-		
-		for (NSUInteger i = 0 ; i < foundLibs.count ; ++i)
-		{
-			NSDictionary *aLib = [foundLibs objectAtIndex:i];
-			NSString *libName = [aLib objectForKey:@"libName"];
-			NSNumber *codeNumber = [aLib objectForKey:@"libType"];
-			NSString *libLoc = [aLib objectForKey:@"libPath"];
-			NSInteger libCode = codeNumber.integerValue;
-
-			if (libCode == kCodeTypeAgent)
-			{
-				if (currentProject.projectAgentLibraries == nil) currentProject.projectAgentLibraries = [[NSMutableDictionary alloc] init];
-				projectLibList = currentProject.projectAgentLibraries;
-			}
-			else
-			{
-				if (currentProject.projectDeviceLibraries == nil) currentProject.projectDeviceLibraries = [[NSMutableDictionary alloc] init];
-				projectLibList = currentProject.projectDeviceLibraries;
-			}
-			
-			BOOL match = NO;
-			
-			if (projectLibList.count > 0) 
-			{
-				// Does the library name match an existing one?
-
-				NSArray *keys = [projectLibList allKeys];
-				
-				for (NSUInteger j = 0 ; j < keys.count ; ++j)
-				{
-					NSString *key = [keys objectAtIndex:j];
-					if ([key compare:libName] == NSOrderedSame)
-					{
-						match = YES;
-						break;
-					}
-				}
-			}
-			
-			if (!match)
-			{
-				// The found library isn't known, so we'll have to add it
-
-				currentProject.projectHasChanged = YES;
-			}
-			else
-			{
-				// The found library does match, but we should check if it has moved.
-				// Note saved paths ('aPath') may be absolute or relative; found paths ('libLoc') are absolute
-
-				NSString *aPath = [projectLibList objectForKey:libName];
-
-				if (cv != kLower)
-				{
-					// Version is 2.1 or above, so saved path is relative - convert it for comparison
-
-					aPath = [self getAbsolutePath:currentProject.projectPath :aPath];
-				}
-
-				if ([aPath compare:libLoc] != NSOrderedSame)
-				{
-					// Names match but the path doesn't. Ergo library has moved, so warn user
-					// Note: we update the path in the record in the next section
-
-					currentProject.projectHasChanged = YES;
-					[self writeToLog:[NSString stringWithFormat:@"Local library \"%@\" has been moved from \"%@\" to \"%@\".", libName, [aPath stringByDeletingLastPathComponent], [libLoc stringByDeletingLastPathComponent]] :YES];
-				}
-			}
-		}
-		
-		// Now clear out the recorded library lists and add in the new ones from 'foundLibs'
-		
-		if (currentProject.projectDeviceLibraries) [currentProject.projectDeviceLibraries removeAllObjects];
-		if (currentProject.projectAgentLibraries) [currentProject.projectAgentLibraries removeAllObjects];
-		
-		for (NSUInteger i = 0 ; i < foundLibs.count ; ++i)
-		{
-			NSDictionary *aLib = [foundLibs objectAtIndex:i];
-			NSString *libName = [aLib objectForKey:@"libName"];
-
-			NSString *libPath = [aLib objectForKey:@"libPath"];
-			if (cv != kLower) libPath = [self getRelativeFilePath:currentProject.projectPath :libPath];
-
-			NSNumber *codeNumber = [aLib objectForKey:@"libType"];
-			NSInteger libCode = codeNumber.integerValue;
-
-			// NSString *libVersion = [aLib objectForKey:@"libVer"];
-			
-			if (libCode == kCodeTypeAgent)
-			{
-				[currentProject.projectAgentLibraries setObject:libPath forKey:libName];
-			}
-			else
-			{
-				[currentProject.projectDeviceLibraries setObject:libPath forKey:libName];
-			}
-		}
-	}
-	
-	// Update library counts
-	
-	currentDeviceLibCount = currentProject.projectDeviceLibraries.count;
-	currentAgentLibCount = currentProject.projectAgentLibraries.count;
-	NSUInteger count = currentDeviceLibCount + currentAgentLibCount;
-	
-	if (count > 0)
-	{
-		if (count == 1)
-		{
-			[self writeToLog:@"1 local library inserted." :YES];
-		}
-		else
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%lu local libraries inserted.", (long)count] :YES];
-		}
-	}
-	else
-	{
-		[self writeToLog:@"No local libraries included." :YES];
-	}
-	
-	// PROCESS LOCAL FILES
-
-	// NOTE From file version 2.1 (kPathChangeProjectVersion) file paths are relative to project file
-	//      Earlier versions use absolute paths (should not change unless project files is updated at load)
-
-	// Do we have any local files #included or #imported in the source code?
-	
-	// Local files #included or #imported in the source code will all be stored in 'foundFiles'
-	// Clear out the recorded files lists and add in the new ones from 'foundFiles'
-	
-	if (currentProject.projectAgentFiles.count + currentProject.projectDeviceFiles.count != foundFiles.count) currentProject.projectHasChanged = YES;
-
-	if (foundFiles.count == 0)
-	{
-		if (currentProject.projectAgentFiles != nil && currentProject.projectAgentFiles.count > 0)
-		{
-			if (currentProject.projectAgentFiles.count == 1)
-			{
-				[self writeToLog:@"1 local file no longer referenced in the project's agent code." :YES];
-			}
-			else
-			{
-				[self writeToLog:[NSString stringWithFormat:@"%li local files no longer referenced in the project's agent code.", (long)currentProject.projectAgentFiles.count] :YES];
-			}
-
-			[currentProject.projectAgentFiles removeAllObjects];
-		}
-
-		if (currentProject.projectDeviceFiles != nil && currentProject.projectDeviceFiles.count > 0)
-		{
-			if (currentProject.projectDeviceFiles.count == 1)
-			{
-				[self writeToLog:@"1 local file no longer referenced in the project's device code." :YES];
-			}
-			else
-			{
-				[self writeToLog:[NSString stringWithFormat:@"%li local files no longer referenced in the project's device code.", (long)currentProject.projectDeviceFiles.count] :YES];
-			}
-
-			[currentProject.projectDeviceFiles removeAllObjects];
-		}
-	}
-	else
-	{
-		NSUInteger aFilesCount = 0;
-		NSUInteger dFilesCount = 0;
-
-		for (NSDictionary *item in foundFiles)
-		{
-			NSNumber *codeNumber = [item objectForKey:@"fileType"];
-			NSUInteger codeType = codeNumber.integerValue;
-
-			if (codeType == kCodeTypeAgent)
-			{
-				++aFilesCount;
-			}
-			else
-			{
-				++dFilesCount;
-			}
-		}
-
-		NSInteger total = currentProject.projectAgentFiles.count - aFilesCount;
-
-		if (total == 1)
-		{
-			[self writeToLog:@"1 local file no longer referenced in the project's agent code." :YES];
-		}
-		else if (total > 1)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%li local files no longer referenced in the project's agent code.", (long)total] :YES];
-		}
-
-		total = currentProject.projectDeviceFiles.count - dFilesCount;
-
-		if (total == 1)
-		{
-			[self writeToLog:@"1 local file no longer referenced in the project's device code." :YES];
-		}
-		else if (total > 1)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%li local files no longer referenced in the project's device code.", (long)total] :YES];
-		}
-		
-		NSMutableDictionary *projectFileList;
-		NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
-
-		for (NSUInteger i = 0 ; i < foundFiles.count ; ++i)
-		{
-			// Found files' paths will be absolute
-
-			NSDictionary *aFile = [foundFiles objectAtIndex:i];
-			NSString *fileName = [aFile objectForKey:@"fileName"];
-			NSNumber *codeNumber = [aFile objectForKey:@"fileType"];
-			NSString *fileLoc = [aFile objectForKey:@"filePath"];
-			NSInteger fileType = codeNumber.integerValue;
-
-			if (fileType == kCodeTypeAgent)
-			{
-				if (currentProject.projectAgentFiles == nil) currentProject.projectAgentFiles = [[NSMutableDictionary alloc] init];
-				projectFileList = currentProject.projectAgentFiles;
-			}
-			else
-			{
-				if (currentProject.projectDeviceFiles == nil) currentProject.projectDeviceFiles = [[NSMutableDictionary alloc] init];
-				projectFileList = currentProject.projectDeviceFiles;
-			}
-
-			BOOL match = NO;
-
-			if (projectFileList.count > 0)
-			{
-				NSArray *keys = [projectFileList allKeys];
-
-				for (NSUInteger j = 0 ; j < keys.count ; ++j)
-				{
-					NSString *key = [keys objectAtIndex:j];
-					if ([key compare:fileName] == NSOrderedSame)
-					{
-						match = YES;
-						break;
-					}
-				}
-			}
-
-			if (!match)
-			{
-				currentProject.projectHasChanged = YES;
-			}
-			else
-			{
-				NSString *aPath = [projectFileList objectForKey:fileName];
-
-				if (cv != kLower) aPath = [self getAbsolutePath:currentProject.projectPath :aPath];
-
-				if ([aPath compare:fileLoc] != NSOrderedSame)
-				{
-					currentProject.projectHasChanged = YES;
-					[self writeToLog:[NSString stringWithFormat:@"Local file \"%@\" has been moved from \"%@\" to \"%@\".", fileName, [aPath stringByDeletingLastPathComponent], [fileLoc stringByDeletingLastPathComponent]] :YES];
-				}
-			}
-		}
-
-		// Now clear out the recorded library lists and add in the new ones from 'foundLibs'
-
-		if (currentProject.projectDeviceFiles) [currentProject.projectDeviceFiles removeAllObjects];
-		if (currentProject.projectAgentFiles) [currentProject.projectAgentFiles removeAllObjects];
-
-		for (NSUInteger i = 0 ; i < foundFiles.count ; ++i)
-		{
-			NSDictionary *aFile = [foundFiles objectAtIndex:i];
-			NSString *fileName = [aFile objectForKey:@"fileName"];
-
-			NSString *filePath = [aFile objectForKey:@"filePath"];
-			if (cv != kLower) filePath = [self getRelativeFilePath:currentProject.projectPath :filePath];
-
-			NSNumber *codeNumber = [aFile objectForKey:@"fileType"];
-			NSInteger fileType = codeNumber.integerValue;
-
-			if (fileType == kCodeTypeAgent)
-			{
-				[currentProject.projectAgentFiles setObject:filePath forKey:fileName];
-			}
-			else
-			{
-				[currentProject.projectDeviceFiles setObject:filePath forKey:fileName];
-			}
-		}
-	}
-
-	count = currentProject.projectDeviceFiles.count + currentProject.projectAgentFiles.count;
-	
-	if (count > 0)
-	{
-		if (count == 1)
-		{
-			[self writeToLog:@"1 local file inserted." :YES];
-		}
-		else
-		{
-			[self writeToLog:[NSString stringWithFormat:@"%lu local files inserted.", (long)count] :YES];
-		}
-	}
-	else
-	{
-		[self writeToLog:@"No local files included." :YES];
-	}
-
-	// Finally, clear and register the new libraries for changes
-
-	[self addFileWatchPaths:currentProject.projectAgentLibraries.allValues];
-	[self addFileWatchPaths:currentProject.projectAgentFiles.allValues];
-	[self addFileWatchPaths:currentProject.projectDeviceLibraries.allValues];
-	[self addFileWatchPaths:currentProject.projectDeviceFiles.allValues];
-}
-
-
-
-- (void)addFileWatchPaths:(NSArray *)paths
-{
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
-
-	for (NSUInteger i = 0 ; i < paths.count ; ++i)
-	{
-		NSString *path = [paths objectAtIndex:i];
-
-		// File version >= 2.1? Convert relative path to absolute before passing it to file watcher
-
-		if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-
-		if (![fileWatchQueue isPathBeingWatched:path]) [fileWatchQueue addPath:path];
-	}
-}
-
-
-
-- (NSString *)processSource:(NSString *)codePath :(NSUInteger)codeType :(BOOL)willReturnCode
-{
-    // Loads the contents of the source code file referenced by 'codePath' - 'codeType' indicates whether the code
+	// Loads the contents of the source code file referenced by 'codePath' - 'codeType' indicates whether the code
 	// is agent or device - and parses it for multi-line comment blocks. Only code outside these blocks is passed
 	// on for further processing, ie. parsing for #require, #include or #import directives.
-	
+
 	// 'willReturnCode' is set to YES if we want compiled code back; if we are only parsing the code for a list
 	// of included files and libraries, we can pass in NO.
-	
-	
+
+	// We return nil if there is a compilation error, otherwise the processed code
+
 	NSRange commentStartRange, commentEndRange;
-    NSString *compiledCode = @"";
+	NSString *compiledCode = @"";
 
-    // Attempt to load in the source text file's contents
+	// Attempt to load in the source text file's contents
 
-    NSError *error;
-    NSString *sourceCode = [NSString stringWithContentsOfFile:codePath encoding:NSUTF8StringEncoding error:&error];
+	NSError *error;
+	NSString *sourceCode = [NSString stringWithContentsOfFile:codePath encoding:NSUTF8StringEncoding error:&error];
+
 	if (error)
 	{
-		[self writeToLog:[NSString stringWithFormat:@"[ERROR] Unable to load source file \"%@\" - aborting compile.", codePath] :YES];
+		[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Unable to load source file \"%@\" - aborting compile.", codePath] :YES];
 		return nil;
 	}
 
-    // Run through the loaded source code searching for multi-line comment blocks
-    // When we find one, we examine all the code between the newly found comment block
+	// Run through the loaded source code searching for multi-line comment blocks
+	// When we find one, we examine all the code between the newly found comment block
 	// and the previously found one (or the start of the file). 'index' records the location
 	// of the start of file or the end of the previous comment block
 
-    NSUInteger index = 0;
-    BOOL done = NO;
-	
+	NSUInteger index = 0;
+	BOOL done = NO;
+
 	while (done == NO)
-    {
-        commentStartRange = [sourceCode rangeOfString:@"/*" options:NSCaseInsensitiveSearch range:NSMakeRange(index, sourceCode.length - index)];
+	{
+		commentStartRange = [sourceCode rangeOfString:@"/*" options:NSCaseInsensitiveSearch range:NSMakeRange(index, sourceCode.length - index)];
 
-        if (commentStartRange.location != NSNotFound)
-        {
-            // We have found a comment block.
-            // Get the code *ahead* of the comment block that has not yet been processed,
-            // ie. between locations 'index' and 'commentStartRange.location'
+		if (commentStartRange.location != NSNotFound)
+		{
+			// We have found a comment block.
+			// Get the code *ahead* of the comment block that has not yet been processed,
+			// ie. between locations 'index' and 'commentStartRange.location'
 
-            NSRange preCommentRange = NSMakeRange(index, commentStartRange.location - index);
-            NSString *codeToProcess = [sourceCode substringWithRange:preCommentRange];
+			NSRange preCommentRange = NSMakeRange(index, commentStartRange.location - index);
+			NSString *codeToProcess = [sourceCode substringWithRange:preCommentRange];
 
-            // Check for #requires
+			// Check for #requires
 			// 'processRequires:' finds EI libraries, so it doesn't return compiled code
 
-            [self processRequires:codeToProcess];
+			[self processRequires:codeToProcess];
 
-            // Check for #imports
-			// 'processImports:' will return compiled code if 'willReturnCode' is true, else nil
-			
-            NSString *processedCode = [self processImports:codeToProcess :@"#import" :codeType :willReturnCode];
+			// Check for #imports
 
-            if (willReturnCode)
-            {
-                // If we are compiling code (ie. 'willReturnCode' is YES), then
-                // use the compiled code for the next stage of processing.
-				// 'processedCode' is nil if there are no #imports in the code
+			NSString *processedCode = [self processImports:codeToProcess :@"#import" :codeType :projectPath :model :willReturnCode];
 
-                if (processedCode != nil) codeToProcess = processedCode;
-            }
+			// 'processedCode' returns nil for an error, 'none' for no #imports or checks, and processed code otherwise
+
+			if (processedCode != nil)
+			{
+				if (([processedCode compare:@"none"] != NSOrderedSame) && willReturnCode)
+				{
+					// If we are compiling code (ie. 'willReturnCode' is YES), then
+					// use the compiled code for the next stage of processing.
+
+					codeToProcess = processedCode;
+				}
+			}
+			else
+			{
+				// Compilation error: missing file or somesuch, so bail
+
+				if (willReturnCode) return nil;
+			}
 
 			// Check for #includes
+
+			processedCode = [self processImports:codeToProcess :@"#include" :codeType :projectPath :model :willReturnCode];
+
+			if (processedCode != nil)
+			{
+				if (([processedCode compare:@"none"] != NSOrderedSame) && willReturnCode)
+				{
+					// If we are compiling code (ie. 'willReturnCode' is YES), then
+					// use the compiled code for the next stage of processing.
+
+					codeToProcess = processedCode;
+				}
+			}
+			else
+			{
+				// Compilation error: missing file or somesuch, so bail
+
+				if (willReturnCode) return nil;
+			}
 			
-			processedCode = [self processImports:codeToProcess :@"#include" :codeType :willReturnCode];
+			// 'codeToProcess' contains compiled code (or the raw code if we are not compiling), so add it to any code we have already
 
-            if (willReturnCode)
-            {
-                if (processedCode != nil) codeToProcess = processedCode;
-            }
+			compiledCode = [compiledCode stringByAppendingString:codeToProcess];
 
-            // 'codeToProcess' contains compiled code (or the raw code if we are not compiling), so add it to any code we have already
+			// We have processed the block of valid code *before* the /*, so find the end of the commment block: */
 
-            compiledCode = [compiledCode stringByAppendingString:codeToProcess];
+			commentEndRange = [sourceCode rangeOfString:@"*/" options:NSCaseInsensitiveSearch range:NSMakeRange(commentStartRange.location + 2, sourceCode.length - commentStartRange.location - 2)];
 
-            // We have processed the block of valid code *before* the /*, so find the end of the commment block: */
-
-            commentEndRange = [sourceCode rangeOfString:@"*/" options:NSCaseInsensitiveSearch range:NSMakeRange(commentStartRange.location + 2, sourceCode.length - commentStartRange.location - 2)];
-
-            if (commentEndRange.location != NSNotFound)
-            {
-                // Found the end of the comment block and it's within the file. Add it to the compiled code store (ie. keep the comment block)
+			if (commentEndRange.location != NSNotFound)
+			{
+				// Found the end of the comment block and it's within the file. Add it to the compiled code store (ie. keep the comment block)
 				// NOTE Can make this a preference later, ie. upload code with comments stripped
-				
-                NSRange commentRange = NSMakeRange(commentStartRange.location, (commentEndRange.location + 2 - commentStartRange.location));
-                compiledCode = [compiledCode stringByAppendingString:[sourceCode substringWithRange:commentRange]];
-				
+
+				NSRange commentRange = NSMakeRange(commentStartRange.location, (commentEndRange.location + 2 - commentStartRange.location));
+				compiledCode = [compiledCode stringByAppendingString:[sourceCode substringWithRange:commentRange]];
+
 				// Move 'index' to the end of the comment block
-				
-                index = commentStartRange.location + commentRange.length;
-            }
-            else
-            {
-                // Got to the end of the source code without finding the end of the comment block so we can ignore all of what remains
 
-                compiledCode = [compiledCode stringByAppendingString:[sourceCode substringFromIndex:commentStartRange.location]];
-                done = YES;
-            }
-        }
-        else
-        {
-            // There are no comment blocks in the remaining code, so just take the remaining code and process it to the end
+				index = commentStartRange.location + commentRange.length;
+			}
+			else
+			{
+				// Got to the end of the source code without finding the end of the comment block so we can ignore all of what remains
 
-            NSString *codeToProcess = [sourceCode substringFromIndex:index];
+				compiledCode = [compiledCode stringByAppendingString:[sourceCode substringFromIndex:commentStartRange.location]];
+				done = YES;
+			}
+		}
+		else
+		{
+			// There are no comment blocks in the remaining code, so just take the remaining code and process it to the end
 
-            [self processRequires:codeToProcess];
+			NSString *codeToProcess = [sourceCode substringFromIndex:index];
 
-            NSString *processedCode = [self processImports:codeToProcess :@"#import" :codeType :willReturnCode];
+			[self processRequires:codeToProcess];
 
-            if (willReturnCode)
-            {
-                if (processedCode != nil) codeToProcess = processedCode;
-            }
+			NSString *processedCode = [self processImports:codeToProcess :@"#import" :codeType :projectPath :model :willReturnCode];
 
-            processedCode = [self processImports:codeToProcess :@"#include" :codeType :willReturnCode];
+			if (processedCode != nil)
+			{
+				if (([processedCode compare:@"none"] != NSOrderedSame) && willReturnCode)
+				{
+					// If we are compiling code (ie. 'willReturnCode' is YES), then
+					// use the compiled code for the next stage of processing.
 
-            if (willReturnCode)
-            {
-                if (processedCode != nil) codeToProcess = processedCode;
-            }
+					codeToProcess = processedCode;
+				}
+			}
+			else
+			{
+				// Compilation error: missing file or somesuch, so bail
 
-            compiledCode = [compiledCode stringByAppendingString:codeToProcess];
-            done = YES;
-        }
-    }
+				if (willReturnCode) return nil;
+			}
 
-    // Device/Agent code has been processed: libraries and linked files found and stored
+			processedCode = [self processImports:codeToProcess :@"#include" :codeType :projectPath :model :willReturnCode];
+
+			if (processedCode != nil)
+			{
+				if (([processedCode compare:@"none"] != NSOrderedSame) && willReturnCode)
+				{
+					// If we are compiling code (ie. 'willReturnCode' is YES), then
+					// use the compiled code for the next stage of processing.
+
+					codeToProcess = processedCode;
+				}
+			}
+			else
+			{
+				// Compilation error: missing file or somesuch, so bail
+
+				if (willReturnCode) return nil;
+			}
+
+			compiledCode = [compiledCode stringByAppendingString:codeToProcess];
+			done = YES;
+		}
+	}
+
+	// Code has been processed: any libraries and linked files that have been found are now stored
 	// If we have asked to receive compiled code, return it now, or return nil
 
-    if (willReturnCode) return compiledCode;
-    return nil;
+	if (willReturnCode) return compiledCode;
+
+	return nil;
 }
 
 
 
-- (void)processRequires:(NSString *)sourceCode
+- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode 
 {
-    // Parses the passed in 'sourceCode' for #require directives. If any are found,
-	// their names and version numbers are stored in the current project's 'projectImpLibs' array
-	
-	NSRange requireRange, commentRange;
-    NSUInteger lineStartIndex;
-    NSString *libName;
-
-    BOOL done = NO;
-    NSUInteger index = 0;
-
-    // Remove the list of currently known EI libs?
-
-    while (done == NO)
-    {
-        // Look for the NEXT occurrence of the #require directive
-
-        requireRange = [sourceCode rangeOfString:@"#require" options:NSCaseInsensitiveSearch range:NSMakeRange(index, sourceCode.length - index)];
-
-        if (requireRange.location != NSNotFound)
-        {
-            // We have found at least one '#require'. Find the line it is in and then run through the
-            // line char by char to see if we have a single-line comment mark ahead of the #require
-
-            [sourceCode getLineStart:&lineStartIndex end:NULL contentsEnd:NULL forRange:requireRange];
-
-            commentRange = NSMakeRange(NSNotFound, 0);
-
-            // If the #require is not at the start of a line, see if it is preceded by comment marks
-
-            if (requireRange.location != lineStartIndex) commentRange = [sourceCode rangeOfString:@"//" options:NSLiteralSearch range:NSMakeRange(lineStartIndex, requireRange.location - lineStartIndex)];
-
-            if (commentRange.location == NSNotFound)
-            {
-                // No Comment mark found ahead of the #require on the same line, so we can get the EI library's name
-
-                libName = [sourceCode substringFromIndex:(requireRange.location + 8)];
-                commentRange = [libName rangeOfString:@"\""];
-                libName = [libName substringFromIndex:(commentRange.location + 1)];
-                commentRange = [libName rangeOfString:@"\""];
-                libName = [libName substringToIndex:commentRange.location];
-
-                // Check for spaces and remove
-
-                libName = [libName stringByReplacingOccurrencesOfString:@" " withString:@""];
-
-                // Separate name from version, eg. "lib.class.nut:1.0.0"
-
-                NSArray *elements = [libName componentsSeparatedByString:@":"];
-
-                // Log and record the found library's name
-
-                [self writeToLog:[NSString stringWithFormat:@"Electric Imp Library \"%@\" version %@ included in project \"%@\".", [elements objectAtIndex:0], [elements objectAtIndex:1], currentProject.projectName] :YES];
-
-                // Add the library to the project - name and version (as string)
-
-                if (foundEILibs.count == 0)
-                {
-                    NSArray *library = [NSArray arrayWithObjects:[elements objectAtIndex:0], [elements objectAtIndex:1], nil];
-                    [foundEILibs addObject:library];
-                }
-                else
-                {
-                    BOOL match = NO;
-
-                    for (NSUInteger k = 0 ; k < foundEILibs.count ; ++k)
-                    {
-                        // See if the library is already listed
-
-                        NSArray *aLib = [foundEILibs objectAtIndex:k];
-                        NSString *libName = [aLib objectAtIndex:0];
-                        NSString *libVersion = [aLib objectAtIndex:1];
-                        if (([libName compare:[elements objectAtIndex:0]] == NSOrderedSame) && ([libVersion compare:[elements objectAtIndex:1]] == NSOrderedSame)) match = YES;
-                    }
-
-                    if (!match) {
-                        NSArray *library = [NSArray arrayWithObjects:[elements objectAtIndex:0], [elements objectAtIndex:1], nil];
-                        [foundEILibs addObject:library];
-                    }
-                }
-            }
-            
-            // Move the file pointer along and look for the next library
-            
-            index = requireRange.location + 9;
-        }
-        else
-        {
-            // There are no more occurrences of '#require' in the rest of the file, so mark search as done
-            
-            done = YES;
-        }
-    }
-}
-
-
-
-- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(BOOL)willReturnCode
-{
-    // Parses the passed in 'sourceCode' for occurences of 'searchString' - here either "#import" or "#include".
+	// Parses the passed in 'sourceCode' for occurences of 'searchString' - either "#import" or "#include".
 	// The value of 'codeType' indicates whether the source is agent or device code.
 	// The value of 'willReturnCode' indicates whether the method should returne compiled code or not. If it is
 	// being used to gather a list of #included libraries and files, 'willReturnCode' will be NO.
-	
+
+	// NOTE 'projectPath' should be an absolute path to the source file
+
 	NSUInteger lineStartIndex;
-    NSRange includeRange, commentRange;
-    NSMutableArray *deadLibs, *deadFiles;
-	
+	NSRange includeRange, commentRange;
+	NSMutableArray *deadLibs, *deadFiles;
+
 	NSString *returnCode = sourceCode;
 	NSUInteger index = 0;
-    BOOL done = NO;
-    BOOL found = NO;
+	BOOL done = NO;
+	BOOL found = NO;
 
-    while (done == NO)
-    {
-        /*
+	while (done == NO)
+	{
+		/*
 		 Loop through the code looking any and all appearances of 'searchString':
-		 
+
 		 <---- codeStart ---->#import "some.lib"<---- codeEnd ---->
 		 ^
 		 index
-		 
+
 		 after processing becomes
-		 
+
 		 <---- codeStart ----><libCode><---- codeEnd ---->
-		                               ^
-									   index
+		 ^
+		 index
 		 */
 
-        includeRange = [returnCode rangeOfString:searchString options:NSCaseInsensitiveSearch range:NSMakeRange(index, returnCode.length - index)];
+		includeRange = [returnCode rangeOfString:searchString options:NSCaseInsensitiveSearch range:NSMakeRange(index, returnCode.length - index)];
 
-        if (includeRange.location != NSNotFound)
-        {
-            NSString *libPath, *libCode, *libName;
+		if (includeRange.location != NSNotFound)
+		{
+			NSString *libPath, *libCode, *libName, *libVer;
 
-            // We have found at least one #import or #include. Now find the line it's in,
-            // then check to see if we have a comment mark ahead of the directive
+			// We have found at least one #import or #include. Now find the line it's in,
+			// then check to see if we have a comment mark ahead of the directive
 
-            [returnCode getLineStart:&lineStartIndex end:NULL contentsEnd:NULL forRange:includeRange];
-            commentRange = NSMakeRange(NSNotFound, 0);
+			[returnCode getLineStart:&lineStartIndex end:NULL contentsEnd:NULL forRange:includeRange];
+			commentRange = NSMakeRange(NSNotFound, 0);
 
-            // Look for '//' between the start of the line and the occurence of the directive
+			// Look for '//' between the start of the line and the occurence of the directive
 
-            if (includeRange.location != lineStartIndex) commentRange = [returnCode rangeOfString:@"//" options:NSLiteralSearch range:NSMakeRange(lineStartIndex, includeRange.location - lineStartIndex)];
+			if (includeRange.location != lineStartIndex) commentRange = [returnCode rangeOfString:@"//" options:NSLiteralSearch range:NSMakeRange(lineStartIndex, includeRange.location - lineStartIndex)];
 
-            if (commentRange.location == NSNotFound)
-            {
+			if (commentRange.location == NSNotFound)
+			{
 				// No Comment mark found ahead of the #import on the same line, so we can get the lib's name
-				
+
 				NSString *codeStart, *codeEnd;
-				
+
 				found = YES;
-	
-                libName = [returnCode substringFromIndex:(includeRange.location + searchString.length)];
-                codeStart = [returnCode substringToIndex:includeRange.location];
-                commentRange = [libName rangeOfString:@"\""];
-                libName = [libName substringFromIndex:(commentRange.location + 1)];
-                commentRange = [libName rangeOfString:@"\""];
-                codeEnd = [libName substringFromIndex:(commentRange.location + 1)];
-                libName = [libName substringToIndex:commentRange.location];
 
-                // Look for path indicators in libName, ie. /
+				libName = [returnCode substringFromIndex:(includeRange.location + searchString.length)];
+				codeStart = [returnCode substringToIndex:includeRange.location];
+				commentRange = [libName rangeOfString:@"\""];
+				libName = [libName substringFromIndex:(commentRange.location + 1)];
+				commentRange = [libName rangeOfString:@"\""];
+				codeEnd = [libName substringFromIndex:(commentRange.location + 1)];
+				libName = [libName substringToIndex:commentRange.location];
 
-                commentRange = [libName rangeOfString:@"/" options:NSLiteralSearch];
+				// We have a library or file name and path. Now we need to parse the path:
+				// is it absolute (/Users/smitty/GitHub/Project/file.class.nut)
+				// relative to home (~/GitHub/Project/file.class.nut)
+				// or relative to the source file (../aProject/file.class.nut)
 
-                if (commentRange.location != NSNotFound)
-                {
-                    // Found at least one / so there must be directory info here,
-                    // even if it's just ~/lib.class.nut
+				// First, look for path indicators in libName, ie. /
 
-					/*
+				commentRange = [libName rangeOfString:@"/" options:NSLiteralSearch];
 
-					// What it if is ../lib.class.nut? This indicates relativity - but relative to what?
-					// We can only assume it's the project file.
+				if (commentRange.location != NSNotFound)
+				{
+					// Found at least one / so there must be directory info here,
+					// even if it's just ~/lib.class.nut
 
-					NSRange dotRange = [libName rangeOfString:@".."];
+					// Get the path component from the source file's library name info
 
-					if (dotRange.location != NSNotFound)
+					libPath = [libName stringByDeletingLastPathComponent];
+					libPath = [libPath stringByStandardizingPath];
+
+					// Check for a relative path, ie. at least one ../
+
+					commentRange = [libName rangeOfString:@"../" options:NSLiteralSearch];
+
+					if (commentRange.location != NSNotFound)
 					{
-						// Have no choice but to try adding the appropriate code path to the file path
+						// If we have a relative path, process it with 'getAbsolutePath:',
+						// otherwise assume we have an absolute path and leave it unchanged
 
-						if (codeType == kCodeTypeAgent)
-						{
-							//libName = [[currentProject.projectAgentCodePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", libName];
-						}
-						else
-						{
-							//libName = [[currentProject.projectDeviceCodePath stringByDeletingLastPathComponent] stringByAppendingFormat:@"/%@", libName];
-						}
-
-						libName = [self getAbsolutePath:currentProject.projectPath :libName];
-					}
-					else
-					{
-						// We have directory info but no .., so we must have a subdirectory
-						// eg. abc/def/lib.class.nut
-
-						libName = [self getAbsolutePath:currentProject.projectPath :libName];
+						libPath = [self getAbsolutePath:projectPath :libPath];
 					}
 
-					*/
+					// Get the actual library name
 
-                    // Get the path component from the source file's library name info
+					libName = [libName lastPathComponent];
+				}
+				else
+				{
+					// Didn't find any / characters so we can assume we just have a file name
+					// eg. 'lib.class.nut'. Assume the file is in the same folder as the source file
+					// (which is passed in, so can be the project path or the source path, despite the name)
 
-					libName = [self getAbsolutePath:currentProject.projectPath :libName];
-					libPath = [libName stringByStandardizingPath];
-					libPath = [libPath stringByDeletingLastPathComponent];
+					libPath = projectPath;
+				}
 
-                    // Get the actual library name
-
-                    libName = [libName lastPathComponent];
-                }
-                else
-                {
-                    // Didn't find any / characters so we can assume we just have a file name
-                    // eg. 'lib.class.nut'. Assume the file is in the same folder as the project (otherwise it's in / which is unlikely
-
-                    libPath = currentProject.projectPath;
-                }
+#ifdef DEBUG
+    NSLog(@"%@", libName);
+    NSLog(@"%@", libPath);
+#endif
 
 				// At this point, 'libName' should be of the form 'lib.class.nut', and
-				// 'libPath' should be an *absolute* path (we will convert later)
+				// 'libPath' should be the absolute path
 
 				// Assume library or file will be added to the project
 
-                BOOL addToCodeFlag = YES;
-                BOOL addToProjectFlag = YES;
-                BOOL isLibraryFlag = NO;
+				BOOL addToCodeFlag = YES;
+				BOOL addToModelFlag = YES;
+				BOOL isLibraryFlag = NO;
 
 				// Is the #include a library or a regular file? ie. check for *.class.nut and *.library.nut
-				
+
 				NSRange aRange = [libName rangeOfString:@"class"];
-                if (aRange.location != NSNotFound) isLibraryFlag = YES;
+				if (aRange.location != NSNotFound) isLibraryFlag = YES;
 
-                aRange = [libName rangeOfString:@"library"];
-                if (aRange.location != NSNotFound) isLibraryFlag = YES;
+				aRange = [libName rangeOfString:@"library"];
+				if (aRange.location != NSNotFound) isLibraryFlag = YES;
 
-                // Attempt to load in the contents of the referenced file
+				// Attempt to load in the contents of the referenced file
 
-                NSError *error = nil;
-                libCode = [NSString stringWithContentsOfFile:[libPath stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
+				NSError *error = nil;
+				libCode = [NSString stringWithContentsOfFile:[libPath stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
 
-                if (libCode == nil)
-                {
-					// Library or file is not in the named directory, so try the project directory
+				if (libCode == nil)
+				{
+					// Library or file is not in the named directory, so try the source directory
 
-					libCode = [NSString stringWithContentsOfFile:[currentProject.projectPath stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
+					libCode = [NSString stringWithContentsOfFile:[projectPath stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
 
 					if (libCode == nil)
 					{
 						// Library or file is not in the named directory, so try the working directory
-						// Note: this is repeated test if the user only #includes the library file name
+						// Note: this is repeated test if the project is in the working directory
 
 						libCode = [NSString stringWithContentsOfFile:[workingDirectory stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
 
 						if (libCode == nil)
 						{
-							// Library or file is not in the working directory, try the saved directory, if we have one - change to project directory?
+							// Library or file is not in the working directory, try the saved directory, if we have one
 
 							NSString *savedPath = nil;
 
-							if (codeType == kCodeTypeAgent)
+							if (isLibraryFlag)
 							{
-								if (isLibraryFlag)
+								for (File *lib in model.libraries)
 								{
-									savedPath = [currentProject.projectAgentLibraries valueForKey:libName];
-								}
-								else
-								{
-									savedPath = [currentProject.projectAgentFiles valueForKey:libName];
+									if (([lib.filename compare:libName] == NSOrderedSame) && ([lib.type compare:@"library"] == NSOrderedSame)) savedPath = lib.path;
 								}
 							}
-							else if (codeType == kCodeTypeDevice)
+							else
 							{
-								if (isLibraryFlag)
+								for (File *file in model.files)
 								{
-									savedPath = [currentProject.projectDeviceLibraries valueForKey:libName];
-								}
-								else
-								{
-									savedPath = [currentProject.projectDeviceFiles valueForKey:libName];
+									if (([file.filename compare:libName] == NSOrderedSame) && ([file.type compare:@"file"] == NSOrderedSame)) savedPath = file.path;
 								}
 							}
 
 							if (savedPath != nil)
 							{
-								// We have a saved path for this file, so try it
+								// We have a saved path for this file, so try it - remember it's relative
 
-								NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+								savedPath = [self getAbsolutePath:projectPath :savedPath];
 
-								// For version 2.1 and up, 'savedPath' will be a relative path so convert to absolute before using
-
-								if (cv != kLower) savedPath = [self getAbsolutePath:currentProject.projectPath :savedPath];
-
-								libCode = [NSString stringWithContentsOfFile:savedPath encoding:NSUTF8StringEncoding error:&error];
+								libCode = [NSString stringWithContentsOfFile:[savedPath stringByAppendingFormat:@"/%@", libName] encoding:NSUTF8StringEncoding error:&error];
 
 								if (libCode == nil)
 								{
@@ -3642,9 +5977,11 @@
 									}
 
 									addToCodeFlag = NO;
-									addToProjectFlag = NO;
-									if (willReturnCode) done = YES;
+									addToModelFlag = NO;
 
+									// If we're compiling, bail
+
+									if (willReturnCode) done = YES;
 								}
 								else
 								{
@@ -3670,81 +6007,95 @@
 								}
 
 								addToCodeFlag = NO;
-								addToProjectFlag = NO;
+								addToModelFlag = NO;
+
+								// If we are compiling, however, bail
+
 								if (willReturnCode) done = YES;
 							}
 						}
 						else
 						{
 							// The library is in the working directory, so use that as its path
-							
-							libPath = [workingDirectory stringByAppendingFormat:@"/%@", libName];
+
+							libPath = workingDirectory;
 						}
 					}
 					else
 					{
-						// The library is in the project directory, so use that as its path
+						// The library is in the source directory, so use that as its path
 
-						libPath = [currentProject.projectPath stringByAppendingFormat:@"/%@", libName];
+						libPath = projectPath;
 					}
-                }
-                else
-                {
-                    // We've got the file, so just add the name to complete the path (which is absolute)
-					
-					libPath = [libPath stringByAppendingFormat:@"/%@", libName];
-                }
+				}
 
-                BOOL match = NO;
+				libVer = [self getLibraryVersionNumber:libCode];
 
-				if (addToProjectFlag)
+				BOOL match = NO;
+
+				if (addToModelFlag)
 				{
 					// 'addToProjectFlag' defaults to YES, ie. if we find a library we want to
-					// add it to the project. It becomes NO if a located library can't be found
-					// in the file system, ie. we *can't* add it to the project
+					// add it to the model. It becomes NO if a located library can't be found
+					// in the file system, ie. we *can't* add it to the model
 
 					if (isLibraryFlag)
 					{
 						// Item is a library or class
 						// Check we haven't found it already
 
-						for (NSDictionary *lib in foundLibs)
+						if (foundLibs.count > 0)
 						{
-							NSString *aName = [lib objectForKey:@"libName"];
-
-							if ([aName compare:libName] == NSOrderedSame)
+							for (File *alib in foundLibs)
 							{
-								// We have match, but the library may have been included in the agent
-								// code and we are now looking at the device code (agent always comes first)
-								// so check this before setting 'match'
-
-								NSNumber *type = [lib objectForKey:@"libType"];
-
-								if (type.integerValue == codeType)
+								if ([alib.filename compare:libName] == NSOrderedSame)
 								{
-									// Library matches with a library already found in this file
+									// We have match, but the library may have been included in the agent
+									// code and we are now looking at the device code (agent always comes first)
+									// so check this before setting 'match'
 
-									match = YES;
-								}
-								else
-								{
-									// Library matches with a library found in a different file,
-									// ie. no need to add it to the found list again BUT we DO want
-									// to compile it in
+									if (codeType == kCodeTypeAgent)
+									{
+										if ([model.type compare:@"agent"] == NSOrderedSame)
+										{
+											match = YES;
+										}
+										else
+										{
+											// Library matches with a library found in a different file,
+											// ie. no need to add it to the found list again BUT we DO want
+											// to compile it in
 
-									addToProjectFlag = NO;
+											addToModelFlag = NO;
+										}
+									}
+									else
+									{
+										if ([model.type compare:@"device"] == NSOrderedSame)
+										{
+											match = YES;
+										}
+										else
+										{
+											addToModelFlag = NO;
+										}
+									}
 								}
 							}
 						}
 
-						if (match == NO && addToProjectFlag == YES)
+						if (!match && addToModelFlag)
 						{
-							NSString *vString = [NSString stringWithString:[self getLibraryVersionNumber:libCode]];
-							NSArray *values = [NSArray arrayWithObjects:libPath, libName, [NSNumber numberWithInteger:codeType], vString, nil];
-							NSArray *keys = [NSArray arrayWithObjects:@"libPath", @"libName", @"libType", @"libVer", nil];
-							NSDictionary *aDict = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-							[foundLibs addObject:aDict];
-							[self writeToLog:[NSString stringWithFormat:@"Local library \"%@\" found in project \"%@\".", libName, currentProject.projectName] :YES];
+							// NOTE file path at this point is still absolute - we deal with that in 'processLibraries:'
+
+							File *newLib = [[File alloc] init];
+							newLib.type = @"library";
+							newLib.filename = libName;
+							newLib.path = libPath;
+							newLib.version = libVer;
+
+							[foundLibs addObject:newLib];
+							[self writeToLog:[NSString stringWithFormat:@"Local library \"%@\" found in source.", libName] :YES];
 						}
 					}
 					else
@@ -3752,41 +6103,47 @@
 						// File name lacks neither a library or class tagging so assume it's a general file
 						// Check we haven't found it already
 
-						for (NSDictionary *file in foundFiles)
+						if (foundFiles.count > 0)
 						{
-							NSString *aName = [file objectForKey:@"fileName"];
-							if ([aName compare:libName] == NSOrderedSame) match = YES;
+							for (File *file in foundFiles)
+							{
+								if ([file.filename compare:libName] == NSOrderedSame) match = YES;
+							}
 						}
 
-						if (match == NO && addToProjectFlag == YES)
+						if (!match && addToModelFlag)
 						{
-							NSArray *values = [NSArray arrayWithObjects:libPath, libName, [NSNumber numberWithInteger:codeType], nil];
-							NSArray *keys = [NSArray arrayWithObjects:@"filePath", @"fileName", @"fileType", nil];
-							NSDictionary *aDict = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-							[foundFiles addObject:aDict];
-							[self writeToLog:[NSString stringWithFormat:@"Local file \"%@\" found in project \"%@\".", libName, currentProject.projectName] :YES];
+							// NOTE file path at this point is still absolute - we deal with that in 'processLibraries:'
+
+							File *newFile = [[File alloc] init];
+							newFile.type = @"file";
+							newFile.filename = libName;
+							newFile.path = libPath;
+
+							[foundFiles addObject:newFile];
+							[self writeToLog:[NSString stringWithFormat:@"Local file \"%@\" found in source.", libName] :YES];
 						}
 					}
 				}
 
-                // Compile in the code if this is required (it may not be if we're just scanning for libraries and files
+				// Compile in the code if this is required (it may not be if we're just scanning for libraries and files
 
-                if (addToCodeFlag)
+				if (addToCodeFlag)
 				{
 					// 'addToCodeFlag' defaults to YES - we assume that if we have found a library in the
 					// source code, that we want to add it to the return code. It is set to NO of the library
-					// *can't* be located in the file system
+					// *can't* be located in the file system. NOTE 'libCode' should be valid in this case
 
 					if (!match)
 					{
 						// Haven't placed the referenced code yet so do it now
-						
+
 						returnCode = [codeStart stringByAppendingString:libCode];
 						returnCode = [returnCode stringByAppendingString:codeEnd];
 
 						// Set 'index' to the start of the code that has yet to be checked,
 						// after 'codeStart' and 'libCode'
-						
+
 						index = codeStart.length + libCode.length;
 					}
 					else
@@ -3794,9 +6151,9 @@
 						// We have placed this file already so simply remove the reference from the code
 
 						returnCode = [codeStart stringByAppendingString:codeEnd];
-						
+
 						// Set 'index' to the start of the code that has yet to be checked, ie 'codeEnd'
-						
+
 						index = codeStart.length;
 					}
 				}
@@ -3806,7 +6163,7 @@
 
 					index = codeStart.length + [libPath stringByAppendingFormat:@"/%@", libName].length;
 				}
-            }
+			}
 			else
 			{
 				// The #include is commented out, so move the file pointer along and look for the next library
@@ -3815,50 +6172,51 @@
 
 				index = includeRange.location + searchString.length;
 			}
-        }
-        else
-        {
-            // There are no more occurrences of '#import' in the rest of the file, so mark search as done
+		}
+		else
+		{
+			// There are no more occurrences of '#import' in the rest of the file, so mark search as done
 
-            done = YES;
-        }
-    }
+			done = YES;
+		}
+	}
 
-    // If there were no #includes, we can bail
+	// If there were no #includes, we can bail
 
-    if (!found) return nil;
+	if (!found) return @"none";
 
-    // If any libraries have been removed, these are listed in 'deadLibs'
+	// If any libraries / files can't be located, these are listed in 'deadLibs' / 'deadFiles'
 
-    if (deadLibs.count > 0)
-    {
-        // One or more libraries in the source file are neither in the working directory nor their recorded location.
+	if (deadLibs.count > 0)
+	{
+		NSString *mString = nil;
 
-        // NOTE Do we care if we're not returning code???
-
-        NSString *mString = nil;
-
-        if (deadLibs.count == 1)
-        {
-            mString = [NSString stringWithFormat:@"1 local library, \"%@\", can’t be located in the file system and will be removed from the project.", [deadLibs firstObject]];
-        }
-        else
-        {
-            NSString *dString = @"";
+		if (deadLibs.count == 1)
+		{
+			mString = [NSString stringWithFormat:@"1 local library, \"%@\", can’t be located in the file system.", [deadLibs firstObject]];
+		}
+		else
+		{
+			NSString *dString = @"";
 
 			for (NSUInteger i = 0 ; i < deadLibs.count ; ++i)
-            {
-                dString = [dString stringByAppendingFormat:@"%@, ", [deadLibs objectAtIndex:i]];
-            }
+			{
+				dString = [dString stringByAppendingFormat:@"%@, ", [deadLibs objectAtIndex:i]];
+			}
 
-            dString = [dString substringToIndex:dString.length - 2];
-            mString = [NSString stringWithFormat:@"%li local libraries - %@ - can’t be located in the file system and will be removed from the project.", deadLibs.count, dString];
-        }
+			dString = [dString substringToIndex:dString.length - 2];
+			mString = [NSString stringWithFormat:@"%li local libraries - %@ - can’t be located in the file system.", deadLibs.count, dString];
+		}
 
-        [self writeToLog:mString :YES];
+		[self writeErrorToLog:mString :YES];
+
 		NSString *tString = ((codeType == kCodeTypeDevice) ? @"You should check the library locations specified in your device code." : @"You should check the library locations specified in your agent code.");
 		[self writeToLog:tString :YES];
-    }
+
+		// If we're compiling rather than just checking code, bail and indicate an error condition
+
+		if (returnCode) return nil;
+	}
 
 	if (deadFiles.count > 0)
 	{
@@ -3866,7 +6224,7 @@
 
 		if (deadFiles.count == 1)
 		{
-			mString = [NSString stringWithFormat:@"1 local file, \"%@\", can’t be located in the file system and will be removed from the project.", [deadFiles firstObject]];
+			mString = [NSString stringWithFormat:@"1 local file, \"%@\", can’t be located in the file system.", [deadFiles firstObject]];
 		}
 		else
 		{
@@ -3878,141 +6236,595 @@
 			}
 
 			dString = [dString substringToIndex:dString.length - 2];
-			mString = [NSString stringWithFormat:@"%li local files - %@ - can’t be located in the file system and will be removed from the project.", deadLibs.count, dString];
+			mString = [NSString stringWithFormat:@"%li local files - %@ - can’t be located in the file system.", deadLibs.count, dString];
 		}
 
 		[self writeToLog:mString :YES];
 		[self writeToLog:@"You should check the file locations specified in your source code." :YES];
+
+		if (returnCode) return nil;
 	}
 
-    // At this point, 'foundlibs' contains zero or more local libraries and 'foundFiles' contains zero or more local files
+	// At this point, 'foundlibs' contains zero or more local libraries and 'foundFiles' contains zero or more local files
+	// 'deadLibs' and 'deadFiles' will be empty - ie. there are no libraries and files included that could not be located
 
-    if (willReturnCode == YES) return returnCode;
-    return nil;
+	if (willReturnCode == YES) return returnCode;
+
+	return @"none";
 }
 
 
 
-- (NSString *)processDefines:(NSString *)sourceCode :(NSInteger)codeType
+- (void)processRequires:(NSString *)sourceCode
 {
-    NSRange defineRange, commentRange;
-    NSUInteger lineStartIndex;
-	NSString *defString, *defName, *defValue;
-	
-	NSString *compiledCode = @"";
-    NSUInteger index = 0;
-    BOOL done = NO;
+	// Parses the passed in 'sourceCode' for #require directives. If any are found,
+	// their names and version numbers are stored in 'foundEILibs' for later processing
 
-    // Pass One - Look for #define directives
-	
-	if (projectDefines != nil) projectDefines = nil;
+	NSRange requireRange, commentRange;
+	NSUInteger lineStartIndex;
+	NSString *libName;
 
-    while (done == NO)
-    {
-        // Look for the next occurrence of the #define directive
+	BOOL done = NO;
+	NSUInteger index = 0;
 
-        defineRange = [sourceCode rangeOfString:@"#define" options:NSCaseInsensitiveSearch range:NSMakeRange(index, sourceCode.length - index)];
+	// Remove the list of currently known EI libs?
 
-        if (defineRange.location != NSNotFound)
-        {
-            // We have found at least one '#define'. Now find the line it's in,
-            // then run through char by char to see if we have a comment marks
+	while (done == NO)
+	{
+		// Look for the NEXT occurrence of the #require directive
 
-			NSUInteger len = 0;
-			
-			[sourceCode getLineStart:&lineStartIndex end:NULL contentsEnd:NULL forRange:defineRange];
+		requireRange = [sourceCode rangeOfString:@"#require" options:NSCaseInsensitiveSearch range:NSMakeRange(index, sourceCode.length - index)];
 
-            commentRange = NSMakeRange(NSNotFound, 0);
+		if (requireRange.location != NSNotFound)
+		{
+			// We have found at least one '#require'. Find the line it is in and then run through the
+			// line char by char to see if we have a single-line comment mark ahead of the #require
 
-            // If the #define is not at the start of a line, see if it is preceded by comment marks
+			[sourceCode getLineStart:&lineStartIndex end:NULL contentsEnd:NULL forRange:requireRange];
 
-            if (defineRange.location != lineStartIndex) commentRange = [sourceCode rangeOfString:@"//" options:NSLiteralSearch range:NSMakeRange(lineStartIndex, defineRange.location - lineStartIndex)];
+			commentRange = NSMakeRange(NSNotFound, 0);
 
-            if (commentRange.location == NSNotFound)
-            {
-                // Get the define's name
-				
-				defString = [sourceCode substringFromIndex:defineRange.location + 7];
-                commentRange = [defString rangeOfString:@"="];
-				defName = [defString substringWithRange:NSMakeRange(0, commentRange.location)];
-				len = defName.length + 1;
-                
-				// Remove spaces
-				
-				defName = [defName stringByReplacingOccurrencesOfString:@" " withString:@""];
-				
-				// Get the value
-				
-				defString = [defString substringFromIndex:commentRange.location + 1];
-				commentRange = [defString rangeOfString:@"\n"];
-				defValue = [defString substringWithRange:NSMakeRange(0, commentRange.location)];				
-				len = len + defValue.length;
-				defValue = [defValue stringByReplacingOccurrencesOfString:@" " withString:@""];
-				
-				if (defName.length == 0 || defValue.length == 0) 
+			// If the #require is not at the start of a line, see if it is preceded by comment marks
+
+			if (requireRange.location != lineStartIndex) commentRange = [sourceCode rangeOfString:@"//" options:NSLiteralSearch range:NSMakeRange(lineStartIndex, requireRange.location - lineStartIndex)];
+
+			if (commentRange.location == NSNotFound)
+			{
+				// No Comment mark found ahead of the #require on the same line, so we can get the EI library's name
+
+				libName = [sourceCode substringFromIndex:(requireRange.location + 8)];
+				commentRange = [libName rangeOfString:@"\""];
+				libName = [libName substringFromIndex:(commentRange.location + 1)];
+				commentRange = [libName rangeOfString:@"\""];
+				libName = [libName substringToIndex:commentRange.location];
+
+				// Check for spaces and remove
+
+				libName = [libName stringByReplacingOccurrencesOfString:@" " withString:@""];
+
+				// Separate name from version, eg. "lib.class.nut:1.0.0"
+
+				NSArray *elements = [libName componentsSeparatedByString:@":"];
+
+				// Log and record the found library's name
+
+				[self writeToLog:[NSString stringWithFormat:@"Electric Imp Library \"%@\" version %@ included in source.", [elements objectAtIndex:0], [elements objectAtIndex:1]] :YES];
+
+				// TODO Add a warning if the library has no version value
+
+				// Add the library to the project - name and version (as string)
+
+				File *newLib = [[File alloc] init];
+				newLib.filename = [elements objectAtIndex:0];
+				newLib.version = [elements objectAtIndex:1];
+				newLib.type = @"eilib";
+
+				if (foundEILibs.count == 0)
 				{
-					NSUInteger lineNumber = [self getLineNumber:sourceCode :defineRange.location];					
-					[self writeToLog:[NSString stringWithFormat:@"[ERROR] Malformed #define at line %li", lineNumber] :YES];
-					return nil;
+					// Use the File object, just set the .path to the EI library version
+
+					[foundEILibs addObject:newLib];
 				}
 				else
 				{
 					BOOL match = NO;
-					
-					if (projectDefines.count > 0)
+
+					for (File *aLib in foundEILibs)
 					{
-						NSArray *keys = [projectDefines allKeys];
-						
-						for (NSUInteger i = 0 ; i < keys.count ; ++i)
-						{
-							NSString *dName = [keys objectAtIndex:i];
-							if ([defName compare:dName] == NSOrderedSame) match = YES;
-						}
+						// See if the library is already listed
+
+						if (([aLib.filename compare:[elements objectAtIndex:0]] == NSOrderedSame) && ([aLib.path compare:[elements objectAtIndex:1]] == NSOrderedSame)) match = YES;
 					}
-					
-					if (!match) 
-					{
-						if (projectDefines == nil) projectDefines = [[NSMutableDictionary alloc] init];
-						[projectDefines setObject:defValue forKey:defName];
-					}
-					else
-					{
-						NSUInteger lineNumber = [self getLineNumber:sourceCode :defineRange.location];
-						[self writeToLog:[NSString stringWithFormat:@"[ERROR] %@ redefined at line %li", defName, lineNumber] :YES];
-						return nil;
-					}
+
+					if (!match) [foundEILibs addObject:newLib];
 				}
-            }
-			
-			// Add the code from 'index' to the #define
-			compiledCode = [compiledCode stringByAppendingString:[sourceCode substringWithRange:NSMakeRange(index, defineRange.location - index)]];
-			
+			}
+
 			// Move the file pointer along and look for the next library
 
-            index = defineRange.location + len + 8;
-        }
-        else
-        {
-            // There are no more occurrences of '#define' in the rest of the file, so mark search as done
+			index = requireRange.location + 9;
+		}
+		else
+		{
+			// There are no more occurrences of '#require' in the rest of the file, so mark search as done
 
-            done = YES;
-			
-			// Add the code from 'index' to the #define
-			compiledCode = [compiledCode stringByAppendingString:[sourceCode substringWithRange:NSMakeRange(index, sourceCode.length - index)]];
-        }
-    }
+			done = YES;
+		}
+	}
+}
 
-    // Pass Two - Now run through and replace all instances of each key with value
-	
-	NSArray *keys = [projectDefines allKeys];
-	for (NSUInteger i = 0 ; i < keys.count ; ++i)
+
+
+- (void)processLibraries:(Model *)model
+{
+	// This method wrangles the collection of current libraries found in the source code files
+	// It looks for Electric Imp links and for local files and libraries
+
+	// Get the model's parent project
+
+	Project *thisProject;
+	//Devicegroup *thisDevicegroup;
+
+	for (Project *project in projectArray)
 	{
-		NSString *key = [keys objectAtIndex:i];
-		NSString *value = [projectDefines valueForKey:key];
-		compiledCode = [compiledCode stringByReplacingOccurrencesOfString:key withString:value];
+		if (project.devicegroups.count > 0)
+		{
+			for (Devicegroup *dg in project.devicegroups)
+			{
+				NSMutableArray *ms = dg.models;
+
+				for (Model *m in ms)
+				{
+					if (m == model)
+					{
+						thisProject = project;
+						//thisDevicegroup = dg;
+						break;
+					}
+				}
+			}
+		}
 	}
 
-    return compiledCode;
+	if (thisProject == nil)
+	{
+		// WHOOPS
+
+		NSLog(@"Found orphan model in processLibraries:");
+		return;
+	}
+
+	// PROCESS EI LIBRARIES
+
+	// Do we have any Electric Imp libraries #required in the source code?
+
+	if (foundEILibs.count > 0 && model.impLibraries == nil) model.impLibraries = [[NSMutableArray alloc] init];
+
+	NSMutableArray *iLibs = model.impLibraries;
+
+	if (foundEILibs.count == 0)
+	{
+		// There are no EI libraries in the current code - though there may have been some included before
+
+		if (iLibs.count > 0)
+		{
+			if (iLibs.count == 1)
+			{
+				[self writeToLog:[NSString stringWithFormat:@"1 Electric Imp library no longer included in this %@ code.", model.type] :YES];
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included in this %@ code.", (long)iLibs.count, model.type] :YES];
+			}
+
+			[iLibs removeAllObjects];
+		}
+		else
+		{
+			[self writeToLog:[NSString stringWithFormat:@"No Electric Imp libraries included in this %@ code.", model.type] :YES];
+		}
+	}
+	else
+	{
+		NSInteger added = 0;
+		NSInteger removed = 0;
+
+		// First, run through the contents of 'foundEILibs' to see if there is a 1:1 match with
+		// the lists of known local librariess; if not, mark that the project has changed
+
+		if (iLibs.count > 0)
+		{
+			for (File *aLib in foundEILibs)
+			{
+				NSString *match = nil;
+
+				// Does the library name match an existing one?
+
+				for (File *lib in iLibs)
+				{
+					if ([aLib.filename compare:lib.filename] == NSOrderedSame)
+					{
+						// If there is a match, set the value of 'match' to the found library version
+
+						match = lib.path;
+					}
+				}
+
+				if (match == nil)
+				{
+					// There's a library here that is not in the original list
+
+					++added;
+				}
+				else
+				{
+					// The found library does match, but we should check if its version has changed
+
+					if ([match compare:aLib.path] != NSOrderedSame)
+					{
+						// Names match but the versions don't
+
+						[self writeToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", aLib.filename, match, aLib.path] :YES];
+					}
+				}
+			}
+
+			for (File *lib in iLibs)
+			{
+				BOOL match = NO;
+
+				for (File *aLib in foundEILibs)
+				{
+					if ([aLib.filename compare:lib.filename] == NSOrderedSame) match = YES;
+				}
+
+				if (!match)
+				{
+					// There is a saved library that's no longer present
+
+					++removed;
+				}
+			}
+		}
+		else
+		{
+			added = foundEILibs.count;
+		}
+
+		if (removed == 0 && added == 0)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"No Electric Imp libraries added to or removed from the %@ code.", model.type] :YES];
+		}
+		else
+		{
+			NSString *as = @"";
+			NSString *rs = @"";
+
+			if (added == 1)
+			{
+				as = @"1 Electric Imp library added to";
+			}
+			else if (added > 1)
+			{
+				as = [NSString stringWithFormat:@"%li Electric Imp libraries added to", (long)added];
+			}
+
+			if (removed == 1)
+			{
+				rs = @"1 Electric Imp library removed from";
+			}
+			else if (removed > 1)
+			{
+				rs = [NSString stringWithFormat:@"%li Electric Imp libraries removed from", (long)added];
+			}
+
+			if (as.length > 0)
+			{
+				if (rs.length > 0) as = [as stringByAppendingFormat:@", and %@", rs];
+			}
+			else
+			{
+				as = rs;
+			}
+
+			if (as.length > 0) [self writeToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+		}
+
+		// Now replace the recorded EI library list with the new one from 'foundEILibs'
+		// NOTE impLibraries is not saved
+
+		model.impLibraries = foundEILibs;
+	}
+
+	// PROCESS LOCAL LIBRARIES
+
+	// Do we have any local libraries #included or #imported in the source code?
+	
+	// Check for a disparity between the number of known libraries and those found in the compilation
+	// If there is a disparity, the project has changed so set the 'need to save' flag. Note if there
+	// is no disparity, there may still have been changes made - we check for these below
+
+	// Local libraries #included or #imported in the source code will all be stored in 'foundLibs'
+
+	if (foundLibs.count > 0 && model.libraries == nil) model.libraries = [[NSMutableArray alloc] init];
+
+	NSMutableArray *mLibs = model.libraries;
+
+	if (foundLibs.count == 0)
+	{
+		// There are no libraries #included or #imported in the current code,
+		// so clear the counts and the lists stored in the project
+		
+		if (mLibs.count > 0)
+		{
+			if (mLibs.count == 1)
+			{
+				[self writeToLog:[NSString stringWithFormat:@"1 local library no longer referenced in the %@ code.", model.type] :YES];
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the %@ code.", (long)mLibs.count, model.type] :YES];
+			}
+
+			thisProject.haschanged = YES;
+			[mLibs removeAllObjects];
+		}
+		else
+		{
+			[self writeToLog:[NSString stringWithFormat:@"No local libraries included in this %@ code.", model.type] :YES];
+		}
+	}
+	else
+	{
+		NSInteger added = 0;
+		NSInteger removed = 0;
+
+		// First, run through the contents of 'foundLibs' to see if there is a 1:1 match with
+		// the lists of known local librariess; if not, mark that the project has changed
+
+		if (mLibs.count > 0)
+		{
+			for (File *aLib in foundLibs)
+			{
+				BOOL match = NO;
+
+				for (File *lib in mLibs)
+				{
+					if ([aLib.filename compare:lib.filename] == NSOrderedSame) match = YES;
+				}
+
+				if (!match) ++added;
+			}
+
+			for (File *lib in mLibs)
+			{
+				BOOL match = NO;
+
+				for (File *aLib in foundLibs)
+				{
+					if ([aLib.filename compare:lib.filename] == NSOrderedSame) match = YES;
+				}
+
+				if (!match) ++removed;
+			}
+		}
+		else
+		{
+			added = foundLibs.count;
+		}
+
+		if (removed == 0 && added == 0)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"No local libraries added to or removed from the %@ code.", model.type] :YES];
+		}
+		else
+		{
+			thisProject.haschanged = YES;
+
+			NSString *as = @"";
+			NSString *rs = @"";
+
+			if (added == 1)
+			{
+				as = @"1 local library added to";
+			}
+			else if (added > 1)
+			{
+				as = [NSString stringWithFormat:@"%li local libraries added to", (long)added];
+			}
+
+			if (removed == 1)
+			{
+				rs = @"1 local library removed from";
+			}
+			else if (removed > 1)
+			{
+				rs = [NSString stringWithFormat:@"%li local libraries removed from", (long)added];
+			}
+
+			if (as.length > 0)
+			{
+				if (rs.length > 0) as = [as stringByAppendingFormat:@", and %@", rs];
+			}
+			else
+			{
+				as = rs;
+			}
+
+			if (as.length > 0) [self writeToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+		}
+
+		// Now replace the recorded EI library list with the new one from 'foundEILibs'
+		
+		model.libraries = foundLibs;
+	}
+
+	// PROCESS LOCAL FILES
+
+	// Do we have any local files #included or #imported in the source code?
+	
+	// Local files #included or #imported in the source code will all be stored in 'foundFiles'
+	// Clear out the recorded files lists and add in the new ones from 'foundFiles'
+
+	if (foundFiles.count > 0 && model.files == nil) model.files = [[NSMutableArray alloc] init];
+
+	NSMutableArray *mFiles = model.files;
+
+	if (foundFiles.count == 0)
+	{
+		// There are no libraries #included or #imported in the current code,
+		// so clear the counts and the lists stored in the project
+
+		if (mFiles.count > 0)
+		{
+			if (mFiles.count == 1)
+			{
+				[self writeToLog:[NSString stringWithFormat:@"1 local file no longer referenced in the %@ code.", model.type] :YES];
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"%li local file no longer referenced in the %@ code.", (long)mFiles.count, model.type] :YES];
+			}
+
+			thisProject.haschanged = YES;
+			[mFiles removeAllObjects];
+		}
+		else
+		{
+			[self writeToLog:[NSString stringWithFormat:@"No local files included in this %@ code.", model.type] :YES];
+		}
+	}
+	else
+	{
+		NSInteger added = 0;
+		NSInteger removed = 0;
+
+		if (mFiles.count > 0)
+		{
+			for (File *aFile in foundFiles)
+			{
+				BOOL match = NO;
+
+				for (File *file in mFiles)
+				{
+					if ([aFile.filename compare:file.filename] == NSOrderedSame) match = YES;
+				}
+
+				if (!match) ++added;
+			}
+
+			for (File *file in mFiles)
+			{
+				BOOL match = NO;
+
+				for (File *aFile in foundFiles)
+				{
+					if ([aFile.filename compare:file.filename] == NSOrderedSame) match = YES;
+				}
+
+				if (!match) ++removed;
+			}
+		}
+		else
+		{
+			added = foundFiles.count;
+		}
+
+		if (removed == 0 && added == 0)
+		{
+			[self writeToLog:[NSString stringWithFormat:@"No local files added to or removed from the %@ code.", model.type] :YES];
+		}
+		else
+		{
+			thisProject.haschanged = YES;
+
+			NSString *as = @"";
+			NSString *rs = @"";
+
+			if (added == 1)
+			{
+				as = @"1 local file added to";
+			}
+			else if (added > 1)
+			{
+				as = [NSString stringWithFormat:@"%li local files added to", (long)added];
+			}
+
+			if (removed == 1)
+			{
+				rs = @"1 local file removed from";
+			}
+			else if (removed > 1)
+			{
+				rs = [NSString stringWithFormat:@"%li local file removed from", (long)added];
+			}
+
+			if (as.length > 0)
+			{
+				if (rs.length > 0) as = [as stringByAppendingFormat:@", and %@", rs];
+			}
+			else
+			{
+				as = rs;
+			}
+
+			if (as.length > 0) [self writeToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+		}
+
+		// Now replace the recorded EI library list with the new one from 'foundEILibs'
+
+		model.files = foundFiles;
+	}
+
+	// Finally, clear and register the new libraries for changes
+	// NOTE 'mFiles' and 'mLibs' point to the old lists
+
+	for (File *item in mFiles) { [fileWatchQueue removePath:[self getAbsolutePath:thisProject.path :item.path]]; }
+	for (File *item in mLibs) { [fileWatchQueue removePath:[self getAbsolutePath:thisProject.path :item.path]]; }
+
+	for (File *item in model.libraries)
+	{
+
+#ifdef DEBUG
+		NSLog(@"Path: %@ Name: %@", item.path, item.filename);
+#endif
+
+		NSString *path = [item.path stringByAppendingFormat:@"/%@", item.filename];
+		if (![fileWatchQueue isPathBeingWatched:path]) [fileWatchQueue addPath:path];
+	}
+	
+	for (File *item in model.files)
+	{
+
+#ifdef DEBUG
+		NSLog(@"Path: %@ Name: %@", item.path, item.filename);
+#endif
+
+		NSString *path = [item.path stringByAppendingFormat:@"/%@", item.filename];
+		if (![fileWatchQueue isPathBeingWatched:path]) [fileWatchQueue addPath:path];
+	}
+
+	// Finally cnvert paths from absolute paths to relative paths for storage
+
+	for (File *lib in model.libraries)
+	{
+		lib.path = [self getRelativeFilePath:thisProject.path :lib.path];
+
+#ifdef DEBUG
+		NSLog(@"Path: %@ Name: %@", lib.path, lib.filename);
+#endif
+
+	}
+
+	for (File *file in model.files)
+	{
+		file.path = [self getRelativeFilePath:thisProject.path :file.path];
+
+#ifdef DEBUG
+		NSLog(@"Path: %@ Name: %@", file.path, file.filename);
+#endif
+
+	}
 }
 
 
@@ -4029,26 +6841,29 @@
 {
 	NSString *returnString = @"";
 
+	if (libcode == nil) return returnString;
+
 	NSError *err;
-	NSString *pattern = @"static\\s*version\\s*=\[\\s*\\d*\\s*,\\s*\\d*\\s*,\\s*\\d*\\s*]";
+	NSString *pattern = @"static *VERSION *= *\"[0-9]*.[0-9]*.[0-9]*\"";
 	NSRegularExpressionOptions regexOptions =  NSRegularExpressionCaseInsensitive;
 	NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:regexOptions error:&err];
-	if (err) return @"";
+	if (err) return returnString;
 	NSTextCheckingResult *result = [regex firstMatchInString:libcode options:0 range:NSMakeRange(0, libcode.length)];
-	NSRange vRange = result.range;
+	NSRange vRange = (result != nil) ? result.range : NSMakeRange(NSNotFound, 0);
 
 	// TODO check for comments
 
 	if (vRange.location != NSNotFound)
 	{
 		libcode = [libcode substringFromIndex:vRange.location];
-		vRange = [libcode rangeOfString:@"[" options:NSCaseInsensitiveSearch];
-		NSRange eRange = [libcode rangeOfString:@"]" options:NSCaseInsensitiveSearch];
+		vRange = [libcode rangeOfString:@"\"" options:NSCaseInsensitiveSearch];
+		libcode = [libcode substringFromIndex:vRange.location + 1];
+		NSRange eRange = [libcode rangeOfString:@"\"" options:NSCaseInsensitiveSearch];
 
 		if (eRange.location != NSNotFound)
 		{
-			NSString *rString = [libcode substringWithRange:NSMakeRange(vRange.location + 1, eRange.location - vRange.location - 1)];
-			NSArray *vParts = [rString componentsSeparatedByString:@","];
+			NSString *rString = [libcode substringToIndex:eRange.location];
+			NSArray *vParts = [rString componentsSeparatedByString:@"."];
 
 			for (NSString *part in vParts)
 			{
@@ -4066,1933 +6881,1626 @@
 
 
 
-#pragma mark - Library and Project Menu Methods
-
-
-- (IBAction)cleanProject:(id)sender
-{
-    // Clean the project by clearing saved data – a compile will re-populate it
-
-    if (currentProject == nil)
-    {
-        [self writeToLog:@"[ERROR] You have no open project to clean." :YES];
-        return;
-    }
-	
-	// Warn user what cleaning the project means
-	
-	NSAlert *ays = [[NSAlert alloc] init];
-	[ays addButtonWithTitle:@"No"];
-	[ays addButtonWithTitle:@"Yes"];
-    [ays setMessageText:[NSString stringWithFormat:@"You are about to clean project \"%@\". Are you sure you want to proceed?", currentProject.projectName]];
-	[ays setInformativeText:@"Cleaning a project will remove its source code files, libraries and any association it has with a model."];
-	[ays setAlertStyle:NSCriticalAlertStyle];
-	[ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode){
-		
-		// Only clean if 'Yes' selected
-		
-		if (returnCode == 1001) [self cleanProjectTwo];
-	}];
-}
-
-
-
-- (void)cleanProjectTwo
-{
-	// Clear all the project's settings
-	
-	currentProject.projectSquinted = 0;
-	currentProject.projectHasChanged = YES;
-	currentProject.projectImpLibs = nil;
-	[currentProject.projectDeviceLibraries removeAllObjects];
-	currentProject.projectDeviceLibraries = nil;
-	[currentProject.projectAgentLibraries removeAllObjects];
-	currentProject.projectAgentLibraries = nil;
-	[currentProject.projectDeviceFiles removeAllObjects];
-	currentProject.projectDeviceFiles = nil;
-	[currentProject.projectAgentFiles removeAllObjects];
-	currentProject.projectAgentFiles = nil;
-	currentProject.projectModelID = nil;
-	currentProject.projectAgentCode = nil;
-	currentProject.projectDeviceCode = nil;
-	currentProject.projectAgentCodePath = nil;
-	currentProject.projectDeviceCodePath = nil;
-	currentProject.projectVersion = kCurrentProjectVersionString;
-	
-	// Indicate the project needs saving
-	
-	[saveLight setFull:NO];
-	[self updateMenus];
-	[self setToolbar];
-}
-
-
-
-- (void)updateLibraryMenu
-{
-    NSMenuItem *item;
-	
-    // Update the external library menu. First clear the current menu
-    
-    if (externalLibsMenu.numberOfItems > 0) [externalLibsMenu removeAllItems];
-	
-	// Add agent libraries, if any
-
-    if (currentProject.projectAgentLibraries.count > 0) [self libAdder:[currentProject.projectAgentLibraries allKeys]];
-	
-	// Add device libraries, if any
-    
-    if (currentProject.projectDeviceLibraries.count > 0) [self libAdder:[currentProject.projectDeviceLibraries allKeys]];
-
-    // Add EI Libraries, if any
-
-    if (currentProject.projectImpLibs.count > 0)
-    {
-        if (externalLibsMenu.numberOfItems > 0) [externalLibsMenu addItem:[NSMenuItem separatorItem]];
-
-        if (currentProject.projectSquinted == 0)
-        {
-            item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Libraries (uncompiled)" action:nil keyEquivalent:@""];
-        }
-        else
-        {
-            item = [[NSMenuItem alloc] initWithTitle:@"Electric Imp Libraries" action:nil keyEquivalent:@""];
-        }
-
-        [externalLibsMenu addItem:item];
-        [item setEnabled:NO];
-
-        for (NSUInteger i = 0 ; i < currentProject.projectImpLibs.count ; ++i)
-        {
-            NSString *libName = [self getLibraryTitle:[currentProject.projectImpLibs objectAtIndex:i]];
-            [self addLibraryToMenu:libName :YES];
-        }
-    }
-
-	// Tidy up the menu
-
-	if (externalLibsMenu.numberOfItems == 0)
-	{
-		// If there are no library files in place, just put a greyed out 'none' there instead
-		
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
-		[externalLibsMenu addItem:item];
-		item.enabled = NO;
-	}
-    else
-    {
-        // Check for duplications, ie. if agent and device both use the same lib
-        // TODO someone may have the same library name in separate files, so we need to
-        // check for this too.
-
-        for (NSUInteger i = 0 ; i < externalLibsMenu.numberOfItems ; ++i)
-        {
-            NSMenuItem *libItem = [externalLibsMenu itemAtIndex:i];
-
-            if (libItem.enabled == YES)
-            {
-                for (NSUInteger j = 0 ; j < externalLibsMenu.numberOfItems ; ++j)
-                {
-                    if (j != i)
-                    {
-                        NSMenuItem *aLibItem = [externalLibsMenu itemAtIndex:j];
-
-                        if (aLibItem.enabled == YES)
-                        {
-                            if ([libItem.title compare:aLibItem.title] == NSOrderedSame)
-                            {
-                                // The names match, so remove the matcher
-
-                                [externalLibsMenu removeItemAtIndex:j];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-
-- (void)libAdder:(NSArray *)keyArray
-{
-    NSMenuItem *item;
-
-    for (NSUInteger i = 0 ; i < keyArray.count ; ++i)
-    {
-        if (externalLibsMenu.numberOfItems == 0)
-        {
-            // This is the first item on the list, so make sure it’s preceded
-            // by a suitable header entry
-
-            if (currentProject.projectSquinted == 0)
-            {
-                item = [[NSMenuItem alloc] initWithTitle:@"Local Libraries (uncompiled)" action:nil keyEquivalent:@""];
-            }
-            else
-            {
-                item = [[NSMenuItem alloc] initWithTitle:@"Local Libraries" action:nil keyEquivalent:@""];
-            }
-
-            [externalLibsMenu addItem:item];
-            item.enabled = YES;
-        }
-
-        NSString *libTitle = [self getLibraryTitle:[keyArray objectAtIndex:i]];
-        [self addLibraryToMenu:libTitle :NO];
-    }
-}
-
-
-
-- (NSString *)getLibraryTitle:(id)item
-{
-	if ([item isKindOfClass:[NSString class]])
-	{
-		return (NSString *)item;
-	}
-	else
-	{
-		NSString *title = [item objectAtIndex:0];
-		title = [title stringByAppendingFormat:@" (%@)", [item objectAtIndex:1]];
-		return title;
-	}
-}
-
-
-
-- (void)addLibraryToMenu:(NSString *)libName :(BOOL)isEILib
-{
-    // Create a new menu entry for the Projects menu
-
-    NSMenuItem *item;
-
-    if (isEILib)
-    {
-        item = [[NSMenuItem alloc] initWithTitle:libName action:@selector(launchLibsPage) keyEquivalent:@""];
-    }
-    else
-    {
-        item = [[NSMenuItem alloc] initWithTitle:libName action:@selector(externalLibOpen:) keyEquivalent:@""];
-
-    }
-
-    [externalLibsMenu addItem:item];
-}
-
-
-
-- (void)updateFilesMenu
-{
-    // Update the external files menu. First clear the current menu
-
-    if (externalFilesMenu.numberOfItems > 0) [externalFilesMenu removeAllItems];
-
-    // Add agent linked files, if any
-
-    if (currentProject.projectAgentFiles.count > 0) [self fileAdder:[currentProject.projectAgentFiles allKeys]];
-
-    // Add device linked files, if any (Comments as above)
-
-    if (currentProject.projectDeviceFiles.count > 0) [self fileAdder:[currentProject.projectDeviceFiles allKeys]];
-
-	// Tidy up the menu
-
-    if (externalFilesMenu.numberOfItems == 0)
-    {
-        // If there are no files to add, just put a greyed out 'none' there instead
-
-        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
-        [externalFilesMenu addItem:item];
-        item.enabled = NO;
-    }
-    else
-    {
-        // Check for duplications, ie. if agent and device both use the same lib
-        // TODO someone may have the same library name in separate files, so we need to
-        // check for this too.
-
-        for (NSUInteger i = 0 ; i < externalFilesMenu.numberOfItems ; ++i)
-        {
-            NSMenuItem *libItem = [externalFilesMenu itemAtIndex:i];
-
-            if (libItem.enabled == YES)
-            {
-                for (NSUInteger j = 0 ; j < externalFilesMenu.numberOfItems ; ++j)
-                {
-                    if (j != i)
-                    {
-                        NSMenuItem *aLibItem = [externalFilesMenu itemAtIndex:j];
-                        
-                        if (aLibItem.enabled == YES)
-                        {
-                            if ([libItem.title compare:aLibItem.title] == NSOrderedSame)
-                            {
-                                // The names match, so remove the current one
-                                
-                                [externalFilesMenu removeItemAtIndex:j];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-
-- (void)fileAdder:(NSArray *)keyArray
-{
-    for (NSUInteger i = 0 ; i < keyArray.count ; ++i)
-    {
-        [self addFileToMenu:[keyArray objectAtIndex:i]];
-    }
-}
-
-
-
-- (void)addFileToMenu:(NSString *)filename
-{
-    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:filename action:@selector(externalFileOpen:) keyEquivalent:@""];
-    [externalFilesMenu addItem:item];
-}
-
-
-
-- (void)launchLibsPage
-{
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/libraries/"]];
-}
-
-
-
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject
-{
-	// Create a new menu entry to the Projects menu’s Open Projects submenu and to the Current Project popup
-	// For the Open Projects submenu, each menu item's representedObject points to the named project
-	// For the Current Project popup, each menu item's tag is set to the index of the project in the submenu
-	// This allows us to choose projects irrespective of the name used in the menu, for example letting us
-	// distinguish between 'explorer' and 'explorer 2'
-
-	NSMenuItem *item;
-	
-	// Run through the existing menu items, to check that we're not adding one already there
-	// If there are no menu items, we can proceed safely
-	
-	if (noProjectsFlag)
-	{
-		// There are no open projects yet (the one we're adding is the first
-		// so clear the 'None' entries from the menu pop-up
-		
-		[projectsMenu removeAllItems];
-		[projectsPopUp removeAllItems];
-	}
-	
-	if (projectsMenu.numberOfItems > 0)
-	{
-		// Run through the existing menu items and turn them off
-
-		for (NSUInteger i = 0 ; i < projectsMenu.numberOfItems ; ++i)
-		{
-			item = [projectsMenu itemAtIndex:i];
-			
-			if ([item.title compare:menuItemTitle] == NSOrderedSame)
-			{
-				// The new project is already on the menu, so return failure
-				
-				return NO;
-			}
-			
-			// Otherwise untick the menu item
-			
-			item.state = NSOffState;
-		}
-	}
-	
-	// If we have got this far, we can safely add the project to the submenu...
-	
-	item = [[NSMenuItem alloc] initWithTitle:menuItemTitle action:@selector(chooseProject:) keyEquivalent:@""];
-	item.representedObject = aProject;
-	item.state = NSOnState;
-	[projectsMenu addItem:item];
-	
-	// ...and to the popup
-	
-	[projectsPopUp addItemWithTitle:menuItemTitle];
-	NSInteger index = [projectsPopUp indexOfItemWithTitle:menuItemTitle];
-	[projectsPopUp selectItemAtIndex:index];
-	projectsPopUp.selectedItem.tag = [projectsMenu indexOfItem:item];
-	projectsPopUp.enabled = YES;
-
-	// Return success
-	
-	return YES;
-}
-
-
-
 #pragma mark - Pasteboard Methods
 
 
 - (IBAction)copyDeviceCodeToPasteboard:(id)sender
 {
-    // If there is no device code to copy, bail
-	
-    if (currentProject.projectDeviceCode == nil)
-    {
-        [self writeToLog:@"[WARNING] This project has no device code to copy: compile the project first." :YES];
-        return;
-    }
-    
-    NSPasteboard *pb = [NSPasteboard generalPasteboard];
-    NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
-    [pb declareTypes:types owner:self];
-    [pb setString:currentProject.projectDeviceCode forType:NSStringPboardType];
-    [self writeToLog:@"Compiled device code copied to clipboard." :YES];
+    if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	BOOL flag = NO;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"device"] == NSOrderedSame)
+		{
+			if (model.squinted && model.code.length > 0)
+			{
+				NSPasteboard *pb = [NSPasteboard generalPasteboard];
+				NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+				[pb declareTypes:types owner:self];
+				[pb setString:model.code forType:NSStringPboardType];
+				[self writeToLog:@"Compiled device code copied to clipboard." :YES];
+				flag = YES;
+			}
+
+			break;
+		}
+	}
+
+	if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled device code to copy." :YES];
 }
 
 
 
 - (IBAction)copyAgentCodeToPasteboard:(id)sender
 {
-    // If there is no agent code to copy, bail
-    
-    if (currentProject.projectAgentCode == nil)
-    {
-        [self writeToLog:@"[WARNING] This project has no agent code to copy: compile the project first." :YES];
-        return;
-    }
-    
-    NSPasteboard *pb = [NSPasteboard generalPasteboard];
-    NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
-    [pb declareTypes:types owner:self];
-    [pb setString:currentProject.projectAgentCode forType:NSStringPboardType];
-    [self writeToLog:@"Compiled agent code copied to clipboard." :YES];
+    if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	BOOL flag = NO;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			if (model.squinted && model.code.length > 0)
+			{
+				NSPasteboard *pb = [NSPasteboard generalPasteboard];
+				NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+				[pb declareTypes:types owner:self];
+				[pb setString:model.code forType:NSStringPboardType];
+				[self writeToLog:@"Compiled agent code copied to clipboard." :YES];
+				flag = YES;
+			}
+
+			break;
+		}
+	}
+
+	if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled agent code to copy." :YES];
 }
 
 
 
 - (IBAction)copyAgentURL:(id)sender
 {
-	if (currentDevice == -1)
+	if (selectedDevice == nil)
 	{
-		// This should never appear: without a selected device, the menu item will be disabled
-
-		[self writeToLog:@"[ERROR] You have not selected a device." :YES];
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
-	NSDictionary *device = [ide.devices objectAtIndex:currentDevice];
-	NSString *uString = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", [device objectForKey:@"agent_id"]];
+	NSString *agentid = [self getValueFrom:selectedDevice withKey:@"agent_id"];
+	NSString *ustring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", agentid];
 	NSPasteboard *pb = [NSPasteboard generalPasteboard];
-	NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
-	[pb declareTypes:types owner:self];
-	[pb setString:uString forType:NSStringPboardType];
-	[self writeToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [device objectForKey:@"name"]] :YES];
+	NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
+
+	[pb declareTypes:ptypes owner:self];
+	[pb setString:ustring forType:NSStringPboardType];
+
+	[self writeToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
 }
 
 
 
-#pragma mark - Model and Device Methods
+#pragma mark - API Response Handler Methods
 
-
-- (IBAction)getProjectsFromServer:(id)sender
+- (void)listProducts:(NSNotification *)note
 {
-	// Handler that now simply calls getApps: in response to user action
+	// This method should ONLY be called by BuildAPIAccess instance AFTER loading a list of products
+	// At this point we typically need to select or re-select a product
 
-	[self getApps];
-}
+	NSString *sid = nil;
+	NSDictionary *dict = (NSDictionary *)note.object;
+	NSDictionary *so = [dict objectForKey:@"object"];
+	NSArray *data = [dict objectForKey:@"data"];
+	NSString *action = [so objectForKey:@"action"];
 
+	// 'selectedProduct' may point to an entry in the existing 'productsArray', but this is
+	// about to be zapped, so preserved the ID of the product it points to
 
-
-- (void)getApps
-{
-    // Make copies of the current device and model records (if we have current selections)
-	// We require copies because the ide arrays may be repopulated and we need to retain key data
-
-	if (currentDevice != -1) cDevice = [[ide.devices objectAtIndex:currentDevice] copy];
-	if (currentModel != -1) cModel = [[ide.models objectAtIndex:currentModel] copy];
-
-	[self writeToLog:@"Getting a list of models from the server..." :YES];
-    PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
-    [ide setk:[ide decodeBase64String:[pc stringForKey:@"com.bps.Squinter.ak.notional.tally"]]];
-	[ide getModels:YES];
-}
-
-
-
-- (void)listModels
-{
-	// This method should ONLY be called by the BuildAPI instance AFTER loading a list of models
-	// At this point we need to select or re-select a model, a device (maybe) and a project (maybe)
-
-	[modelsMenu removeAllItems];
-	
-	if (ide.models.count == 0)
+	if (selectedProduct != nil)
 	{
-		// No models in the list, so warn and bail
-
-		[self writeToLog:@"[WARNING] There are no models listed on the server." :YES];
-
-		if (checkModelsFlag)
-		{
-			// We're only checking the models available, so bail
-
-			checkModelsFlag = NO;
-			return;
-		}
-		else
-		{
-			// There may be no models but there still might be devices
-
-			[self writeToLog:@"Acquiring list of devices..." :YES];
-			return;
-		}
+		sid = [self getValueFrom:selectedProduct withKey:@"id"];
+		selectedProduct = nil;
 	}
 
-	for (NSDictionary *aModel in ide.models)
+	if (productsArray == nil)
 	{
-		// Run through the list of models (in the ide object) and add a menu item for each
-
-		NSString *mName = [aModel valueForKey:@"name"];
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:mName
-													  action:@selector(chooseModel:)
-											   keyEquivalent:@""];
-		[modelsMenu addItem:item];
-
-		if (newModelFlag == YES)
-		{
-			// We are here after creating a new model successfully and getting a fresh list of models, 
-			// so we auto-select the new model. Can only create a new model by creating a new project,
-			// and the names will match at this point (we don't yet have the model ID)
-
-			NSString *mName = [aModel objectForKey:@"name"];
-
-			if ([mName compare:currentProject.projectName] == NSOrderedSame)
-			{
-				// Select the model in the menu (can't use chooseModel: as menu not built yet)
-
-				item.state = NSOnState;
-                currentModel = [modelsMenu indexOfItem:item];
-				currentProject.projectModelID = [aModel objectForKey:@"id"];
-			}
-		}
-		else
-		{
-			if (currentProject != nil)
-			{
-				// If we have a project open, see if it is linked to one of the newly loaded models
-
-				NSString *mID = [aModel objectForKey:@"id"];
-
-				if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
-				{
-					// Select the model in the menu (can't use chooseModel: as menu not built yet)
-
-					item.state = NSOnState;
-                    currentModel = [modelsMenu indexOfItem:item];
-                }
-            }
-			else
-			{
-				// No selected project so select previously selected model
-
-				if (cModel)
-				{
-					NSString *prevName = [cModel objectForKey:@"name"];
-
-					if ([prevName compare:mName] == NSOrderedSame)
-					{
-						// Select the model in the menu (can't use chooseModel: as menu not built yet)
-
-						item.state = NSOnState;
-						currentModel = [modelsMenu indexOfItem:item];
-						cModel = nil;
-					}
-				}
-			}
-        }
-	}
-
-    [self updateMenus];
-	[self setToolbar];
-
-	newModelFlag = NO;
-
-	if (checkModelsFlag)
-	{
-		// Just checking models? Return immediately to prevent the user being notified
-		// that devices are also being loaded
-
-		checkModelsFlag = NO;
-		return;
-	}
-	
-	// Should not need to trigger a device list update here as it will have been handled by BuildAPI
-	// It's sufficient to simply tell the user what is happening
-
-	[self writeToLog:@"List of models loaded, now acquiring list of devices..." :YES];
-}
-
-
-
-- (void)chooseModel:(id)sender
-{
-    // Records the index of the selected model – this is the index within ide.models
-    // Called in response to project selection, device selection; called directly by
-    // 'Current Models' menu items
-	
-	NSMenuItem *item = (NSMenuItem *)sender;
-    NSInteger itemNumber = [modelsMenu indexOfItem:item];
-	NSInteger newModelIndex = -1;
-	BOOL autoSelectFlag = [[NSUserDefaults standardUserDefaults] boolForKey:@"com.bps.squinter.autoselectdevice"];
-
-	for (NSUInteger i = 0; i < modelsMenu.numberOfItems ; ++i)
-    {
-        // Turn off all the menu items except the sender's
-        
-        item = [modelsMenu itemAtIndex:i];
-        
-        if (i == itemNumber)
-        {
-            // Turn on the selected model, make it the current model
-            // and turn on the project link menu, if necessary
-
-            item.state = NSOnState;
-			newModelIndex = i;
-
-			if (autoSelectFlag == YES && fromDeviceSelectFlag == NO)
-			{
-				// User's preference is to auto-select model's first device (if it has one)
-				
-				if ([item submenu] != nil)
-				{
-					// This model has one or more devices so get and select the first one
-					
-					NSMenuItem *dItem = [[item submenu] itemAtIndex:0];
-					[self chooseDevice:dItem];
-				}
-			}
-        }
-        else
-        {
-            // Turn off all other menu items...
-			
-			item.state = NSOffState;
-			
-			// ...and any device sub-menus too
-			
-			NSMenu *smenu = [item submenu];
-			
-			if (smenu)
-			{
-				for (NSUInteger j = 0 ; j < smenu.numberOfItems ; ++j)
-				{
-					NSMenuItem *sitem = [smenu itemAtIndex:j];
-					sitem.state = NSOffState;
-				}
-			}
-        }
-    }
-	
-	if (currentModel != newModelIndex)
-	{
-		currentModel = newModelIndex;
-
-		// If we are NOT coming from device selection, and we have changed
-		// models, we must also de-select any previously selected device
-
-		if (fromDeviceSelectFlag == NO && autoSelectFlag == NO) currentDevice = -1;
-	}
-
-    [self updateMenus];
-	[self setToolbar];
-}
-
-
-
-- (IBAction)modelToProjectStageOne:(id)sender
-{
-    if (currentModel == -1)
-    {
-        [self writeToLog:@"[ERROR] You have not selected a model for the project to be built from." :YES];
-        return;
-    }
-
-	// Set up savingProject to hold the new project we will save
-	
-	NSDictionary *model = [ide.models objectAtIndex:currentModel];
-	savingProject = [[Project alloc] init];
-	savingProject.projectName = [model objectForKey:@"name"];
-	savingProject.projectAgentCodePath = [savingProject.projectName stringByAppendingString:@".agent.nut"];
-	savingProject.projectAgentCodePath = [workingDirectory stringByAppendingFormat:@"/%@", savingProject.projectAgentCodePath];
-	savingProject.projectDeviceCodePath = [savingProject.projectName stringByAppendingString:@".device.nut"];
-	savingProject.projectDeviceCodePath = [workingDirectory stringByAppendingFormat:@"/%@", savingProject.projectDeviceCodePath];
-
-	showCodeFlag = NO;
-    [ide getCode:[model valueForKey:@"id"]];
-}
-
-
-
-- (void)modelToProjectStageTwo
-{
-    // This method is called by ToolsAPI ONLY in response to modelToProjectStageOne:
-	
-	if (showCodeFlag == YES)
-    {
-        // We're not saving the code, just showing it in the log
-
-		[self writeToLog:@"\n" :NO];
-		[self writeToLog:@"Agent code:" :NO];
-		[self writeToLog:@" " :NO];
-        [self listCode:ide.agentCode :-1 :-1 :-1];
-		[self writeToLog:@"\n" :NO];
-        [self writeToLog:@"Device code:" :NO];
-		[self writeToLog:@" " :NO];
-        [self listCode:ide.deviceCode :-1 :-1 :-1];
-        showCodeFlag = NO;
-        return;
-    }
-
-    savingProject.projectDeviceCode = ide.deviceCode;
-	savingProject.projectAgentCode = ide.agentCode;
-	savingProject.projectHasChanged	= YES;
-	saveProjectSubFilesFlag = YES;
-	
-	// Get the model ID and save it
-	
-	NSDictionary *model = [ide.models objectAtIndex:currentModel];
-	savingProject.projectModelID = [model objectForKey:@"id"];
-	
-	[self saveProjectAs:nil];
-}
-
-
-
-- (void)createdModel
-{
-	// This is called by the BuildAPI instance in response to a new model being created
-	// The BuildAPI instance automatically updates its model and device lists
-
-	[self writeToLog:[NSString stringWithFormat:@"Created model \"%@\". Refreshing Current Models menu...", itemToCreate] :YES];
-}
-
-
-
-- (IBAction)uploadCode:(id)sender
-{
-	if (currentProject == nil)
-	{
-		[self writeToLog:@"[ERROR] You have not selected a project to upload." :YES];
-		return;
-	}
-	
-	if (currentModel == -1)
-	{
-		[self writeToLog:@"[ERROR] You have not selected a model for the code to be uploaded to." :YES];
-		return;
-	}
-
-    if ((currentProject.projectDeviceCode == nil || [currentProject.projectDeviceCode compare:@""] == NSOrderedSame) && (currentProject.projectAgentCode == nil || [currentProject.projectAgentCode compare:@""] == NSOrderedSame))
-    {
-        // Project lacks agent AND device code, ie. nothing to upload
-
-        [self writeToLog:[NSString stringWithFormat:@"Project \"%@\" has no code to upload. You may need to compile it.", currentProject.projectName] :YES];
-        return;
-    }
-	
-	// Check that currentModel points to the project's model (it may have changed)
-	
-	__block BOOL modelCheckFlag = NO;
-	
-	if (currentProject.projectModelID.length != 0)
-	{
-		NSString *mID = currentProject.projectModelID;
-		for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
-		{
-			NSDictionary *aModel = [ide.models objectAtIndex:i];
-			NSString *aID = [aModel objectForKey:@"id"];
-			if ([mID compare:aID] == NSOrderedSame)
-			{
-				if (currentModel == i)
-				{
-					// currentModel matches the one assigned to the project
-					
-					modelCheckFlag = YES;
-					break;
-				}
-			}
-		}
+		productsArray = [[NSMutableArray alloc] init];
 	}
 	else
 	{
-		modelCheckFlag = YES;
+		[productsArray removeAllObjects];
 	}
-	
-	if (modelCheckFlag)
+
+	if (data != nil)
 	{
-        [self writeToLog:[NSString stringWithFormat:@"Uploading agent and device code from project \"%@\" to model \"%@\".", currentProject.projectName, [[modelsMenu itemAtIndex:currentModel] title]] :YES];
-        [ide uploadCode:[self getModelID:currentModel] :currentProject.projectDeviceCode :currentProject.projectAgentCode];
-	}
-	else
-	{
-		// Present warning dialog
-		
-		NSDictionary *model;
-		NSString *mID = currentProject.projectModelID;
-		for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
+		NSArray *prs = data;
+
+		if (prs.count > 0)
 		{
-			model = [ide.models objectAtIndex:i];
-			NSString *aID = [model objectForKey:@"id"];
-			if ([mID compare:aID] == NSOrderedSame) break;
-		}
-		
-		NSDictionary *aModel = [ide.models objectAtIndex:currentModel];
-		NSString *aName = [aModel objectForKey:@"name"];
-		NSAlert *ays = [[NSAlert alloc] init];
-		NSPanel *panel = (NSPanel *)ays.window;
-		NSRect f = panel.frame;
-		f.size.width = 600;
-		[panel setFrame:f display:NO];
-		[ays addButtonWithTitle:@"No"];
-		[ays addButtonWithTitle:@"Yes"];
-        [ays setMessageText:[NSString stringWithFormat:@"You are about to upload code associated with model \"%@\" to model “%@.\" Are you sure you want to proceed?", [model objectForKey:@"name"], aName]];
-		[ays setInformativeText:@"This is probably because you selected a device whose assigned model is not the one associated with the current project. Uploading code will overwrite a model’s existing code."];
-		[ays setAlertStyle:NSCriticalAlertStyle];
-		[ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode){
-			
-			if (returnCode == 1001)
+			for (NSDictionary *pr in prs)
 			{
-				// User wants to upload
-				
-				[self writeToLog:[NSString stringWithFormat:@"Uploading agent and device code from project \"%@\" to model \"%@\".", currentProject.projectName, [[modelsMenu itemAtIndex:currentModel] title]] :YES];
-				[ide uploadCode:[self getModelID:currentModel] :currentProject.projectDeviceCode :currentProject.projectAgentCode];
+				// Convert incoming dictionary into a mutable one
+
+				NSMutableDictionary *apr = [[NSMutableDictionary alloc] init];
+
+				[apr setObject:[pr objectForKey:@"id"] forKey:@"id"];
+				[apr setObject:[pr objectForKey:@"type"] forKey:@"type"];
+				[apr setObject:[pr objectForKey:@"relationships"] forKey:@"relationships"];
+				[apr setObject:[NSMutableDictionary dictionaryWithDictionary:[pr objectForKey:@"attributes"]] forKey:@"attributes"];
+				[productsArray addObject:apr];
+
+				// If we need to match against a previous 'selectedProduct' ID, do it now
+
+				if (sid != nil && [sid compare:[pr objectForKey:@"id"]] == NSOrderedSame) selectedProduct = apr;
 			}
-			else
-			{
-				[self writeToLog:@"[WARNING] Code not uploaded - model target changed." :YES];
-			}
-		}];
-	}	
-}
 
+			// Inform the user
 
-
-- (void)uploadCodeStageTwo
-{
-	[self writeToLog:@"Agent and device code uploaded. Restart the model\'s assigned device(s) to run the new code." :YES];
-}
-
-
-
-- (IBAction)refreshDevices:(id)sender
-{
-    if (ide.models.count == 0)
-    {
-        // Can't display devices without models. We have no models yet, so get both
-
-        [self getApps];
-    }
-    else
-    {
-        if (currentDevice != -1) cDevice = [[ide.devices objectAtIndex:currentDevice] copy];
-
-		[self writeToLog:@"Updating devices’ status information." :YES];
-		[ide getDevices];
-    }
-}
-
-
-
-- (void)listDevices
-{
-	// This method should ONLY be called by the ToolsAPI object instance AFTER loading a list of devices
-
-	BOOL allDevicesUnassignedFlag = NO;
-	BOOL addedUnassignedMenu = NO;
-	NSMutableArray *autoRenameList = nil;
-	NSMutableArray *deviceList = [[NSMutableArray alloc] init];
-
-	// Bail if we're in the process of auto-renaming multiple devices
-	// The last device on the rename flag will clear this so that everything
-	// gets listed correctly and devices aren't renamed multiple times
-
-	if (autoRenameFlag == YES) return;
-
-	if (ide.devices.count == 0)
-	{
-		[self writeToLog:@"[WARNING] There are no devices listed on the server."  :YES];
-		return;
-	}
-
-	if (ide.models.count == 0)
-	{
-		allDevicesUnassignedFlag = YES;
-		[self writeToLog:@"[WARNING] There are no models listed on the server. All your devices are unnassigned."  :YES];
-	}
-
-    // Remove existing model menu device sub-menus (needed after reassignment)
-
-    NSMenuItem *aMenuItem = nil;
-
-    if (modelsMenu.numberOfItems > 0)
-	{
-		for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
-		{
-			aMenuItem = [modelsMenu itemAtIndex:i];
-
-			if (aMenuItem.submenu != nil)
-			{
-				[aMenuItem.submenu removeAllItems];
-				aMenuItem.submenu = nil;
-			}
-		}
-
-		// Clear the unassigned section if there is one (we add it back if required; it may not be)
-
-		aMenuItem = [modelsMenu itemAtIndex:modelsMenu.numberOfItems - 1];
-
-		if ([aMenuItem.title compare:@"Unassigned"] == NSOrderedSame)
-		{
-			// There is an Unassigned entry (+ spacer if there are other models) so remove both
-
-			[modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
-			if (modelsMenu.numberOfItems > 0) [modelsMenu removeItemAtIndex:modelsMenu.numberOfItems - 1];
-		}
-	}
-
-	// Clear the devices list pop up
-
-	[devicesPopUp removeAllItems];
-	devicesPopUp.enabled = NO;
-
-	// Run through the current list of devices from the server and add them to the model menu submenus
-	// We store a fresh list of device names in 'deviceList'
-
-	for (NSMutableDictionary *device in ide.devices)
-	{
-		NSString *wantedModel = [device objectForKey:@"model_id"];
-
-		if ((NSNull *)wantedModel == [NSNull null]) wantedModel = @"Unassigned";
-
-		if ((([wantedModel compare:@"Unassigned"] == NSOrderedSame) || (allDevicesUnassignedFlag)) && (addedUnassignedMenu == NO))
-		{
-			// We need to add an 'Unassigned' category to the models menu
-
-			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Unassigned" action:nil keyEquivalent:@""];
-			[modelsMenu addItem:item];
-			addedUnassignedMenu = YES;
-		}
-		
-        NSString *deviceMenuName = [device objectForKey:@"name"];
-
-		if ((NSNull *)deviceMenuName == [NSNull null])
-		{
-			if (autoRenameList == nil) autoRenameList = [[NSMutableArray alloc] init];
-			deviceMenuName = [device objectForKey:@"id"];
-			[autoRenameList addObject:deviceMenuName];
-		}
-
-        /*
-		 NSString *deviceState = [device valueForKey:@"powerstate"];
-
-        // Add a tick or cross to the name to indicate online status
-
-        if ([deviceState compare:@"online"] != NSOrderedSame)
-        {
-            deviceMenuName = [deviceMenuName stringByAppendingString:kOfflineTag];
-        }
-
-
-		if ([ide isDeviceLogging:(NSString *)[device objectForKey:@"id"]])
-		{
-			deviceMenuName = [deviceMenuName stringByAppendingString:@" Logging"];
-		}
-		*/
-
-		// deviceMenuName = [deviceMenuName stringByAppendingString:[self menuString:[device objectForKey:@"id"]]];
-
-        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:deviceMenuName action:@selector(chooseDevice:) keyEquivalent:@""];
-
-		[deviceList addObject:deviceMenuName];
-
-		// Add the device to a model-menu entry's submenu
-		
-		if ([wantedModel compare:@"Unassigned"] == NSOrderedSame)
-		{
-			// Add the device to the Unassigned menu
-
-			for (NSUInteger j = 0 ; j < modelsMenu.numberOfItems ; ++j)
-			{
-				NSMenuItem *aMenuItem = [modelsMenu itemAtIndex:j];
-
-				if ([aMenuItem.title compare:@"Unassigned"] == NSOrderedSame)
-				{
-					NSMenu *submenu = aMenuItem.submenu;
-
-					if (submenu == nil)
-					{
-						submenu = [[NSMenu alloc] initWithTitle:aMenuItem.title];
-						submenu.autoenablesItems = YES;
-						aMenuItem.submenu = submenu;
-					}
-
-					[submenu addItem:item];
-					item.enabled = YES;
-					break;
-				}
-			}
+			[self writeToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
 		}
 		else
 		{
-			// Go through all the models to find the one with the ID we want
-
-			for (NSDictionary *model in ide.models)
-			{
-				NSString *modelID = [model objectForKey:@"id"];
-
-				if ([modelID compare:wantedModel] == NSOrderedSame)
-				{
-					// The model's id and the device's model_id match
-
-					for (NSUInteger j = 0 ; j < modelsMenu.numberOfItems ; ++j)
-					{
-						NSMenuItem *aMenuItem = [modelsMenu itemAtIndex:j];
-
-						// Find the menu that matches the selected model's name
-
-						if ([aMenuItem.title compare:[model objectForKey:@"name"]] == NSOrderedSame)
-						{
-							NSMenu *submenu = aMenuItem.submenu;
-						
-							if (submenu == nil)
-							{
-								submenu = [[NSMenu alloc] initWithTitle:aMenuItem.title];
-								submenu.autoenablesItems = YES;
-								aMenuItem.submenu = submenu;
-							}
-							
-							[submenu addItem:item];
-							item.enabled = YES;
-							break;
-						}
-					}
-
-					break;
-				}
-			}
+			[self writeToLog:@"There are no products listed on the server." :YES];
 		}
-	}
-	
-	// Make up the device pop up 
 
-	if (deviceList.count > 0)
+		[self refreshProductsMenu];
+		[self refreshProjectsMenu];
+		[self setToolbar];
+	}
+
+	if (action != nil && ([action compare:@"uploadproject"] == NSOrderedSame))
 	{
-		// Sort the list of devices by name
-		
-		[devicesPopUp addItemsWithTitles:[deviceList sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
-		
-		if (cDevice)
-		{
-			NSString *dId = [cDevice objectForKey:@"id"];
+		// We are coming here because we want to upload a new project, so go back
+		// and re-check the product information
 
-			for (NSDictionary *aDev in ide.devices)
-			{
-				NSString *aDevId = [aDev objectForKey:@"id"];
-
-				if ([aDevId compare:dId] == NSOrderedSame)
-				{
-					[devicesPopUp selectItemWithTitle:(NSString *)[aDev objectForKey:@"name"]];
-					currentDevice = [ide.devices indexOfObject:aDev];
-					break;
-				}
-			}
-		}
-		else
-		{
-			// No saved device, so add a 'None' item and select it
-
-			[devicesPopUp addItemWithTitle:@"None"];
-			NSMenuItem *item = [devicesPopUp itemWithTitle:@"None"];
-			[devicesPopUp selectItemWithTitle:@"None"];
-			item.enabled = NO;
-		}
+		[self uploadProject:[so objectForKey:@"project"]];
 	}
-	
-	// Sort the models menu's submenus
-	
-	for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
-	{
-		NSMenuItem *item = [modelsMenu itemAtIndex:i];
-
-		if (item.submenu != nil)
-		{
-			NSArray *items = item.submenu.itemArray;
-			[item.submenu removeAllItems];
-			
-			NSSortDescriptor* alphaDesc = [NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES];
-			items = [items sortedArrayUsingDescriptors:[NSArray arrayWithObjects:alphaDesc, nil]];
-			
-			for (NSMenuItem	*ditem in items)
-			{
-				[item.submenu addItem:ditem];
-				if (ditem.isHidden) ditem.hidden = false;
-			}
-		}
-	}
-	
-	
-	if (addedUnassignedMenu)
-	{
-		// We added an ‘Unassigned’ entry in the models menu - we should move it to the end
-		// but only if it's not the only entry
-
-		if (modelsMenu.numberOfItems > 1)
-		{
-			NSMenuItem *unassMenuItem = [modelsMenu itemWithTitle:@"Unassigned"];
-			NSUInteger unassIndex = [modelsMenu indexOfItemWithTitle:@"Unassigned"];
-			[modelsMenu removeItemAtIndex:unassIndex];
-			[modelsMenu addItem:[NSMenuItem separatorItem]];
-			[modelsMenu addItem:unassMenuItem];
-		}
-	}
-
-    // Modify the report line according to past action
-    // ie. if we've reassigned devices, say so
-
-	if (reDeviceIndex == -1)
-    {
-        // Reselect current device if there is one
-		
-		if (cDevice)
-		{
-			NSDictionary *dDict = [ide.devices objectAtIndex:currentDevice];
-			NSString *dString = [dDict objectForKey:@"name"];
-			
-			for (NSInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
-			{
-				NSMenuItem *modelItem = [modelsMenu itemAtIndex:i];
-				NSMenu *devMenu = [modelItem submenu];
-				if (devMenu)
-				{
-					for (NSInteger j = 0 ; j < devMenu.numberOfItems ; ++j)
-					{
-						NSMenuItem *devItem = [devMenu itemAtIndex:j];
-						NSString *aString = devItem.title;
-						NSArray *parts = [aString componentsSeparatedByString:@" "];
-						aString = [parts objectAtIndex:0];
-						if ([aString compare:dString] == NSOrderedSame) [self chooseDevice:devItem];
-					}
-				}
-			}
-
-			cDevice = nil;
-		}
-    }
-    else
-    {
-        reDeviceIndex = -1;
-        reModelIndex = -1;
-    }
-
-	[self writeToLog:@"Your models and devices lists have been updated." :YES];
-
-    // This method deselects devices, so disable the Devices menu items
-
-    for (NSUInteger i = 0 ; i < deviceMenu.numberOfItems ; ++i)
-    {
-        NSMenuItem *item = [deviceMenu itemAtIndex:i];
-        if (item != refreshMenuItem) item.enabled = NO;
-    }
-	
-	// Finally, did we 'rename' any unassigned devices? If so, actually rename them
-
-	if (autoRenameList.count > 0)
-	{
-		[self writeToLog:@"[WARNING] There are new, unassigned devices present. These will now be processed." :YES];
-		autoRenameFlag = YES;
-
-		for (NSUInteger i = 0 ; i < autoRenameList.count ; ++i)
-		{
-			NSString *devId = [autoRenameList objectAtIndex:i];
-			[ide autoRenameDevice:devId];
-
-			// Is this the last change on the list?
-			// If so, ermit listDevice: to actually list the devices
-
-			if (i == autoRenameList.count - 1) autoRenameFlag = NO;
-		}
-	}
-
-    if (devicesPopUp.numberOfItems > 0) devicesPopUp.enabled = YES;
-
-	// Update the devices' state indicators
-
-	[self updateDeviceLists];
-
-	// Update other related parts of the UI
-	
-	[self updateMenus];
-	[self setToolbar];
 }
 
 
 
-- (IBAction)chooseDevice:(id)sender
+- (void)productToProjectStageTwo:(NSNotification *)note
 {
-	// The user has selected a device from a Models menu item’s sub-menu
-    // or has selected a device by some other means, eg. switching projects
-	
-	// Sets currentDevice: based on (unique) name of device as presented by the menu
+    // This method is called by BuildAPIAccess ONLY. It may be in response to 'downloadProduct:'
+	// or to 'deleteProduct:' It should be responding with a list of the product's device groups
 
-	NSMenuItem *item;
-	NSString *dName;
-	NSString *rawName;
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *so = [data objectForKey:@"object"];
+	NSMutableArray *dgs = [data objectForKey:@"data"];
+	NSString *action = [so objectForKey:@"action"];
 
-	if (sender == devicesPopUp)
+	if (action != nil)
 	{
-		// Device selected from the popup rather than the menu
-
-		item = devicesPopUp.selectedItem;
-
-		if ([item.title compare:@"None"] == NSOrderedSame)
+		if ([action compare:@"downloadproduct"] == NSOrderedSame)
 		{
-			item.enabled = NO;
-			return;
-		}
-	}
-	else
-	{
-		item = (NSMenuItem *)sender;
-	}
+			// Perform the flow for downloading a product
 
-	rawName = item.title;
+			Project *np = [so objectForKey:@"project"];
+			NSMutableArray *npdgs = np.devicegroups;
 
-	// Extract the device name from the menu title
+			// Record the total number of device groups to the product has, ie. the number of
+			// device group deployments we will need to retrieve
 
-	NSArray *nameItems = [rawName componentsSeparatedByString:@" "];
-	dName = [nameItems objectAtIndex:0];
+			np.count = dgs.count;
 
-	for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
-	{
-		// Get the device data from the devices list by name not index
-
-		NSDictionary *dDict = [ide.devices objectAtIndex:i];
-		NSString *dString = [dDict objectForKey:@"name"];
-
-		if ([dString compare:dName] == NSOrderedSame) currentDevice = i;
-	}
-
-	// Update menus with new selection's name as necessary
-
-	for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
-	{
-		NSMenuItem *model = [modelsMenu itemAtIndex:i];
-
-		if (sender == devicesPopUp)
-		{
-			NSMenu *smenu = model.submenu;
-
-			if (smenu != nil)
+			// Add the product's device group records to the new project
+			
+			for (NSDictionary *dg in dgs)
 			{
-				// Model has a submenu - see if it contains the selected device
+				Devicegroup *ndg = [[Devicegroup alloc] init];
+				ndg.name = [self getValueFrom:dg withKey:@"name"];
+				ndg.did = [self getValueFrom:dg withKey:@"id"];
+				ndg.description = [self getValueFrom:dg withKey:@"description"];
+				ndg.type = [self getValueFrom:dg withKey:@"type"];
+				ndg.models = [[NSMutableArray alloc] init];
+				[npdgs addObject:ndg];
 
-				for (NSUInteger j = 0 ; j < smenu.numberOfItems ; ++j)
+				NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];
+
+				if (cd != nil)
 				{
-					NSMenuItem *sdev = [smenu itemAtIndex:j];
-					sdev.state = NSOffState;
-					NSString *sName = @"";
+					NSString *dpid = [cd objectForKey:@"id"];
 
-					NSRange oRange = [sdev.title rangeOfString:dName];
-
-					if (oRange.location != NSNotFound)
+					if (dpid != nil)
 					{
-						sName = dName;
+						// Now retrieve the code using the devicegroup id
+
+						NSDictionary *dict = @{ @"action" : action,
+												@"devicegroup" : ndg,
+												@"project" : np };
+
+						[ide getDeployment:dpid :dict];
+
+						// At this point we have to wait for multiple async calls to 'productToProjectStageThree:'
 					}
 					else
 					{
-						sName = sdev.title;
+						// Decrement the tally of downloadable device groups
+
+						--np.count;
 					}
-
-					if ([sName compare:dName] == NSOrderedSame)
-					{
-						// We have a match so select the model, unless it's 'unassigned'
-
-						if ([model.title compare:@"Unassigned"] != NSOrderedSame)
-						{
-							// Device’s assigned model can be selected so call chooseModel:
-							// to select the model to ensure menus are enabled. This will
-							// deselect all other device sub-menus but this one
-
-							fromDeviceSelectFlag = YES;
-							[self chooseModel:model];
-							fromDeviceSelectFlag = NO;
-						}
-						else
-						{
-							// The device is unassigned, so don't select the model and clear the menu selection
-
-							for (NSUInteger k = 0 ; k < modelsMenu.numberOfItems ; ++k)
-							{
-								NSMenuItem *aModel = [modelsMenu itemAtIndex:k];
-								aModel.state = NSOffState;
-							}
-
-							currentModel = -1;
-						}
-
-						// Select the device itself
-
-						sdev.state = NSOnState;
-					}
-				}
-			}
-		}
-		else
-		{
-			if (model == item.parentItem)
-			{
-				// Select the device in its models menu submenu...
-
-				if (model.submenu != nil)
-				{
-					for (NSUInteger j = 0 ; j < model.submenu.numberOfItems ; ++j)
-					{
-						NSMenuItem *sitem = [model.submenu itemAtIndex:j];
-						sitem.state = NSOffState;
-					}
-				}
-
-				item.state = NSOnState;
-
-				// ...and in the devices popup
-
-				[devicesPopUp selectItemWithTitle:rawName];
-
-				// Is the device in the Unassigned section?
-
-				if ([model.title compare:@"Unassigned"] == NSOrderedSame)
-				{
-					// The device is unassigned, so don't select the model and clear the menu selection
-
-					for (NSUInteger j = 0 ; j < modelsMenu.numberOfItems ; ++j)
-					{
-						NSMenuItem *aModel = [modelsMenu itemAtIndex:j];
-						aModel.state = NSOffState;
-					}
-
-					currentModel = -1;
 				}
 				else
 				{
-					// Device’s assigned model can be selected so call chooseModel:
-					// to select the model to ensure menus are enabled. This will
-					// deselect all other device sub-menus but this one
+					// Decrement the tally of downloadable device groups
 
-					fromDeviceSelectFlag = YES;
-					[self chooseModel:model];
-					fromDeviceSelectFlag = NO;
+					--np.count;
+				}
+
+				// NOTE if 'cd' or 'dpid' is nil, the device group has no current deployment
+				// TODO do we get a historical, or create an empty file?
+			}
+		}
+		else
+		{
+			// Perform the flow for deleting a product
+
+			NSMutableDictionary *dp = [so objectForKey:@"product"];
+			NSDictionary *pd = [dp objectForKey:@"product"];
+			[dp setObject:[NSNumber numberWithInteger:dgs.count] forKey:@"count"];
+			[dp setObject:dgs forKey:@"devicegroups"];
+
+			[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking devicegroups for assigned devices...", [self getValueFrom:pd withKey:@"name"]] :YES];
+
+			for (NSDictionary *dg in dgs)
+			{
+				NSDictionary *dict = @{ @"action" : action,
+										@"devicegroup" : dg,
+										@"product" : dp };
+
+				// Get the list of devices assigned to this device group
+
+				[ide getDevicesWithFilter:@"devicegroup.id" :[dg objectForKey:@"id"] :dict];
+			}
+
+			// Pick up the action in 'listDevices:'
+		}
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (productToProjectStageTwo:)"] :YES];
+	}
+}
+
+
+
+- (void)productToProjectStageThree:(NSNotification *)note
+{
+	// This method is called by the BuildAPIAccess instance in response to
+	// multiple requests to retrieve the current deployment for a given device group
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *deployment = [data objectForKey:@"data"];
+	NSDictionary *dict = [data objectForKey:@"object"];
+	NSString *action = [dict objectForKey:@"action"];
+	Project *project = [dict objectForKey:@"project"];
+	Devicegroup *newDevicegroup = [dict objectForKey:@"devicegroup"];
+
+	if (newDevicegroup.models == nil) newDevicegroup.models = [[NSMutableArray alloc] init];
+
+	if (deployment != nil)
+	{
+		if ([action compare:@"updatecode"] == NSOrderedSame)
+		{
+			// Compare the deployment we have with the one just downloaded
+
+			if (newDevicegroup.models.count == 0)
+			{
+				// The target has no models, so create them using the code below
+
+
+				return;
+			}
+
+			NSString *sha = [self getValueFrom:deployment withKey:@"sha"];
+			NSString *updated = [self getValueFrom:deployment withKey:@"updated_at"];
+			if (updated == nil) updated = [self getValueFrom:deployment withKey:@"created_at"];
+			NSDate *deployDate = [logDef dateFromString:updated];
+
+			for (Model *model in newDevicegroup.models)
+			{
+				// Check dates
+				
+				NSDate *modelDate = [logDef dateFromString:model.updated];
+
+				if ([modelDate earlierDate:deployDate] == modelDate)
+				{
+					// The model is older than the current deployment, so update the model
+
+					NSString *code = [model.type compare:@"agent"] == NSOrderedSame
+					? [self getValueFrom:deployment withKey:@"agent_code"]
+					: [self getValueFrom:deployment withKey:@"device_code"];
+
+					model.code = code;
+					model.sha = sha;
+					model.updated = updated;
+					model.squinted = NO;
+					newDevicegroup.squinted = 0;
+
+					Project *project = [self getParentProject:newDevicegroup];
+					project.haschanged = YES;
+					[saveLight needSave:YES];
+					[_window setDocumentEdited:YES];
 				}
 			}
 		}
-	}
-
-	// Set the Stream toolbar item according to state
-
-	if (currentDevice != -1)
-	{
-		NSDictionary *dDict = [ide.devices objectAtIndex:currentDevice];
-		NSString *dId = [dDict objectForKey:@"id"];
-
-		streamLogsItem.isOn = [ide isDeviceLogging:dId];
-
-		[streamLogsItem validate];
-	}
-
-	// Remove the 'None' item from the devices popup on the first device selection
-
-	NSMenuItem *nitem = [devicesPopUp itemWithTitle:@"None"];
-	if (nitem != nil) [devicesPopUp removeItemWithTitle:@"None"];
-
-	// Update Menus etc
-
-	[self updateMenus];
-	[self setToolbar];
-}
-
-
-
-- (IBAction)restartDevice:(id)sender
-{
-    if (currentDevice == -1)
-	{
-		[self writeToLog:@"[ERROR] You have not selected a device to restart." :YES];
-		return;
-	}
-	
-	// Single devices can be restarted by assigning them to the model to which they
-	// are already assigned.	
-	
-	restartFlag = YES;
-	reDeviceIndex = currentDevice;
-	[ide restartDevice:[self getDeviceID:currentDevice]];
-}
-
-
-
-- (IBAction)restartDevices:(id)sender
-{
-    if (currentModel == -1)
-    {
-        [self writeToLog:@"[ERROR] You have not selected a model. Go to Models > Current Models to select one." :YES];
-        return;
-    }
-
-    NSMenuItem *mItem = [modelsMenu itemAtIndex:currentModel];
-
-    if (mItem.submenu == nil)
-    {
-        [self writeToLog:@"[ERROR] You have selected a model with no assigned devices." :YES];
-        return;
-    }
-
-	reModelIndex = currentModel;
-	[ide restartDevices:[self getModelID:currentModel]];
-}
-
-
-
-- (void)restarted
-{
-    // This method should ONLY be called by the BuildAPI instance AFTER loading a list of models
-
-	if (restartFlag)
-	{
-		NSDictionary *dDict = [ide.devices objectAtIndex:reDeviceIndex];
-		[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" restarted.", [dDict objectForKey:@"name"]] :YES];
-		restartFlag = NO;
-		reDeviceIndex = -1;
-	}
-	else
-	{
-   		NSMenuItem *mItem = [modelsMenu itemAtIndex:reModelIndex];
-    	[self writeToLog:[NSString stringWithFormat:@"Devices assigned to model \"%@\" have restarted.", mItem.title] :YES];
-		reModelIndex = -1;
-	}
-}
-
-
-
-- (IBAction)assignProject:(id)sender
-{
-	if (currentModel == -1)
-	{
-		[self writeToLog:@"[ERROR] You have not selected a model. Go to Models > Current Models to select one." :YES];
-		return;
-	}
-	
-	if (currentProject == nil)
-	{
-		[self writeToLog:@"[ERROR] You have not selected a project. Go to Project > Currently Open Projects to select one." :YES];
-		return;
-	}
-	
-	NSDictionary *model = [ide.models objectAtIndex:currentModel];
-	currentProject.projectModelID = [model objectForKey:@"id"];
-	currentProject.projectHasChanged = YES;
-	[saveLight setFull:!currentProject.projectHasChanged];
-	[self updateMenus];
-	[self setToolbar];
-}
-
-
-
-- (IBAction)assignDevice:(id)sender
-{
-	if (ide.models.count == 0)
-	{
-		[self writeToLog:@"[ERROR] You have no models in your account. You will need to create one before any device can be assigned to a model." :YES];
-		return;
-	}
-
-	if (ide.devices.count == 0)
-	{
-		[self writeToLog:@"[ERROR] You have no devices in your account." :YES];
-		return;
-	}
-		
-	// If we have got this far, we have a list of one or more models and one or more devices
-
-	[assignDeviceMenuDevices removeAllItems];
-	[assignDeviceMenuModels removeAllItems];
-
-    assignDeviceMenuModels.autoenablesItems = NO;
-
-    if (ide.devices.count > 0)
-    {
-        for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
-        {
-            NSDictionary *device = [ide.devices objectAtIndex:i];
-            [assignDeviceMenuDevices addItemWithTitle:[device objectForKey:@"name"]];
-        }
-    }
-    else
-    {
-        [assignDeviceMenuDevices addItemWithTitle:@"No devices"];
-        assignDeviceMenuDevices.enabled = NO;
-    }
-
-    if (ide.models.count > 0)
-    {
-        for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
-        {
-            NSDictionary *model = [ide.models objectAtIndex:i];
-            [assignDeviceMenuModels addItemWithTitle:[model objectForKey:@"name"]];
-        }
-    }
-    else
-    {
-        [assignDeviceMenuModels addItemWithTitle:@"No models"];
-        assignDeviceMenuModels.enabled = NO;
-    }
-
-    if (currentModel != -1) [assignDeviceMenuModels selectItemAtIndex:currentModel];
-    if (currentDevice != -1) [assignDeviceMenuDevices selectItemAtIndex:currentDevice];
-
-    [_window beginSheet:assignDeviceSheet completionHandler:nil];
-}
-
-
-
-- (IBAction)assignDeviceSheetCancel:(id)sender
-{
-	[_window endSheet:assignDeviceSheet];
-}
-
-
-
-- (IBAction)assignDeviceSheetAssign:(id)sender
-{
-	reDeviceIndex = [assignDeviceMenuDevices indexOfSelectedItem];
-	reModelIndex = [assignDeviceMenuModels indexOfSelectedItem];
-
-    [_window endSheet:assignDeviceSheet];
-    [ide assignDevice:[self getDeviceID:reDeviceIndex] toModel:[self getModelID:reModelIndex]];
-}
-
-
-
-- (void)reassigned
-{
-    // This method should ONLY be called by the ToolsAPI instance AFTER loading a list of models,
-	// possibly in response to a single device restart. reDeviceIndex may or may not equal currentDevice
-
-    NSString *deviceName = [[ide.devices objectAtIndex:reDeviceIndex] objectForKey:@"name"];
-	NSString *modelName = [[ide.models objectAtIndex:reModelIndex] objectForKey:@"name"];
-	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" now assigned to model \"%@\".", deviceName, modelName] :YES];
-
-	// If the model being assigned a device is the current one, and there's no current device,
-	// make the reassigned device current
-
-	if ((reModelIndex == currentModel) && (currentDevice == -1))
-	{
-		currentDevice = reDeviceIndex;
-		[self updateMenus];
-		[self setToolbar];
-	}
-}
-
-
-
-- (IBAction)deleteModel:(id)sender
-{
-    if (currentModel == -1)
-    {
-        [self writeToLog:@"[ERROR] You have not selected a model. Go to Models > Current Models to select a model." :YES];
-        return;
-    }
-
-    NSDictionary *mDict = [ide.models objectAtIndex:currentModel];
-    NSString *mId = [mDict objectForKey:@"id"];
-    NSString *devs = @"";
-    BOOL flag = NO;
-    toDelete = nil;
-
-    for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
-    {
-        NSDictionary *dDict = [ide.devices objectAtIndex:i];
-		NSString *m = [dDict objectForKey:@"model_id"];
-		if ((NSNull *)m != [NSNull null])
+		else
 		{
-			if ([mId compare:m] == NSOrderedSame)
-			{
-				// Set flag to show at least one device is assigned to this model
+			// Create two models - one device, one agent - based on the deployment
 
-				flag = YES;
-				devs = [devs stringByAppendingFormat:@", %@", [dDict objectForKey:@"name"]];
+			Model *model;
+			NSString *code = [self getValueFrom:deployment withKey:@"device_code"];
+
+			if (code != nil)
+			{
+				model = [[Model alloc] init];
+				model.type = @"device";
+				model.squinted = YES;
+				model.code = code;
+				model.path = project.path;
+				model.sha = [self getValueFrom:deployment withKey:@"sha"];
+				model.updated = [self getValueFrom:deployment withKey:@"updated_at"];
+				if (model.updated == nil) model.updated = [self getValueFrom:deployment withKey:@"created_at"];
+				[newDevicegroup.models addObject:model];
+			}
+
+			code = [self getValueFrom:deployment withKey:@"agent_code"];
+
+			if (code != nil)
+			{
+				model = [[Model alloc] init];
+				model.type = @"agent";
+				model.squinted = YES;
+				model.code = code;
+				model.path = project.path;
+				model.sha = [self getValueFrom:deployment withKey:@"sha"];
+				model.updated = [self getValueFrom:deployment withKey:@"updated_at"];
+				if (model.updated == nil) model.updated = [self getValueFrom:deployment withKey:@"created_at"];
+				[newDevicegroup.models addObject:model];
 			}
 		}
-    }
+	}
 
-    if (flag == NO)
-    {
-        // No devices are assigned to this model, so proceed with the delete attempt
+	// Decrement the tally of downloadable device groups to see if we've got them all yet
 
-        NSAlert *ays = [[NSAlert alloc] init];
-        [ays addButtonWithTitle:@"No"];
-        [ays addButtonWithTitle:@"Yes"];
-        [ays setMessageText:[NSString stringWithFormat:@"You are about to delete model \"%@\". Are you sure you want to proceed?", [mDict objectForKey:@"name"]]];
-        [ays setInformativeText:@"Selecting ‘Yes’ will permanently delete the model."];
-        [ays setAlertStyle:NSWarningAlertStyle];
-        [ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode){
+	--project.count;
 
-            if (returnCode == 1001)
-            {
-                // Proceed with the deletion
-
-                // TODO Remove link to open projects
-
-                NSString *mID = [mDict objectForKey:@"id"];
-                if (projectArray.count > 0)
-                {
-                    for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
-                    {
-                        Project *aProject = [projectArray objectAtIndex:i];
-                        if ([aProject.projectModelID compare:mID] == NSOrderedSame)
-                        {
-                            [self writeToLog:[NSString stringWithFormat:@"Unlinking model \"%@\" from project \"%@\".", [mDict objectForKey:@"name"], aProject.projectName] :YES];
-                            aProject.projectModelID = @"";
-                            aProject.projectHasChanged = YES;
-                            if (aProject == currentProject) [saveLight setFull:NO];
-                        }
-                    }
-                }
-
-                toDelete = [mDict objectForKey:@"name"];
-                [ide deleteModel:[self getModelID:currentModel]];
-            }
-        }];
-    }
-    else
-    {
-        devs = [devs substringFromIndex:2];
-        NSString *s = @"this device";
-        if ([devs componentsSeparatedByString:@","].count > 1) s = @"these devices";
-        NSString *message = [NSString stringWithFormat:@"[ERROR] The model \"%@\" has one or more devices (%@) assigned to it. You must re-assign \"%@\" before deleting the model.", [mDict objectForKey:@"name"], devs, s];
-        [self writeToLog:message :YES];
-    }
-}
-
-
-
-- (void)deleteModelStageTwo
-{
-	// This method should ONLY be called by the ToolsAPI instance AFTER deleting a model
-	
-	[self writeToLog:[NSString stringWithFormat:@"Deleted model \"%@\". Refreshing your list of models.", toDelete] :YES];
-}
-
-
-
-- (IBAction)deleteDevice:(id)sender
-{
-	if (currentDevice == -1)
+	if (project.count == 0)
 	{
-		[self writeToLog:@"[ERROR] You have not selected a device to delete." :YES];
+		// We have now acquired all the device groups models, so we can save everything
+
+		[self productToProjectStageFour:project];
+	}
+}
+
+
+
+- (void)productToProjectStageFour:(Project *)project
+{
+	project.haschanged = YES;
+
+	if (savingProject != nil)
+	{
+		// TODO
+
 		return;
 	}
+
+	// Go and save the project
 	
-	NSDictionary *dDict = [ide.devices objectAtIndex:currentDevice];
-	NSAlert *ays = [[NSAlert alloc] init];
-	[ays addButtonWithTitle:@"No"];
-	[ays addButtonWithTitle:@"Yes"];
-	[ays setMessageText:[NSString stringWithFormat:@"You are about to delete device \"%@\". Are you sure you want to proceed?", [dDict objectForKey:@"name"]]];
-	[ays setInformativeText:@"Selecting ‘Yes’ will remove the device from your account."];
-	[ays setAlertStyle:NSWarningAlertStyle];
-	[ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode){
-		
-		if (returnCode == 1001)
-		{
-			// Proceed with the deletion
-			
-			toDelete = [dDict objectForKey:@"name"];
-			[ide deleteDevice:[self getDeviceID:currentDevice]];
-		}
-	}];
+	savingProject = project;
+	savingProject.filename = [savingProject.name stringByAppendingString:@".squirrelproj"];
+	[self saveProjectAs:nil];
+	[self setToolbar];
 }
 
 
 
-- (void)deleteDeviceStageTwo
+- (void)createProductStageTwo:(NSNotification *)note
 {
-	// This method should ONLY be called by the ToolsAPI instance AFTER deleting a device
-	
-	[self writeToLog:[NSString stringWithFormat:@"Deleted device \"%@\". Refreshing your list of devices.", toDelete] :YES];
-}
+	// This is called by the BuildAPIAccess instance in response to a new product being created
+	// This is a result of the user creating a new project and asking for a product to be made too.
 
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *so = [data objectForKey:@"object"];
+	NSString *action = [so objectForKey:@"action"];
+	Project *pr = [so objectForKey:@"project"];
+	data = [data objectForKey:@"data"];
 
+	// Link the project to the new product
 
-- (IBAction)renameModel:(id)sender
-{
-    renameLabel.stringValue = @"Select a model:";
-    [renameMenu removeAllItems];
+	pr.pid = [data objectForKey:@"id"];
 
-    for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
-    {
-        NSDictionary *mDict = [ide.models objectAtIndex:i];
-        [renameMenu addItemWithTitle:[mDict objectForKey:@"name"]];
-    }
+	// Perform appropriate action flows
 
-    if (currentModel != -1) [renameMenu selectItemAtIndex:currentModel];
-
-    [_window beginSheet:renameSheet completionHandler:nil];
-}
-
-
-
-- (void)renameModelStageTwo
-{
-
-	[self writeToLog:@"Model renamed. Refreshing the list of your models and devices." :YES];
-}
-
-
-
-- (IBAction)renameDevice:(id)sender
-{
-    // NOTE The outer checking code is probably unnecessary: you can't select this
-	// menu option unless there is at least one device
-	
-	if (ide.devices.count > 0)
+	if (action != nil)
 	{
-		// Provided we have devices to list, set the Rename sheet’s title 
-		// and clear its pop-up menu
-		
-		renameLabel.stringValue = @"Select a device:";
-		[renameMenu removeAllItems];
-		
-		// Add devices’ names to the heet’s pop-up
-		
-		for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
+		if ([action compare:@"newproject"] == NSOrderedSame)
 		{
-			NSDictionary *dDict = [ide.devices objectAtIndex:i];
-			[renameMenu addItemWithTitle:[dDict objectForKey:@"name"]];
-		}
+			// This is the action flow for a new project
 
-		// If we have a device selected, makes sure it is also selected in the sheet pop-up
-		
-		if (currentDevice != -1)
-		{
-			NSDictionary *dDict = [ide.devices objectAtIndex:currentDevice];
-			[renameMenu selectItemAtIndex:[ide.devices indexOfObject:dDict]];
+			selectedProduct = nil;
+
+			[self writeToLog:[NSString stringWithFormat:@"Created product for project \"%@\".", pr.name] :YES];
+			[self writeToLog:@"Refreshing your list of products..." :YES];
+			[self getProductsFromServer:nil];
+
+			// Add the new project to the project menu. We've already checked for a name clash,
+			// so we needn't care about the return value.
+
+			[self addProjectMenuItem:pr.name :pr];
+
+			// Enable project-related UI items
+			// NOTE It's a new project, so no device groups yet - just update the main device group menu
+
+			[self refreshOpenProjectsMenu];
+			[self refreshProjectsMenu];
+			[self refreshMainDevicegroupsMenu];
+			[self refreshDevicegroupMenu];
+			[self refreshDeviceMenu];
+			[self setToolbar];
+
+			// Mark the status light as empty, ie. in need of saving
+
+			[saveLight show];
+			[saveLight needSave:YES];
+			[_window setDocumentEdited:YES];
+
+			// Save the new project - this gives the user the chance to re-locate it
+
+			savingProject = currentProject;
+			[self saveProjectAs:nil];
 		}
-		
-		// Present the sheet
-		
-		[_window beginSheet:renameSheet completionHandler:nil];
+		else if ([action compare:@"uploadproject"] == NSOrderedSame)
+		{
+			// This is the action flow for a project being uploaded
+			// We now have to upload the device groups
+
+			NSString *createdItem = [self getValueFrom:data withKey:@"name"];
+
+			[self writeToLog:[NSString stringWithFormat:@"Uploaded project \"%@\" to the impCloud.", createdItem] :YES];
+
+			selectedProduct = nil;
+
+			[self writeToLog:@"Refreshing your list of products..." :YES];
+			[self getProductsFromServer:nil];
+			[self writeToLog:@"Uploading the project's device groups..." :YES];
+
+			if (pr.devicegroups.count > 0)
+			{
+				pr.count = pr.devicegroups.count;
+
+				for (Devicegroup *dg in pr.devicegroups)
+				{
+					[self writeToLog:[NSString stringWithFormat:@"Uploading device group \"%@\"...", dg.name] :YES];
+
+					NSDictionary *dict = @{ @"action" : @"uploadproject",
+											@"project" : pr,
+											@"devicegroup" : dg };
+
+					NSDictionary *details = @{ @"name" : dg.name,
+											   @"description" : dg.description,
+											   @"productid" : pr.pid,
+											   @"type" : dg.type };
+
+					[ide createDevicegroup:details :dict];
+				}
+			}
+			
+			// Pick up the action at 'createDevicegroupStageTwo:'
+		}
 	}
 	else
 	{
-		// The user has no devices, so post a warning
-
-		[self writeToLog:@"[WARNING] You have no devices in your account." :YES];
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createProductStageTwo:)"] :YES];
 	}
 }
 
 
 
-- (IBAction)closeRenameSheet:(id)sender
+- (void)deleteProductStageTwo:(NSMutableDictionary *)dict
 {
-	[_window endSheet:renameSheet];
-}
+	// We come here after checking all of a product's device groups to see if they can be deleted
 
+	NSArray *devicegroups = [dict objectForKey:@"devicegroups"];
+	NSDictionary *product = [dict objectForKey:@"product"];
 
+	[dict setObject:[NSNumber numberWithInteger:devicegroups.count] forKey:@"count"];
 
-- (IBAction)saveRenameSheet:(id)sender
-{
-	NSString *newName = renameName.stringValue;
-    NSInteger index = [renameMenu indexOfSelectedItem];
+	[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - deleting devicegroups...", [self getValueFrom:product withKey:@"name"]] :YES];
 
-    [_window endSheet:renameSheet];
-	
-	if ([renameLabel.stringValue compare:@"Select a device:"] == NSOrderedSame)
-    {
-		NSDictionary *dDict = [ide.devices objectAtIndex:index];
-		NSString *dString = [dDict objectForKey:@"name"];
-		
-		// Has the name actually been changed?
-		
-		if ([dString compare:newName] == NSOrderedSame)
-		{
-			// User hasn't changed the name
-			
-			[self writeToLog:[NSString stringWithFormat:@"[WARNING] The name of device \"%@\" remains unchanged.", newName] :YES];
-			return;			
-		}
-		
-		// Check for existing device name usage
+	// Run through the device groups in the list and delete them
 
-		BOOL usedFlag = NO;
-		
-		for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
-		{
-			dDict = [ide.devices objectAtIndex:i];
-			dString = [dDict objectForKey:@"name"];
-			if ([dString compare:newName] == NSOrderedSame) usedFlag = YES;
-		}
+	for (NSDictionary *devicegroup in devicegroups)
+	{
+		NSDictionary *source = @{ @"action" : @"deleteproduct",
+							      @"devicegroup" : devicegroup,
+							      @"product" : dict };
 
-		if (usedFlag == YES)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"[ERROR] The device name \"%@\" is already in use.", newName] :YES];
-		}
-		else
-		{
-			[ide updateDevice:[self getDeviceID:index] :@"name" :newName];
-		}
-    }
-    else
-    {
-		NSDictionary *mDict = [ide.models objectAtIndex:index];
-		NSString *mString = [mDict objectForKey:@"name"];
-		
-		// Has the name actually been changed?
-		
-		if ([mString compare:newName] == NSOrderedSame)
-		{
-			// User hasn't changed the name
-			
-			[self writeToLog:[NSString stringWithFormat:@"[WARNING] The name of model \"%@\" remains unchanged.", newName] :YES];
-			return;			
-		}
-		
-		// Check for existing model name usage
-
-		BOOL usedFlag = NO;
-		
-		for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
-		{
-			mDict = [ide.models objectAtIndex:i];
-			mString = [mDict objectForKey:@"name"];
-			if ([mString compare:newName] == NSOrderedSame) usedFlag = YES;
-		}
-
-		if (usedFlag == YES)
-		{
-			[self writeToLog:[NSString stringWithFormat:@"[ERROR] The model name \"%@\" is already in use.", newName] :YES];
-		}
-		else
-		{
-			[ide updateModel:[self getModelID:index] :@"name" :newName];
-		}
-    }
-}
-
-
-
-- (void)renameDeviceStageTwo
-{
-	NSString *mString;
-
-	if (unassignDeviceFlag) {
-
-		mString = @"Device unassigned. Refreshing the list of your models and devices.";
-		unassignDeviceFlag = NO;
-
-	} else {
-
-		mString = @"Device renamed. Refreshing the list of your models and devices.";
+		[ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
 	}
 
-	[self writeToLog:mString :YES];
+	// Pick up the action in 'deleteDevicegroupStageTwo:'
 }
 
 
 
-- (IBAction)unassignDevice:(id)sender
+- (void)deleteProductStageThree:(NSNotification *)note
 {
-	unassignDeviceFlag = YES;
-	
-	// Pass an empty string as the model_id to unassign a device
+	// This method should ONLY be called by the BuildAPIAccess instance AFTER deleting a product
 
-	[ide updateDevice:[self getDeviceID:currentDevice] :@"model_id" :@""];
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSDictionary *product = [source objectForKey:@"product"];
+	NSDictionary *deletedProduct = [product objectForKey:@"product"];
+
+	selectedProduct = nil;
+
+	[self writeToLog:[NSString stringWithFormat:@"Deleted product \"%@\".", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
+	[self writeToLog:@"Refreshing your list of products..." :YES];
+	[ide getProducts];
 }
 
 
 
-#pragma mark - Device Log Methods
-
-
-- (IBAction)getLogs:(id)sender
+- (void)updateProductStageTwo:(NSNotification *)note
 {
-    if (currentDevice == -1)
-    {
-        [self writeToLog:@"[ERROR] You have not selected a device. Go to Models > Current Models to select a model and one of its devices." :YES];
-        return;
-    }
+	// This method should ONLY be called by the BuildAPIAccess object instance AFTER updating a product
+	// Becuase of this, we only update the local project at this point
 
-	if (ide.devices.count == 0)
-    {
-        [self writeToLog:@"[ERROR] You have no devices in your account." :YES];
-        return;
-    }
-    
-    [ide getLogsForDevice:[self getDeviceID:currentDevice] :@"" :NO];
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *response = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+	Project *project = [source objectForKey:@"project"];
+
+	if (action != nil)
+	{
+		if ([action compare:@"projectchanged"] == NSOrderedSame)
+		{
+			if (project != nil)
+			{
+				project.name = [self getValueFrom:response withKey:@"name"];
+				project.description = [self getValueFrom:response withKey:@"description"];
+
+				[self writeToLog:[NSString stringWithFormat:@"Project and product \"%@\" updated.", project.name] :YES];
+			}
+			else
+			{
+				// Separate response text for when we're updating a product
+
+				[self writeToLog:[NSString stringWithFormat:@"Product \"%@\" updated.", [self getValueFrom:response withKey:@"name"]] :YES];
+			}
+
+			if (productsArray.count > 0)
+			{
+				// Update the local products list, if we have one (we may not)
+
+				[self writeToLog:@"Refreshing your list of products..." :YES];
+				[self getProductsFromServer:nil];
+			}
+		}
+		else if ([action compare:@"syncproduct"] == NSOrderedSame)
+		{
+			// Update the local products list, if we have one (we may not)
+
+			[self writeToLog:@"Refreshing your list of products..." :YES];
+			[self getProductsFromServer:nil];
+
+			project.count = project.devicegroups.count;
+
+			if (project.devicegroups.count > 0)
+			{
+				for (Devicegroup *dg in project.devicegroups)
+				{
+					[ide getDevicegroup:dg.did];
+				}
+			}
+		}
+		else if ([action compare:@"none"] == NSOrderedSame)
+		{
+			return;
+		}
+
+		// Mark the device group's parent project as changed
+		// NOTE we check for nil, but this is very unlikely (project closed before server responded)
+
+		if (project != nil)
+		{
+			project.haschanged = YES;
+			[saveLight needSave:YES];
+			[_window setDocumentEdited:YES];
+
+			// Update the UI
+
+			[self refreshOpenProjectsMenu];
+			[self refreshDevicegroupMenu];
+			[self refreshMainDevicegroupsMenu];
+		}
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateProductStageTwo:)"] :YES];
+	}
+}
+
+
+
+- (void)updateDevicegroupStageTwo:(NSNotification *)note
+{
+	// This method should ONLY be called by the BuildAPIAccess object instance AFTER updating a device group
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *response = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+	Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+
+	// Change the local device group data
+
+	BOOL updated = NO;
+
+	if (action != nil)
+	{
+		if ([action compare:@"devicegroupchanged"] == NSOrderedSame)
+		{
+			NSString *newName = [self getValueFrom:response withKey:@"name"];
+			NSString *newDesc = [self getValueFrom:response withKey:@"description"];
+
+			if (newName != nil && [newName compare:devicegroup.name] != NSOrderedSame)
+			{
+				// If the name has changed, report it
+
+				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" renamed \"%@\".", devicegroup.name, newName] :YES];
+				devicegroup.name = newName;
+				updated = YES;
+			}
+			else if (newDesc != nil && [newDesc compare:devicegroup.description] != NSOrderedSame)
+			{
+				// Only report a description update if the name hasn't changed too
+
+				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" description updated.", devicegroup.name] :YES];
+				updated = YES;
+			}
+		}
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateDevicegroupStageTwo:)"] :YES];
+	}
+
+	if (updated)
+	{
+		// Mark the device group's parent project as changed, but only if it has
+		// NOTE we check for nil, but this is very unlikely (project closed before server responded)
+
+		Project *project = [self getParentProject:devicegroup];
+
+		if (project != nil)
+		{
+			project.haschanged = YES;
+
+			[saveLight needSave:YES];
+			[_window setDocumentEdited:YES];
+			[self refreshMainDevicegroupsMenu];
+			[self refreshDevicegroupMenu];
+		}
+		else
+		{
+			[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Device group \"%@\" is an orphan.", devicegroup.name] :YES];
+		}
+	}
+}
+
+
+
+- (void)deleteDevicegroupStageTwo:(NSNotification *)note
+{
+	// This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+
+	if (action != nil)
+	{
+		if ([action compare:@"deletedevicegroup"] == NSOrderedSame)
+		{
+			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+
+			Project *project = [self getParentProject:devicegroup];
+
+			if (project != nil)
+			{
+				[project.devicegroups removeObject:devicegroup];
+
+				if (devicegroup == currentDevicegroup)
+				{
+					if (project.devicegroups.count > 0)
+					{
+						currentDevicegroup = [project.devicegroups objectAtIndex:0];
+						project.devicegroupIndex = 0;
+					}
+					else
+					{
+						currentDevicegroup = nil;
+						project.devicegroupIndex = -1;
+					}
+				}
+
+				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" deleted.", devicegroup.name] :YES];
+
+				project.haschanged = YES;
+
+				[saveLight setFull:NO];
+				[_window setDocumentEdited:YES];
+				[self refreshDevicegroupMenu];
+				[self refreshMainDevicegroupsMenu];
+			}
+			else
+			{
+				[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Device group \"%@\" is an orphan.", devicegroup.name] :YES];
+			}
+
+			return;
+		}
+		else
+		{
+			// Run the delete product flow
+
+			NSDictionary *devicegroup = [source objectForKey:@"devicegroup"];
+			NSMutableDictionary *product = [source objectForKey:@"product"];
+			NSNumber *number = [product objectForKey:@"count"];
+			NSArray *devicegroups = [product objectForKey:@"devicegroups"];
+			NSInteger count = number.integerValue;
+
+			--count;
+
+			NSDictionary *deletedProduct = [product objectForKey:@"product"];
+
+			[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:deletedProduct withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
+
+			[product setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
+
+			if (count == 0)
+			{
+				// All the device groups are gone, now for the final product... phew
+
+				[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\"...", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
+
+				[ide deleteProduct:[deletedProduct objectForKey:@"id"] :source];
+
+				// Pick this up at 'deleteProductStageThree:'
+			}
+		}
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (deleteDevicegroupStageTwo:)"] :YES];
+	}
+}
+
+
+
+- (void)updateCodeStageTwo:(NSNotification *)note
+{
+	// This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *devicegroup = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+
+	if (devicegroup != nil)
+	{
+		NSDictionary *currentDeployment = [self getValueFrom:devicegroup withKey:@"current_deployment"];
+
+		if (currentDeployment != nil)
+		{
+			// Get the deployment
+
+			[ide getDeployment:[self getValueFrom:currentDeployment withKey:@"id"] :source];
+
+			// Pick up the action at productToProjectStageThree:
+		}
+		else
+		{
+			// Device group has no current deployment so just run an upload
+
+			[self uploadCode:nil];
+		}
+	}
+}
+
+
+
+- (void)listDevices:(NSNotification *)note
+{
+	// This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSArray *devices = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+
+	if (action != nil)
+	{
+		if ([action compare:@"deleteproduct"] == NSOrderedSame)
+		{
+			// Perform the delete product flow. All we are doing here is checking the
+			// number devices being provided so we can determine whether the product's
+			// device groups are themselves able to be deleted
+
+			NSMutableDictionary *deletedProduct = [source objectForKey:@"product"];
+			NSDictionary *product = [deletedProduct objectForKey:@"product"];
+			NSNumber *number = [deletedProduct objectForKey:@"count"];
+			NSInteger count = number.integerValue;
+
+			// First check if we've already discovered the presence of devices
+			// If we have, there's no need to proceed
+
+			if (count == kDoneChecking) return;
+
+			// Does the device group have any devices? If so we can't proceed
+
+			if (devices != nil && devices.count > 0)
+			{
+				// The device group has devices, so the API won't let us delete the devcie group and thus the product
+
+				[deletedProduct setObject:[NSNumber numberWithInteger:kDoneChecking] forKey:@"count"];
+
+				NSDictionary *devicegroup = [source objectForKey:@"devicegroup"];
+
+				[self writeToLog:[NSString stringWithFormat:@"Product \"%@\" can't be deleted because device group \"%@\" has devices assigned. Aborting delete attempt.", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"]] :YES];
+			}
+			else
+			{
+				// This device group has no devices, we can proceed - but have we got them all
+
+				--count;
+
+				if (count == 0)
+				{
+					// We've checked all the device groups and we're good to delete them
+
+					[self deleteProductStageTwo:deletedProduct];
+				}
+				else
+				{
+					[deletedProduct setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
+				}
+			}
+
+			return;
+		}
+
+		if ([action compare:@"showdevicegroupinfo"] == NSOrderedSame)
+		{
+			// This is the async handler for 'showDevicegroupInfo:'
+
+			if (devices.count > 0)
+			{
+				NSString *line = @"";
+
+				if (devices.count == 1)
+				{
+					line = [NSString stringWithFormat:@"1 device assigned to this Device Group: %@", [self getValueFrom:[devices objectAtIndex:0] withKey:@"name"]];
+				}
+				else
+				{
+					line = [NSString stringWithFormat:@"%li devices assigned to this Device Group: ", devices.count];
+					NSString *devs = @"";
+
+					for (NSUInteger i = 0 ; i < devices.count ; ++i)
+					{
+						NSDictionary *dict = [devices objectAtIndex:i];
+						devs = [devs stringByAppendingFormat:@"%@, ", [self getValueFrom:dict withKey:@"name"]];
+					}
+
+					// Remove final ", "
+
+					devs = [devs substringFromIndex:devs.length - 2];
+					line = [line stringByAppendingString:devs];
+				}
+
+				[self writeToLog:line :YES];
+			}
+			else
+			{
+				[self writeToLog:@"This Device Group has no devices assigned to it." :YES];
+			}
+
+			return;
+		}
+
+		if ([action compare:@"getdevices"] == NSOrderedSame)
+		{
+			// Initialise or clear the current list of devices then prep to add the incoming list
+
+			if (devicesArray == nil)
+			{
+				devicesArray = [[NSMutableArray alloc] init];
+			}
+			else
+			{
+				[devicesArray removeAllObjects];
+			}
+
+			action = @"adddevices";
+		}
+
+		if ([action compare:@"adddevices"] == NSOrderedSame)
+		{
+			// Add all the incoming devices to the list
+			// Creata a mutable version of the 'device' NSDictionary so we can amend the name
+			// in the local record. We do this here because all further menus derive from this
+
+			for (NSDictionary *device in devices)
+			{
+				// Construct a dictionary for each device derived from the fixed data returned by the server.
+				// The inner dictionary, 'attributes' is converted to a mutable dictionary
+
+				NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[device objectForKey:@"attributes"]];
+				NSString *name = [self getValueFrom:device withKey:@"name"];
+
+				if (name == nil || ((NSNull *)name == [NSNull null]))
+				{
+					// Name is nil or missing, so use its ID instead, replacing the empty
+					// value (locally) with the new, ID-based name
+
+					name = [self getValueFrom:device withKey:@"id"];
+					[attributes setObject:name forKey:@"name"];
+				}
+
+				NSMutableDictionary *newDevice = [[NSMutableDictionary alloc] init];
+				[newDevice setObject:[device objectForKey:@"id"] forKey:@"id"];
+				[newDevice setObject:[device objectForKey:@"type"] forKey:@"type"];
+				[newDevice setObject:attributes forKey:@"attributes"];
+				[newDevice setObject:[device objectForKey:@"relationships"] forKey:@"relationships"];
+
+				// Finally, add modified (or not) device to current list of devices
+
+#ifdef DEBUG
+				if (newDevice == nil) NSLog(@"nil");
+#endif
+
+				[devicesArray addObject:newDevice];
+			}
+
+			// Sort the devices list by device name (inside the 'attributes' dictionary
+
+			NSComparator compareNames = ^(id dev1, id dev2)
+			{
+				NSString *n1 = [self getValueFrom:dev1 withKey:@"name"];
+				NSString *n2 = [self getValueFrom:dev2 withKey:@"name"];
+				return [n1 caseInsensitiveCompare:n2];
+			};
+
+			[devicesArray sortUsingComparator:compareNames];
+		}
+
+		// Add device IDs to open projects' device groups 'devices' property
+
+		if (projectArray.count > 0)
+		{
+			for (Project *project in projectArray)
+			{
+				if (project.devicegroups.count > 0)
+				{
+					for (Devicegroup *devicegroup in project.devicegroups)
+					{
+						if (devicegroup.devices == nil)
+						{
+							devicegroup.devices = [[NSMutableArray alloc] init];
+						}
+						else
+						{
+							[devicegroup.devices removeAllObjects];
+						}
+
+						for (NSDictionary *device in devicesArray)
+						{
+							NSDictionary *relationships = [device objectForKey:@"relationships"];
+							NSDictionary *devgrp = [relationships objectForKey:@"devicegroup"];
+							NSString *deviceid = [devgrp objectForKey:@"id"];
+
+							// Just check for a nil device group ID - to avoid unassigned devices
+							
+							if (deviceid != nil)
+							{
+								if ([deviceid compare:devicegroup.did] == NSOrderedSame) [devicegroup.devices addObject:deviceid];
+							}
+						}
+					}
+				}
+			}
+		}
+
+		[self writeToLog:@"List of devices loaded: see 'Current Device' and 'Devices' > 'Unassigned Devices'." :YES];
+
+		// Update the UI
+
+		[self refreshDevicesPopup];
+		[self refreshDeviceMenu];
+		[self refreshDevicegroupMenu];
+		[self setToolbar];
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
+	}
+}
+
+
+
+- (void)createDevicegroupStageTwo:(NSNotification *)note
+{
+	// We're back after creating the Device Group on the server
+	// so extract the persisted data to get the new device group,
+	// its project and the flag indicating whether the user wants
+	// source files creating
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *response = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSNumber *makeNewFiles = [source objectForKey:@"files"];
+	Devicegroup	*devicegroup = [source objectForKey:@"devicegroup"];
+	Project *project = [source objectForKey:@"project"];
+	NSString *action = [source objectForKey:@"action"];
+
+	// Record the new device group's ID
+
+	devicegroup.did = [response objectForKey:@"id"];
+
+	if (action != nil)
+	{
+		if ([action compare:@"newdevicegroup"] == NSOrderedSame)
+		{
+			if (newDevicegroupFlag)
+			{
+				// We are adding a device group for newly added file, so go and process those files
+				// and proceed no further here
+
+				[self processAddedFiles:saveUrls];
+				return;
+			}
+
+			// Add the device group to the project
+
+			if (project.devicegroups == nil) project.devicegroups = [[NSMutableArray alloc] init];
+
+			[project.devicegroups addObject:devicegroup];
+
+			// Mark the project as changed
+
+			project.haschanged = YES;
+
+			if (project == currentProject)
+			{
+				// Set the status light if the project is the current one
+
+				[saveLight needSave:YES];
+				[_window setDocumentEdited:YES];
+
+				// And select the device group
+
+				currentDevicegroup = devicegroup;
+				currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+
+				// Update the UI
+
+				[self setToolbar];
+				[self refreshDevicegroupMenu];
+				[self refreshMainDevicegroupsMenu];
+			}
+
+			// Now we can produce the source code file, as the user requested
+
+			if (makeNewFiles != nil && makeNewFiles.boolValue) [self createFilesForDevicegroup:devicegroup.name :@"agent"];
+		}
+		else if ([action compare:@"uploadproject"] == NSOrderedSame)
+		{
+			// We're here after creating a device group as part of a project upload
+
+			// Record the new device group ID
+
+			devicegroup.did = [response objectForKey:@"id"];
+
+			// Decrement the device group processing count
+
+			--project.count;
+
+			if (project.count == 0)
+			{
+				// We have created all the device groups we need to, so it's now time to upload code
+
+				[self uploadProjectStageThree:project];
+			}
+		}
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
+	}
+}
+
+
+
+- (void)uploadProjectStageThree:(Project *)project
+{
+	// NOTE We can't get here without one or more device groups
+	// and there will be one deployment per devicegroup
+
+	[self writeToLog:[NSString stringWithFormat:@"Uploading project \"%@\" code...", project.name] :YES];
+
+	project.count = project.devicegroups.count;
+
+	for (Devicegroup *devicegroup in project.devicegroups)
+	{
+		if (devicegroup.squinted == kBothCodeSquinted)
+		{
+			// Code's agent and device code is compiled
+
+			if (devicegroup.models > 0)
+			{
+				[self writeToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
+
+				NSString *agentCode = @"";
+				NSString *deviceCode = @"";
+
+				for (Model *model in devicegroup.models)
+				{
+					if ([model.type compare:@"agent"] == NSOrderedSame)
+					{
+						agentCode = model.code;
+					}
+					else
+					{
+						deviceCode = model.code;
+					}
+				}
+
+				NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+				dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+				dateFormatter.timeStyle = NSDateFormatterNoStyle;
+
+				NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
+
+				NSDictionary *adg = @{ @"type" : devicegroup.type,
+									   @"id" : devicegroup.did };
+
+				NSDictionary *relationships = @{ @"devicegroup" : adg };
+
+				NSDictionary *attributes = @{ @"flagged" : @NO,
+											  @"agent_code" : agentCode,
+											  @"device_code" : deviceCode,
+											  @"description" : [NSString stringWithFormat:@"Uploaded from Squinter 2.0 at %@", desc] };
+
+				NSDictionary *deployment = @{ @"type" : @"deployment",
+											  @"attributes" : attributes,
+											  @"relationships" : relationships };
+
+				NSDictionary *data = @{ @"data" : deployment };
+
+				NSDictionary *dict = @{ @"action" : @"uploadproject",
+										@"devicegroup" : devicegroup,
+										@"project" : project };
+
+				[ide createDeployment:data :dict];
+
+				// Pick up the action at 'uploadCodeStageTwo:'
+			}
+			else
+			{
+				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" has no code to upload.", devicegroup.name] :YES];
+			}
+		}
+		else
+		{
+			[self writeToLog:[NSString stringWithFormat:@"The code for device group \"%@\" has not been compiled - it will not be uploaded.", devicegroup.name] :YES];
+		}
+	}
+}
+
+
+
+- (void)restarted:(NSNotification *)note
+{
+	// This method ONLY called in response to a notification from BuildAPIAccess that a device or devices have restarted
+	// It is called in response to 'restartDevice:' and 'restartDevices:'
+	// The former passes in 'selectedDevice'; the latter 'currentDevicegroup'
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+
+	if (action != nil)
+	{
+		if ([action compare:@"restartdevice"] == NSOrderedSame)
+		{
+			// The returned entity is a device - we originally called 'restartDevice:'
+
+			NSDictionary *device = [source objectForKey:@"device"];
+			[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" has restarted.", [self getValueFrom:device withKey:@"name"]] :YES];
+		}
+		else
+		{
+			// The returned entity is a device group - we originally called 'restartDevices:'
+
+			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+			[self writeToLog:[NSString stringWithFormat:@"The devices assigned to device group \"%@\" have restarted.", devicegroup.name] :YES];
+		}
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (restarted:)"] :YES];
+	}
+}
+
+
+
+- (void)reassigned:(NSNotification *)note
+{
+	// This method should ONLY be called by the BuildAPIAccess instance
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+	NSDictionary *device = [source objectForKey:@"device"];
+
+	if (action != nil)
+	{
+		if ([action compare:@"unassign"] == NSOrderedSame)
+		{
+			// We're here after a device unassign operation
+			// In this case ONLY, the returned data's 'data' key will be a string
+			// indicating the performed action
+
+			NSString *result = [data objectForKey:@"data"];
+
+			[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" %@.", [self getValueFrom:device withKey:@"name"], result] :YES];
+		}
+		else
+		{
+			// We're here after a device assign/re-asssign operation
+			// In this case ONLY, the returned data's 'data' key will be a dictionary
+
+			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+
+			[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" assigned to device group \"%@\".", [self getValueFrom:device withKey:@"name"], devicegroup.name] :YES];
+		}
+
+		// Update the device lists to reflect the change - this will update UI
+
+		[self updateDevicesStatus:nil];
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (reassigned:)"] :YES];
+	}
+}
+
+
+
+- (void)renameDeviceStageTwo:(NSNotification *)note
+{
+	// Called ONLY in response to a notification from BuildAPIAccess that a device has been renamed
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+
+	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
+
+	selectedDevice = nil;
+
+	// Now refresh the devices list
+
+	[self updateDevicesStatus:nil];
+}
+
+
+
+- (void)deleteDeviceStageTwo:(NSNotification *)note
+{
+	// Called ONLY in response to a notification from BuildAPIAccess that a device has been deleted
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSDictionary *device = [source objectForKey:@"device"];
+
+	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" removed from your account.", [self getValueFrom:device withKey:@"name"]] :YES];
+
+	// If the selected device is the one we've just delete - likely it is
+
+	if (selectedDevice == device) selectedDevice = nil;
+
+	// Now refresh the devices list
+
+	[self updateDevicesStatus:nil];
+}
+
+
+
+- (void)uploadCodeStageTwo:(NSNotification *)note
+{
+	// Called in response to a notification from BuildAPIAccess that a deployment has been created
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *response = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+	Devicegroup	*devicegroup = [source objectForKey:@"devicegroup"];
+	NSString *action = [source objectForKey:@"action"];
+
+	// Get the code SHA and updated date and add to the device groups's two models
+
+	NSString *sha = [self getValueFrom:response withKey:@"sha"];
+	NSString *updated = [self getValueFrom:response withKey:@"updated_at"];
+	if (updated == nil) updated = [self getValueFrom:response withKey:@"created_at"];
+
+	for (Model *model in devicegroup.models)
+	{
+		model.sha = sha;
+		model.updated = updated;
+	}
+
+	// Mark the parent product as changed
+
+	Project *project = [self getParentProject:devicegroup];
+	project.haschanged = YES;
+
+	// Update the UI
+
+	[saveLight needSave:YES];
+	[_window setDocumentEdited:YES];
+
+	if (action != nil)
+	{
+		if ([action compare:@"uploadproject"] == NSOrderedSame)
+		{
+			// Decrement the count of uploaded deployments
+
+			--project.count;
+
+			if (project.count == 0)
+			{
+				// All done!
+
+				[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
+				[self writeToLog:@"Refreshing product list." :YES];
+				[ide getProducts];
+			}
+		}
+		else
+		{
+			[self writeToLog:[NSString stringWithFormat:@"Code uploaded to device group \"%@\". Restart its assigned device(s) to run the new code.", devicegroup.name] :YES];
+		}
+	}
+	else
+	{
+		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (uploadCodeStageTwo:)"] :YES];
+	}
+}
+
+
+
+- (void)loggedIn:(NSNotification *)note
+{
+	// BuildAPIAccess has signalled login success
+
+	// Save credentials if they have changed required
+
+	BOOL flag = NO;
+
+	if (saveDetailsCheckbox.state == NSOnState)
+	{
+		// User has indicated they want the credentials saved for next time
+		// NOTE this should not happen if we auto-log in
+
+		PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
+		NSString *untf = usernameTextField.stringValue;
+		NSString *pwtf = passwordTextField.stringValue;
+
+		// Compare the entered value with the existing value - only overwrite if they are different
+
+		NSString *cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
+
+		cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
+
+		if ([cs compare:untf] != NSOrderedSame)
+		{
+			[pc setString:[ide encodeBase64String:untf] forKey:@"com.bps.Squinter.ak.notional.tully"];
+			flag = YES;
+		}
+
+		cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
+
+		cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
+
+		if ([cs compare:pwtf] != NSOrderedSame)
+		{
+			[pc setString:[ide encodeBase64String:pwtf] forKey:@"com.bps.Squinter.ak.notional.tilly"];
+			flag = YES;
+		}
+
+		if (flag) [self writeToLog:@"impCloud credentials saved in your keychain." :YES];
+	}
+
+	// Set the 'Accounts' menu
+
+	loginMenuItem.title = @"Log out of your account";
+
+	[self setToolbar];
+
+	// Register we are no longer trying to log in
+
+	loginFlag = NO;
+
+	// Inform the user he or she is logged in
+
+	[self writeToLog:@"You now are logged in to the impCloud." :YES];
+
+	// Check for any post-login actions that need to be performed
+
+	if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"])
+	{
+		// User wants the Device lists loaded on login
+
+		[self getProductsFromServer:nil];
+	}
+
+	if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"])
+	{
+		// User wants the Product lists loaded on login
+
+		[self updateDevicesStatus:nil];
+	}
+}
+
+
+
+#pragma mark - Log and Logging Methods
+
+
+- (void)listCommits:(NSNotification *)note
+{
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+
+	__block Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+	__block NSMutableArray *deployments = [data objectForKey:@"data"];
+
+	if (deployments.count > 0)
+	{
+		[extraOpQueue addOperationWithBlock:^(void){
+
+			[self performSelectorOnMainThread:@selector(logLogs:)
+								   withObject:@"--------------------------------------------------------------------------"
+								waitUntilDone:NO];
+
+			[self performSelectorOnMainThread:@selector(logLogs:)
+								   withObject:[NSString stringWithFormat:@"Commits to Device Group \"%@\":", devicegroup.name]
+								waitUntilDone:NO];
+
+			for (NSUInteger i = deployments.count ; i > 0 ; --i)
+			{
+				NSDictionary *deployment = [deployments objectAtIndex:(i - 1)];
+				NSString *sha = [self getValueFrom:deployment withKey:@"sha"];
+				NSString *message = [self getValueFrom:deployment withKey:@"description"];
+				NSString *timestamp = [self getValueFrom:deployment withKey:@"created_at"];
+				NSString *origin = [self getValueFrom:deployment withKey:@"origin"];
+				NSArray *tags = [self getValueFrom:deployment withKey:@"tags"];
+				NSString *tagString = @"";
+
+				if (tags != nil && tags.count > 0)
+				{
+					// List tags out separted by commas
+
+					for (NSString *tag in tags) tagString = [tagString stringByAppendingFormat:@"%@, ", tag];
+					tagString = [tagString substringToIndex:tagString.length - 2];
+				}
+
+
+				NSString *ns = [NSString stringWithFormat:@"%03lu. ", (deployments.count - i + 1)];
+				NSString *ss = [@"                               " substringToIndex:ns.length];
+				NSString *cs;
+
+				if (message != nil && message.length > 0)
+				{
+					cs = [NSString stringWithFormat:@"%@%@\n%@When: %@", ns, message, ss, timestamp];
+				}
+				else
+				{
+					cs = [NSString stringWithFormat:@"%@When: %@", ns, timestamp];
+				}
+
+				if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
+				if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
+				if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
+
+				[self performSelectorOnMainThread:@selector(logLogs:)
+									   withObject:cs
+									waitUntilDone:NO];
+			}
+
+			[self performSelectorOnMainThread:@selector(logLogs:)
+								   withObject:@"--------------------------------------------------------------------------"
+								waitUntilDone:NO];
+		}];
+	}
 }
 
 
 
 - (void)listLogs:(NSNotification *)note
 {
-    // This methiod should only be called by Tools API
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
 
-	if (currentDevice == -1)
+	__block NSDictionary *device = [source objectForKey:@"device"];
+	__block NSString *action = [source objectForKey:@"action"];
+	__block NSMutableArray *theLogs = [data objectForKey:@"data"];
+
+	// Shouldn't need to trap for failure (device == nil) as we only get the selected device
+	// to acquire its name; this method wouldn't have been called if there *hadn't* been
+	// a device selected
+
+	if (theLogs.count > 0)
 	{
-		// This should never appear: without a selected device, the menu item will be disabled
-		
-		[self writeToLog:@"[ERROR] You have not selected a device to restart." :YES];
-		return;
+		[extraOpQueue addOperationWithBlock:^(void){
+			// Calculate the width of the widest status message for spacing the output into columns
+
+			NSUInteger width = 0;
+
+			for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
+			{
+				NSDictionary *aLog = [theLogs objectAtIndex:i];
+				NSString *sString = [aLog objectForKey:@"type"];
+				if (sString.length > width) width = sString.length;
+			}
+
+			if ([action compare:@"gethistory"] == NSOrderedSame)
+			{
+				[self performSelectorOnMainThread:@selector(logLogs:) withObject:[NSString stringWithFormat:@"History of device \"%@\":", [self getValueFrom:device withKey:@"name"]] waitUntilDone:NO];
+
+				for (NSUInteger i = theLogs.count ; i > 0  ; --i)
+				{
+					NSDictionary *entry = [theLogs objectAtIndex:(i - 1)];
+					NSString *timestamp = [entry objectForKey:@"timestamp"];
+					timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
+					timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+
+					NSString *event = [entry objectForKey:@"event"];
+					NSString *owner = [entry objectForKey:@"owner_id"];
+					NSString *actor = [entry objectForKey:@"actor_id"];
+					NSString *doer = ([owner compare:actor] == NSOrderedSame) ? @"you." : @"someone else.";
+
+					NSString *lString = [NSString stringWithFormat:@"%@ Device %@ by %@", timestamp, event, doer];
+
+					[self performSelectorOnMainThread:@selector(logLogs:) withObject:lString waitUntilDone:NO];
+				}
+			}
+			else
+			{
+				[self performSelectorOnMainThread:@selector(logLogs:) withObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [self getValueFrom:device withKey:@"name"]] waitUntilDone:NO];
+
+				for (NSUInteger i = theLogs.count ; i > 0  ; --i)
+				{
+					NSDictionary *entry = [theLogs objectAtIndex:(i - 1)];
+					NSString *timestamp = [entry objectForKey:@"ts"];
+					timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
+					timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+
+					NSString *type = [entry objectForKey:@"type"];
+					NSString *msg = [entry objectForKey:@"msg"];
+
+					NSString *spacer = [@"                                      " substringToIndex:13 - type.length];
+					NSString *lString = [NSString stringWithFormat:@"%@ [%@]%@%@", timestamp, type, spacer, msg];
+					
+					[self performSelectorOnMainThread:@selector(logLogs:) withObject:lString waitUntilDone:NO];
+				}
+			}
+
+			// Look for URLs etc one all the items have gone in
+
+			[self performSelectorOnMainThread:@selector(parseLog) withObject:nil waitUntilDone:NO];
+		}];
 	}
-	
-	NSDictionary *device = [ide.devices objectAtIndex:currentDevice];
+	else
+	{
+		NSString *items = ([action compare:@"gethistory"] == NSOrderedSame) ? @"history" : @"logs";
 
-    // Shouldn't need to trap for failure (device == nil) as we only get the selected device
-    // to acquire its name; this method wouldn't have been called if there *hadn't* been
-    // a device selected
-
-    __block NSArray *theLogs = (NSArray *)note.object;
-
-	[extraOpQueue addOperationWithBlock:^(void){
-
-		// Calculate the width of the widest status message for spacing the output into columns
-
-		NSUInteger width = 0;
-
-		for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-		{
-			NSDictionary *aLog = [theLogs objectAtIndex:i];
-			NSString *sString = [aLog objectForKey:@"type"];
-			if (sString.length > width) width = sString.length;
-		}
-
-		[self performSelectorOnMainThread:@selector(logLogs:) withObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [device objectForKey:@"name"]] waitUntilDone:NO];
-
-		for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-		{
-			NSDictionary *aLog = [theLogs objectAtIndex:i];
-			NSString *dString = [aLog objectForKey:@"timestamp"];
-			dString = [dString stringByReplacingOccurrencesOfString:@"T" withString:@" "];
-			dString = [dString substringToIndex:19];
-			NSString *tString = [aLog objectForKey:@"type"];
-			NSString *sString = [@"                    " substringToIndex:width - tString.length];
-			NSString *lString = [NSString stringWithFormat:@"%@ [%@] %@%@", dString, tString, sString, [aLog objectForKey:@"message"]];
-			[self performSelectorOnMainThread:@selector(logLogs:) withObject:lString waitUntilDone:NO];
-		}
-
-		[self performSelectorOnMainThread:@selector(parseLog) withObject:nil waitUntilDone:NO];
-	}];
+		[self writeToLog:[NSString stringWithFormat:@"There are no %@ entries for device \"%@\"", items, [self getValueFrom:device withKey:@"name"]] :YES];
+	}
 }
 
 
@@ -6015,167 +8523,197 @@
 
 - (IBAction)printLog:(id)sender
 {
-	NSTextView *printView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, 800, 1024)];
-	[printView setEditable:YES];
-	[printView insertText:logTextView.string];
-	[printView setFont:logTextView.font];
-	[printView setEditable:NO];
+	// Get and update the app's NSPrintInfo object
+	// NOTE This takes note of the user's 'Page Setup...' choices
 
-	NSPrintInfo *pInfo = [[NSPrintInfo alloc] init];
-	[pInfo setHorizontalPagination:NSFitPagination];
-	[pInfo setVerticallyCentered:NO];
-	[pInfo setBottomMargin:34.0];
-	[pInfo setTopMargin:34.0];
-	[pInfo setRightMargin:34.0];
-	[pInfo setLeftMargin:34.0];
+	NSPrintInfo *pInfo = [NSPrintInfo sharedPrintInfo];
+	pInfo.horizontalPagination = NSFitPagination;
+	pInfo.verticalPagination = NSAutoPagination;
+	pInfo.verticallyCentered = NO;
+	pInfo.bottomMargin = 34.0;
+	pInfo.topMargin = 34.0;
+	pInfo.rightMargin = 34.0;
+	pInfo.leftMargin = 34.0;
+
+	// Determine the best point size for the orientation
+
+	CGFloat textSize = (pInfo.orientation == NSPaperOrientationPortrait) ? 8.0 : 10.0;
+
+	// Create an NSView for printing using the text from the log
+
+	NSTextView *printView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, pInfo.paperSize.width, pInfo.paperSize.height)];
+	printView.editable = YES;
+	printView.string = logTextView.string;
+	printView.font = [NSFont fontWithName:logTextView.font.fontName size:textSize];
+	printView.editable = NO;
+
+	// Create the print operation and print
+
 	NSPrintOperation *printOp = [NSPrintOperation printOperationWithView:printView
 															   printInfo:pInfo];
 	[printOp setCanSpawnSeparateThread:YES];
-	[printOp runOperationModalForWindow:_window delegate:self didRunSelector:@selector(printDone) contextInfo:nil];
+	[printOp runOperationModalForWindow:_window delegate:self didRunSelector:@selector(printDone: success: contextInfo:) contextInfo:nil];
 }
 
 
 
-- (void)printDone
+- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo
 {
-	[self writeToLog:@"Log contents printed." :YES];
+	if (success) [self writeToLog:@"Log contents sent to print system." :YES];
 }
 
 
 
-- (IBAction)streamLogs:(id)sender
+- (void)loggingStarted:(NSNotification *)note
 {
-	if (currentDevice == -1)
-	{
-		// This should never appear: without a selected device, the menu item will be disabled
-		
-		[self writeToLog:@"[ERROR] You have not selected a device to monitor." :YES];
-		return;
-	}
-	
-	NSDictionary *device = [ide.devices	objectAtIndex:currentDevice];
-	NSString *devId = [device objectForKey:@"id"];
-    
-	if (![ide isDeviceLogging:devId])
-	{
-		// Format the current date and time into ISO8601 and send to the API to get the poll_url
-		
-		NSDateFormatter *df = [[NSDateFormatter alloc] init];
-		df.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss";
-		NSString *tString = [df stringFromDate:[NSDate date]];
+	// We come here via a notification from BuildAPIAccess that a device has been added to the log stream
 
-        [self writeToLog:[NSString stringWithFormat:@"Streaming logs from device \"%@\".", [device objectForKey:@"name"]] :YES];
-		streamLogsItem.isOn = YES;
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSString *dvid = [data objectForKey:@"device"];
+	NSDictionary *device;
 
-		if ([ide loggingCount] == 0)
+	for (NSDictionary *aDevice in devicesArray)
+	{
+		NSString *advid = [aDevice objectForKey:@"id"];
+
+		if ([advid compare:dvid] == NSOrderedSame)
 		{
-			[self setLoggingColours];
+			device = aDevice;
+			break;
 		}
-
-        [ide getLogsForDevice:[device objectForKey:@"id"] :tString :YES];
-
-		NSString *devName = [device objectForKey:@"name"];
-		if (devName.length > logPaddingLength) logPaddingLength = devName.length;
-
-
 	}
-	else
+
+	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
+
+	if (device == selectedDevice)
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Steaming logs from device \"%@\" stopped.", [device objectForKey:@"name"]] :YES];
-		streamLogsItem.isOn = NO;
-		[ide stopLogging:[device objectForKey:@"id"]];
-
-		// Reset the log padding to the longest logging device name
-
-		logPaddingLength = 0;
-
-		for (NSMutableDictionary *aDevice in ide.devices)
-		{
-			NSString *aDevId = [aDevice objectForKey:@"id"];
-			if ([ide isDeviceLogging:aDevId])
-			{
-				NSString *aDevName = [aDevice objectForKey:@"name"];
-				if (aDevName.length > logPaddingLength) logPaddingLength = aDevName.length;
-			}
-		}
+		streamLogsItem.state = kStreamToolbarItemStateOn;
+		streamLogsMenuItem.title = @"Stop Log Streaming";
 	}
 
 	[streamLogsItem validate];
-    [self setDeviceMenu];
-	[self updateDeviceLists];
+	[self refreshDevicesMenus];
+	[self refreshDevicesPopup];
+}
+
+
+
+- (void)loggingStopped:(NSNotification *)note
+{
+	// We come here via a notification from BuildAPIAccess that a device has been removed from the log stream
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSString *dvid = [data objectForKey:@"device"];
+	NSDictionary *device;
+
+	for (NSDictionary *aDevice in devicesArray)
+	{
+		NSString *advid = [aDevice objectForKey:@"id"];
+
+		if ([advid compare:dvid] == NSOrderedSame)
+		{
+			device = aDevice;
+			break;
+		}
+	}
+
+	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
+
+	if (device == selectedDevice)
+	{
+		streamLogsItem.state = kStreamToolbarItemStateOff;
+		streamLogsMenuItem.title = @"Start Log Streaming";
+	}
+
+	[streamLogsItem validate];
+	[self refreshDevicesMenus];
+	[self refreshDevicesPopup];
 }
 
 
 
 - (void)presentLogEntry:(NSNotification *)note
 {
-	NSDictionary *logItem = (NSDictionary *)note.object;
-	NSArray *theLogs = [logItem objectForKey:@"logs"];
-	NSString *devID = [logItem objectForKey:@"id"];
-	NSString *dString = @"";
+	// @"232390b030728cee 2017-05-19T17:28:19.095Z development server.log Connected by WiFi on SSID \"darkmatter\" with IP address 192.168.0.2"
+	// or
+	// @"subscribed 232390b030728cee"
 
-    NSUInteger width = 12;
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSString *logItem = [data objectForKey:@"message"];
+	NSArray *parts = [logItem componentsSeparatedByString:@" "];
 
-    for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-    {
-        NSDictionary *aLog = [theLogs objectAtIndex:i];
-        NSString *sString = [aLog objectForKey:@"type"];
-        if (sString.length > width) width = sString.length;
-    }
-
-	for (NSMutableDictionary *aDevice in ide.devices)
+	if (parts.count > 2)
 	{
-		NSString *aID = [aDevice objectForKey:@"id"];
+		// Indicates the first of the message formats listed above, ie.
+		// {device ID} {timestamp} {log type} {event type} {message}
+		// NOTE {message} comprises the remaining parts of the string
 
-		if ([aID compare:devID] == NSOrderedSame)
-		{
-			dString = [aDevice objectForKey:@"name"];
-		}
-	}
-
-	// Calculate colour table index
-
-	NSUInteger index = [ide indexForID:devID];
-	BOOL done = NO;
-	while (done == NO)
-	{
-		if (index > logColors.count)
-		{
-			index = index - logColors.count;
-		}
-		else
-		{
-			done = YES;
-		}
-	}
-
-	for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-    {
+		NSUInteger width = 12;
 		NSArray *values;
-		NSDictionary *aLog = [theLogs objectAtIndex:i];
-        NSString *tString = [aLog objectForKey:@"type"];
-        NSString *sString = [@"                                      " substringToIndex:width - tString.length];
-		NSString *lString;
+		NSString *device;
+		NSString *log;
 
-		if ([ide loggingCount] > 1)
+		NSString *type = [parts objectAtIndex:3];
+		NSString *timestamp = [parts objectAtIndex:1];
+		timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
+		timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+
+		if (type.length > width) width = type.length;
+
+		NSString *spacer = [@"                                      " substringToIndex:width - type.length];
+		NSString *dvid = [parts objectAtIndex:0];
+
+		for (NSDictionary *dev in devicesArray)
 		{
-			NSString *pString = [@"                                      " substringToIndex:logPaddingLength - dString.length];
-			lString = [NSString stringWithFormat:@"Streamed from \"%@\"%@: [%@] %@%@", dString, pString, tString, sString, [aLog objectForKey:@"message"]];
+			NSString *adid = [dev objectForKey:@"id"];
+
+			if ([dvid compare:adid] == NSOrderedSame)
+			{
+				device = [self getValueFrom:dev withKey:@"name"];
+				break;
+			}
+		}
+
+		NSInteger index = [ide indexOfLoggedDevice:dvid];
+
+		// Calculate colour table index
+
+		BOOL done = NO;
+
+		while (done == NO)
+		{
+			if (index > logColors.count)
+			{
+				index = index - logColors.count;
+			}
+			else
+			{
+				done = YES;
+			}
+		}
+
+		NSRange range = [logItem rangeOfString:type];
+		NSString *message = [logItem substringFromIndex:(range.location + type.length + 1)];
+
+		if (ide.numberOfLogStreams > 1)
+		{
+			NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
+			log = [NSString stringWithFormat:@"\"%@\"%@: [%@] %@%@", device, subspacer, type, spacer, message];
 			values = [NSArray arrayWithObjects:[logColors objectAtIndex:index], nil];
 		}
 		else
 		{
-			lString = [NSString stringWithFormat:@"Streamed from \"%@\": [%@] %@%@", dString, tString, sString, [aLog objectForKey:@"message"]];
-			values = [NSArray arrayWithObjects:textColour, nil];
+			log = [NSString stringWithFormat:@"\"%@\": [%@] %@%@", device, type, spacer, message];
+			values = [NSArray arrayWithObjects:[logColors objectAtIndex:index], nil];
 		}
 
-		lString = [[def stringFromDate:[NSDate date]] stringByAppendingFormat:@" %@", lString];
+		log = [timestamp stringByAppendingFormat:@" %@", log];
 		NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
 		NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-		NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:lString attributes:attributes];
+		NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
 
 		[self writeStreamToLog:attrString];
-    }
+	}
 }
 
 
@@ -6184,99 +8722,812 @@
 {
 	// Notification-triggered method called when logging ends because of a connection break
 
-	NSString *devID = (NSString *)note.object;
+	NSString *devid = (NSString *)note.object;
 
-	for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
+	if (selectedDevice != nil)
 	{
-		NSMutableDictionary *aDev = [ide.devices objectAtIndex:i];
-		NSString *aDevID = [aDev objectForKey:@"id"];
+		NSString *seldevid = [self getValueFrom:selectedDevice withKey:@"id"];
 
-		if ([aDevID compare:devID] == NSOrderedSame)
+		if ([devid compare:seldevid] == NSOrderedSame)
 		{
-			// We have the device signalled by the end-of-logging notification
+			streamLogsItem.state = kStreamToolbarItemStateOff;
+			streamLogsMenuItem.title = @"Start Log Streaming";
+		}
 
-			if (i == currentDevice)
+		[streamLogsItem validate];
+		[self refreshDevicesMenus];
+		[self refreshDevicesPopup];
+		[self updateDeviceLists];
+	}
+}
+
+
+
+#pragma mark - Log Methods
+
+
+- (IBAction)showProjectInfo:(id)sender
+{
+	// If there is no currently selected project, bail
+
+	if (currentProject == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
+	}
+
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
+	NSString *string = nil;
+
+	[lines addObject:[NSString stringWithFormat:@"Project: %@", currentProject.name]];
+
+#ifdef DEBUG
+	[lines addObject:[NSString stringWithFormat:@"Project file version: %@", currentProject.version]];
+#endif
+
+	if (currentProject.pid.length > 0)
+	{
+		if (productsArray.count > 0)
+		{
+			BOOL deadpid = YES;
+
+			for (NSMutableDictionary *product in productsArray)
 			{
-				// Device about which we have been notified is the current device,
-				// so fix the visible UI: update the stream logs toolbar item
+				NSString *pid = [product objectForKey:@"id"];
 
-				streamLogsItem.isOn = NO;
+				if ([pid compare:currentProject.pid] == NSOrderedSame)
+				{
+					string = [NSString stringWithFormat:@"Project linked to product \"%@\" (ID: %@)", [self getValueFrom:product withKey:@"name"], currentProject.pid];
+					deadpid = NO;
+				}
 			}
 
-			// Notify the user via the log
-			
-			[self writeToLog:[NSString stringWithFormat:@"[CONNECTION ERROR] Can no longer stream logs from device \"%@\"", [aDev objectForKey:@"name"]] :YES];
+			if (deadpid)
+			{
+				// We can't find a valid prodict for the project's PID
+
+				if ([currentProject.pid compare:@"old"] == NSOrderedSame)
+				{
+					// However, this is because the project is a conversion from a previous version
+					// of Squinter, so we should indicate this - the user may not have uploaded it yet
+
+					string = @"Project not yet linked to a product becuase it has yet not been uploaded.";
+				}
+				else
+				{
+					string = @"Project linked to a product that may have been deleted.";
+				}
+			}
+		}
+		else
+		{
+			string = [NSString stringWithFormat:@"Project linked to product with ID \"%@\".", currentProject.pid];
+		}
+
+		[lines addObject:string];
+	}
+	else
+	{
+		[lines addObject:@"Project is not linked to a product"];
+	}
+
+
+	if (currentProject.path == nil)
+	{
+		// This will be case if it's a new project that has not been saved yet
+
+		[lines addObject:@"Project has not yet been saved."];
+	}
+	else
+	{
+		// NOTE currentProject.path is always absolute
+
+		[lines addObject:[NSString stringWithFormat:@"Project file location: %@/%@", currentProject.path, currentProject.filename]];
+	}
+
+	if (currentProject.devicegroups.count > 0)
+	{
+		if (currentProject.devicegroups.count == 1)
+		{
+			[lines addObject:@"Project has 1 device group:"];
+		}
+		else
+		{
+			[lines addObject:[NSString stringWithFormat:@"Project has %li device groups:", currentProject.devicegroups.count]];
+		}
+
+		for (Devicegroup *dg in currentProject.devicegroups)
+		{
+			[self compileDevicegroupInfo:dg :2 :lines];
+		}
+	}
+	else
+	{
+		[lines addObject:@"Project has no device groups."];
+	}
+
+	// If we have a project description add it in
+
+	if (currentProject.description.length > 0)
+	{
+		// Calculate the width of the longest line
+
+		NSUInteger dashCount = 0;
+
+		for (NSString *string in lines)
+		{
+			if (string.length > dashCount) dashCount = string.length;
+		}
+
+		// Format the project description to fit that width
+
+		NSArray *dLines = [self displayDescription:currentProject.description :dashCount :@""];
+
+		// Insert the description lines into the ones we already have, ie. line 1 after the name
+
+		for (NSInteger i = 0 ; i < dLines.count ; ++i)
+		{
+			[lines insertObject:[dLines objectAtIndex:i] atIndex:i + 1];
 		}
 	}
 
-	[streamLogsItem validate];
-	[self setDeviceMenu];
-	[self updateDeviceLists];
+	// Finally, print out the lines in the log
+
+	[self printInfoInLog:lines];
 }
 
 
 
-- (IBAction)showAppCode:(id)sender
+- (IBAction)showDeviceGroupInfo:(id)sender
 {
-	// Request the latest code revision for the specified model
+	if (currentProject == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
+	}
 
-	NSDictionary *mDict = [ide.models objectAtIndex:currentModel];
-    NSString *mID = [mDict objectForKey:@"id"];
-    showCodeFlag = YES;
-    [ide getCode:mID];
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	[self compileDevicegroupInfo:currentDevicegroup :0 :nil];
 }
 
 
 
-- (void)listCode:(NSString *)code :(NSInteger)from :(NSInteger)to :(NSInteger)at
+- (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines
+{
+	// Shows info for the selected device group.
+
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
+
+	// Prepare the indent: should be 0 or 2 spaces
+
+	NSString *spaces = @"";
+	NSString *liner = @"";
+
+	if (inset > 0)
+	{
+		for (NSUInteger i = 0 ; i < inset ; ++i)
+		{
+			spaces = [spaces stringByAppendingString:@" "];
+		}
+	}
+
+	[lines addObject:[NSString stringWithFormat:@"%@Device group \"%@\"", spaces, devicegroup.name]];
+
+	if (devicegroup.did != nil && devicegroup.did.length > 0 && [devicegroup.did compare:@"old"] != NSOrderedSame)
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@Device group ID: %@", spaces, devicegroup.did]];
+	}
+	else
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@Device group not uploaded to the impCloud", spaces]];
+	}
+
+	[lines addObject:[NSString stringWithFormat:@"%@Device group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
+
+	if (devicegroup.models.count > 0)
+	{
+		if (devicegroup.models.count == 1)
+		{
+			[lines addObject:[NSString stringWithFormat:@"\n%@This device group has 1 source code file:", spaces]];
+		}
+		else
+		{
+			[lines addObject:[NSString stringWithFormat:@"\n%@This device group has %li source code files:", spaces, (long)devicegroup.models.count]];
+		}
+
+		for (NSUInteger j = 0 ; j < devicegroup.models.count ; ++j)
+		{
+			Model *model = [devicegroup.models objectAtIndex:j];
+			NSString *showPath = [self getPrintPath:currentProject.path :model.path];
+			if (showPath.length > 0) showPath = [showPath stringByAppendingString:@"/"];
+			if (j > 0) liner = @"\n";
+
+			NSString *m = [NSString stringWithFormat:@"%@%@  %li. %@%@", liner, spaces, (long)(j + 1), showPath, model.filename];
+			if (model.hasMoved) m = [m stringByAppendingString:@" ** FILE HAS MOVED FROM THIS LOCATION **"];
+ 			[lines addObject:m];
+			[self compileModelInfo:model :(inset + 4) :lines];
+		}
+	}
+	else
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@This device group has no source code yet.", spaces]];
+	}
+
+	// Get devices for this device group
+
+	if (devicesArray.count > 0)
+	{
+		BOOL first = YES;
+
+		for (NSMutableDictionary *device in devicesArray)
+		{
+			NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+			NSString *dgid = [self getValueFrom:dg withKey:@"id"];
+
+			if (devicegroup.did != nil && devicegroup.did.length > 0 && ([devicegroup.did compare:dgid] == NSOrderedSame))
+			{
+				if (first)
+				{
+					[lines addObject:[NSString stringWithFormat:@"\n%@The following device(s) have been assigned to this device group:", spaces]];
+					first = NO;
+				}
+
+				[lines addObject:[NSString stringWithFormat:@"%@     %@ (%@)", spaces, [self getValueFrom:device withKey:@"name"], [self getValueFrom:device withKey:@"id"]]];
+			}
+		}
+	}
+
+	// Insert the description if there is one - we do this here in order to ensure the description
+	// line width matches that of the longest line in the device group data
+
+	if (devicegroup.description != nil && devicegroup.description.length > 0)
+	{
+		// Get the length of the widest line
+
+		NSUInteger dashCount = 0;
+
+		for (NSString *string in lines)
+		{
+			if (string.length > dashCount) dashCount = string.length;
+		}
+
+		// Format the description for that maximum line width
+
+		NSArray *dLines = [self displayDescription:devicegroup.description :dashCount :spaces];
+
+		// Add the description lines into the ones we already have, ie. on line 1 after the name
+
+		for (NSInteger i = 0 ; i < dLines.count ; ++i)
+		{
+			[lines insertObject:[dLines objectAtIndex:i] atIndex:i + 1];
+		}
+	}
+
+	// Add the new lines to either the passed in array, or a local one
+
+	if (otherLines == nil)
+	{
+		[self printInfoInLog:lines];
+	}
+	else
+	{
+		[otherLines addObjectsFromArray:lines];
+	}
+}
+
+
+
+- (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines
+{
+	NSString *path;
+
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
+
+	// Prepare the indent: should be 4 or 6 spaces
+
+	NSString *spaces = @"";
+
+	if (inset > 0)
+	{
+		for (NSUInteger i = 0 ; i < inset ; ++i)
+		{
+			spaces = [spaces stringByAppendingString:@" "];
+		}
+	}
+
+	if (model.libraries.count > 0)
+	{
+		if (model.libraries.count == 1)
+		{
+			[lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local library:", spaces, model.type]];
+
+			File *lib = [model.libraries objectAtIndex:0];
+
+			path = [self getPrintPath:currentProject.path :lib.path];
+			path = (path.length == 0) ? lib.filename : [path stringByAppendingFormat:@"/%@", lib.filename];
+
+			[lines addObject:[NSString stringWithFormat:@"%@   %@ (version %@)", spaces, path, ((lib.version.length == 0) ? @"unknown" : lib.version)]];
+		}
+		else
+		{
+			[lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local libraries:", spaces, model.type]];
+
+			for (NSUInteger i = 0 ; i < model.libraries.count ; ++i)
+			{
+				File *lib = [model.libraries objectAtIndex:i];
+
+				path = [self getPrintPath:currentProject.path :lib.path];
+				path = (path.length == 0) ? lib.filename : [path stringByAppendingFormat:@"/%@", lib.filename];
+
+				[lines addObject:[NSString stringWithFormat:@"%@   %li. %@ (%@)", spaces, (long)(i + 1), path, ((lib.version.length == 0) ? @"unknown" : lib.version)]];
+			}
+		}
+	}
+	else
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports no local libraries.", spaces, model.type]];
+	}
+
+	if (model.files.count > 0)
+	{
+		if (model.files.count == 1)
+		{
+			[lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local file:", spaces, model.type]];
+
+			File *file = [model.files objectAtIndex:0];
+
+			path = [self getPrintPath:currentProject.path :file.path];
+			path = (path.length == 0) ? file.filename : [path stringByAppendingFormat:@"/%@", file.filename];
+
+			[lines addObject:[NSString stringWithFormat:@"%@   %@", spaces, path]];
+		}
+		else
+		{
+			[lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local files:", spaces, model.type]];
+
+			for (NSUInteger i = 0 ; i < model.files.count ; ++i)
+			{
+				File *file = [model.files objectAtIndex:i];
+
+				path = [self getPrintPath:currentProject.path :file.path];
+				path = (path.length == 0) ? file.filename : [path stringByAppendingFormat:@"/%@", file.filename];
+				
+				[lines addObject:[NSString stringWithFormat:@"%@   %li. %@", spaces, (long)(i + 1), path]];
+			}
+		}
+	}
+	else
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports no local files.", spaces, model.type]];
+	}
+
+	if (!model.squinted) [lines addObject:[NSString stringWithFormat:@"%@ [WARNING] This file has not been compiled so the list above may be out of date.", spaces]];
+
+	if (model.impLibraries.count > 0)
+	{
+		if (model.impLibraries.count == 1)
+		{
+			[lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads the following Electric Imp library:", spaces, model.type]];
+
+			File *elib = [model.impLibraries objectAtIndex:0];
+			[lines addObject:[NSString stringWithFormat:@"%@   %@ (%@)", spaces, elib.filename, elib.version]];
+		}
+		else
+		{
+			[lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads the following Electric Imp libraries:", spaces, model.type]];
+
+			for (NSUInteger i = 0 ; i < model.impLibraries.count ; ++i)
+			{
+				File *elib = [model.impLibraries objectAtIndex:i];
+				[lines addObject:[NSString stringWithFormat:@"%@   %li. %@ (%@)", spaces, (long)(i + 1), elib.filename, elib.version]];
+			}
+		}
+	}
+	else
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads no Electric Imp libraries.", spaces, model.type]];
+	}
+
+	if (model.sha != nil && model.sha.length > 0)
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@ Code uploaded at %@ as SHA %@", spaces, model.updated, model.sha]];
+	}
+
+	if (otherLines == nil)
+	{
+		[self printInfoInLog:lines];
+	}
+	else
+	{
+		[otherLines addObjectsFromArray:lines];
+	}
+}
+
+
+- (IBAction)showDeviceInfo:(id)sender
+{
+	if (selectedDevice == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		return;
+	}
+
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
+
+	[lines addObject:[NSString stringWithFormat:@"Device: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
+	[lines addObject:[NSString stringWithFormat:@"Device ID: %@", [selectedDevice objectForKey:@"id"]]];
+	[lines addObject:[NSString stringWithFormat:@"Device Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
+
+	// [lines addObject:[NSString stringWithFormat:@"Free memory: %@ KB", [self getValueFrom:selectedDevice withKey:@"free_memory"]]];
+
+	NSString *mac = [self getValueFrom:selectedDevice withKey:@"mac_address"];
+	mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
+	[lines addObject:[NSString stringWithFormat:@"MAC Address: %@", mac]];
+
+	NSNumber *boolean = [self getValueFrom:selectedDevice withKey:@"device_online"];
+	NSString *string = (boolean.boolValue) ? @"online" : @"offline";
+
+	if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"IP Address: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
+
+	[lines addObject:[NSString stringWithFormat:@"State: %@", string]];
+
+	boolean = [self getValueFrom:selectedDevice withKey:@"agent_running"];
+	string = (boolean.boolValue) ? @"online" : @"offline";
+	[lines addObject:[NSString stringWithFormat:@"Agent state: %@", string]];
+
+	if (boolean.boolValue)
+	{
+		[lines addObject:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
+	}
+
+	NSDictionary *dg = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
+	NSString *dgid = [self getValueFrom:dg withKey:@"id"];
+
+	if (dgid != nil)
+	{
+		Devicegroup *adg = nil;
+		Project *apr = nil;
+
+		if (projectArray.count > 0)
+		{
+			for (Project *pr in projectArray)
+			{
+				if (pr.devicegroups.count > 0)
+				{
+					for (Devicegroup *dg in pr.devicegroups)
+					{
+						if ([dgid compare:dg.did] == NSOrderedSame)
+						{
+							adg = dg;
+							apr = pr;
+							break;
+						}
+					}
+				}
+
+				if (adg != nil) break;
+			}
+		}
+
+		if (adg != nil)
+		{
+			[lines addObject:[NSString stringWithFormat:@"Device assigned to device group \"%@\" of project \"%@\".", adg.name, apr.name]];
+		}
+		else
+		{
+			[lines addObject:[NSString stringWithFormat:@"Device assigned to a device group of ID \"%@\".", dgid]];
+		}
+	}
+	else
+	{
+		[lines addObject:@"Device is not assigned to a device group."];
+	}
+
+
+	// Add the assembled lines to the log view and re-check for URLs
+
+	[self printInfoInLog:lines];
+	[self parseLog];
+}
+
+
+
+- (IBAction)logDeviceCode:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	if (currentDevicegroup.models.count == 0)
+	{
+		[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
+		return;
+	}
+
+	BOOL done = NO;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"device"] == NSOrderedSame)
+		{
+			if ((currentDevicegroup.squinted & kDeviceCodeSquinted) == 0) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest device code.", currentDevicegroup.name] :YES];
+
+			done = YES;
+			[self writeToLog:@"Device Code:" :NO];
+			[self writeToLog:@" " :NO];
+			[extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
+			break;
+		}
+	}
+
+	if (!done) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
+}
+
+
+
+- (IBAction)logAgentCode:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	if (currentDevicegroup.models.count == 0)
+	{
+		[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
+		return;
+	}
+
+	BOOL done = NO;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			if ((currentDevicegroup.squinted & kAgentCodeSquinted) == 0) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest agent code.", currentDevicegroup.name] :YES];
+
+			done = YES;
+			[self writeToLog:@"Agent Code:" :NO];
+			[self writeToLog:@" " :NO];
+			[extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
+			break;
+		}
+	}
+
+	if (!done) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
+}
+
+
+
+- (IBAction)clearLog:(id)sender
+{
+	[logTextView setString:@""];
+}
+
+
+
+- (void)printInfoInLog:(NSMutableArray *)lines
+{
+	// Determine the number of characters in the longest line...
+
+	NSInteger dashCount = 0;
+
+	for (NSString *string in lines)
+	{
+		if (string.length > dashCount) dashCount = string.length;
+	}
+
+	// ...then build a string of dashes that long
+
+	NSString *dashes = @"";
+
+	for (NSUInteger i = 0 ; i < dashCount ; ++i)
+	{
+		dashes = [dashes stringByAppendingString:@"-"];
+	}
+
+	// Write out the dashes
+
+	[self writeToLog:dashes :NO];
+
+	// Write out the lines themselves
+
+	for (NSString *string in lines)
+	{
+		[self writeToLog:string :NO];
+	}
+
+	// Write out the dashes
+
+	[self writeToLog:dashes :NO];
+}
+
+
+
+- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp
+{
+	logTextView.editable = YES;
+
+	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
+
+	[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
+
+	if (addTimestamp)
+	{
+		NSString *date = [def stringFromDate:[NSDate date]];
+		//date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+		[logTextView insertText:date replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
+	}
+
+	if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+
+	[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+
+	logTextView.editable = NO;
+}
+
+
+
+- (void)writeErrorToLog:(NSString *)string :(BOOL)addTimestamp
+{
+	NSArray *values = [NSArray arrayWithObjects:[NSColor redColor], nil];
+	NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
+	[self writeStyledToLog:attrString :addTimestamp];
+}
+
+
+
+- (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp
+{
+	NSArray *values = [NSArray arrayWithObjects:[NSColor orangeColor], nil];
+	NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
+	[self writeStyledToLog:attrString :addTimestamp];
+}
+
+
+
+- (void)writeStyledToLog:(NSAttributedString *)string :(BOOL)addTimestamp
+{
+	logTextView.editable = YES;
+
+	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
+
+	[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
+
+	NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
+
+	if (addTimestamp)
+	{
+		NSString *date = [def stringFromDate:[NSDate date]];
+		//date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+		[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes]
+			   replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
+	}
+
+	if (string != nil)
+	{
+		[logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+	}
+
+	[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+
+	logTextView.editable = NO;
+}
+
+
+
+- (NSString *)getDisplayPath:(NSString *)path
+{
+	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+
+	if (index == 0) path = [self getAbsolutePath:currentProject.path :path];
+
+	if (index == 2)
+	{
+		path = [self getAbsolutePath:currentProject.path :path];
+		path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[path stringByDeletingLastPathComponent]];
+	}
+
+	return path;
+}
+
+
+
+- (void)showCodeErrors:(NSNotification *)note
+{
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *object = [data objectForKey:@"object"];
+	Devicegroup *devicegroup = [object objectForKey:@"devicegroup"];
+	NSMutableArray *errors = [data objectForKey:@"data"];
+
+	if (errors.count > 0)
+	{
+		[self writeErrorToLog:@"Server-reported syntax-check code errors listed below." :YES];
+		[self writeErrorToLog:@" " :NO];
+
+		for (NSArray *error in errors)
+		{
+			NSDictionary *err = [error objectAtIndex:0];
+			NSUInteger row = [[err objectForKey:@"row"] integerValue];
+			NSUInteger col = [[err objectForKey:@"column"] integerValue];
+			NSString *filename = [err objectForKey:@"file"];
+			NSArray *parts = [filename componentsSeparatedByString:@"_"];
+			filename = [parts objectAtIndex:0];
+
+			[self writeErrorToLog:[NSString stringWithFormat:@"Error in %@ code: %@ (line %lu, column %lu)", filename, [err objectForKey:@"text"], (unsigned long)row, (unsigned long)col] :NO];
+
+			for (Model *model in devicegroup.models)
+			{
+				if ([model.type compare:filename] == NSOrderedSame)
+				{
+					[self listCode:model.code :row - 5 :row + 5 :row :col];
+				}
+			}
+		}
+	}
+}
+
+
+
+- (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col
 {
 	// Display 'code' as a listing in the log
 
-    __block NSInteger lineStart = 1;
-    __block NSInteger lineEnd = 0;
-    __block NSInteger lineHighlight = -1;
+	__block NSInteger lineStart = 1;
+	__block NSInteger lineEnd = 0;
+	__block NSInteger lineHighlight = -1;
 	__block NSInteger lineTotal = 0;
 	__block NSInteger numberLength = 1;
-    __block NSInteger lineCount = 0;
+	__block NSInteger lineCount = 0;
 	__block NSString *outputString = @"";
 
 	NSString *zeroes = @"0000000000";
 
-    // Run through the code string to count lines
-	
+	// Run through the code string to count lines
+
 	[code enumerateLinesUsingBlock:^(NSString *line, BOOL *stop) {
 		++lineTotal;
 	}];
 
-    // Check the parameters
+	// Check the parameters
 
-    lineStart = from;
-    if (lineStart < 1) lineStart = 1;
+	lineStart = (from < 1) ? 1 : from;
+	lineEnd = (to > lineTotal || to < 1) ? lineTotal : to;
 
-    lineEnd = to;
-    if (lineEnd > lineTotal || lineEnd < 1) lineEnd = lineTotal;
+	if (lineEnd < lineStart)
+	{
+		// End comes before Start, so swap them around
 
-    if (lineEnd < lineStart)
-    {
-        // End comes before Start, so swap them around
+		NSInteger a = lineStart;
+		lineStart = lineEnd;
+		lineEnd = a;
+	}
+	else if (lineEnd == lineStart)
+	{
+		// End equals Start, so just list the whole code
 
-        NSInteger a = lineStart;
-        lineStart = lineEnd;
-        lineEnd = a;
-    }
-    else if (lineEnd == lineStart)
-    {
-        // End equals Start, so just list the whole code
+		lineEnd = lineTotal;
+		lineStart = 1;
+	}
 
-        lineEnd = lineTotal;
-        lineStart = 1;
-    }
+	lineHighlight = (at > lineEnd || at < lineStart) ? -1 : at;
 
-    lineHighlight = at;
-    if (lineHighlight > lineEnd || lineHighlight < lineStart) lineHighlight = -1;
+	// Set the max number of characters in the biggest line number
 
-    // Set the max number of characters in the biggest line number
-	
 	if (lineTotal > 99999)
 	{
 		numberLength = 6;
@@ -6298,40 +9549,41 @@
 		numberLength = 2;
 	}
 
-    // Run through the code again, this time to display
-	
+	// Run through the code again, this time to display
+
 	[code enumerateLinesUsingBlock:^(NSString *line, BOOL *stop) {
 
-        ++lineCount;
+		++lineCount;
 
-        if (lineCount >= lineStart && lineCount <= lineEnd)
-        {
-            NSString *num = [NSString stringWithFormat:@"%li", lineCount];
-            NSString *initialZeroes = [zeroes substringToIndex:numberLength - num.length];
+		if (lineCount >= lineStart && lineCount <= lineEnd)
+		{
+			NSString *num = [NSString stringWithFormat:@"%li", lineCount];
+			NSString *initialZeroes = [zeroes substringToIndex:numberLength - num.length];
 
-            if (lineHighlight != -1)
-            {
-                if (lineCount == lineHighlight)
-                {
-                    initialZeroes = [@"-> " stringByAppendingString:initialZeroes];
-                    num = [initialZeroes stringByAppendingFormat:@"%@  %@", num, line];
-                }
-                else
-                {
-                    initialZeroes = [@"   " stringByAppendingString:initialZeroes];
-                    num = [initialZeroes stringByAppendingFormat:@"%@  %@", num, line];
-                }
-            }
-            else
-            {
-                num = [initialZeroes stringByAppendingFormat:@"%@  %@", num, line];
-            }
+			if (lineHighlight != -1)
+			{
+				if (lineCount == lineHighlight)
+				{
+					initialZeroes = [@"-> " stringByAppendingString:initialZeroes];
+					num = [initialZeroes stringByAppendingFormat:@"%@  %@", num, line];
+				}
+				else
+				{
+					initialZeroes = [@"   " stringByAppendingString:initialZeroes];
+					num = [initialZeroes stringByAppendingFormat:@"%@  %@", num, line];
+				}
+			}
+			else
+			{
+				num = [initialZeroes stringByAppendingFormat:@"%@  %@", num, line];
+			}
 
 			outputString = [outputString stringByAppendingFormat:@"%@\n", num];
-        }
+		}
 	}];
 
 	// Get main thread to output the string
+
 	listString = outputString;
 	[self performSelectorOnMainThread:@selector(logCode) withObject:nil waitUntilDone:NO];
 }
@@ -6341,501 +9593,7 @@
 - (void)logCode
 {
 	[self writeToLog:listString :NO];
-}
-
-
-#pragma mark - Log Methods
-
-
-- (IBAction)getProjectInfo:(id)sender
-{
-    // If there is no currently selected project, bail
-	
-    if (currentProject == nil)
-	{
-		[self writeToLog:@"[ERROR] There are no open projects." :YES];
-		return;
-	}
-	
-    NSArray *array;
-	NSMutableArray *lines = [[NSMutableArray alloc] init];
-    NSString *string = nil;
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
-
-    if (ide.models != nil && ide.models.count > 0)
-	{
-		for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
-		{
-			NSDictionary *model = [ide.models objectAtIndex:i];
-            NSString *mID = [model objectForKey:@"id"];
-            if ([mID compare:currentProject.projectModelID] == NSOrderedSame)
-            {
-				string = [model valueForKey:@"name"];
-			}
-		}
-	}
-
-    [lines addObject:[NSString stringWithFormat:@"Project \"%@\"", currentProject.projectName]];
-
-#ifdef DEBUG
-
-	[lines addObject:[NSString stringWithFormat:@"Project Object Version %@", currentProject.projectVersion]];
-
-#endif
-
-	if (string) [lines addObject:[NSString stringWithFormat:@"Project linked to model \"%@\"", string]];
-
-	if (currentProject.projectPath == nil)
-	{
-		// This will be case if it's a new project that has not been saved yet
-
-		[lines addObject:@"Project has not yet been saved"];
-	}
-	else
-	{
-		[lines addObject:[NSString stringWithFormat:@"Project location: %@/%@.squirrelproj", currentProject.projectPath, currentProject.projectName]];
-	}
-
-	NSString *rString;
-	if (index == 0)
-	{
-		rString = @"absolute paths";
-	}
-	else if (index == 1)
-	{
-		rString = @"relative to the project file (above)";
-	}
-	else
-	{
-		rString = @"relative to your home directory";
-	}
-
-	[lines addObject:[NSString stringWithFormat:@"The following file locations are %@", rString]];
-	[lines addObject:@" "];
-
-    if (currentProject.projectAgentCodePath != nil)
-    {
-        string = @"Project has agent code";
-
-        if (currentProject.projectSquinted > 1)
-        {
-            string = [string stringByAppendingString:@" which has been compiled."];
-        }
-        else
-        {
-            string = [string stringByAppendingString:@" which has not been compiled."];
-        }
-        
-        [lines addObject:string];
-		[lines addObject:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectAgentCodePath]]];
-
-        if (currentProject.projectAgentLibraries.count == 0)
-        {
-            [lines addObject:@"There are no local libraries in the agent code."];
-        }
-        else if (currentProject.projectAgentLibraries.count == 1)
-        {
-            [lines addObject:@"There is 1 local library in the agent code:"];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"There are %li local libraries in the agent code:", (long)currentProject.projectAgentLibraries.count]];
-        }
-
-        if (currentProject.projectAgentLibraries.count > 0)
-        {
-            array = [currentProject.projectAgentLibraries allValues];
-
-            for (NSUInteger i = 0 ; i < array.count ; ++i)
-            {
-                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
-            }
-        }
-
-        if (currentProject.projectAgentFiles.count == 0)
-        {
-            [lines addObject:@"There are no local files in the agent code."];
-        }
-        else if (currentProject.projectAgentFiles.count == 1)
-        {
-            [lines addObject:@"There is 1 local file in the agent code:"];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"There are %li local files in the agent code:", (long)currentProject.projectAgentFiles.count]];
-        }
-
-        if (currentProject.projectAgentFiles.count > 0)
-        {
-            array = [currentProject.projectAgentFiles allValues];
-
-			for (NSUInteger i = 0 ; i < array.count ; ++i)
-            {
-                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
-            }
-        }
-
-        [lines addObject:@" "];
-    }
-    else
-    {
-        [lines addObject:@"Project has no agent code."];
-    }
-
-
-    if (currentProject.projectDeviceCodePath != nil)
-	{
-        string = @"Project has device code";
-
-        if (currentProject.projectSquinted == 1 || currentProject.projectSquinted == 3)
-		{
-			string = [string stringByAppendingString:@" which has been compiled."];
-		}
-		else
-		{
-			string = [string stringByAppendingString:@" which has not been compiled."];
-		}
-
-		[lines addObject:string];
-		[lines addObject:[NSString stringWithFormat:@"Agent code path: %@", [self getDisplayPath:currentProject.projectDeviceCodePath]]];
-
-        if (currentProject.projectDeviceLibraries.count == 0)
-        {
-            [lines addObject:@"There are no local libraries in the device code."];
-        }
-        else if (currentProject.projectDeviceLibraries.count == 1)
-        {
-            [lines addObject:@"There is 1 local library in the device code:"];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"There are %li local libraries in the device code:", (long)currentProject.projectDeviceLibraries.count]];
-        }
-
-        if (currentProject.projectDeviceLibraries.count > 0)
-        {
-            array = [currentProject.projectDeviceLibraries allValues];
-
-			for (NSUInteger i = 0 ; i < array.count ; ++i)
-            {
-                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
-            }
-        }
-
-        if (currentProject.projectDeviceFiles.count == 0)
-        {
-            [lines addObject:@"There are no local files in the device code."];
-        }
-        else if (currentProject.projectDeviceFiles.count == 1)
-        {
-            [lines addObject:@"There is 1 local file in the device code:"];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"There are %li local files in the device code:", (long)currentProject.projectDeviceFiles.count]];
-        }
-
-        if (currentProject.projectDeviceFiles.count > 0)
-        {
-            array = [currentProject.projectDeviceFiles allValues];
-
-			for (NSUInteger i = 0 ; i < array.count ; ++i)
-            {
-                [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getDisplayPath:[array objectAtIndex:i]]]];
-            }
-        }
-
-        [lines addObject:@" "];
-
-	}
-	else
-	{
-		[lines addObject:@"Project has no device code."];
-	}
-
-	if (currentProject.projectImpLibs.count > 0)
-    {
-        if (currentProject.projectImpLibs.count == 1)
-        {
-            [lines addObject:@"The Project includes the following Electric Imp library:"];
-        }
-        else
-        {
-            [lines addObject:@"The Project includes the following Electric Imp libraries:"];
-        }
-
-		for (NSUInteger i = 0 ; i < currentProject.projectImpLibs.count ; ++i)
-		{
-            [lines addObject:[NSString stringWithFormat:@"%li. %@", (long)i+1, [self getLibraryTitle:[currentProject.projectImpLibs objectAtIndex:i]]]];
-		}
-    }
-    else
-    {
-        [lines addObject:@"The Project contains no Electric Imp libraries."];
-    }
-	
-	[self printInfoInLog:lines];
-}
-
-
-
-- (NSString *)getDisplayPath:(NSString *)path
-{
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
-	Float32 version = currentProject.projectVersion.floatValue;
-
-	if (version > kPreviousProjectVersion)
-	{
-		if (index == 0) path = [self getAbsolutePath:currentProject.projectPath :path];
-
-		if (index == 2)
-		{
-			path = [self getAbsolutePath:currentProject.projectPath :path];
-			path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :path];
-		}
-	}
-	else
-	{
-		if (index == 2) path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :path];
-		if (index == 1) path = [self getRelativeFilePath:currentProject.projectPath :path];
-	}
-
-	return path;
-}
-
-
-
-- (IBAction)showDeviceInfo:(id)sender
-{
-	if (currentDevice == -1)
-	{
-		// This should never appear: without a selected device, the menu item will be disabled
-		
-		[self writeToLog:@"[ERROR] You have not selected a device to restart." :YES];
-		return;
-	}
-	
-	NSDictionary *device = [ide.devices objectAtIndex:currentDevice];
-	NSMutableArray *lines = [[NSMutableArray alloc] init];
-
-	[lines addObject:[NSString stringWithFormat:@"Device: %@", [device objectForKey:@"name"]]];
-	[lines addObject:[NSString stringWithFormat:@"Device ID: %@", [device objectForKey:@"id"]]];
-	[lines addObject:[NSString stringWithFormat:@"State: %@", [device objectForKey:@"powerstate"]]];
-
-	// If the device is unassigned, it will have a null model id
-
-	NSString *mId = [device objectForKey:@"model_id"];
-	NSString *modelName = nil;
-
-	if ((NSNull *)mId != [NSNull null])
-	{
-		for (NSUInteger i = 0 ; i < ide.models.count ; ++i)
-		{
-			NSDictionary *model = [ide.models objectAtIndex:i];
-			if ([[model objectForKey:@"id"] compare:mId] == NSOrderedSame) modelName = [NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]];
-		}
-	}
-	else
-	{
-		modelName = @"This device is not assigned to a model.";
-	}
-
-	[lines addObject:modelName];
-
-	NSString *agentId = [device objectForKey:@"agent_id"];
-
-	// If the device has never been assigned to a model, agentId will be NSNull, so check for this
-
-	if ((NSNull *)agentId != [NSNull null])
-	{
-		[lines addObject:[NSString stringWithFormat:@"Agent State: %@", [device objectForKey:@"agent_status"]]];
-		[lines addObject:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [device objectForKey:@"agent_id"]]];
-
-
-	}
-	else
-	{
-		[lines addObject:@"This device has no agent. You must assign it to a model first."];
-	}
-
-	[self printInfoInLog:lines];
-
-	[self parseLog];
-}
-
-
-
-- (IBAction)showModelInfo:(id)sender
-{
-    NSUInteger index = -1;
-
-    if (currentModel == -1)
-    {
-        // No currently selected model, so check the menu
-
-        if (ide.models.count > 0)
-        {
-            for (NSUInteger i = 0 ; i < modelsMenu.numberOfItems ; ++i)
-            {
-                NSMenuItem *item = [modelsMenu itemAtIndex:i];
-                if (item.state == NSOnState) index = i;
-            }
-
-            if (index == -1)
-            {
-                [self writeToLog:@"[ERROR] You have not selected a model. Select one from the Models menu’s Current Models list." :YES];
-                return;
-            }
-        }
-        else
-        {
-            // No models to select
-
-            [self writeToLog:@"[ERROR] You need to get your list of models from the server." :YES];
-            return;
-        }
-    }
-    else
-    {
-        index = currentModel;
-    }
-
-    NSDictionary *model = [ide.models objectAtIndex:index];
-	NSMutableArray *lines = [[NSMutableArray alloc] init];
-    NSString *mid = [model objectForKey:@"id"];
-
-    [lines addObject:[NSString stringWithFormat:@"Model: %@", [model objectForKey:@"name"]]];
-    [lines addObject:[NSString stringWithFormat:@"Model ID: %@", mid]];
-
-    NSString *dString = @"";
-    NSUInteger dCount = 0;
-
-    for (NSUInteger i = 0 ; i < ide.devices.count ; ++i)
-    {
-        NSDictionary *dev = [ide.devices objectAtIndex:i];
-        NSString *dMid = [dev objectForKey:@"model_id"];
-		if ((NSNull *)dMid == [NSNull null]) dMid = @"";
-        if ([mid compare:dMid] == NSOrderedSame)
-        {
-            dString = [dString stringByAppendingFormat:@"%@, ", [dev objectForKey:@"name"]];
-            ++dCount;
-        }
-    }
-
-    if (dCount > 0)
-    {
-        // Remove final comma and space
-
-        dString = [dString substringToIndex:dString.length - 2];
-        NSString *cString = @"device";
-        if (dCount > 1) cString = @"devices";
-        [lines addObject:[NSString stringWithFormat:@"%lu %@ assigned to this model: %@", (unsigned long)dCount, cString, dString]];
-    }
-    else
-    {
-        [lines addObject:@"No devices assigned to this model"];
-    }
-
-	[self printInfoInLog:lines];
-}
-
-
-
-- (IBAction)logDeviceCode:(id)sender
-{
-    if (currentProject == nil) return;
-	
-	if (currentProject.projectDeviceCodePath.length < 1 || currentProject.projectDeviceCode.length < 1)
-	{
-		[self writeToLog:@"This project currently has no device code." :YES];
-		return;
-	}
-	
-	if (!(currentProject.projectSquinted & 0x01))
-	{
-		[self writeToLog:@"This project has not been compiled using the latest device code." :YES];
-		[self writeToLog:@"This listing may not reflect your source code." :YES];
-	}
-	
-	[self writeToLog:@"Device Code:" :NO];
 	[self writeToLog:@" " :NO];
-
-	[extraOpQueue addOperationWithBlock:^{[self listCode:currentProject.projectDeviceCode :-1 :-1 :-1];}];
-}
-
-
-
-- (IBAction)logAgentCode:(id)sender
-{
-    if (currentProject == nil) return;
-    
-	if (currentProject.projectAgentCodePath.length < 1 || currentProject.projectAgentCode.length < 1)
-	{
-		[self writeToLog:@"This project currently has no agent code." :YES];
-		return;
-	}
-	
-	if (!(currentProject.projectSquinted > 1))
-	{
-		[self writeToLog:@"This project has not been compiled using the latest agent code." :YES];
-		[self writeToLog:@"This listing may not reflect your source code." :YES];
-	}
-	
-	[self writeToLog:@"Agent Code:" :NO];
-	[self writeToLog:@" " :NO];
-
-	[extraOpQueue addOperationWithBlock:^{[self listCode:currentProject.projectAgentCode :-1 :-1 :-1];}];
-}
-
-
-
-- (void)printInfoInLog:(NSMutableArray *)lines
-{
-	NSInteger dashCount = 0;
-
-	for (NSString *string in lines)
-	{
-		if (string.length > dashCount) dashCount = string.length;
-	}
-
-	NSString *dashes = @"";
-
-	for (NSUInteger i = 0 ; i < dashCount ; ++i)
-	{
-		dashes = [dashes stringByAppendingString:@"-"];
-	}
-
-	[self writeToLog:dashes :YES];
-
-	for (NSString *string in lines)
-	{
-		[self writeToLog:string :YES];
-	}
-
-	[self writeToLog:dashes :YES];
-}
-
-
-
-- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp
-{
-    logTextView.editable = YES;
-	
-	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
-	
-	[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
-    
-    if (addTimestamp)
-    {
-        [logTextView insertText:[def stringFromDate:[NSDate date]]];
-        [logTextView insertText:@" "];
-    }
-    
-    if (string != nil) [logTextView insertText:string];
-    [logTextView insertText:@"\n"];
-	logTextView.editable = NO;
 }
 
 
@@ -6847,103 +9605,96 @@
 	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
 	[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
-	if (string != nil) [logTextView insertText:string];
-	[logTextView insertText:@"\n"];
+
+	if (string != nil && string.length > 0)
+	{
+		[logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+	}
+
+	[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+
 	logTextView.editable = NO;
 }
 
 
 
-- (IBAction)clearLog:(id)sender
+- (void)displayError:(NSNotification *)note;
 {
-    [logTextView setString:@""];
-}
+	// Relay a BuildAPIAccess error
 
+	NSDictionary *error = (NSDictionary *)note.object;
+	NSString *errorMessage = [error objectForKey:@"message"];
+	NSNumber *code = [error objectForKey:@"code"];
+	NSInteger errorCode = [code integerValue];
 
+	if (loginFlag)
+	{
+		// We are attempting to log in, so the error should relate to that action, ie.
+		// most likely a failed connection, or missing or rejected credentials
 
-- (void)displayError
-{
-    // Relay a Build API error, held in the Build API object instance's errorMessage property
+		BOOL flag = NO;
 
-    if (ide.errorMessage != nil)
-    {
-        if (ide.codeErrors.count > 0)
-        {
-            // Ignore all of this type of error message but for first line
+		if (saveDetailsCheckbox.state == NSOnState && errorCode == kErrorNetworkError)
+		{
+			// User has indicated they want the credentials saved for next time
+			// NOTE only save the credentials if we were unable to connect, ie. ignore rejected credentials
 
-            NSArray *lines = [ide.errorMessage componentsSeparatedByString:@"\n"];
-            [self writeToLog:[lines firstObject] :YES];
+			PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
+			NSString *untf = usernameTextField.stringValue;
+			NSString *pwtf = passwordTextField.stringValue;
 
-            // Get the agent code then device code errors
+			// Compare the entered value with the existing value - only overwrite if they are different
 
-            [self listCodeErrors:currentProject.projectAgentCode :@"Agent"];
-            [self listCodeErrors:currentProject.projectDeviceCode :@"Device"];
-            [self writeToLog:@" " :NO];
-            [self writeToLog:@"Server-reported syntax-check code errors listed above." :YES];
+			NSString *cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
 
-            // Clear the list of errors for next time
+			cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
 
-            [ide.codeErrors removeAllObjects];
-        }
-        else
-        {
-            [self writeToLog:ide.errorMessage :YES];
-        }
-    }
-    else
-    {
-        [self writeToLog:@"Connection error" :YES];
-    }
-}
+			if ([cs compare:untf] != NSOrderedSame)
+			{
+				[pc setString:[ide encodeBase64String:untf] forKey:@"com.bps.Squinter.ak.notional.tully"];
+				flag = YES;
+			}
 
+			cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
 
+			cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
 
-- (void)listCodeErrors:(NSString *)code :(NSString *)codeKind
-{
-    NSDictionary *codeError;
-    NSString *codeType;
-    BOOL flag = NO;
+			if ([cs compare:pwtf] != NSOrderedSame)
+			{
+				[pc setString:[ide encodeBase64String:pwtf] forKey:@"com.bps.Squinter.ak.notional.tilly"];
+				flag = YES;
+			}
 
-    for (NSUInteger i = 0 ; i < ide.codeErrors.count ; ++i)
-    {
-        codeError = [ide.codeErrors objectAtIndex:i];
-        codeType = [codeError valueForKey:@"type"];
+			if (flag) [self writeToLog:@"impCloud credentials saved in your keychain." :YES];
+		}
 
-        if ([codeType compare:[codeKind lowercaseString]] == NSOrderedSame)
-        {
-            if (!flag)
-            {
-                [self writeToLog:[NSString stringWithFormat:@"\n%@ code syntax errors:", codeKind] :NO];
-                flag = YES;
-            }
+		// Notify the user
 
-            NSNumber *r = [codeError valueForKey:@"row"];
-            NSUInteger row = r.longValue;
-            [self writeToLog:[codeError objectForKey:@"message"] :NO];
-            [self listCode:code :row - 5 :row + 5 :row];
-        }
-    }
-}
+		if (errorCode == kErrorNetworkError)
+		{
+			[self writeErrorToLog:@"[LOGIN ERROR] Could not access the Electric Imp impCloud. Please check your network connection." :YES];
+		}
+		else if (errorCode == kErrorLoginRejectCredentials)
+		{
+			[self writeErrorToLog:@"[LOGIN ERROR] Your impCloud access credentials have been rejected. Please check your username and password." : YES];
+		}
+		else
+		{
+			[self writeErrorToLog:[NSString stringWithFormat:@"[LOGIN ERROR] %@", errorMessage] : YES];
+		}
 
+		// Register that we are no longer trying to log in
 
+		loginFlag = NO;
+	}
+	else
+	{
+		// The error was not specifically related to log in
 
-#pragma mark - Model and Device ID Look-up Methods
+		NSString *errString = (errorCode == kErrorNetworkError) ? @"[NETWORK ERROR] " : @"";
 
-
-- (NSString *)getModelID:(NSInteger)index
-{
-    if (index < 0 || index > ide.models.count) return nil;
-    NSDictionary *mDict = [ide.models objectAtIndex:index];
-    return [mDict objectForKey:@"id"];
-}
-
-
-
-- (NSString *)getDeviceID:(NSInteger)index
-{
-    if (index < 0 || index > ide.devices.count) return nil;
-    NSDictionary *dDict = [ide.devices objectAtIndex:index];
-    return [dDict objectForKey:@"id"];
+		[self writeErrorToLog:[errString stringByAppendingString:errorMessage] :YES];
+	}
 }
 
 
@@ -6954,39 +9705,53 @@
 - (IBAction)externalOpen:(id)sender
 {
     // Open the original source code files an external editor
-    
-    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
 
-    if (sender == externalOpenDeviceItem || sender == externalOpenMenuItem || sender == viewDeviceCode)
+	if (currentDevicegroup == nil)
+	{
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	if (sender == externalOpenDeviceItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewDeviceCode)
     {
-        if (currentProject.projectDeviceCodePath)
+		for (Model *model in currentDevicegroup.models)
 		{
-			if (cv != kLower)
+			if ([model.type compare:@"device"] == NSOrderedSame)
 			{
-				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
-			}
-			else
-			{
-				[workspace openFile:currentProject.projectDeviceCodePath];
+				[self switchToEditor:model];
+				break;
 			}
 		}
     }
     
-    if (sender == externalOpenAgentItem || sender == externalOpenMenuItem || sender == viewAgentCode)
+    if (sender == externalOpenAgentItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewAgentCode)
     {
-        if (currentProject.projectAgentCodePath)
+		for (Model *model in currentDevicegroup.models)
 		{
-			if (cv != kLower)
+			if ([model.type compare:@"agent"] == NSOrderedSame)
 			{
-				[workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
-			}
-			else
-			{
-				[workspace openFile:currentProject.projectAgentCodePath];
+				[self switchToEditor:model];
+				break;
 			}
 		}
     }
+}
+
+
+
+- (void)switchToEditor:(Model *)model
+{
+	if (model.hasMoved)
+	{
+		// We've previously recorded that the model file or its parent project file have moved, so warn the user and bail
+
+		[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Source file \"%@\" can't be found it is known location.", model.filename] :YES];
+		return;
+	}
+
+	NSString *path = [NSString stringWithFormat:@"%@/%@", model.path, model.filename];
+	path = [self getAbsolutePath:currentProject.path :path];
+	[nswsw openFile:path];
 }
 
 
@@ -6994,158 +9759,150 @@
 - (IBAction)externalLibOpen:(id)sender
 {
     // Open class libraries in an external editor
-    
-    NSArray *keyArray;
-    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
 
-    if (sender == externalOpenLibItem)
+	if (sender == externalOpenLibsItem)
     {
-        if (currentProject.projectAgentLibraries.count > 0)
-        {
-            keyArray = [currentProject.projectAgentLibraries allKeys];
-            
-            for (NSUInteger i = 0 ; i < keyArray.count ; ++i)
-            {
-				// Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
-				
-				[NSThread sleepForTimeInterval:0.2];
-				NSString *path = [currentProject.projectAgentLibraries objectForKey:[keyArray objectAtIndex:i]];
-				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-				[workspace openFile:path withApplication:nil andDeactivate:NO];
-            }
-        }
-        
-        if (currentProject.projectDeviceLibraries.count > 0)
-        {
-            keyArray = [currentProject.projectDeviceLibraries allKeys];
-            
-			for (NSUInteger i = 0 ; i < currentProject.projectDeviceLibraries.count ; ++i)
-            {
-				[NSThread sleepForTimeInterval:0.2];
-				NSString *path = [currentProject.projectDeviceLibraries objectForKey:[keyArray objectAtIndex:i]];
-				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-				[workspace openFile:path withApplication:nil andDeactivate:NO];
+		for (Model *model in currentDevicegroup.models)
+		{
+			if (model.libraries.count > 0)
+			{
+				for (File *lib in model.libraries)
+				{
+					if (lib.hasMoved)
+					{
+						[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Library \"%@\" can't be found it is known location.", model.filename] :YES];
+					}
+					else
+					{
+						NSString *path = [self getAbsolutePath:currentProject.path :lib.path];
+						path = [path stringByAppendingFormat:@"/%@", lib.filename];
+						[nswsw openFile:path];
+
+						// Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
+
+						[NSThread sleepForTimeInterval:0.2];
+					}
+				}
 			}
-        }
+		}
     }
     else
     {
         NSMenuItem *item = (NSMenuItem *)sender;
-        NSInteger itemNumber = [item.menu indexOfItem:item];
+        NSString *name = item.representedObject;
 
-        // We always present agent libs then device libs, so if the itemNumber is greater than
-        // the number of items in the AgentProjectLibraryPaths, it's device code
-        
-        if (itemNumber - 1 < currentProject.projectAgentLibraries.count)
-        {
-			NSString *path = [currentProject.projectAgentLibraries objectForKey:item.title];
-			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-			[workspace openFile:path withApplication:nil andDeactivate:NO];
-        }
-        else
-        {
-			NSString *path = [currentProject.projectDeviceLibraries objectForKey:item.title];
-			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-			[workspace openFile:path withApplication:nil andDeactivate:NO];
-        }
-    }
+		for (Model *model in currentDevicegroup.models)
+		{
+			if (model.libraries.count > 0)
+			{
+				for (File *lib in model.libraries)
+				{
+					if ([lib.filename compare:name] == NSOrderedSame)
+					{
+						if (lib.hasMoved)
+						{
+							[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Library \"%@\" can't be found it is known location.", model.filename] :YES];
+							return;
+						}
+						else
+						{
+							NSString *path = [self getAbsolutePath:currentProject.path :lib.path];
+							path = [path stringByAppendingFormat:@"/%@", lib.filename];
+							[nswsw openFile:path];
+						}
+
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 
 
 
 - (IBAction)externalFileOpen:(id)sender
 {
-    // Open class libraries in an external editor
+	// Open included files in an external editor
 
-    NSArray *keyArray;
-    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
+	if (sender == externalOpenFileItem)
+	{
+		for (Model *model in currentDevicegroup.models)
+		{
+			if (model.files.count > 0)
+			{
+				for (File *file in model.files)
+				{
+					if (file.hasMoved)
+					{
+						[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" can't be found it is known location.", model.filename] :YES];
+					}
+					else
+					{
+						NSString *path = [self getAbsolutePath:currentProject.path :file.path];
+						path = [path stringByAppendingFormat:@"/%@", file.filename];
+						[nswsw openFile:path];
 
-    if (sender == externalOpenFileItem)
-    {
-        if (currentProject.projectAgentFiles.count > 0)
-        {
-            keyArray = [currentProject.projectAgentFiles allKeys];
+						// Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
 
-            for (NSUInteger i = 0 ; i < keyArray.count ; ++i)
-            {
-                // Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
+						[NSThread sleepForTimeInterval:0.2];
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		NSMenuItem *item = (NSMenuItem *)sender;
 
-                [NSThread sleepForTimeInterval:0.2];
-				NSString *path = [currentProject.projectAgentFiles objectForKey:[keyArray objectAtIndex:i]];
-				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-				[workspace openFile:path withApplication:nil andDeactivate:NO];
-            }
-        }
+		for (Model *model in currentDevicegroup.models)
+		{
+			if (model.files.count > 0)
+			{
+				for (File *file in model.files)
+				{
+					if ([file.filename compare:item.title] == NSOrderedSame)
+					{
+						if (file.hasMoved)
+						{
+							[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" can't be found it is known location.", model.filename] :YES];
 
-        if (currentProject.projectDeviceFiles.count > 0)
-        {
-            keyArray = [currentProject.projectDeviceFiles allKeys];
+						}
+						else
+						{
+							NSString *path = [self getAbsolutePath:currentProject.path :file.path];
+							path = [path stringByAppendingFormat:@"/%@", file.filename];
+							[nswsw openFile:path];
+						}
 
-            for (NSUInteger i = 0 ; i < currentProject.projectDeviceFiles.count ; ++i)
-            {
-                [NSThread sleepForTimeInterval:0.2];
-				NSString *path = [currentProject.projectDeviceFiles objectForKey:[keyArray objectAtIndex:i]];
-				if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-				[workspace openFile:path withApplication:nil andDeactivate:NO];
-            }
-        }
-    }
-    else
-    {
-        NSMenuItem *item = (NSMenuItem *)sender;
-        NSInteger itemNumber = [item.menu indexOfItem:item];
-
-        // We always present agent libs then device libs, so if the itemNumber is greater than
-        // the number of items in the AgentProjectLibraryPaths, it's device code
-
-        if (itemNumber < currentProject.projectAgentFiles.count)
-        {
-			NSString *path = [currentProject.projectAgentFiles objectForKey:item.title];
-			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-			[workspace openFile:path withApplication:nil andDeactivate:NO];
-        }
-        else
-        {
-			NSString *path = [currentProject.projectDeviceFiles objectForKey:item.title];
-			if (cv != kLower) path = [self getAbsolutePath:currentProject.projectPath :path];
-			[workspace openFile:path withApplication:nil andDeactivate:NO];
-        }
-    }
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 
 
 
 - (IBAction)externalOpenAll:(id)sender
 {
-    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
-
-	if (cv != kLower)
+	if (currentDevicegroup == nil)
 	{
-		if (currentProject.projectDeviceCodePath) [workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectDeviceCodePath]];
-
-		// Add a delay, or the second open is somehow missed out
-
-		[NSThread sleepForTimeInterval:0.2];
-
-		if (currentProject.projectAgentCodePath) [workspace openFile:[self getAbsolutePath:currentProject.projectPath :currentProject.projectAgentCodePath]];
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
 	}
-	else
-	{
-		if (currentProject.projectDeviceCodePath) [workspace openFile:currentProject.projectDeviceCodePath withApplication:nil andDeactivate:NO];
 
-		// Add a delay, or the second open is somehow missed out
+	[self externalOpen:externalOpenBothItem];
 
-		[NSThread sleepForTimeInterval:0.2];
+	// Add a delay, or the second open is somehow missed out
 
-		if (currentProject.projectAgentCodePath) [workspace openFile:currentProject.projectAgentCodePath withApplication:nil andDeactivate:NO];
-	}
+	[NSThread sleepForTimeInterval:0.2];
 
 	if (sender != externalOpenBothItem)
 	{
-		[self externalLibOpen:externalOpenLibItem];
+		[self externalLibOpen:externalOpenLibsItem];
+		[NSThread sleepForTimeInterval:0.2];
 		[self externalFileOpen:externalOpenFileItem];
 	}
 }
@@ -7154,439 +9911,55 @@
 
 - (IBAction)openAgentURL:(id)sender
 {
-	if (currentDevice == -1)
+	if (selectedDevice == nil)
 	{
-		// This should never appear: without a selected device, the menu item will be disabled
-
-		[self writeToLog:@"[ERROR] You have not selected a device." :YES];
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
-	NSDictionary *device = [ide.devices objectAtIndex:currentDevice];
-	NSString *uString = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", [device objectForKey:@"agent_id"]];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:uString]];
+	NSString *urlstring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]];
+
+	[nswsw openURL:[NSURL URLWithString:urlstring]];
 }
 
 
 
-#pragma mark - Preferences Methods
-
-
-- (IBAction)showPrefs:(id)sender
+- (IBAction)showProjectInFinder:(id)sender
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-    // Set working directory
-
-	workingDirectoryField.stringValue = @"";
-	workingDirectoryField.stringValue = workingDirectory;
-
-    // Set colour wells
-
-    float r = [[defaults objectForKey:@"com.bps.squinter.text.red"] floatValue];
-    float b = [[defaults objectForKey:@"com.bps.squinter.text.blue"] floatValue];
-    float g = [[defaults objectForKey:@"com.bps.squinter.text.green"] floatValue];
-    textColour = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
-
-    r = [[defaults objectForKey:@"com.bps.squinter.back.red"] floatValue];
-    b = [[defaults objectForKey:@"com.bps.squinter.back.blue"] floatValue];
-    g = [[defaults objectForKey:@"com.bps.squinter.back.green"] floatValue];
-    backColour = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
-
-    textColorWell.color = textColour;
-    [textColorWell setAction:@selector(showPanelForText)];
-    backColorWell.color = backColour;
-    [backColorWell setAction:@selector(showPanelForBack)];
-
-    // Set font name and size menus
-
-    [fontsMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue]];
-    NSInteger index = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue] - 9;
-    if (index == 9) index = 6;
-    [sizeMenu selectItemAtIndex:index];
-
-    // Set checkboxes
-
-    if ([defaults boolForKey:@"com.bps.squinter.preservews"])
-    {
-        preserveCheckbox.state = NSOnState;
-    }
-    else
-    {
-        preserveCheckbox.state = NSOffState;
-    }
-	
-	if ([defaults boolForKey:@"com.bps.squinter.autocompile"])
+	if (currentProject == nil)
 	{
-		autoCompileCheckbox.state = NSOnState;
-	}
-	else
-	{
-		autoCompileCheckbox.state = NSOffState;
-	}
-	
-	if ([defaults boolForKey:@"com.bps.squinter.autoload"])
-	{
-		loadModelsCheckbox.state = NSOnState;
-	}
-	else
-	{
-		loadModelsCheckbox.state = NSOffState;
-	}
-	
-	if ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"])
-	{
-		autoSelectDeviceCheckbox.state = NSOnState;
-	}
-	else
-	{
-		autoSelectDeviceCheckbox.state = NSOffState;
-	}
-	
-	if ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"])
-	{
-		autoUpdateCheckCheckbox.state = NSOnState;
-	}
-	else
-	{
-		autoUpdateCheckCheckbox.state = NSOffState;
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		return;
 	}
 
-	if ([defaults boolForKey:@"com.bps.squinter.showboldtext"])
-	{
-		boldTestCheckbox.state = NSOnState;
-	}
-	else
-	{
-		boldTestCheckbox.state = NSOffState;
-	}
-
-	// Set location menu
-
-	[locationMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue]];
-
-    // Show the sheet
-
-    [_window beginSheet:preferencesSheet completionHandler:nil];
-
-    // Save request for credentials until after the sheet has appeared
-    // (Makes connection between credential request and field more obvious)
-
-    if ([[defaults stringForKey:@"com.bps.squinter.ak.count"] compare:@"xxx"] == NSOrderedSame)
-    {
-        akTextField.stringValue = @"";
-    }
-    else
-    {
-        PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
-        akTextField.stringValue = [ide decodeBase64String:[pc stringForKey:@"com.bps.Squinter.ak.notional.tally"]];
-    }
+	[nswsw selectFile:[NSString stringWithFormat:@"%@/%@", currentProject.path, currentProject.filename] inFileViewerRootedAtPath:currentProject.path];
 }
 
 
 
-- (IBAction)cancelPrefs:(id)sender
+- (IBAction)showModelFilesInFinder:(id)sender
 {
-    [_window endSheet:preferencesSheet];
-}
-
-
-
-- (IBAction)setPrefs:(id)sender
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	BOOL changeFlag = NO;
-
-    workingDirectory = workingDirectoryField.stringValue;
-
-    if (preserveCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.preservews"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.preservews"];
-    }
-	
-	if (autoCompileCheckbox.state == NSOnState)
+	if (currentDevicegroup == nil)
 	{
-		[defaults setBool:YES forKey:@"com.bps.squinter.autocompile"];
+		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
 	}
-	else
-	{
-		[defaults setBool:NO forKey:@"com.bps.squinter.autocompile"];
-	}
-	
-	if (autoSelectDeviceCheckbox.state == NSOnState)
-	{
-		[defaults setBool:YES forKey:@"com.bps.squinter.autoselectdevice"];
-	}
-	else
-	{
-		[defaults setBool:NO forKey:@"com.bps.squinter.autoselectdevice"];
-	}
-	
-	if (autoUpdateCheckCheckbox.state == NSOnState)
-	{
-		[defaults setBool:YES forKey:@"com.bps.squinter.autocheckupdates"];
-	}
-	else
-	{
-		[defaults setBool:NO forKey:@"com.bps.squinter.autocheckupdates"];
-	}
-	
-	if ([akTextField.stringValue compare:@""] != NSOrderedSame)
-	{
-		[defaults setObject:@"something" forKey:@"com.bps.squinter.ak.count"];
 
-        // Keychain
+	if (currentDevicegroup.models.count > 0)
+	{
+		Model *md = [currentDevicegroup.models objectAtIndex:0];
+		NSString *mPath = [self getAbsolutePath:currentProject.path :md.path];
 
-        PDKeychainBindings *pk = [PDKeychainBindings sharedKeychainBindings];
-		NSString *t = [ide decodeBase64String:[pk stringForKey:@"com.bps.Squinter.ak.notional.tally"]];
+		if (mPath.length > 0) [nswsw selectFile:[NSString stringWithFormat:@"%@/%@", mPath, md.filename] inFileViewerRootedAtPath:mPath];
 
-		if ([t compare:akTextField.stringValue] != NSOrderedSame)
+		if (currentDevicegroup.models.count > 1)
 		{
-			// API key changed
+			md = [currentDevicegroup.models objectAtIndex:1];
+			NSString *mPath2 = [self getAbsolutePath:currentProject.path :md.path];
 
-			[pk setObject:[ide encodeBase64String:akTextField.stringValue] forKey:@"com.bps.Squinter.ak.notional.tally"];
-			changeFlag = YES;
+			if ([mPath compare:mPath2] != NSOrderedSame) [nswsw selectFile:[NSString stringWithFormat:@"%@/%@", mPath2, md.filename] inFileViewerRootedAtPath:mPath2];
 		}
 	}
-    else
-    {
-        // Clear credo
-
-        [defaults setObject:@"xxx" forKey:@"com.bps.squinter.ak.count"];
-        [ide clrk];
-
-        PDKeychainBindings *pk = [PDKeychainBindings sharedKeychainBindings];
-        [pk setObject:@"" forKey:@"com.bps.Squinter.ak.notional.tally"];
-    }
-
-	if (loadModelsCheckbox.state == NSOnState)
-	{
-		[defaults setBool:YES forKey:@"com.bps.squinter.autoload"];
-	}
-	else
-	{
-		[defaults setBool:NO forKey:@"com.bps.squinter.autoload"];
-	}
-
-	if (boldTestCheckbox.state == NSOnState)
-	{
-		[defaults setBool:YES forKey:@"com.bps.squinter.showboldtext"];
-	}
-	else
-	{
-		[defaults setBool:NO forKey:@"com.bps.squinter.showboldtext"];
-	}
-
-    textColour = textColorWell.color;
-    backColour = backColorWell.color;
-
-    float r = (float)[textColour redComponent];
-    float b = (float)[textColour blueComponent];
-    float g = (float)[textColour greenComponent];
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.text.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.text.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.text.blue"];
-
-    r = (float)[backColour redComponent];
-    b = (float)[backColour blueComponent];
-    g = (float)[backColour greenComponent];
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.back.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.back.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.back.blue"];
-
-    if (r == 0) r = 0.1;
-    if (b == 0) b = 0.1;
-    if (g == 0) g = 0.1;
-
-    NSUInteger a = 100 * r * b * g;
-    if (a < 30)
-    {
-        [logScrollView setScrollerKnobStyle:NSScrollerKnobStyleLight];
-    }
-    else
-    {
-        [logScrollView setScrollerKnobStyle:NSScrollerKnobStyleDark];
-    }
-
-    NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
-    NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
-    if (fontSize == 15) fontSize = 18;
-
-	logTextView.font = [self setLogViewFont:fontName :fontSize :(boldTestCheckbox.state == NSOnState)];
-	[logTextView setTextColor:textColour];
-    [logClipView setBackgroundColor:backColour];
-
-    [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
-    [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
-
-	[defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
-
-	// Close the sheet
-
-    [_window endSheet:preferencesSheet];
-
-	if (changeFlag)
-	{
-		// API key changed, so refresh lists
-
-		[self writeToLog:@"API Key changed - getting fresh list of models from the server..." :YES];
-		[ide.devices removeAllObjects];
-		[ide.models removeAllObjects];
-		currentDevice = -1;
-		currentModel = -1;
-
-		[self updateMenus];
-		[self getApps];
-	}
-}
-
-
-
-- (IBAction)chooseWorkingDirectory:(id)sender
-{
-    if (choosePanel) choosePanel = nil;
-    choosePanel = [NSOpenPanel openPanel];
-    choosePanel.message = @"Select a directory for your projects...";
-    choosePanel.canChooseFiles = NO;
-    choosePanel.canChooseDirectories = YES;
-    choosePanel.canCreateDirectories = YES;
-    choosePanel.allowsMultipleSelection = NO;
-    choosePanel.delegate = self;
-
-    // Run the NSOpenPanel
-
-    [choosePanel beginSheetModalForWindow:preferencesSheet
-                       completionHandler:^(NSInteger result)
-     {
-         // Close sheet first to stop it hogging the event queue
-
-         [NSApp stopModal];
-         [NSApp endSheet:choosePanel];
-         [choosePanel orderOut:self];
-
-         if (result == NSFileHandlingPanelOKButton) [self setWorkingDirectory:[choosePanel URLs]];
-     }
-     ];
-
-    [NSApp runModalForWindow:choosePanel];
-    [choosePanel makeKeyWindow];
-}
-
-
-
-- (void)setWorkingDirectory:(NSArray *)urls
-{
-    NSURL *url = [urls objectAtIndex:0];
-    NSString *path = [url path];
-    workingDirectoryField.stringValue = path;
-}
-
-
-
-- (NSString *)getFontName:(NSInteger)index
-{
-    NSString *fontName = @"";
-
-    switch (index)
-    {
-        case 0:
-            fontName = @"Andale Mono";
-            break;
-
-        case 1:
-            fontName = @"Courier";
-            break;
-
-        case 2:
-            fontName = @"Menlo";
-            break;
-
-        case 3:
-            fontName = @"Monaco";
-            break;
-
-		case 4:
-            fontName = @"Source Code Pro";
-            break;
-
-        default:
-            fontName = @"Menlo";
-            break;
-    }
-
-    return fontName;
-}
-
-
-
-- (void)showPanelForText
-{
-    [textColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForBack
-{
-    [backColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-#pragma mark - About and Help Sheet Methods
-
-
-- (IBAction)showAboutSheet:(id)sender
-{
-    [aboutVersionLabel setStringValue:[NSString stringWithFormat:@"Version %@.%@",
-                [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
-                [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]];
-    [_window beginSheet:aboutSheet completionHandler:nil];
-}
-
-
-
-- (IBAction)closeAboutSheet:(id)sender
-{
-    [_window endSheet:aboutSheet];
-}
-
-
-
-- (IBAction)showHideToolbar:(id)sender
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-	if (squinterToolbar.isVisible)
-    {
-        squinterToolbar.visible = NO;
-        showHideToolbarMenuItem.title = @"Show Toolbar";
-        [defaults setValue:[NSNumber numberWithBool:NO] forKey:@"com.bps.squinter.toolbarstatus"];
-    }
-    else
-    {
-        squinterToolbar.visible = YES;
-        showHideToolbarMenuItem.title = @"Hide Toolbar";
-		[defaults setValue:[NSNumber numberWithBool:YES] forKey:@"com.bps.squinter.toolbarstatus"];
-    }
-}
-
-
-
-- (IBAction)showAuthor:(id)sender
-{
-    if (sender == author01) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/carlbrown/PDKeychainBindingsController"]];
-    if (sender == author02) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/bdkjones/VDKQueue"]];
-    if (sender == author03) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/uliwitness/UliKit"]];
-    if (sender == author04) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/buildapi/"]];
-	if (sender == author05) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/adobe-fonts/source-code-pro"]];
-	if (sender == author06) [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"]];
 }
 
 
@@ -7594,401 +9967,129 @@
 #pragma mark - UI Update Methods
 
 
-- (void)updateMenus
+- (void)refreshProjectsMenu
 {
-    // Single point to run all the menu-setting methods
-	
-	[self setProjectMenu];
-	[self setModelsMenu];
-	[self setDeviceMenu];
-	[self setViewMenu];
-}
+	// Manages the Projects menu's state,
+	// except for the Open Projects submenu ('refreshOpenProjectsMenu')
+	// and the Current Products submenu ('refreshProductsmenu')
 
-
-
-- (void)setDeviceMenu
-{
-    // Sets the state of various device menu entries
-
-    if (currentDevice != -1)
-    {
-        // There is a current device, so add its name to the menus
-		
-		NSDictionary *device = [ide.devices objectAtIndex:currentDevice];
-		NSString *dString = [device objectForKey:@"name"];
-		NSString *dId = [device objectForKey:@"id"];
-
-        showSelectedMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", dString];
-		restartSelectedMenuItem.title = [NSString stringWithFormat:@"Restart “%@”", dString];
-		copySelectedMenuItem.title = [NSString stringWithFormat:@"Copy ”%@” Agent URL", dString];
-		openAgentURLMenuItem.title = [NSString stringWithFormat:@"Open ”%@” Agent URL", dString];
-        unassignSelectedMenuItem.title = [NSString stringWithFormat:@"Unassign “%@”", dString];
-        removeSelectedMenuItem.title = [NSString stringWithFormat:@"Remove “%@” from Your Account", dString];
-        getLogsSelectedMenuItem.title = [NSString stringWithFormat:@"Get Logs from “%@”", dString];
-        
-		// Update the stream item according to whether we are streaming or not
-		
-        if ([ide isDeviceLogging:dId])
-        {
-            streamLogsMenuItem.title = [NSString stringWithFormat:@"Stop Log Stream from “%@”", dString];
-        }
-        else
-        {
-            streamLogsMenuItem.title = [NSString stringWithFormat:@"Start Log Stream from “%@”", dString];
-        }
-		
-		// Enable all the menu items
-		
-		for (NSUInteger i = 0 ; i < deviceMenu.numberOfItems ; ++i)
-		{
-			NSMenuItem *item = [deviceMenu itemAtIndex:i];
-			item.enabled = YES;
-		}
-		
-		// But if the selected device is unassigned, turn off the unassign menu item
-		
-		if ((NSNull *)[device objectForKey:@"model_id"] == [NSNull null]) unassignSelectedMenuItem.enabled = NO;
-    }
-    else
-    {
-        // No device is current, so apply generic menu names
-		
-		showSelectedMenuItem.title = @"Show Selected Device Info";
-		restartSelectedMenuItem.title = @"Restart Selected Device";
-		copySelectedMenuItem.title = @"Copy Selected Device’s Agent URL";
-		openAgentURLMenuItem.title = @"Open Selected Device’s Agent URL";
-		unassignSelectedMenuItem.title = @"Unassign Selected Device";
-        removeSelectedMenuItem.title = @"Remove Selected Device from Your Account";
-        getLogsSelectedMenuItem.title = @"Get Logs from Selected Device";
-        streamLogsMenuItem.title = @"Start Log Stream from Selected Device";
-        
-		// Disable all menu items but the last - no device selected so nothing to action
-		
-		for (NSUInteger i = 0 ; i < deviceMenu.numberOfItems - 1 ; ++i)
-		{
-            // Assumes last item on menu (Update Devices’ Status) is always last
-
-            NSMenuItem *item = [deviceMenu itemAtIndex:i];
-			item.enabled = NO;
-		}
-		
-		// Enable last item (update status)
-		
-		NSMenuItem *item = [deviceMenu itemAtIndex:(deviceMenu.numberOfItems - 1)];
-		item.enabled = YES;
-		
-		// If we have devices, make sure the rename device menu item is enabled
-		
-		if (ide.devices.count > 0) renameDeviceMenuItem.enabled = YES;
-    }
-	
-	// Enable or disable the devices popup according to whether we have devices listed or not
-	
-	if (ide.devices.count == 0) 
-	{
-		devicesPopUp.enabled = NO;
-	}
-	else
-	{
-		devicesPopUp.enabled = YES;
-	}
-}
-
-
-
-- (void)setModelsMenu
-{
-	// Sets the state of various model menu entries
-	
-	if (currentModel != -1)
-    {
-        // A model has been chosen so update menu items with selected model's name
-
-        NSString *mString = [[modelsMenu itemAtIndex:currentModel] title];
-        showModelInfoMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", mString];
-        showModelCodeMenuItem.title = [NSString stringWithFormat:@"Show “%@” Code in Log", mString];
-        deleteModelMenuItem.title = [NSString stringWithFormat:@"Delete “%@”", mString];
-        saveModelProjectMenuItem.title = [NSString stringWithFormat:@"Save “%@” as a Project...", mString];
-		restartDevicesModelMenuItem.title = [NSString stringWithFormat:@"Restart All “%@” Devices", mString];
-
-        // Enable model menu items that require a model selection
-
-        showModelInfoMenuItem.enabled = YES;
-		showModelCodeMenuItem.enabled = YES;
-		deleteModelMenuItem.enabled = YES;
-        saveModelProjectMenuItem.enabled = YES;
-        
-        // Enable or disable items that also require a project selection
-
-        if (currentProject != nil)
-        {
-            // Project selected and a model selected
-
-            linkMenuItem.title = [NSString stringWithFormat:@"Link Model “%@” to Project “%@”", mString, currentProject.projectName];
-            linkMenuItem.enabled = YES;
-        }
-        else
-        {
-            // Model selected but no project selected
-
-            linkMenuItem.title = [NSString stringWithFormat:@"Link Model “%@” to a Project", mString];
-            linkMenuItem.enabled = NO;
-        }
-
-		// Enable or disable items that also require models with devices
-
-		NSMutableDictionary *aModel = [ide.models objectAtIndex:currentModel];
-		NSArray *mDevs = [aModel objectForKey:@"devices"];
-
-		if (mDevs.count > 0)
-		{
-			restartDevicesModelMenuItem.enabled = YES;
-		}
-		else
-		{
-			restartDevicesModelMenuItem.enabled = NO;
-		}
-    }
-    else
-    {
-        // There's no selected model, so zero everything; make names generic
-
-        showModelInfoMenuItem.title = @"Show Selected Model Info";
-        showModelCodeMenuItem.title = @"Show Selected Model Code in Log";
-        deleteModelMenuItem.title = @"Delete Selected Model";
-        saveModelProjectMenuItem.title = @"Save Selected Model as a Project...";
-		restartDevicesModelMenuItem.title = @"Restart All Selected Model’s Devices";
-
-        showModelInfoMenuItem.enabled = NO;
-        showModelCodeMenuItem.enabled = NO;
-        deleteModelMenuItem.enabled = NO;
-        saveModelProjectMenuItem.enabled = NO;
-		restartDevicesModelMenuItem.enabled = NO;
-
-        // Update items that may have a project selection
-
-        if (currentProject != nil)
-        {
-            // Project selected but no model selected
-
-            linkMenuItem.title = [NSString stringWithFormat:@"Link a Model to Project “%@”", currentProject.projectName];
-        }
-        else
-        {
-            // Neither project nor model selected
-
-            linkMenuItem.title = @"Link a Model to a Project";
-        }
-
-        linkMenuItem.enabled = NO;
-    }
-
-    // Update items that only need a list of apps
-
-	if (ide.models.count > 0)
-	{
-		renameModelMenuItem.enabled = YES;
-		assignDeviceModelMenuItem.enabled = YES;
-	}
-	else
-	{
-		renameModelMenuItem.enabled = NO;
-		assignDeviceModelMenuItem.enabled = NO;
-	}
-}
-
-
-
-- (void)setProjectMenu
-{
-    // Set the Project menu's state 
-	// NOTE this does not manage the Current Open Projects submenu - this is handled
-	// by closeProject: and addProjectMenuItem:
-	
 	if (currentProject != nil)
-    {
-        // A project has been selected - update the menu items with its name
-		
-		squintMenuItem.title = [NSString stringWithFormat:@"Compile Project “%@”", currentProject.projectName];
-        cleanMenuItem.title = [NSString stringWithFormat:@"Clean Project “%@”", currentProject.projectName];
-		squintMenuItem.enabled = YES;
-		cleanMenuItem.enabled = YES;
-		
-		externalOpenMenuItem.title = [NSString stringWithFormat:@"View “%@” Main Files in Editor", currentProject.projectName];
-		externalOpenLibItem.title = [NSString stringWithFormat:@"View “%@” Library Files in Editor", currentProject.projectName];
-        externalOpenFileItem.title = [NSString stringWithFormat:@"View “%@” Linked Files in Editor", currentProject.projectName];
+	{
+		// A project is selected
 
-		checkElectricImpLibrariesItem.title = [NSString stringWithFormat:@"Check “%@” Electric Imp Libraries", currentProject.projectName];
-		checkElectricImpLibrariesItem.enabled = (currentProject.projectImpLibs.count > 0) ? YES : NO;
-		
-		copyAgentCodeItem.enabled = (currentProject.projectSquinted > 1);
-		copyDeviceCodeItem.enabled = (currentProject.projectSquinted == 1 || currentProject.projectSquinted == 3);
-		
-		if (currentModel != -1)
-        {
-            // Model and Project selected
+		showProjectInfoMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", currentProject.name];
+		showProjectFinderMenuItem.title = [NSString stringWithFormat:@"Show “%@” in Finder", currentProject.name];
+		renameProjectMenuItem.title = [NSString stringWithFormat:@"Edit “%@”...", currentProject.name];
+		syncProjectMenuItem.title = currentProject.pid.length > 0 ? [NSString stringWithFormat:@"Sync “%@”", currentProject.name] : [NSString stringWithFormat:@"Upload “%@”", currentProject.name];
 
-            NSDictionary *mDict = [ide.models objectAtIndex:currentModel];
-            projectLinkMenuItem.title = [NSString stringWithFormat:@"Link Project “%@” to Model “%@”", currentProject.projectName, [mDict objectForKey:@"name"]];
-			projectLinkMenuItem.enabled = YES;
-        }
-        else
-        {
-            // Project selected but no Model
-
-            projectLinkMenuItem.title = [NSString stringWithFormat:@"Link “%@’ to a Model", currentProject.projectName];
-            projectLinkMenuItem.enabled = NO;
-        }
-
-		if (currentProject.projectModelID != nil)
+		if (selectedProduct != nil)
 		{
-			// Does the current project have a linked model?
+			// ...and a product is selected
 
-			NSString *mName;
-			BOOL nameFlag = NO;
-
-			for (NSDictionary *model in ide.models)
-			{
-				NSString *mID = [model objectForKey:@"id"];
-
-				if ([currentProject.projectModelID compare:mID] == NSOrderedSame)
-				{
-					mName = [model objectForKey:@"name"];
-					nameFlag = YES;
-					break;
-				}
-			}
-
-
-			if (nameFlag)
-			{
-				uploadMenuItem.title = [NSString stringWithFormat:@"Upload Project “%@” to Model “%@”", currentProject.projectName, mName];
-				uploadMenuItem.enabled = YES;
-			}
-			else
-			{
-				uploadMenuItem.title = [NSString stringWithFormat:@"Upload Project “%@” to a Model", currentProject.projectName];
-				uploadMenuItem.enabled = NO;
-			}
+			NSString *pName = [self getValueFrom:selectedProduct withKey:@"name"];
+			linkProductMenuItem.title = [NSString stringWithFormat:@"Link Product “%@” to Project “%@”", pName, currentProject.name];
 		}
 		else
 		{
-			// We have no linked model, so suggest the currently selected one
+			// ...but a product is not
 
-			uploadMenuItem.title = [NSString stringWithFormat:@"Upload Project “%@” to a Model", currentProject.projectName];
-			uploadMenuItem.enabled = NO;
+			linkProductMenuItem.title = [NSString stringWithFormat:@"Link Product to Project “%@”", currentProject.name];
 		}
-
-    }
-    else
-    {
-        // No project selected
-		
-		squintMenuItem.title = @"Compile Current Project";
-		cleanMenuItem.title = @"Clean Current Project";
-		squintMenuItem.enabled = NO;
-		cleanMenuItem.enabled = NO;
-		copyAgentCodeItem.enabled = NO;
-		copyDeviceCodeItem.enabled = NO;
-		
-		externalOpenMenuItem.title = @"Open Main Files in Editor";
-		externalOpenLibItem.title = @"Open Library Files in Editor";
-		externalOpenFileItem.title = @"Open Linked Files in Editor";
-
-		checkElectricImpLibrariesItem.title = @"Check Project Electric Imp Libraries";
-		checkElectricImpLibrariesItem.enabled = NO;
-
-		// Reset Open Libs submenu
-		
-		[externalLibsMenu removeAllItems];
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
-		[externalLibsMenu addItem:item];
-		item.enabled = NO;
-
-        // Reset Open Files submenu
-
-        [externalFilesMenu removeAllItems];
-        item = [[NSMenuItem alloc] initWithTitle:@"None" action:NULL keyEquivalent:@""];
-        [externalFilesMenu addItem:item];
-        item.enabled = NO;
-
-        if (currentModel != -1)
-        {
-            // Model selected but no project
-
-            NSDictionary *mDict = [ide.models objectAtIndex:currentModel];
-            uploadMenuItem.title = [NSString stringWithFormat:@"Upload a Project to Model “%@”", [mDict objectForKey:@"name"]];
-            projectLinkMenuItem.title = [NSString stringWithFormat:@"Link a Project to Model “%@”", [mDict objectForKey:@"name"]];
-		}
-        else
-        {
-            // Neither Project nor Model selected
-
-            projectLinkMenuItem.title = @"Link a Project to a Model";
-            uploadMenuItem.title = @"Upload a Project to a Model";
-        }
-		
-		uploadMenuItem.enabled = NO;
-		projectLinkMenuItem.enabled = NO;
 	}
+	else
+	{
+		// No project selected...
+
+		showProjectInfoMenuItem.title = @"Show Project Info";
+		showProjectFinderMenuItem.title = @"Show Project in Finder";
+		renameProjectMenuItem.title = @"Edit Project...";
+		syncProjectMenuItem.title = @"Upload Project";
+
+		if (selectedProduct != nil)
+		{
+			// ...but a product is selected
+
+			NSString *pName = [self getValueFrom:selectedProduct withKey:@"name"];
+			linkProductMenuItem.title = [NSString stringWithFormat:@"Link Product “%@” to Project", pName];
+		}
+		else
+		{
+			// ...and neither is a product
+
+			linkProductMenuItem.title = @"Link Product to Project";
+		}
+	}
+
+	// We only need to update the Projects menu's product-specific entries when a product is chosen
+
+	if (selectedProduct != nil)
+	{
+		NSString *pName = [self getValueFrom:selectedProduct withKey:@"name"];
+
+		downloadProductMenuItem.title = [NSString stringWithFormat:@"Download “%@”", pName];
+		deleteProductMenuItem.title = [NSString stringWithFormat:@"Delete “%@”", pName];
+		renameProductMenuItem.title = [NSString stringWithFormat:@"Edit “%@”...", pName];
+	}
+	else
+	{
+		downloadProductMenuItem.title = @"Download Product";
+		deleteProductMenuItem.title = @"Delete Product";
+		renameProductMenuItem.title = @"Edit Product...";
+	}
+
+	showProjectInfoMenuItem.enabled = (currentProject != nil) ? YES : NO;
+	showProjectFinderMenuItem.enabled = (currentProject != nil) ? YES : NO;
+	renameProjectMenuItem.enabled = (currentProject != nil) ? YES : NO;
+	downloadProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
+	linkProductMenuItem.enabled = (currentProject != nil && selectedProduct != nil) ? YES : NO;
+	deleteProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
+	renameProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
+	syncProjectMenuItem.enabled = (currentProject != nil && currentProject.pid.length == 0) ? YES : NO;
+
+	// Update the File menu's one changeable item
+
+	fileAddFilesMenuItem.enabled = (currentProject != nil) ? YES : NO;
 }
 
 
 
-- (void)setViewMenu
+- (void)refreshOpenProjectsMenu
 {
-    // The View menu has two items. These are only actionable if there is a selected project
-	// and that project has been compiled
-	
-	if (currentProject != nil && currentProject.projectSquinted > 0)
-    {
-        logDeviceCodeMenuItem.enabled = YES;
-        logAgentCodeMenuItem.enabled = YES;
-    }
-    else
-    {
-        logDeviceCodeMenuItem.enabled = NO;
-        logAgentCodeMenuItem.enabled = NO;
-    }
-}
+	// This method manages the Open projects submenu of the Projects menu
+	// It also handles the Projects Popup
 
-
-
-- (void)setProjectLists
-{
-	[projectsMenu removeAllItems];
+	[openProjectsMenu removeAllItems];
 	[projectsPopUp removeAllItems];
+
+	NSMenuItem *item;
 
 	if (projectArray.count > 0)
 	{
 		// There are projects to list, so add them all to the menu and the pop-up
 
-		for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
+		for (Project *project in projectArray)
 		{
-			Project *project = [projectArray objectAtIndex:i];
-			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:project.projectName action:@selector(chooseProject:) keyEquivalent:@""];
+			NSString *name = project.name;
+			item = [[NSMenuItem alloc] initWithTitle:name action:@selector(chooseProject:) keyEquivalent:@""];
 			item.representedObject = project;
-			[projectsMenu addItem:item];
-			[projectsPopUp addItemWithTitle:project.projectName];
-			NSInteger index = [projectsPopUp indexOfItemWithTitle:project.projectName];
-			NSMenuItem *subitem = [projectsPopUp itemAtIndex:index];
-			subitem.tag = [projectsMenu indexOfItem:item];
+			[openProjectsMenu addItem:item];
+			[projectsPopUp addItemWithTitle:name];
+			NSMenuItem *subitem = [projectsPopUp itemAtIndex:[projectsPopUp indexOfItemWithTitle:project.name]];
+			subitem.tag = [openProjectsMenu indexOfItem:item];
 		}
 
 		if (currentProject != nil)
 		{
 			// We have a project selected, so mark it as such in the menu and pop-up
 
-			NSMenuItem *selected = [projectsMenu itemWithTitle:currentProject.projectName];
-			for (NSUInteger i = 0 ; i < projectsMenu.numberOfItems ; ++i)
-			{
-				NSMenuItem *anItem = [projectsMenu itemAtIndex:i];
+			NSMenuItem *selected = [openProjectsMenu itemWithTitle:currentProject.name];
 
+			for (NSMenuItem *anItem in openProjectsMenu.itemArray)
+			{
 				if (anItem == selected)
 				{
 					anItem.state = NSOnState;
 					[projectsPopUp selectItemWithTitle:selected.title];
-					projectsPopUp.enabled = YES;
 				}
 				else
 				{
@@ -7996,15 +10097,739 @@
 				}
 			}
 		}
+
+		projectsPopUp.enabled = YES;
 	}
 	else
 	{
-		// No projects open, so just add 'None' items to the menu and the pop-up
+		// No projects open, so just add 'None' items to the the pop-up
 
-		NSMenuItem *noneItem = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
-		[projectsMenu addItem:noneItem];
+		item = [[NSMenuItem alloc] initWithTitle:@"Create New Project"
+										  action:@selector(newProject:)
+								   keyEquivalent:@""];
+		item.enabled = YES;
+		item.state = NSOffState;
+		[openProjectsMenu addItem:item];
+
 		[projectsPopUp addItemWithTitle:@"None"];
+		projectsPopUp.enabled = NO;
 	}
+}
+
+
+
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject
+{
+	// Create a new menu entry to the 'Projects' menu’s 'Open Projects' submenu and to the Current Project popup
+	// For the Open Projects submenu, each menu item's representedObject points to the named project
+	// For the Current Project popup, each menu item's tag is set to the index of the project in the submenu
+	// This allows us to choose projects irrespective of the name used in the menu, for example letting us
+	// distinguish between 'explorer' and 'explorer 2'
+
+	// Run through the existing menu items, to check that we're not adding one already there
+	// If there are no menu items, we can proceed safely
+
+	if (projectArray == nil || projectArray.count == 0)
+	{
+		// There are no open projects yet (the one we're adding is the first
+		// so clear the 'None' entries from the menu pop-up
+
+		[openProjectsMenu removeAllItems];
+		[projectsPopUp removeAllItems];
+	}
+	else
+	{
+		// There are projects, so check that the passed in title is not on the menu already
+		// TODO should have checked this already, so we can dispose of this section eventually
+
+		for (NSMenuItem *item in openProjectsMenu.itemArray)
+		{
+			if ([item.title compare:menuItemTitle] == NSOrderedSame)
+			{
+				// The title is there already - but does the menu item reference the same project?
+
+				if (aProject == item.representedObject)
+				{
+					// Yes it does, so signal failure to add
+
+					return NO;
+				}
+			}
+		}
+	}
+
+	// Switch off all the menu items
+
+	if (openProjectsMenu.itemArray.count > 0)
+	{
+		for (NSMenuItem *item in openProjectsMenu.itemArray)
+		{
+			if (item.state == NSOnState) item.state = NSOffState;
+		}
+	}
+
+	// Add the menu to the list of open projects and select it...
+
+	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:menuItemTitle action:@selector(chooseProject:) keyEquivalent:@""];
+	item.representedObject = aProject;
+	item.state = NSOnState;
+	[openProjectsMenu addItem:item];
+
+	// ...and add it to the popup and select it
+
+	[projectsPopUp addItemWithTitle:menuItemTitle];
+	NSMenuItem *pitem = [projectsPopUp itemWithTitle:menuItemTitle];
+	pitem.tag = [openProjectsMenu indexOfItem:item];
+	projectsPopUp.enabled = YES;
+	[projectsPopUp selectItem:pitem];
+
+	// Return success
+	
+	return YES;
+}
+
+
+
+- (void)refreshProductsMenu
+{
+	// This method manages the Current Products submenu of the Projects menu
+	// It should ONLY be called as a consequence of getting a list of products
+	// from the server
+
+	NSMenuItem *item;
+
+	[productsMenu removeAllItems];
+
+	if (productsArray == nil)
+	{
+		// No products in the list, so warn the user and bail
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Get Products List"
+										  action:@selector(getProductsFromServer:)
+								   keyEquivalent:@""];
+		item.enabled = YES;
+		item.state = NSOffState;
+		[productsMenu addItem:item];
+		return;
+	}
+
+	if (productsArray.count == 0)
+	{
+		// No products in the list, so warn the user and bail
+
+		item = [[NSMenuItem alloc] initWithTitle:@"None"
+										  action:nil
+								   keyEquivalent:@""];
+		item.enabled = NO;
+		item.state = NSOffState;
+		[productsMenu addItem:item];
+		return;
+	}
+
+	for (NSMutableDictionary *aProduct in productsArray)
+	{
+		// Run through the list of products and add a menu item for each
+
+		NSString *name = [self getValueFrom:aProduct withKey:@"name"];
+		item = [[NSMenuItem alloc] initWithTitle:name
+										  action:@selector(chooseProduct:)
+								   keyEquivalent:@""];
+		item.representedObject = aProduct;
+		item.state = NSOffState;
+		[productsMenu addItem:item];
+	}
+
+	// Add the update command
+
+	item = [NSMenuItem separatorItem];
+	[productsMenu addItem:item];
+
+	item = [[NSMenuItem alloc] initWithTitle:@"Update Products List"
+									  action:@selector(getProductsFromServer:)
+							   keyEquivalent:@""];
+	item.enabled = YES;
+	item.state = NSOffState;
+	item.representedObject = nil;
+	[productsMenu addItem:item];
+
+	// Re-select the existing item or select the first on the list
+	// NOTE we do this by comparing IDs because the selected product's
+	// reference will have changed if the list was updated
+
+	if (selectedProduct != nil)
+	{
+		for (item in productsMenu.itemArray)
+		{
+			if (item.representedObject == selectedProduct)
+			{
+				item.state = NSOnState;
+				break;
+			}
+		}
+	}
+	else
+	{
+		// Select the first item on the list unless the currentProject has an associated product
+
+		if (currentProject.pid != nil && currentProject.pid.length > 0)
+		{
+			BOOL done = NO;
+
+			for (NSMutableDictionary *product in productsArray)
+			{
+				NSString *apid = [self getValueFrom:product withKey:@"id"];
+
+				if ([apid compare:currentProject.pid] == NSOrderedSame)
+				{
+					for (NSMenuItem *item in productsMenu.itemArray)
+					{
+						// Compare the product objects' 'id' keys
+
+						if (item.representedObject == product)
+						{
+							item.state = NSOnState;
+							done = YES;
+							break;
+						}
+					}
+				}
+
+				if (done) break;
+			}
+		}
+		else if (productsArray.count > 0)
+		{
+			// Choose first item on the list - if there is something to choose
+
+			NSMenuItem *item = [productsMenu.itemArray objectAtIndex:0];
+			item.state = NSOnState;
+			selectedProduct = item.representedObject;
+		}
+	}
+}
+
+
+
+- (void)refreshDevicegroupMenu
+{
+	// Rebuild the Device Groups menu's submenu of current project device groups
+	// This menu controls the View menu
+
+	NSMenuItem *item;
+
+	// First, clear the current menu, if it has any items
+
+	if (deviceGroupsMenu.itemArray.count > 0) [deviceGroupsMenu removeAllItems];
+
+	// No device groups in the project? Just put 'None' in the menu
+
+	if (currentProject == nil)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:@"None"
+										  action:nil
+								   keyEquivalent:@""];
+		item.enabled = NO;
+		[deviceGroupsMenu addItem:item];
+	}
+	else if (currentProject.devicegroups.count == 0)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:@"Create New Device Group"
+										  action:@selector(newDevicegroup:)
+								   keyEquivalent:@""];
+		item.enabled = YES;
+		item.state = NSOffState;
+		[deviceGroupsMenu addItem:item];
+	}
+	else
+	{
+		for (Devicegroup *dg in currentProject.devicegroups)
+		{
+			item = [[NSMenuItem alloc] initWithTitle:dg.name
+											  action:@selector(chooseDevicegroup:)
+									   keyEquivalent:@""];
+			item.representedObject = dg;
+			item.state = (dg == currentDevicegroup) ? NSOnState : NSOffState;
+			[deviceGroupsMenu addItem:item];
+		}
+
+		// Add the 'fixed' menu entries
+
+		item = [NSMenuItem separatorItem];
+		[deviceGroupsMenu addItem:item];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Create New Device Group"
+										  action:@selector(newDevicegroup:)
+								   keyEquivalent:@""];
+		item.enabled = YES;
+		item.state = NSOffState;
+		[deviceGroupsMenu addItem:item];
+
+		// If we won't have a device group selected, so pick the first one on the list
+
+		if (currentDevicegroup == nil)
+		{
+			item = [deviceGroupsMenu.itemArray objectAtIndex:0];
+			item.state = NSOnState;
+			currentDevicegroup = item.representedObject;
+			currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+		}
+	}
+
+	// Now go and build the assigned devices submenus
+	// This SHOULD be only place we call this but may not be
+
+	[self refreshDevicesMenus];
+}
+
+
+
+
+- (void)refreshMainDevicegroupsMenu
+{
+	// This method updates the main Device Groups menu, ie. all but the list of
+	// the current Project's Device Groups, which is handled by 'refreshDevicegroupMenu:'
+	// This menu controls the View menu
+
+	NSMenuItem *item;
+	BOOL compiled = YES;
+	BOOL gotFiles = YES;
+
+	if (currentDevicegroup != nil)
+	{
+		NSString *name = currentDevicegroup.name;
+
+		showDeviceGroupInfoMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", name];
+		showModelFilesFinderMenuItem.title = [NSString stringWithFormat:@"Show “%@” Source Files in Finder", name];
+		restartDeviceGroupMenuItem.title = [NSString stringWithFormat:@"Restart “%@” Devices", name];
+		listCommitsMenuItem.title = [NSString stringWithFormat:@"List Commits to “%@”", name];
+		deleteDeviceGroupMenuItem.title = [NSString stringWithFormat:@"Delete “%@”", name];
+		renameDeviceGroupMenuItem.title = [NSString stringWithFormat:@"Edit “%@”...", name];
+		compileMenuItem.title = [NSString stringWithFormat:@"Compile “%@” Code", name];
+		uploadMenuItem.title = [NSString stringWithFormat:@"Upload “%@” Code", name];
+
+		externalSourceMenu.title = [NSString stringWithFormat:@"View “%@” Source in Editor", name];
+		externalLibsMenu.title = [NSString stringWithFormat:@"View “%@” Local Libraries in Editor", name];
+		externalFilesMenu.title = [NSString stringWithFormat:@"View “%@” Local Files in Editor", name];
+
+		if (currentDevicegroup.models.count > 0)
+		{
+			// Got models - see if the code is compiled
+
+			compiled = ((currentDevicegroup.squinted & kDeviceCodeSquinted) != 0 && (currentDevicegroup.squinted & kAgentCodeSquinted) != 0);
+		}
+		else
+		{
+			// No models, ergo no compiled code
+
+			compiled = NO;
+			gotFiles = NO;
+		}
+
+	}
+	else
+	{
+		showDeviceGroupInfoMenuItem.title = @"Show Device Group Info";
+		showModelFilesFinderMenuItem.title = @"Show Device Group Source Files in Finder";
+		restartDeviceGroupMenuItem.title = @"Restart Device Group Devices";
+		listCommitsMenuItem.title = @"List Commits to Device Group";
+		deleteDeviceGroupMenuItem.title = @"Delete Device Group";
+		renameDeviceGroupMenuItem.title = @"Edit Device Group";
+		compileMenuItem.title = @"Compile Device Group Code";
+		uploadMenuItem.title = @"Upload Device Group Code";
+
+		externalSourceMenu.title = @"View Device Group Source in Editor";
+		externalLibsMenu.title = @"View Device Group Local Libraries in Editor";
+		externalFilesMenu.title = @"View Device Group Local Files in Editor";
+
+		[self defaultExternalMenus];
+	}
+
+	// Enable or disable items as appropriate
+
+	showDeviceGroupInfoMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	showModelFilesFinderMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
+	restartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	listCommitsMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	deleteDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	renameDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	compileMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
+	uploadMenuItem.enabled = (currentDevicegroup != nil && compiled == YES) ? YES : NO;
+	uploadExtraMenuItem.enabled = (currentDevicegroup != nil && compiled == YES) ? YES : NO;
+	checkImpLibrariesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
+	removeFilesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
+
+	// Enable or Disable the source code submenu based on whether's there's a selected device group
+	// and whether that deviece group has agent and/or device code or not
+
+	compiled = NO;
+	gotFiles = NO;
+
+	if (currentDevicegroup != nil)
+	{
+		if (currentDevicegroup.models.count > 0)
+		{
+			for (Model *md in currentDevicegroup.models)
+			{
+				if ([md.type compare:@"agent"] == NSOrderedSame && md.filename.length > 0) compiled = YES;
+				if ([md.type compare:@"device"] == NSOrderedSame && md.filename.length > 0) gotFiles = YES;
+			}
+		}
+	}
+
+	for (NSUInteger i = 0 ; i < externalSourceMenu.itemArray.count ; ++i)
+	{
+		item = [externalSourceMenu.itemArray objectAtIndex:i];
+
+		if (i == 0) item.enabled = (compiled == YES) ? YES : NO;
+		if (i == 1) item.enabled = (gotFiles == YES) ? YES : NO;
+		if (i == 2) item.enabled = (gotFiles == YES && compiled == YES) ? YES : NO;
+	}
+
+	// Upddate the library, imp library and files submenus
+	
+	[self refreshLibraryMenus];
+	[self refreshFilesMenu];
+
+	// Update the View Menu
+	// This SHOULD be the only place we do this, ie. we should always come here first
+	// because this only changes when the device group state changes
+
+	[self refreshViewMenu];
+}
+
+
+
+- (void)defaultExternalMenus
+{
+	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
+	item.enabled = NO;
+	[externalLibsMenu addItem:item];
+
+	item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
+	item.enabled = NO;
+	[externalFilesMenu addItem:item];
+
+	item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
+	item.enabled = NO;
+	[impLibrariesMenu addItem:item];
+}
+
+
+
+- (void)refreshDevicesMenus
+{
+	// Rebuild the various sub-menus of devices assigned to the
+	// listed device groups, ie. those belonging to the current project
+
+	if (currentProject == nil || currentProject.devicegroups.count == 0)
+	{
+		// There is no project selected, or the project has no device groups,
+		// so this menu will be empty. Proceed no further
+
+		return;
+	}
+
+	NSMenuItem *menuItem = nil;
+
+	if (deviceGroupsMenu.numberOfItems > 2)
+	{
+		// Remove existing device sub-menus
+
+		for (menuItem in deviceGroupsMenu.itemArray)
+		{
+			if (menuItem.submenu != nil)
+			{
+				[menuItem.submenu removeAllItems];
+				menuItem.submenu = nil;
+			}
+		}
+	}
+
+	// Rebuild the sub-menus
+
+	for (NSMutableDictionary *device in devicesArray)
+	{
+		NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+		NSString *dgid = (NSString *)[dg objectForKey:@"id"];
+
+		if (dgid != nil)
+		{
+			// If the device's device group ID is not nil, it's assigned
+			// and we should check for its inclusion here
+
+			for (NSMenuItem *item in deviceGroupsMenu.itemArray)
+			{
+				Devicegroup *adg = item.representedObject;
+
+				if (adg != nil)
+				{
+					if ([adg.did compare:dgid] == NSOrderedSame)
+					{
+						NSMenu *submenu = item.submenu;
+
+						if (submenu == nil)
+						{
+							// If there's no devices submenu, add one
+
+							submenu = [[NSMenu alloc] initWithTitle:adg.name];
+							item.submenu = submenu;
+							submenu.autoenablesItems = YES;
+						}
+
+						// Add the device's menu entry and enable it
+
+						NSString *dstring = [self getValueFrom:device withKey:@"name"];
+						NSMenuItem *ditem = [[NSMenuItem alloc] initWithTitle:dstring action:@selector(chooseDevice:) keyEquivalent:@""];
+
+						[submenu addItem:ditem];
+						ditem.enabled = YES;
+						ditem.state = NSOffState;
+						ditem.representedObject = device;
+						ditem.image = [self menuImage:device];
+
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	// Sort the device groups menus submenus
+
+	for (NSMenuItem *item in deviceGroupsMenu.itemArray)
+	{
+		if (item.submenu != nil)
+		{
+			NSArray *items = item.submenu.itemArray;
+			[item.submenu removeAllItems];
+
+			NSSortDescriptor *alpha = [NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES selector:@selector(caseInsensitiveCompare:)];
+			items = [items sortedArrayUsingDescriptors:[NSArray arrayWithObjects:alpha, nil]];
+
+			for (NSMenuItem	*ditem in items)
+			{
+				[item.submenu addItem:ditem];
+				if (ditem.isHidden) ditem.hidden = NO;
+			}
+		}
+	}
+
+	// Re-select the selected device, if there is one
+	// NOTE the selected device may not be represented here becuase
+	// it's assigned to another device group or is assigned
+	// NOTE A new device group will have no devices, so this won't
+	// select any part of the menu
+
+	if (selectedDevice != nil)
+	{
+		BOOL flag = NO;
+		NSString *devid = [selectedDevice objectForKey:@"id"];
+
+		// For 'deviceGroupsMenu' we have to iterate through any submenus
+		// and compare the IDs of the represented device and the selectedDevice
+		// as the objects may be identical by value but not by reference
+
+		for (NSMenuItem *item in deviceGroupsMenu.itemArray)
+		{
+			if (item.submenu != nil)
+			{
+				for (NSMenuItem *sitem in item.submenu.itemArray)
+				{
+					NSMutableDictionary *sdict = (NSMutableDictionary *)sitem.representedObject;
+					NSString *sid = [sdict objectForKey:@"id"];
+
+					if ([devid compare:sid] == NSOrderedSame)
+					{
+						// Set 'selectedDevice' to point at the right object
+
+						selectedDevice = sdict;
+						sitem.state = NSOnState;
+						flag = YES;
+						break;
+					}
+				}
+			}
+
+			if (flag) break;
+		}
+	}
+}
+
+
+
+- (void)refreshDeviceMenu
+{
+	if (selectedDevice != nil)
+	{
+		NSString *dName = [self getValueFrom:selectedDevice withKey:@"name"];
+
+		showDeviceInfoMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", dName];
+		restartDeviceMenuItem.title = [NSString stringWithFormat:@"Restart “%@”", dName];
+		copyAgentURLMenuItem.title = [NSString stringWithFormat:@"Copy “%@” Agent URL", dName];
+		openAgentURLMenuItem.title = [NSString stringWithFormat:@"Open “%@” Agent URL", dName];
+		unassignDeviceMenuItem.title = [NSString stringWithFormat:@"Unassign “%@”", dName];
+		getLogsMenuItem.title = [NSString stringWithFormat:@"Get Logs from “%@”", dName];
+		getHistoryMenuItem.title = [NSString stringWithFormat:@"Get History of “%@”", dName];
+		deleteDeviceMenuItem.title = [NSString stringWithFormat:@"Delete “%@”", dName];
+
+		BOOL flag = [ide isDeviceLogging:[selectedDevice objectForKey:@"id"]];
+		streamLogsMenuItem.title = (flag) ? @"Stop Log Streaming" : @"Start Log Streaming";
+	}
+	else
+	{
+		showDeviceInfoMenuItem.title = @"Show Device Info";
+		restartDeviceMenuItem.title = @"Restart Device";
+		copyAgentURLMenuItem.title = @"Copy Device’s Agent URL";
+		openAgentURLMenuItem.title = @"Open Device’s Agent URL";
+		unassignDeviceMenuItem.title = @"Unassign Device";
+		getLogsMenuItem.title = @"Get Logs from Device";
+		getHistoryMenuItem.title = @"Get History of Device";
+		deleteDeviceMenuItem.title = @"Delete Device";
+		streamLogsMenuItem.title = @"Start Log Streaming";
+	}
+
+	showDeviceInfoMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	restartDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	copyAgentURLMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	openAgentURLMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	unassignDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	getLogsMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	getHistoryMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	streamLogsMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+	deleteDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
+
+	unassignDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
+	renameDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
+	assignDeviceMenuItem.enabled = (devicesArray.count > 0 && projectArray.count > 0) ? YES : NO;
+}
+
+
+
+- (void)refreshDevicesPopup
+{
+	// Make up the device pop up from scratch. It should list all the device we have,
+	// Not just the ones in selected project device groups
+
+	// Clear the devices list pop up
+
+	devicesPopUp.enabled = NO;
+	[devicesPopUp removeAllItems];
+
+	if (devicesArray.count > 0)
+	{
+		for (NSUInteger i = 0 ; i < devicesArray.count ; ++i)
+		{
+			NSMutableDictionary *device = [devicesArray objectAtIndex:i];
+			NSString *dvName = [self getValueFrom:device withKey:@"name"];
+			[devicesPopUp addItemWithTitle:dvName];
+
+			NSMenuItem *item = [devicesPopUp itemWithTitle:dvName];
+			item.tag = i;
+			item.representedObject = device;
+			item.image = [self menuImage:device];
+		}
+
+		devicesPopUp.enabled = YES;
+	}
+	else
+	{
+		// No devices, so add a 'None' item and select it
+
+		[devicesPopUp addItemWithTitle:@"None"];
+		[devicesPopUp selectItemWithTitle:@"None"];
+		NSMenuItem *item = [devicesPopUp itemWithTitle:@"None"];
+		item.enabled = NO;
+	}
+	
+	if (selectedDevice != nil)
+	{
+		// Select the correct pop-up item
+
+		NSString *dvName = [self getValueFrom:selectedDevice withKey:@"name"];
+		[devicesPopUp selectItemWithTitle:dvName];
+	}
+	else
+	{
+		// Selecte the first device on the list
+
+		[devicesPopUp selectItemAtIndex:0];
+		selectedDevice = [devicesArray objectAtIndex:0];
+	}
+
+	// Update the list of unassigned devices - this only happens here
+	
+	[self refreshUnassignedDevicesMenu];
+}
+
+
+
+- (void)refreshUnassignedDevicesMenu
+{
+	// Rebuild the various sub-menus of development devices assigned to the
+	// listed device groups, ie. those belonging to the current project
+
+	// NOTE 'refreshDevicesPopup:' handles the 'no devices' warning
+
+	// NOTE #2 This should ALWAYS be called after 'refreshDevicesPopup:'
+
+	[unassignedDevicesMenu removeAllItems];
+
+	NSMutableArray *items = nil;
+	NSMutableArray *repos = nil;
+
+	for (NSMutableDictionary *device in devicesArray)
+	{
+		NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+		NSString *dgid = [dg objectForKey:@"id"];
+		NSString *dvName = [self getValueFrom:device withKey:@"name"];
+
+		if (dgid == nil || ((NSNull *)dgid == [NSNull null]))
+		{
+			// If there is no device group ID, so the device must be unassigned
+
+			if (items == nil) items = [[NSMutableArray alloc] init];
+			if (repos == nil) repos = [[NSMutableArray alloc] init];
+
+			[items addObject:dvName];
+			[repos addObject:device];
+		}
+	}
+
+	if (items.count > 0)
+	{
+		// Populate the menu
+
+		for (NSUInteger i = 0 ; i < items.count ; ++i)
+		{
+			NSString *device = [items objectAtIndex:i];
+			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:device action:@selector(chooseDevice:) keyEquivalent:@""];
+
+			NSMutableDictionary *rep = [repos objectAtIndex:i];
+			item.representedObject = rep;
+			item.state = (selectedDevice == rep) ? NSOnState : NSOffState;
+			item.image = [self menuImage:rep];
+			[unassignedDevicesMenu addItem:item];
+		}
+	}
+	else
+	{
+		// No unassigned devices, so add 'None'
+
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[unassignedDevicesMenu addItem:item];
+	}
+}
+
+
+
+- (void)refreshViewMenu
+{
+	// The View menu has two items. These are only actionable if there is a selected device group
+	// and that device group's code has has been compiled
+
+	logDeviceCodeMenuItem.enabled = (currentDevicegroup != nil && currentDevicegroup.squinted & kDeviceCodeSquinted) ? YES : NO;
+	logAgentCodeMenuItem.enabled = (currentDevicegroup != nil && currentDevicegroup.squinted & kAgentCodeSquinted) ? YES : NO;
 }
 
 
@@ -8019,93 +10844,23 @@
 
 	NSUInteger truncateLength = 24;
 
-	for (NSMenuItem *item in devicesPopUp.itemArray)
+	if (devicesArray.count > 0)
 	{
-		NSArray *itemTitleParts = [item.title componentsSeparatedByString:@" "];
-		NSString *itemTitle = [itemTitleParts objectAtIndex:0];
-		if (itemTitle.length > truncateLength) truncateLength = itemTitle.length;
-	}
-
-	for (NSMenuItem *item in devicesPopUp.itemArray)
-	{
-		NSArray *itemTitleParts = [item.title componentsSeparatedByString:@" "];
-		NSString *itemTitle = [itemTitleParts objectAtIndex:0];
-
-		for (NSMutableDictionary *device in ide.devices)
+		for (NSMutableDictionary *device in devicesArray)
 		{
-			NSString *deviceName = [device objectForKey:@"name"];
-
-			if ((NSNull *)deviceName == [NSNull null]) deviceName = [device objectForKey:@"id"];
-
-			if ([itemTitle compare:deviceName] == NSOrderedSame)
-			{
-				itemTitle = [itemTitle stringByAppendingString:[self menuString:[device objectForKey:@"id"]]];
-
-				/* 
-				 
-				NSDictionary *attributes;
-				NSRange aRange = [iTitle rangeOfString:@"offline"];
-				itemTitle = [NSString stringWithFormat:@"%@%@", itemTitle, [@"                        " substringToIndex:(len - itemTitle.length)]];
-				if (aRange.location == NSNotFound)
-				{
-					attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-										[NSColor colorWithRed:0.0 green:1.0 blue:0.0 alpha:1.0], NSForegroundColorAttributeName,
-										[NSFont menuFontOfSize:[NSFont systemFontSize]],
-										NSFontAttributeName, nil];
-				}
-				else
-				{
-					attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-										[NSColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:1.0], NSForegroundColorAttributeName,
-										[NSFont menuFontOfSize:[NSFont systemFontSize]],
-										NSFontAttributeName, nil];
-				}
-
-				NSMutableAttributedString *as1 = [[NSMutableAttributedString alloc] initWithString:@"• " attributes:attributes];
-
-				attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-							  [NSColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:1.0], NSForegroundColorAttributeName,
-							  [NSFont menuFontOfSize:[NSFont systemFontSize]],
-							  NSFontAttributeName, nil];
-
-				NSMutableAttributedString *as2 = [[NSMutableAttributedString alloc] initWithString:itemTitle attributes:attributes];
-
-				[as1 appendAttributedString:as2];
-
-				// NSAttributedString *as = [[NSAttributedString alloc] initWithString:@"•" attributes:attributes];
-
-				[item setAttributedTitle:as1];
-
-				*/
-
-				item.title = itemTitle;
-			}
+			NSString *dname = [self getValueFrom:device withKey:@"name"];
+			if (dname.length > truncateLength) truncateLength = dname.length;
 		}
-	}
 
-	// Do the models menu's submenus
-
-	for (NSMenuItem *item in modelsMenu.itemArray)
-	{
-		// Does the model have any devices? If it does not, it will have no submenu
-
-		if (item.submenu != nil)
+		for (NSMenuItem *item in devicesPopUp.itemArray)
 		{
-			NSMenu *submenu = item.submenu;
-
-			for (NSMenuItem *submenuItem in submenu.itemArray)
+			for (NSMutableDictionary *device in devicesArray)
 			{
-				NSArray *itemTitleParts = [submenuItem.title componentsSeparatedByString:@" "];
-				NSString *itemTitle = [itemTitleParts objectAtIndex:0];
+				NSString *dname = [self getValueFrom:device withKey:@"name"];
 
-				for (NSMutableDictionary *device in ide.devices)
-				{
-					NSString *deviceName = [device objectForKey:@"name"];
+				if (dname == nil) dname = [self getValueFrom:device withKey:@"id"];
 
-					if ((NSNull *)deviceName == [NSNull null]) deviceName = [device objectForKey:@"id"];
-
-					if ([itemTitle compare:deviceName] == NSOrderedSame) submenuItem.title = [itemTitle stringByAppendingString:[self menuString:[device objectForKey:@"id"]]];
-				}
+				if ([item.title compare:dname] == NSOrderedSame) item.title = dname;
 			}
 		}
 	}
@@ -8113,7 +10868,237 @@
 
 
 
-- (NSString *)menuString:(NSString *)deviceID
+- (void)refreshRecentFilesMenu
+{
+	NSMenuItem *item;
+
+	[openRecentMenu removeAllItems];
+
+	// 'recentFiles' is set by 'addRecentFileToMenu:' and initialised at startup by reading in from the defaults
+
+	if (recentFiles == nil || recentFiles.count == 0)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:@"Clear Menu" action:@selector(clearRecent:) keyEquivalent:@""];
+		item.enabled = NO;
+		[openRecentMenu addItem:item];
+	}
+	else
+	{
+		for (NSDictionary *file in recentFiles)
+		{
+			item = [[NSMenuItem alloc] initWithTitle:[file objectForKey:@"name"] action:@selector(openRecent:) keyEquivalent:@""];
+			item.enabled = YES;
+			item.representedObject = file;
+			[openRecentMenu addItem:item];
+		}
+
+		[openRecentMenu addItem:[NSMenuItem separatorItem]];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Open All" action:@selector(openRecentAll) keyEquivalent:@""];
+		item.enabled = YES;
+		[openRecentMenu addItem:item];
+
+		[openRecentMenu addItem:[NSMenuItem separatorItem]];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Clear Menu" action:@selector(clearRecent:) keyEquivalent:@""];
+		item.enabled = YES;
+		[openRecentMenu addItem:item];
+	}
+}
+
+
+
+#pragma mark Imported Library and File List Methods
+
+- (void)refreshLibraryMenus
+{
+	// This method updates the lists of local and ei libraries
+
+	// Update the external library menu. First clear the current menu
+
+	if (externalLibsMenu.numberOfItems > 0) [externalLibsMenu removeAllItems];
+	if (impLibrariesMenu.numberOfItems > 0) [impLibrariesMenu removeAllItems];
+
+	NSInteger aLibCount = 0;
+	NSInteger dLibCount = 0;
+	NSInteger iaLibCount = 0;
+	NSInteger idLibCount = 0;
+	NSString *m;
+	NSMenuItem *item;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			aLibCount = aLibCount + model.libraries.count;
+			iaLibCount = iaLibCount + model.impLibraries.count;
+		}
+		else
+		{
+			dLibCount = dLibCount + model.libraries.count;
+			idLibCount = idLibCount + model.impLibraries.count;
+		}
+	}
+
+	// Add agent libraries, if any
+
+	if (aLibCount > 0)
+	{
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[externalLibsMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"agent"] == NSOrderedSame)
+			{
+				[self libAdder:model.libraries :NO];
+			}
+		}
+	}
+
+	// Add device libraries, if any
+
+	if (dLibCount > 0)
+	{
+		// Drop in a spacer if we have any files above
+
+		if (aLibCount > 0) [externalLibsMenu addItem:[NSMenuItem separatorItem]];
+
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[externalLibsMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"device"] == NSOrderedSame)
+			{
+				[self libAdder:model.libraries :NO];
+			}
+		}
+	}
+
+	if (dLibCount == 0 && aLibCount == 0)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[externalLibsMenu addItem:item];
+	}
+
+	// Add EI Libraries, if any... agent...
+
+	if (iaLibCount > 0)
+	{
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[impLibrariesMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"agent"] == NSOrderedSame)
+			{
+				[self libAdder:model.impLibraries :YES];
+			}
+		}
+	}
+
+	// ...and device
+
+	if (idLibCount > 0)
+	{
+		// Drop in a spacer if we have any files above
+
+		if (iaLibCount > 0) [impLibrariesMenu addItem:[NSMenuItem separatorItem]];
+
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[impLibrariesMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"device"] == NSOrderedSame)
+			{
+				[self libAdder:model.impLibraries :YES];
+			}
+		}
+	}
+
+	if (idLibCount == 0 && iaLibCount == 0)
+	{
+		NSString *title = @"None";
+
+		if (currentDevicegroup != nil && currentDevicegroup.squinted == 0) title = @"Unknown - Code Uncompiled";
+		
+		item = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[impLibrariesMenu addItem:item];
+	}
+}
+
+
+
+- (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib
+{
+	for (File *lib in libs)
+	{
+		[self addLibraryToMenu:lib :isEILib :YES];
+	}
+}
+
+
+
+- (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive
+{
+	// Create a new menu entry for the libraries menus
+
+	NSMenuItem *item;
+
+	if (isEILib)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", lib.version] action:@selector(launchLibsPage) keyEquivalent:@""];
+		[impLibrariesMenu addItem:item];
+	}
+	else
+	{
+		if (isActive)
+		{
+			item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", ((lib.version.length == 0) ? @"unknown" : lib.version)]  action:@selector(externalLibOpen:) keyEquivalent:@""];
+			item.representedObject = lib.filename;
+		}
+		else
+		{
+			item = [[NSMenuItem alloc] initWithTitle:lib.filename action:nil keyEquivalent:@""];
+		}
+
+		item.enabled = isActive;
+		[externalLibsMenu addItem:item];
+	}
+}
+
+
+- (NSImage *)menuImage:(NSMutableDictionary *)device
+{
+	// Sets a device menu's icon according to the device's connection status
+
+	NSImage *returnImage = nil;
+	NSString *nameString = @"";
+
+	NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
+	NSString *dvid = [self getValueFrom:device withKey:@"id"];
+
+	nameString = boolean.boolValue ? @"online" : @"offline";
+	if ([ide isDeviceLogging:dvid]) nameString = [nameString stringByAppendingString:@"_logging"];
+
+	returnImage = [NSImage imageNamed:nameString];
+	return returnImage;
+}
+
+
+- (NSString *)menuString:(NSMutableDictionary *)device
 {
 	// Creates the status readout that will be added to the device's name in menus
 	// eg. "Action (logging)"
@@ -8122,19 +11107,11 @@
 	NSString *loggingString = @"";
 	NSString *returnString = @"";
 
-	for (NSMutableDictionary *device in ide.devices)
-	{
-		NSString *aDeviceID = [device objectForKey:@"id"];
+	NSString *dvid = [self getValueFrom:device withKey:@"id"];
+	NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
 
-		if ([aDeviceID compare:deviceID] == NSOrderedSame)
-		{
-			aDeviceID = [device objectForKey:@"powerstate"];
-			if ([aDeviceID compare:@"online"] != NSOrderedSame) statusString = @"offline";
-			break;
-		}
-	}
-
-	if ([ide isDeviceLogging:deviceID]) loggingString = @"logging";
+	if (!boolean.boolValue) statusString = @"offline";
+	if ([ide isDeviceLogging:dvid]) loggingString = @"logging";
 
 	// Assemble the menuString, eg.
 	// "(offline)", "(offline, logging)", "(logging)"
@@ -8145,12 +11122,17 @@
 
 		returnString = @" (";
 
+		// Add in the offline status indicator if there is one
+
 		if (statusString.length > 0) returnString = [returnString stringByAppendingString:statusString];
+
+		// If we are logging too, add that in too, prefixing with a comma and space
+		// if we have already added offline status
 
 		if (loggingString.length > 0)
 		{
-			if (returnString.length > 2) returnString = [returnString stringByAppendingString:@", "];
-			returnString = [returnString stringByAppendingString:loggingString];
+			if (statusString.length > 0) returnString = [returnString stringByAppendingString:@", "];
+			returnString = @" (logging)";
 		}
 
 		// Finish with a close bracket
@@ -8163,141 +11145,190 @@
 
 
 
-- (void)setToolbar
+- (void)refreshFilesMenu
 {
-    [squinterToolbar validateVisibleItems];
-	
-	// Enable or disable project-specific toolbar items
-	// New Project, Clear, Print are always available
+	// Update the external files menu. First clear the current menu
 
-    if (currentProject != nil)
-    {
-		squintItem.enabled = YES;
-		infoItem.enabled = YES;
-        openAgentCode.enabled = YES;
-        openDeviceCode.enabled = YES;
-        openAllItem.enabled = YES;
-		copyAgentItem.enabled = YES;
-		copyDeviceItem.enabled = YES;
-		
-		// Display Upload button only if we have a linked model
+	if (externalFilesMenu.numberOfItems > 0) [externalFilesMenu removeAllItems];
 
-		if (currentProject.projectModelID != nil)
+	NSInteger aFileCount = 0;
+	NSInteger dFileCount = 0;
+	NSString *m;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
 		{
-			uploadCodeItem.enabled = YES;
+			aFileCount = aFileCount + model.files.count;
 		}
 		else
 		{
-			uploadCodeItem.enabled = NO;
+			dFileCount = dFileCount + model.files.count;
 		}
-    }
-    else
-    {
-		squintItem.enabled = NO;
-		infoItem.enabled = NO;
-        openAgentCode.enabled = NO;
-        openDeviceCode.enabled = NO;
-        openAllItem.enabled = NO;
-		copyAgentItem.enabled = NO;
-		copyDeviceItem.enabled = NO;
-		uploadCodeItem.enabled = NO;
-    }
+	}
 
-    // Enable or disable model-specific toolbar items
+	// Add agent files, if any
 
-    if (currentModel != -1)
-    {
-        restartDevicesItem.enabled = YES;
-    }
-    else
-    {
-        restartDevicesItem.enabled = NO;
-    }
-	
+	if (aFileCount > 0)
+	{
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+
+		[self addFileToMenu:m :NO];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"agent"] == NSOrderedSame)
+			{
+				[self fileAdder:model.files];
+			}
+		}
+	}
+
+	// Add device files, if any
+
+	if (dFileCount > 0)
+	{
+		// Drop in a spacer if we have any files above
+
+		if (aFileCount > 0) [externalFilesMenu addItem:[NSMenuItem separatorItem]];
+
+		//m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+
+		[self addFileToMenu:@"Device Code" :NO];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"device"] == NSOrderedSame)
+			{
+				[self fileAdder:model.files];
+			}
+		}
+	}
+
+	if (dFileCount == 0 && aFileCount == 0)
+	{
+		[self addFileToMenu:@"None" :NO];
+	}
+	else
+	{
+		// Check for duplications, ie. if agent and device both use the same lib
+		// TODO someone may have the same library name in separate files, so we need to
+		// check for this too.
+
+		for (NSUInteger i = 0 ; i < externalFilesMenu.numberOfItems ; ++i)
+		{
+			NSMenuItem *fileItem = [externalFilesMenu itemAtIndex:i];
+
+			if (fileItem.enabled == YES)
+			{
+				for (NSUInteger j = 0 ; j < externalFilesMenu.numberOfItems ; ++j)
+				{
+					if (j != i)
+					{
+						NSMenuItem *aFileItem = [externalFilesMenu itemAtIndex:j];
+
+						if (aFileItem.enabled == YES)
+						{
+							if ([fileItem.title compare:aFileItem.title] == NSOrderedSame)
+							{
+								// The names match, so remove the current one
+
+								[externalFilesMenu removeItemAtIndex:j];
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+- (void)fileAdder:(NSMutableArray *)models
+{
+	for (File *file in models)
+	{
+		[self addFileToMenu:file.filename :YES];
+	}
+}
+
+
+
+- (void)addFileToMenu:(NSString *)filename :(BOOL)isActive
+{
+	// Adds a model's imported file to the menu list
+
+	NSMenuItem *item;
+
+	if (isActive)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:filename action:@selector(externalFileOpen:) keyEquivalent:@""];
+	}
+	else
+	{
+		item = [[NSMenuItem alloc] initWithTitle:filename action:nil keyEquivalent:@""];
+
+	}
+
+	item.enabled = isActive;
+	[externalFilesMenu addItem:item];
+}
+
+
+
+- (void)launchLibsPage
+{
+	[nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/libraries/"]];
+}
+
+
+
+# pragma mark Toolbar Update Methods
+
+- (void)setToolbar
+{
+    // Enable or disable project-specific toolbar items
+	// New Project, Clear, Print are always available
+
+	infoItem.enabled = (currentProject != nil) ? YES : NO;
+	newDevicegroupItem.enabled = (currentProject != nil) ? YES : NO;
+	devicegroupInfoItem.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	squintItem.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	restartDevicesItem.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	openAllItem.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	copyAgentItem.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	copyDeviceItem.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	openAgentCode.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	openDeviceCode.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	listCommitsItem.enabled = (currentProject != nil && currentDevicegroup != nil) ? YES : NO;
+	uploadCodeItem.enabled = (currentProject != nil && currentDevicegroup != nil && currentDevicegroup.squinted > 0) ? YES : NO;
+	uploadCodeExtraItem.enabled = (currentProject != nil && currentDevicegroup != nil && currentDevicegroup.squinted > 0) ? YES : NO;
+	downloadProductItem.enabled = (selectedProduct != nil) ? YES : NO;
+
 	// Enable or disable device-specific toolbar items
-	
-	if (currentDevice != -1)
-	{
-		streamLogsItem.enabled = YES;
-	}
-	else
-	{
-		streamLogsItem.enabled = NO;
-	}
+
+	BOOL flag = [ide isDeviceLogging:[selectedDevice objectForKey:@"id"]];
+	streamLogsItem.enabled = (selectedDevice != nil) ? YES : NO;
+	streamLogsItem.state = flag ? kStreamToolbarItemStateOn : kStreamToolbarItemStateOff;
+
+	// Enabled or disable the login item
+
+	loginAndOutItem.isLocked = !ide.isLoggedIn;
+
+	// Validate items
+
+	[squinterToolbar validateVisibleItems];
 }
 
 
 
-- (void)setColours
-{
-	// Populate the 'colors' array with a set of colours for logging different devices
-
-	[colors addObject:[NSColor cyanColor]];
-	[colors addObject:[NSColor magentaColor]];
-	[colors addObject:[NSColor yellowColor]];
-	[colors addObject:[NSColor orangeColor]];
-	[colors addObject:[NSColor brownColor]];
-	[colors addObject:[NSColor purpleColor]];
-	[colors addObject:[NSColor greenColor]];
-	[colors addObject:[NSColor redColor]];
-	[colors addObject:[NSColor blueColor]];
-}
-
-
-
-- (void)setLoggingColours
-{
-	[logColors removeAllObjects];
-
-	NSInteger back = [self perceivedBrightness:backColour];
-
-	if (back > 130)
-	{
-		// Background is light
-
-		for (NSColor *colour in colors)
-		{
-			NSInteger stock = [self perceivedBrightness:colour];
-
-			if (back - stock > 20)
-			{
-				[logColors addObject:colour];
-			}
-		}
-	}
-	else
-	{
-		// Background is dark
-
-		for (NSColor *colour in colors)
-		{
-			NSInteger stock = [self perceivedBrightness:colour];
-
-			if (stock - back > 20)
-			{
-				[logColors addObject:colour];
-			}
-		}
-	}
-}
-
-
-
-- (NSInteger)perceivedBrightness:(NSColor *)colour
-{
-	CGFloat red, blue, green, alpha;
-	[colour colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
-	[colour getRed:&red green:&green blue:&blue alpha:&alpha];
-	red = red * 255;
-	blue = blue * 255;
-	green = green * 255;
-	return (NSInteger)sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068));
-}
-
-
+#pragma mark Logging Area Methods
 
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold
 {
+	// Set the log window's basic text settings based on preferences
+
 	NSFontManager *fontManager = [NSFontManager sharedFontManager];
 	NSFont *font;
 
@@ -8317,7 +11348,85 @@
 }
 
 
-#pragma mark - Progress Methods
+
+- (void)setColours
+{
+	// Populate the 'colors' array with a set of colours for logging different devices
+
+	[colors addObject:[NSColor cyanColor]];
+	[colors addObject:[NSColor magentaColor]];
+	[colors addObject:[NSColor yellowColor]];
+	[colors addObject:[NSColor orangeColor]];
+	[colors addObject:[NSColor brownColor]];
+	[colors addObject:[NSColor purpleColor]];
+	[colors addObject:[NSColor greenColor]];
+	[colors addObject:[NSColor blueColor]];
+	[colors addObject:[NSColor redColor]];
+	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:1.0 blue:1.0 alpha:1.0]]; // White
+	[colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:1.0]]; // Black
+	[colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.5 blue:0.5 alpha:1.0]]; // Mid-grey
+	[colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1.0]]; // Light-grey
+	[colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.3 blue:0.3 alpha:1.0]]; // Dark-grey
+}
+
+
+
+- (void)setLoggingColours
+{
+	[logColors removeAllObjects];
+
+	NSInteger back = [self perceivedBrightness:backColour];
+	// NSInteger fore = [self perceivedBrightness:textColour];
+
+	if (back > 130)
+	{
+		// Background is light
+
+		for (NSColor *colour in colors)
+		{
+			NSInteger stock = [self perceivedBrightness:colour];
+
+			if (back - stock > 40)
+			{
+				// Colour is dark enough to use against this background
+				// But is it too close to the text colour ?
+				
+				[logColors addObject:colour];
+			}
+		}
+	}
+	else
+	{
+		// Background is dark
+
+		for (NSColor *colour in colors)
+		{
+			NSInteger stock = [self perceivedBrightness:colour];
+
+			if (stock - back > 40) [logColors addObject:colour];
+		}
+	}
+}
+
+
+
+- (NSInteger)perceivedBrightness:(NSColor *)colour
+{
+	// Returns the perceived brightness of the specified colour
+	// Used to pick colours that will stand out against the log's background color
+
+	CGFloat red, blue, green, alpha;
+	[colour colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
+	[colour getRed:&red green:&green blue:&blue alpha:&alpha];
+	red = red * 255;
+	blue = blue * 255;
+	green = green * 255;
+	return (NSInteger)sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068));
+}
+
+
+
+#pragma mark Progress Methods
 
 
 - (void)startProgress
@@ -8336,117 +11445,411 @@
 
 
 
+#pragma mark About Sheet Methods
+
+
+- (IBAction)showAboutSheet:(id)sender
+{
+	[aboutVersionLabel setStringValue:[NSString stringWithFormat:@"Version %@.%@",
+									   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+									   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]];
+	[_window beginSheet:aboutSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)viewSquinterSite:(id)sender
+{
+	[_window endSheet:aboutSheet];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/"]];
+}
+
+
+
+- (IBAction)closeAboutSheet:(id)sender
+{
+	[_window endSheet:aboutSheet];
+}
+
+
+
+- (IBAction)showHideToolbar:(id)sender
+{
+	if (squinterToolbar.isVisible)
+	{
+		squinterToolbar.visible = NO;
+		showHideToolbarMenuItem.title = @"Show Toolbar";
+		[defaults setValue:[NSNumber numberWithBool:NO] forKey:@"com.bps.squinter.toolbarstatus"];
+	}
+	else
+	{
+		squinterToolbar.visible = YES;
+		showHideToolbarMenuItem.title = @"Hide Toolbar";
+		[defaults setValue:[NSNumber numberWithBool:YES] forKey:@"com.bps.squinter.toolbarstatus"];
+	}
+}
+
+
+
+#pragma mark Help Menu Methods
+
+- (IBAction)showAuthor:(id)sender
+{
+	if (sender == author01) [nswsw openURL:[NSURL URLWithString:@"https://github.com/carlbrown/PDKeychainBindingsController"]];
+	if (sender == author02) [nswsw openURL:[NSURL URLWithString:@"https://github.com/bdkjones/VDKQueue"]];
+	if (sender == author03) [nswsw openURL:[NSURL URLWithString:@"https://github.com/uliwitness/UliKit"]];
+	if (sender == author04) [nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
+	if (sender == author05) [nswsw openURL:[NSURL URLWithString:@"https://github.com/adobe-fonts/source-code-pro"]];
+	if (sender == author06) [nswsw openURL:[NSURL URLWithString:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"]];
+}
+
+
+
+#pragma mark Preferences Sheet Methods
+
+
+- (IBAction)showPrefs:(id)sender
+{
+	// Set working directory
+
+	workingDirectoryField.stringValue = @"";
+	workingDirectoryField.stringValue = workingDirectory;
+
+	// Set colour wells
+
+	float r = [[defaults objectForKey:@"com.bps.squinter.text.red"] floatValue];
+	float b = [[defaults objectForKey:@"com.bps.squinter.text.blue"] floatValue];
+	float g = [[defaults objectForKey:@"com.bps.squinter.text.green"] floatValue];
+	textColour = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
+
+	r = [[defaults objectForKey:@"com.bps.squinter.back.red"] floatValue];
+	b = [[defaults objectForKey:@"com.bps.squinter.back.blue"] floatValue];
+	g = [[defaults objectForKey:@"com.bps.squinter.back.green"] floatValue];
+	backColour = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
+
+	textColorWell.color = textColour;
+	[textColorWell setAction:@selector(showPanelForText)];
+	backColorWell.color = backColour;
+	[backColorWell setAction:@selector(showPanelForBack)];
+
+	// Set font name and size menus
+
+	[fontsMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue]];
+	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue] - 9;
+	if (index == 9) index = 6;
+	[sizeMenu selectItemAtIndex:index];
+
+	// Set checkboxes
+
+	preserveCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.preservews"]) ? NSOnState : NSOffState;
+	autoCompileCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocompile"]) ? NSOnState : NSOffState;
+	loadModelsCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoload"]) ? NSOnState : NSOffState;
+	autoLoadListsCheckbox.state =  ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) ? NSOnState : NSOffState;
+	autoUpdateCheckCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) ? NSOnState : NSOffState;
+	boldTestCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.showboldtext"]) ? NSOnState : NSOffState;
+	loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
+
+	// Set location menu
+
+	[locationMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue]];
+
+	// Set recent files count menu
+
+	NSInteger count = ([[defaults objectForKey:@"com.bps.squinter.recentFilesCount"] integerValue] / 5) - 1;
+
+	[recentFilesCountMenu selectItemAtIndex:count];
+
+	count = [defaults stringForKey:@"com.bps.squinter.logListCount"].integerValue;
+
+	[maxLogCountMenu selectItemWithTag:count];
+
+	// Show the sheet
+
+	[_window beginSheet:preferencesSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)cancelPrefs:(id)sender
+{
+	[_window endSheet:preferencesSheet];
+}
+
+
+
+- (IBAction)setPrefs:(id)sender
+{
+	workingDirectory = workingDirectoryField.stringValue;
+
+	if (autoLoadListsCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.autoloadlists"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.autoloadlists"];
+	}
+
+	if (preserveCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.preservews"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.preservews"];
+	}
+
+	if (autoCompileCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.autocompile"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.autocompile"];
+	}
+
+	if (loadDevicesCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.autoloaddevlists"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.autoloaddevlists"];
+	}
+
+	if (autoUpdateCheckCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.autocheckupdates"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.autocheckupdates"];
+	}
+
+	if (loadModelsCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.autoload"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.autoload"];
+	}
+
+	if (boldTestCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.showboldtext"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.showboldtext"];
+	}
+
+	if (azureCheckbox.state == NSOnState)
+	{
+		[defaults setBool:YES forKey:@"com.bps.squinter.useazure"];
+	}
+	else
+	{
+		[defaults setBool:NO forKey:@"com.bps.squinter.useazure"];
+	}
+
+	textColour = textColorWell.color;
+	backColour = backColorWell.color;
+
+	float r = (float)[textColour redComponent];
+	float b = (float)[textColour blueComponent];
+	float g = (float)[textColour greenComponent];
+
+	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.text.red"];
+	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.text.green"];
+	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.text.blue"];
+
+	r = (float)[backColour redComponent];
+	b = (float)[backColour blueComponent];
+	g = (float)[backColour greenComponent];
+
+	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.back.red"];
+	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.back.green"];
+	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.back.blue"];
+
+	if (r == 0) r = 0.1;
+	if (b == 0) b = 0.1;
+	if (g == 0) g = 0.1;
+
+	NSUInteger a = 100 * r * b * g;
+	if (a < 30)
+	{
+		[logScrollView setScrollerKnobStyle:NSScrollerKnobStyleLight];
+	}
+	else
+	{
+		[logScrollView setScrollerKnobStyle:NSScrollerKnobStyleDark];
+	}
+
+	NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
+	NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
+	if (fontSize == 15) fontSize = 18;
+
+	logTextView.font = [self setLogViewFont:fontName :fontSize :(boldTestCheckbox.state == NSOnState)];
+	[logTextView setTextColor:textColour];
+	[logClipView setBackgroundColor:backColour];
+
+	[defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
+	[defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
+
+	[defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
+
+	// Set recent files count
+
+	NSInteger count = (recentFilesCountMenu.indexOfSelectedItem + 1) * 5;
+
+	[defaults setObject:[NSNumber numberWithInteger:count] forKey:@"com.bps.squinter.recentFilesCount"];
+
+	// Set max list items count
+
+	count = maxLogCountMenu.selectedTag;
+	ide.maxListCount = count;
+	
+	[defaults setObject:[NSNumber numberWithInteger:count] forKey:@"com.bps.squinter.logListCount"];
+
+	// If the max is now lower than the current list total, we should prune the list
+
+	if (recentFiles.count > count)
+	{
+		while (recentFiles.count > count) [recentFiles removeLastObject];
+		[self refreshRecentFilesMenu];
+	}
+
+	// Close the sheet
+
+	[_window endSheet:preferencesSheet];
+}
+
+
+
+- (IBAction)chooseWorkingDirectory:(id)sender
+{
+	if (choosePanel) choosePanel = nil;
+	choosePanel = [NSOpenPanel openPanel];
+	choosePanel.message = @"Select a directory for your projects...";
+	choosePanel.canChooseFiles = NO;
+	choosePanel.canChooseDirectories = YES;
+	choosePanel.canCreateDirectories = YES;
+	choosePanel.allowsMultipleSelection = NO;
+	choosePanel.delegate = self;
+
+	// Run the NSOpenPanel
+
+	[choosePanel beginSheetModalForWindow:preferencesSheet
+						completionHandler:^(NSInteger result)
+	 {
+		 // Close sheet first to stop it hogging the event queue
+
+		 [NSApp stopModal];
+		 [NSApp endSheet:choosePanel];
+		 [choosePanel orderOut:self];
+
+		 if (result == NSFileHandlingPanelOKButton) [self setWorkingDirectory:[choosePanel URLs]];
+	 }
+	 ];
+
+	[NSApp runModalForWindow:choosePanel];
+	[choosePanel makeKeyWindow];
+}
+
+
+
+- (void)setWorkingDirectory:(NSArray *)urls
+{
+	NSURL *url = [urls objectAtIndex:0];
+	NSString *path = [url path];
+	workingDirectoryField.stringValue = path;
+}
+
+
+
+- (NSString *)getFontName:(NSInteger)index
+{
+	NSString *fontName = @"";
+
+	switch (index)
+	{
+		case 0:
+			fontName = @"Andale Mono";
+			break;
+
+		case 1:
+			fontName = @"Courier";
+			break;
+
+		case 2:
+			fontName = @"Menlo";
+			break;
+
+		case 3:
+			fontName = @"Monaco";
+			break;
+
+		case 4:
+			fontName = @"Source Code Pro";
+			break;
+
+		default:
+			fontName = @"Menlo";
+			break;
+	}
+
+	return fontName;
+}
+
+
+
+- (void)showPanelForText
+{
+	[textColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForBack
+{
+	[backColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
 #pragma mark - File Watching Methods
-
-
-- (NSData *)bookmarkForURL:(NSURL *)url
-{
-	NSError *error = nil;
-	NSData *bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationSuitableForBookmarkFile
-					 includingResourceValuesForKeys:nil
-									  relativeToURL:[NSURL URLWithString:@"~"]
-											  error:&error];
-	if (error || (bookmark == nil))
-	{
-		return nil;
-	}
-
-	return bookmark;
-}
-
-
-
-- (NSURL *)urlForBookmark:(NSData *)bookmark
-{
-	BOOL bookmarkIsStale = NO;
-	NSError *error = nil;
-	NSURL *bookmarkURL = [NSURL URLByResolvingBookmarkData:bookmark
-												   options:NSURLBookmarkResolutionWithoutUI
-											 relativeToURL:[NSURL URLWithString:@"~"]
-									   bookmarkDataIsStale:&bookmarkIsStale
-													 error:&error];
-
-	if (error != nil)
-	{
-		// Report error
-		return nil;
-	}
-
-	if (bookmarkIsStale) {
-		// Need to refresh the bookmark from the URL
-		// Question is, what makes a bookmark stale?
-
-		bookmark = [self bookmarkForURL:bookmarkURL];
-	}
-
-	return bookmarkURL;
-}
-
 
 
 -(void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
 {
     // A file has changed so notify the user
-	// IMPORTANT: fpath is the ORIGINAL location. VDKQueue will continue watching this file wherever it is moved
-	// or whatever it is renamed.
-	
-    if ([noteName compare:VDKQueueRenameNotification] == NSOrderedSame)
+	// IMPORTANT: fpath is the MONITORED location. VDKQueue will continue watching this file wherever it is moved
+	// or whatever it is renamed
+	// TODO Review for new archtecture
+
+#ifdef DEBUG
+	NSLog(@"File change: %@", fpath);
+#endif
+
+	if ([noteName compare:VDKQueueRenameNotification] == NSOrderedSame)
     {
         // Called when the file is MOVED or RENAMED
 
-        // TODO pop up a dialog to prompt for search
-
-        currentProject.projectSquinted = 0;
-		currentProject.projectHasChanged = YES;
-        [saveLight setFull:!currentProject.projectHasChanged];
-		
-		[self writeToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been renamed or moved. You will need to re-add it to this project.", [fpath lastPathComponent]] :YES];
+        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been renamed or moved. You will need to re-add it to this device group.", [fpath lastPathComponent]] :YES];
     }
 	
 	if ([noteName compare:VDKQueueDeleteNotification] == NSOrderedSame)
 	{
-		// Only called when Trash is emptied
+		// Only called when Trash is emptied/GitHub desktop deletes a file before saving a new version
 		
-		NSString *string = [fpath lastPathComponent];
-		NSRange range = [string rangeOfString:@"."];
-		string = [string substringFromIndex:range.location + 1];
-		range = [string rangeOfString:@"."];
-		NSString *type = [string substringToIndex:range.location];
-		
-		// Remove file from project and clear appropriate libraries list
-		
-		if ([type compare:@"agent"] == NSOrderedSame)
-		{
-			currentProject.projectAgentCodePath = nil;
-			[currentProject.projectAgentLibraries removeAllObjects];
-			currentProject.projectAgentLibraries = nil;
-			currentProject.projectSquinted = currentProject.projectSquinted = 0 & 0x01;
-		}
-		
-		if ([type compare:@"device"] == NSOrderedSame)
-		{
-			currentProject.projectDeviceCodePath = nil;
-			[currentProject.projectDeviceLibraries removeAllObjects];
-			currentProject.projectDeviceLibraries = nil;
-			currentProject.projectSquinted = currentProject.projectSquinted = 0 & 0x02;
-		}
-		
-		currentProject.projectSquinted = 0;
-		currentProject.projectHasChanged = YES;
-		[saveLight setFull:!currentProject.projectHasChanged];
-		
-		[self writeToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been deleted.", [fpath lastPathComponent]] :YES];
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been deleted.", [fpath lastPathComponent]] :YES];
 	}
 	
 	if ([noteName compare:VDKQueueWriteNotification] == NSOrderedSame)
 	{
-		[self writeToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this project.", [fpath lastPathComponent]] :YES];
-		currentProject.projectSquinted = 0;
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this device group's code.", [fpath lastPathComponent]] :YES];
 	}
-	
-	// Update the Project Menu in case the 'projectSquinted' value has changed
-	
-	[self setProjectMenu];
 }
 
 
@@ -8456,33 +11859,60 @@
 
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath
 {
-	NSString *theFilePath = [filePath stringByDeletingLastPathComponent];
-	NSString *theFileName = [filePath lastPathComponent];
+	// This method takes an absolute location ('filePath') and returns a location relative
+	// to another location ('basePath'). Typically, this is the path to the host
+	// project
 
-	if (theFilePath.length > basePath.length)
+	basePath = [basePath stringByStandardizingPath];
+	filePath = [filePath stringByStandardizingPath];
+
+	NSString *theFilePath = filePath;
+
+	NSInteger nf = [self numberOfFoldersInPath:theFilePath];
+	NSInteger nb = [self numberOfFoldersInPath:basePath];
+
+	if (nf > nb) // theFilePath.length > basePath.length
 	{
+		// The file path is longer than the base path
 		NSRange r = [theFilePath rangeOfString:basePath];
 
 		if (r.location != NSNotFound)
 		{
+			// The file path contains the base path, eg.
+			// '/Users/smitty/documents/github/squinter/files'
+			// contains
+			// '/Users/smitty/documents/github/squinter'
+
 			theFilePath = [theFilePath substringFromIndex:r.length];
-			theFilePath = [theFilePath stringByAppendingFormat:@"/%@", theFileName];
+			//theFilePath = [theFilePath stringByAppendingFormat:@"/%@", theFileName];
 		}
 		else
 		{
+			// The file path does not contain the base path, eg.
+			// '/Users/smitty/downloads'
+			// doesn't contain
+			// '/Users/smitty/documents/github/squinter'
+
 			theFilePath = [self getPathDelta:basePath :theFilePath];
-			theFilePath = [theFilePath stringByAppendingString:theFileName];
+			//theFilePath = [theFilePath stringByAppendingString:theFileName];
 		}
 	}
-	else if (theFilePath.length < basePath.length)
+	else if (nf < nb) // theFilePath.length < basePath.length
 	{
 		NSRange r = [basePath rangeOfString:theFilePath];
 
 		if (r.location != NSNotFound)
 		{
+			// The base path contains the file path, eg.
+			// '/Users/smitty/documents/github/squinter/files'
+			// contains
+			// '/Users/smitty/documents'
+
 			theFilePath = [basePath substringFromIndex:r.length];
 			NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
-			theFilePath = theFileName;
+			//theFilePath = theFileName;
+
+			// Add in '../' for each directory in the base path but not in the file path
 
 			for (NSInteger i = 0 ; i < filePathParts.count - 1 ; ++i)
 			{
@@ -8491,22 +11921,37 @@
 		}
 		else
 		{
+			// The base path doesn't contains the file path, eg.
+			// '/Users/smitty/documents/github/squinter/files'
+			// doesn't contain
+			// '/Users/smitty/downloads'
+
 			theFilePath = [self getPathDelta:basePath :theFilePath];
-			theFilePath = [theFilePath stringByAppendingString:theFileName];
+			//theFilePath = [theFilePath stringByAppendingString:theFileName];
 		}
 	}
 	else
 	{
-		NSRange r = [theFilePath rangeOfString:basePath];
+		// The two paths are the same length
 
-		if (r.location != NSNotFound)
+		if ([theFilePath compare:basePath] == NSOrderedSame)
 		{
-			theFilePath = theFileName;
+			// The file path and the base patch are the same, eg.
+			// '/Users/smitty/documents/github/squinter'
+			// matches
+			// '/Users/smitty/documents/github/squinter'
+
+			theFilePath = @"";
 		}
 		else
 		{
+			// The file path and the base patch are not the same, eg.
+			// '/Users/smitty/documents/github/squinter'
+			// matches
+			// '/Users/smitty/downloads/archive/nofiles'
+
 			theFilePath = [self getPathDelta:basePath :theFilePath];
-			theFilePath = [theFilePath stringByAppendingString:theFileName];
+			//theFilePath = [theFilePath stringByAppendingString:theFileName];
 		}
 	}
 
@@ -8514,14 +11959,18 @@
 }
 
 
+
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath
 {
-	NSUInteger location;
+	NSInteger location = -1;
 	NSArray *fileParts = [filePath componentsSeparatedByString:@"/"];
 	NSArray *baseParts = [basePath componentsSeparatedByString:@"/"];
 
 	for (NSUInteger i = 0 ; i < fileParts.count ; ++i)
 	{
+		// Compare the two paths, directory by directory, starting at the left
+		// then break when they no longer match
+
 		NSString *filePart = [fileParts objectAtIndex:i];
 		NSString *basePart = [baseParts objectAtIndex:i];
 
@@ -8536,70 +11985,42 @@
 
 	for (NSUInteger i = location ; i < baseParts.count ; ++i)
 	{
+		// Add a '../' for every non-matching base path directory
+
 		path = [path stringByAppendingString:@"../"];
 	}
 
 	for (NSUInteger i = location ; i < fileParts.count ; ++i)
 	{
+		// Then add the actual file path directries from the no matching part
+
 		path = [path stringByAppendingFormat:@"%@/", [fileParts objectAtIndex:i]];
 	}
+
+	// Remove the final /
+
+	path = [path substringToIndex:(path.length - 1)];
 
 	return path;
 }
 
 
 
-- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
+- (NSInteger)numberOfFoldersInPath:(NSString *)path
 {
-	NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
-	absolutePath = [absolutePath stringByStandardizingPath];
-	return absolutePath;
+	NSArray *parts = [path componentsSeparatedByString:@"/"];
+	return (parts.count - 1);
 }
 
 
 
-- (void)updateProject:(Project *)project
+- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
 {
-	// Convert the project to the latest version
+	// Expand a relative path that is relative to the base path to an absolute path
 
-	NSInteger cv = [self compareVersion:currentProject.projectVersion :kCurrentProjectVersionString];
-
-	if (cv == kLower)
-	{
-		// Project should be updated
-
-		cv = [self compareVersion:currentProject.projectVersion :kPathChangeProjectVersion];
-
-		if (cv == kLower)
-		{
-			// For upgrades from 1.0-2.0 -> 2.1
-			// Add oldProjectPath property
-
-			project.oldProjectPath = project.projectPath;
-
-			// Convert saved paths to relative paths
-
-			project.projectAgentCodePath = [self getRelativeFilePath:project.projectPath :project.projectAgentCodePath];
-			project.projectDeviceCodePath = [self getRelativeFilePath:project.projectPath :project.projectDeviceCodePath];
-
-			[self updatePaths:project.projectDeviceLibraries :project.projectPath];
-			[self updatePaths:project.projectDeviceFiles :project.projectPath];
-			[self updatePaths:project.projectAgentLibraries :project.projectPath];
-			[self updatePaths:project.projectAgentFiles :project.projectPath];
-		}
-
-		// Mark the project as needing to be saved, and up the version
-
-		project.projectHasChanged = YES;
-		project.projectVersion = kCurrentProjectVersionString;
-
-		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" project file updated to version %@", project.projectName, project.projectVersion] :YES];
-	}
-
-	// Finally, set the status light
-
-	[saveLight setLight:YES];
-	[saveLight setFull:!currentProject.projectHasChanged];
+	NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
+	absolutePath = [absolutePath stringByStandardizingPath];
+	return absolutePath;
 }
 
 
@@ -8615,6 +12036,65 @@
 		path = [self getRelativeFilePath:relPath :path];
 		[set setObject:path forKey:key];
 	}
+}
+
+
+
+- (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath
+{
+	// Takes an absolute path to a project and a file path relative to that same project,
+	// and returns the user's preferred style of path for printing
+
+	NSInteger pathType = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+
+	switch (pathType)
+	{
+		case 0:
+			// Absolute Path
+			return [self getAbsolutePath:projectPath :filePath];
+		case 1:
+			// Path relative to project DEFAULT
+			return filePath;
+			break;
+
+		default:
+			// Path relative to home
+			return [@"~" stringByAppendingString:[self getRelativeFilePath:@"~" :[self getAbsolutePath:projectPath :filePath]]];
+			break;
+	}
+}
+
+
+
+- (NSData *)bookmarkForURL:(NSURL *)url
+{
+	NSError *error = nil;
+	NSData *bookmark = [url bookmarkDataWithOptions: NSURLBookmarkCreationSuitableForBookmarkFile
+					 includingResourceValuesForKeys: nil
+									  relativeToURL: nil
+											  error: &error];
+
+	if (error != nil) return nil;
+	return bookmark;
+}
+
+
+
+- (NSURL *)urlForBookmark:(NSData *)bookmark
+{
+	NSError *error = nil;
+	BOOL isStale = NO;
+	NSURL *url = [NSURL URLByResolvingBookmarkData: bookmark
+										   options: NSURLBookmarkResolutionWithoutUI
+									 relativeToURL: nil
+							   bookmarkDataIsStale: &isStale
+											 error: &error];
+
+	// There was an error, so return 'nil' as a warning
+
+	if (error != nil) return nil;
+	stale = isStale;
+	return url;
 }
 
 
@@ -8637,9 +12117,9 @@
 
 	BOOL performCheck = NO;
 
-	if (currentProject.projectImpLibs.count > 0)
+	if (currentDevicegroup.models.count > 0)
 	{
-		if (eiLibListTime)
+		if (eiLibListTime != nil)
 		{
 			NSDate *now = [NSDate date];
 			NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
@@ -8654,7 +12134,7 @@
 			{
 				// Last check was less than 1 hour earlier, so use existing list if it exists
 
-				if (eiLibListData)
+				if (eiLibListData != nil)
 				{
 					[self compareElectricImpLibs];
 					return;
@@ -8670,7 +12150,6 @@
 			performCheck = YES;
 		}
 
-
 		if (performCheck)
 		{
 			// Set/reset the time of the most recent check
@@ -8680,6 +12159,7 @@
 			if (connectionIndicator.hidden == YES)
 			{
 				// Start the connection indicator
+
 				connectionIndicator.hidden = NO;
 				[connectionIndicator startAnimation:self];
 			}
@@ -8701,15 +12181,12 @@
 didReceiveResponse:(NSURLResponse *)response
  completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler
 {
-	// This delegate method is called when the server responds to the connection request
-	// Use it to trap certain status codes
-
 	NSHTTPURLResponse *rps = (NSHTTPURLResponse *)response;
+
 	if (rps.statusCode != 200)
 	{
 		NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
-		[self writeToLog:errString :YES];
-
+		[self writeErrorToLog:errString :YES];
 		completionHandler(NSURLSessionResponseCancel);
 		return;
 	}
@@ -8721,9 +12198,6 @@ didReceiveResponse:(NSURLResponse *)response
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
-	// This delegate method is called when the server sends some data back
-	// Add the data to the correct connexion object
-
 	[eiLibListData appendData:data];
 }
 
@@ -8731,9 +12205,6 @@ didReceiveResponse:(NSURLResponse *)response
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-	// All the data has been supplied by the server in response to a connection - or an error has been encountered
-	// Parse the data and, according to the connection activity - update device, create model etc – apply the results
-
 	if (task == eiLibListTask)
 	{
 		if (ide.numberOfConnections < 1)
@@ -8778,7 +12249,7 @@ didReceiveResponse:(NSURLResponse *)response
 	}
 	else
 	{
-		[self writeToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
+		[self writeErrorToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
 		eiLibListData = nil;
 		return;
 	}
@@ -8789,6 +12260,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 		BOOL allOKFlag = YES;
 		NSArray *libraryList = [parsedData componentsSeparatedByString:@"\n"];
+
 		for (NSString *library in libraryList)
 		{
 			// Watch out for single carriage-returns in .csv file
@@ -8804,30 +12276,36 @@ didReceiveResponse:(NSURLResponse *)response
 					NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
 					NSString *libVer = [libParts objectAtIndex:1];
 
-					for (NSArray *eiLib in currentProject.projectImpLibs)
+					for (Model *model in currentDevicegroup.models)
 					{
-						NSString *eiLibName = [[eiLib objectAtIndex:0] lowercaseString];
-						NSString *eiLibVer = [eiLib objectAtIndex:1];
-
-						if ([eiLibName compare:libName] == NSOrderedSame)
+						if (model.impLibraries.count > 0)
 						{
-							// Local EI lib record and download lib record match
-							// First check for deprecation
-							if ([libVer compare:@"dep"] == NSOrderedSame)
+							for (File *eiLib in model.impLibraries)
 							{
-								// Library is marked as deprecated
+								NSString *name = [eiLib.filename lowercaseString];
 
-								NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
-								[self writeToLog:mString :YES];
-								allOKFlag = NO;
-							}
-							else if ([eiLibVer compare:libVer] != NSOrderedSame)
-							{
-								// Library versions are not the same, so report the discrepancy
+								if ([name compare:libName] == NSOrderedSame)
+								{
+									// Local EI lib record and download lib record match
+									// First check for deprecation
 
-								NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLibVer];
-								[self writeToLog:mString :YES];
-								allOKFlag = NO;
+									if ([libVer compare:@"dep"] == NSOrderedSame)
+									{
+										// Library is marked as deprecated
+
+										NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
+										[self writeWarningToLog:mString :YES];
+										allOKFlag = NO;
+									}
+									else if ([eiLib.version	compare:libVer] != NSOrderedSame)
+									{
+										// Library versions are not the same, so report the discrepancy
+
+										NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLib.version];
+										[self writeWarningToLog:mString :YES];
+										allOKFlag = NO;
+									}
+								}
 							}
 						}
 					}
@@ -8837,12 +12315,397 @@ didReceiveResponse:(NSURLResponse *)response
 
 		if (allOKFlag)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in project \"%@\" are up to date.", currentProject.projectName] :YES];
+			[self writeToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", currentDevicegroup.name] :YES];
 		}
 	}
 }
 
 
+
+#pragma mark - NSTextFieldDelegate Methods
+
+- (void)controlTextDidChange:(NSNotification *)obj
+{
+	id sender = obj.object;
+
+	// New Project sheet
+
+	if (sender == newProjectNameTextField)
+	{
+		if (newProjectNameTextField.stringValue.length > 80)
+		{
+			newProjectNameTextField.stringValue = [newProjectNameTextField.stringValue substringToIndex:80];
+			NSBeep();
+		}
+
+		newProjectNameCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)newProjectNameTextField.stringValue.length];
+	}
+
+	if (sender == newProjectDescTextField)
+	{
+		if (newProjectDescTextField.stringValue.length > 255)
+		{
+			newProjectDescTextField.stringValue = [newProjectDescTextField.stringValue substringToIndex:255];
+			NSBeep();
+		}
+
+		newProjectDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)newProjectDescTextField.stringValue.length];
+	}
+
+	// Rename Project Sheet
+
+	if (sender == renameProjectTextField)
+	{
+		if (renameProjectTextField.stringValue.length > 80)
+		{
+			renameProjectTextField.stringValue = [renameProjectTextField.stringValue substringToIndex:80];
+			NSBeep();
+		}
+
+		renameProjectCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)renameProjectTextField.stringValue.length];
+	}
+
+	if (sender == renameProjectDescTextField)
+	{
+		if (renameProjectDescTextField.stringValue.length > 255)
+		{
+			renameProjectDescTextField.stringValue = [renameProjectDescTextField.stringValue substringToIndex:255];
+			NSBeep();
+		}
+
+		renameProjectDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)renameProjectDescTextField.stringValue.length];
+	}
+
+	// New Device Group Sheet
+
+	if (sender == newDevicegroupNameTextField)
+	{
+		if (newDevicegroupNameTextField.stringValue.length > 80)
+		{
+			newDevicegroupNameTextField.stringValue = [newDevicegroupNameTextField.stringValue substringToIndex:80];
+			NSBeep();
+		}
+
+		newDevicegroupNameCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)newDevicegroupNameTextField.stringValue.length];
+	}
+
+	if (sender == newDevicegroupDescTextField)
+	{
+		if (newDevicegroupDescTextField.stringValue.length > 255)
+		{
+			newDevicegroupDescTextField.stringValue = [newDevicegroupDescTextField.stringValue substringToIndex:255];
+			NSBeep();
+		}
+
+		newDevicegroupDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)newDevicegroupDescTextField.stringValue.length];
+	}
+
+	// Rename Device Group Sheet
+
+	// Upload Code Extra Sheet
+
+	if (sender == uploadCommitTextField)
+	{
+		if (uploadCommitTextField.stringValue.length > 255)
+		{
+			uploadCommitTextField.stringValue = [uploadCommitTextField.stringValue substringToIndex:255];
+			NSBeep();
+		}
+
+		uploadCommitCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)uploadCommitTextField.stringValue.length];
+	}
+
+	if (sender == uploadOriginTextField)
+	{
+		if (uploadOriginTextField.stringValue.length > 255)
+		{
+			uploadOriginTextField.stringValue = [uploadOriginTextField.stringValue substringToIndex:255];
+			NSBeep();
+		}
+
+		uploadOriginCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)uploadOriginTextField.stringValue.length];
+	}
+
+	if (sender == uploadTagsTextField)
+	{
+		if (uploadTagsTextField.stringValue.length > 500)
+		{
+			uploadTagsTextField.stringValue = [uploadTagsTextField.stringValue substringToIndex:500];
+			NSBeep();
+		}
+
+		uploadTagsCountField.stringValue = [NSString stringWithFormat:@"%li/500", (long)uploadTagsTextField.stringValue.length];
+	}
+
+	// Rename Device Sheet
+
+	if (sender == renameName)
+	{
+		if (renameName.stringValue.length > 140)
+		{
+			renameName.stringValue = [renameName.stringValue substringToIndex:140];
+		}
+
+		renameNameLength.stringValue = [NSString stringWithFormat:@"%li/140", (long)renameName.stringValue.length];
+	}
+}
+
+
+
+#pragma mark - Utilty Methods
+
+
+- (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key
+{
+	NSDictionary *rd = nil;
+
+	// This extracts the required key, wherever it is in the source (API) data
+
+	if ([key compare:@"id"] == NSOrderedSame) return [apiDict objectForKey:@"id"];
+	if ([key compare:@"type"] == NSOrderedSame) return [apiDict objectForKey:@"type"];
+
+	// Attributes General properties
+
+	if ([key compare:@"created_at"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.created_at"];
+	if ([key compare:@"updated_at"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.updated_at"];
+
+	if ([key compare:@"name"] == NSOrderedSame)
+	{
+		NSString *name = [apiDict valueForKeyPath:@"attributes.name"];
+		if ((NSNull *)name == [NSNull null]) return nil;
+		return name;
+	}
+
+	if ([key compare:@"description"] == NSOrderedSame)
+	{
+		NSString *desc = [apiDict valueForKeyPath:@"attributes.description"];
+		if ((NSNull *)desc == [NSNull null]) return nil;
+		return desc;
+	}
+
+	// Attributes Device properties
+
+	if ([key compare:@"device_online"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.device_online"];
+	if ([key compare:@"mac_address"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.mac_address"];
+	if ([key compare:@"ip_address"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.ip_address"];
+	if ([key compare:@"imp_type"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.imp_type"];
+	if ([key compare:@"agent_id"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.agent_id"];
+	if ([key compare:@"agent_running"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.agent_running"] boolValue]];
+	if ([key compare:@"swversion"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.swversion"];
+
+	// if ([key compare:@"free_memory"] == NSOrderedSame) return (NSNumber *)[NSNumber numberWithInteger:[[apiDict valueForKeyPath:@"attributes.free_memory"] integerValue]];
+
+	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
+	if ([key compare:@"last_blinkup_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.last_blinkup_at"]];
+
+	// Attributes Deployment properties
+
+	if ([key compare:@"flagged"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.flagged"] boolValue]];
+	if ([key compare:@"sha"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.sha"];
+
+	if ([key compare:@"agent_code"] == NSOrderedSame)
+	{
+		NSString *ac = [apiDict valueForKeyPath:@"attributes.agent_code"];
+		if ((NSNull *)ac == [NSNull null]) return nil;
+		return ac;
+	}
+
+	if ([key compare:@"device_code"] == NSOrderedSame)
+	{
+		NSString *dc = [apiDict valueForKeyPath:@"attributes.device_code"];
+		if ((NSNull *)dc == [NSNull null]) return nil;
+		return dc;
+	}
+
+	if ([key compare:@"origin"] == NSOrderedSame)
+	{
+		NSString *or = [apiDict valueForKeyPath:@"attributes.origin"];
+		if ((NSNull *)or == [NSNull null]) return nil;
+		return or;
+	}
+
+	if ([key compare:@"tags"] == NSOrderedSame)
+	{
+		NSArray *tags = [apiDict valueForKeyPath:@"attributes.tags"];
+		if ((NSNull *)tags == [NSNull null]) return nil;
+		return tags;
+	}
+
+	// Relationships properties
+
+	if ([key compare:@"product"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.product"];
+	if ([key compare:@"devicegroup"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.devicegroup"];
+	if ([key compare:@"current_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.current_deployment"];
+
+	if ((NSNull *)rd == [NSNull null]) return nil;
+	return rd;
+}
+
+
+
+- (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
+{
+	NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup", @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
+	NSArray *dgnames = @[ @"Production", @"Factory Fixture", @"Development", @"Factory Test", @"Production Test"];
+
+	for (NSUInteger i = 0 ; i < dgtypes.count ; ++i)
+	{
+		NSString *dgtype = back ? [dgnames objectAtIndex:i] : [dgtypes objectAtIndex:i];
+
+		if ([dgtype compare:type] == NSOrderedSame) return (back ? [dgtypes objectAtIndex:i] : [dgnames objectAtIndex:i]);
+	}
+
+	if (!back) return @"Unknown";
+	return @"development_devicegroup";
+}
+
+
+
+- (Project *)getParentProject:(Devicegroup *)devicegroup
+{
+	for (Project *ap in projectArray)
+	{
+		if (ap.devicegroups.count > 0)
+		{
+			for (Devicegroup *adg in ap.devicegroups)
+			{
+				if (adg == devicegroup) return ap;
+			}
+		}
+	}
+
+	return nil;
+}
+
+
+
+- (NSDate *)convertTimestring:(NSString *)dateString
+{
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+	[dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
+	NSLog(@"convertTimestring: %@", dateString);
+	return [logDef dateFromString:dateString];
+}
+
+
+
+- (NSString *)getErrorMessage:(NSUInteger)index
+{
+	switch (index)
+	{
+		case kErrorMessageNoSelectedDevice:
+			return @"[ERROR] You have not selected a device. Choose one from the 'Current Device' pop-up below.";
+
+		case kErrorMessageNoSelectedDevicegroup:
+			return @"[ERROR] You have not selected a device group. Go to 'Device Groups'  > 'Project's Device Groups' to select one.";
+
+		case kErrorMessageNoSelectedProject:
+			return @"[ERROR] You have not selected a project. Go to 'Projects' > 'Open Projects' to select one.";
+
+		case kErrorMessageNoSelectedProduct:
+			return @"[ERROR] You have not selected a product. Go to 'Projects' > 'Current Products' to select one.";
+
+		case kErrorMessageMalformedOperation:
+			return @"[ERROR] Malformed action request - no action specified.";
+	}
+
+	return @"No Error";
+}
+
+
+
+- (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces
+{
+	// Takes a device group or project description, adds a caption, and formats it as a series
+	// of lines up to the specified length 'maxWidth', breaking at spaces not mid-word
+	// Used by the 'showProjectInfo:' and 'showDevicegroupInfo:' methods
+
+	description = [NSString stringWithFormat:@"Description: %@", description];
+
+	NSInteger count = 0;
+	NSMutableArray *lines = [[NSMutableArray alloc] init];
+
+	while (count < description.length)
+	{
+		NSRange range = NSMakeRange(count, maxWidth);
+
+		if (count + maxWidth > description.length) range = NSMakeRange(count, description.length - count);
+
+		NSString *line = [description substringWithRange:range];
+		NSInteger back = 1;
+		BOOL done = NO;
+
+		if (line.length == maxWidth)
+		{
+			// Only process a line if it's the full width
+
+			do
+			{
+				// Work back from the list line character
+
+				range = NSMakeRange(line.length - back, 1);
+				NSString *last = [line substringWithRange:range];
+
+				if ([last compare:@" "] == NSOrderedSame)
+				{
+					// Found a space
+
+					done = YES;
+					line = [line substringToIndex:line.length - back];
+				}
+				else
+				{
+					back++;
+				}
+
+			}
+			while (!done);
+		}
+
+		[lines addObject:[spaces stringByAppendingString:line]];
+
+		count = count + line.length + 1;
+	}
+
+	return lines;
+}
+
+
+- (void)setDevicegroupDevices:(Devicegroup *)devicegroup
+{
+	if (devicesArray.count > 0)
+	{
+		for (NSMutableDictionary *device in devicesArray)
+		{
+			NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+			NSString *dgid = [self getValueFrom:dg withKey:@"id"];
+
+			if (devicegroup.did != nil && devicegroup.did.length > 0 && ([devicegroup.did compare:dgid] == NSOrderedSame))
+			{
+				if (devicegroup.devices == nil) devicegroup.devices = [[NSMutableArray alloc] init];
+
+				BOOL flag = NO;
+
+				NSString *dvn = [self getValueFrom:device withKey:@"name"];
+
+				if (dvn == nil) [self getValueFrom:device withKey:@"id"];
+
+				for (NSString *ddevice in devicegroup.devices)
+				{
+					if ([dvn compare:ddevice] == NSOrderedSame)
+					{
+						// Already on the list
+
+						flag = YES;
+						break;
+					}
+				}
+
+				if (!flag && dvn != nil) [devicegroup.devices addObject:dvn];
+			}
+		}
+	}
+}
 
 
 @end
