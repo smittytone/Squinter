@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 47;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -38,12 +38,12 @@
 		504BB2072826574A469035148CF9F65B /* SUAppcastItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcastItem.h; path = Sparkle.framework/Versions/A/Headers/SUAppcastItem.h; sourceTree = "<group>"; };
 		5437577842A25612E738F05F60D3AAA0 /* PDKeychainBindingsController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PDKeychainBindingsController-prefix.pch"; sourceTree = "<group>"; };
 		5D0D452E72ED04FF745036EA4E2FFFB3 /* PDKeychainBindingsController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindingsController.m; path = PDKeychainBindingsController/PDKeychainBindingsController.m; sourceTree = "<group>"; };
-		5E215323AA286323CEAF528BDAB28B4D /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-Squinter.a"; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E215323AA286323CEAF528BDAB28B4D /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C744BC71AA85B4E3BE0118F1AB09201 /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
 		84F52BA8DB92D228C5304D0D0FD1DEB2 /* SUStandardVersionComparator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUStandardVersionComparator.h; path = Sparkle.framework/Versions/A/Headers/SUStandardVersionComparator.h; sourceTree = "<group>"; };
 		85542DF10D139373E443EA53A7046838 /* Pods-Squinter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Squinter-acknowledgements.plist"; sourceTree = "<group>"; };
 		88640F482BC817D2318CB74356D94436 /* PDKeychainBindingsController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindingsController.h; path = PDKeychainBindingsController/PDKeychainBindingsController.h; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9955B29EE75D7EC7EC17AD4A9A2E5242 /* SUVersionComparisonProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionComparisonProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionComparisonProtocol.h; sourceTree = "<group>"; };
 		9B81C2E69A09BA273B57BFF1AB37EB04 /* SUUpdater.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdater.h; path = Sparkle.framework/Versions/A/Headers/SUUpdater.h; sourceTree = "<group>"; };
 		9C267CF6718BE6C5C829FA0744635FD7 /* Pods-Squinter-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-resources.sh"; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 		C30814E24487B32881C29F10C4F98C55 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		CD428214D18A3429A3F10283863DD4FC /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
 		CEB81536547A11E22213C86FAB9B5D3C /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdaterDelegate.h; path = Sparkle.framework/Versions/A/Headers/SUUpdaterDelegate.h; sourceTree = "<group>"; };
-		D729B1A9DC2BC52D819E8966F2B30054 /* libPDKeychainBindingsController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libPDKeychainBindingsController.a; path = libPDKeychainBindingsController.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D729B1A9DC2BC52D819E8966F2B30054 /* libPDKeychainBindingsController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPDKeychainBindingsController.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8B4148CC0C549A1801374F2507EF946 /* PDKeychainBindings.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindings.m; path = PDKeychainBindingsController/PDKeychainBindings.m; sourceTree = "<group>"; };
 		E3F4E8651D7F3A3924146D44E2AA2484 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionDisplayProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		F1F85FFC4043741178099BFB03FE0D2D /* Pods-Squinter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Squinter-dummy.m"; sourceTree = "<group>"; };
@@ -100,7 +100,6 @@
 				5D0D452E72ED04FF745036EA4E2FFFB3 /* PDKeychainBindingsController.m */,
 				B06428707FEB51DA05397359F51800BD /* Support Files */,
 			);
-			name = PDKeychainBindingsController;
 			path = PDKeychainBindingsController;
 			sourceTree = "<group>";
 		};
@@ -119,7 +118,6 @@
 				E3F4E8651D7F3A3924146D44E2AA2484 /* SUVersionDisplayProtocol.h */,
 				91379A0E3B1FD29F509349EC26F278D1 /* Frameworks */,
 			);
-			name = Sparkle;
 			path = Sparkle;
 			sourceTree = "<group>";
 		};
@@ -258,7 +256,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0900;
 			};
 			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
