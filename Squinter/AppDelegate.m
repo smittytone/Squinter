@@ -8875,9 +8875,15 @@
 			[lines addObject:[NSString stringWithFormat:@"Project has %li device groups:", currentProject.devicegroups.count]];
 		}
 
-		for (Devicegroup *dg in currentProject.devicegroups)
+		for (NSUInteger i = 0 ; i < currentProject.devicegroups.count ; ++i)
 		{
+			Devicegroup *dg = [currentProject.devicegroups objectAtIndex:i];
+
 			[self compileDevicegroupInfo:dg :2 :lines];
+
+			// Add a line between device groups
+
+			if (i < currentProject.devicegroups.count - 1) [lines addObject:@" "];
 		}
 	}
 	else
