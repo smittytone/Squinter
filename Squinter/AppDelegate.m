@@ -122,63 +122,63 @@
 
     squintItem.onImageName = @"black_compile";
     squintItem.offImageName = @"black_compile_grey";
-	squintItem.toolTip = @"Compile libraries and files into agent and device code for uploading.";
+	squintItem.toolTip = @"Compile libraries and files into agent and device code for uploading";
 
 	newProjectItem.onImageName = @"plus";
     newProjectItem.offImageName = @"plus_grey";
-	newProjectItem.toolTip = @"Create a new Squinter project.";
+	newProjectItem.toolTip = @"Create a new Squinter project";
 
 	infoItem.onImageName = @"info";
     infoItem.offImageName = @"info_grey";
-	infoItem.toolTip = @"Display detailed project information.";
+	infoItem.toolTip = @"Display detailed project information";
 
 	openAllItem.onImageName = @"open";
     openAllItem.offImageName = @"open_grey";
-	openAllItem.toolTip = @"View the device group's code and library files in your external editor.";
+	openAllItem.toolTip = @"View the device group's code and library files in your external editor";
 
 	viewDeviceCode.onImageName = @"open";
     viewDeviceCode.offImageName = @"open_grey";
-	viewDeviceCode.toolTip = @"Display the device group's compiled device code.";
+	viewDeviceCode.toolTip = @"Display the device group's compiled device code";
 
 	viewAgentCode.onImageName = @"open";
     viewAgentCode.offImageName = @"open_grey";
-	viewAgentCode.toolTip = @"Display the device group's compiled agent code.";
+	viewAgentCode.toolTip = @"Display the device group's compiled agent code";
 
 	uploadCodeItem.onImageName = @"upload2";
     uploadCodeItem.offImageName = @"upload2_grey";
-	uploadCodeItem.toolTip = @"Upload the device group's compiled code to the impCloud.";
+	uploadCodeItem.toolTip = @"Upload the device group's compiled code to the impCloud";
 
 	uploadCodeExtraItem.onImageName = @"uploadplus";
 	uploadCodeExtraItem.offImageName = @"uploadplus_grey";
-	uploadCodeExtraItem.toolTip = @"Upload the device group's compiled code and commit information to the impCloud.";
+	uploadCodeExtraItem.toolTip = @"Upload the device group's compiled code and commit information to the impCloud";
 
 	restartDevicesItem.onImageName = @"restart";
     restartDevicesItem.offImageName = @"restart_grey";
-	restartDevicesItem.toolTip = @"Force all devices running the device group's code to reboot.";
+	restartDevicesItem.toolTip = @"Force all devices running the device group's code to reboot";
 
 	clearItem.onImageName = @"clear";
     clearItem.offImageName = @"clear_grey";
-	clearItem.toolTip = @"Clear the log window.";
+	clearItem.toolTip = @"Clear the log window";
 
 	copyAgentItem.onImageName = @"copy";
     copyAgentItem.offImageName = @"copy_grey";
-	copyAgentItem.toolTip = @"Copy the device group's compiled agent code to the clipboard.";
+	copyAgentItem.toolTip = @"Copy the device group's compiled agent code to the clipboard";
 
 	copyDeviceItem.onImageName = @"copy";
     copyDeviceItem.offImageName = @"copy_grey";
-	copyDeviceItem.toolTip = @"Copy the device group's compiled device code to the clipboard.";
+	copyDeviceItem.toolTip = @"Copy the device group's compiled device code to the clipboard";
 
 	printItem.onImageName = @"print";
     printItem.offImageName = @"print_grey";
-	printItem.toolTip = @"Print the contents of the log window.";
+	printItem.toolTip = @"Print the contents of the log window";
 
 	refreshModelsItem.onImageName = @"refresh";
 	refreshModelsItem.offImageName = @"refresh_grey";
-	refreshModelsItem.toolTip = @"Refresh the list of devices from the impCloud.";
+	refreshModelsItem.toolTip = @"Refresh the list of devices from the impCloud";
 
 	newDevicegroupItem.onImageName = @"plus";
 	newDevicegroupItem.offImageName = @"plus_grey";
-	newDevicegroupItem.toolTip = @"Create a new device group for your selected project.";
+	newDevicegroupItem.toolTip = @"Create a new device group for your selected project";
 
 	devicegroupInfoItem.onImageName = @"info";
 	devicegroupInfoItem.offImageName = @"info_grey";
@@ -188,7 +188,7 @@
     //streamLogsItem.offImageName = @"streamon";
 	//streamLogsItem.onImageNameGrey = @"flag_grey";
 	//streamLogsItem.offImageNameGrey = @"streamon_grey";
-    streamLogsItem.toolTip = @"Enable or disable live log streaming for the current device.";
+    streamLogsItem.toolTip = @"Enable or disable live log streaming for the current device";
 	streamLogsItem.state = kStreamToolbarItemStateOff;
 
 	loginAndOutItem.openImageName = @"logout";
@@ -200,11 +200,15 @@
 
 	listCommitsItem.onImageName = @"commits";
 	listCommitsItem.offImageName = @"commits_grey";
-	listCommitsItem.toolTip = @"List the commits made to the current device group.";
+	listCommitsItem.toolTip = @"List the commits made to the current device group";
 
 	downloadProductItem.onImageName = @"download";
 	downloadProductItem.offImageName = @"download_grey";
-	downloadProductItem.toolTip = @"Download the selected product as a project.";
+	downloadProductItem.toolTip = @"Download the selected product as a project";
+
+	projectsPopUp.toolTip = @"Select an open project";
+	devicesPopUp.toolTip = @"Select a development device";
+	saveLight.toolTip = @"Indicates whether the project needs to be saved (outline) or not (filled)";
 
 	// Other UI Items
     
