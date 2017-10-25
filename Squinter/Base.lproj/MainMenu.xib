@@ -898,18 +898,6 @@
                 <rect key="frame" x="0.0" y="0.0" width="1024" height="582"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lSl-gT-Zzl">
-                        <rect key="frame" x="9" y="12" width="142" height="17"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="17" id="SQ9-pm-Hyu"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="101" id="bnl-GB-CNS"/>
-                        </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Project/Device Group" id="SIn-jF-0uW">
-                            <font key="font" metaFont="systemBold"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kgZ-xK-Ij1">
                         <rect key="frame" x="155" y="7" width="282" height="26"/>
                         <constraints>
@@ -1005,6 +993,18 @@
                             <constraint firstAttribute="height" constant="20" id="Qza-pf-wG9"/>
                         </constraints>
                     </customView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lSl-gT-Zzl">
+                        <rect key="frame" x="9" y="12" width="142" height="17"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="17" id="SQ9-pm-Hyu"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="101" id="bnl-GB-CNS"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Project/Device Group" id="SIn-jF-0uW">
+                            <font key="font" metaFont="systemBold"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="oez-pq-fUm" secondAttribute="bottom" constant="10" id="5cu-Nf-Lac"/>
