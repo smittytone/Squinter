@@ -349,6 +349,13 @@
     [logTextView setTextColor:textColour];
     [logClipView setBackgroundColor:backColour];
 
+	// Set the selection colour to mirror the fore-back setup
+
+	[logTextView setSelectedTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+											textColour, NSBackgroundColorAttributeName,
+											backColour, NSForegroundColorAttributeName,
+											nil]];
+
 	// Set the recent files menu
 
 	recentFiles = [NSMutableArray arrayWithArray:[defaults objectForKey:@"com.bps.squinter.recentFiles"]];
