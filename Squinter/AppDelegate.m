@@ -208,7 +208,7 @@
 
 	projectsPopUp.toolTip = @"Select an open project";
 	devicesPopUp.toolTip = @"Select a development device";
-	saveLight.toolTip = @"Indicates whether the project needs to be saved (outline) or not (filled)";
+	saveLight.toolTip = @"Indicates whether the project has changes to be saved (outline) or not (filled)";
 
 	// Other UI Items
     
@@ -1259,6 +1259,7 @@
 		}
 	}
 
+	/*
     // We've made the selected project the current one, so adjust the project menu's tick marks
     
     for (NSUInteger i = 0; i < openProjectsMenu.numberOfItems ; ++i)
@@ -1272,10 +1273,12 @@
 	// Update the Project list popup
 
 	[projectsPopUp selectItemAtIndex:[projectsPopUp indexOfItemWithTag:itemNumber]];
+	 */
 
 	// Update the Menus and the Toolbar (left until now in case models etc are selected)
 
 	[self refreshProjectsMenu];
+	[self refreshOpenProjectsMenu];
 	[self refreshDevicegroupMenu];
 	[self refreshMainDevicegroupsMenu];
     [self setToolbar];
@@ -10122,8 +10125,9 @@
 			item = [[NSMenuItem alloc] initWithTitle:name action:@selector(chooseProject:) keyEquivalent:@""];
 			item.representedObject = project;
 			[openProjectsMenu addItem:item];
+
 			[projectsPopUp addItemWithTitle:name];
-			NSMenuItem *subitem = [projectsPopUp itemAtIndex:[projectsPopUp indexOfItemWithTitle:project.name]];
+			NSMenuItem *subitem = [projectsPopUp itemWithTitle:project.name];
 			subitem.tag = [openProjectsMenu indexOfItem:item];
 		}
 
@@ -10139,6 +10143,7 @@
 				{
 					anItem.state = NSOnState;
 					[projectsPopUp selectItemWithTitle:selected.title];
+					projectsPopUp.selectedItem.title = [NSString stringWithFormat:@"%@/%@", currentProject.name, currentDevicegroup.name];
 				}
 				else
 				{
@@ -10422,6 +10427,10 @@
 			currentDevicegroup = item.representedObject;
 			currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
 		}
+
+		item = [projectsPopUp selectedItem];
+		Project *pr = [projectArray objectAtIndex:item.tag];
+		item.title = [NSString stringWithFormat:@"%@/%@", pr.name, currentDevicegroup.name];
 	}
 
 	// Now go and build the assigned devices submenus
