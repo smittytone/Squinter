@@ -6313,37 +6313,56 @@
 
 				NSArray *elements = [libName componentsSeparatedByString:@":"];
 
-				// Log and record the found library's name
-
-				[self writeToLog:[NSString stringWithFormat:@"Electric Imp Library \"%@\" version %@ included in source.", [elements objectAtIndex:0], [elements objectAtIndex:1]] :YES];
-
-				// TODO Add a warning if the library has no version value
-
 				// Add the library to the project - name and version (as string)
 
 				File *newLib = [[File alloc] init];
-				newLib.filename = [elements objectAtIndex:0];
-				newLib.version = [elements objectAtIndex:1];
+				newLib.filename = elements.count > 0 ? [elements objectAtIndex:0] : nil;
+				newLib.version = elements.count > 1 ? [elements objectAtIndex:1] : nil;
 				newLib.type = @"eilib";
 
-				if (foundEILibs.count == 0)
+				if (newLib.filename != nil)
 				{
-					// Use the File object, just set the .path to the EI library version
+					// Only manage the library if we've found one
+					// NOTE is this belts and braces?
 
-					[foundEILibs addObject:newLib];
-				}
-				else
-				{
-					BOOL match = NO;
+					// Add a warning if the library has no version value
 
-					for (File *aLib in foundEILibs)
+					if (newLib.version == nil || newLib.version.length == 0)
 					{
-						// See if the library is already listed
+						// EI Library has no version number - which will compile here, but not in the impCloud
 
-						if (([aLib.filename compare:[elements objectAtIndex:0]] == NSOrderedSame) && ([aLib.path compare:[elements objectAtIndex:1]] == NSOrderedSame)) match = YES;
+						[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Electric Imp Library \"%@\" included in source but has no version. Code will compile here but may be rejected by the impCloud.", newLib.filename] :YES];
+
+						[self writeWarningToLog:@"          You should check Electric Imp Library versions to determine the latest version number." :YES];
+
+						newLib.version = @"not set";
+					}
+					else
+					{
+						// Log and record the found library's name
+
+						[self writeToLog:[NSString stringWithFormat:@"Electric Imp Library \"%@\" version %@ included in source.", newLib.filename, newLib.version] :YES];
 					}
 
-					if (!match) [foundEILibs addObject:newLib];
+					if (foundEILibs.count == 0)
+					{
+						// Use the File object, just set the .path to the EI library version
+
+						[foundEILibs addObject:newLib];
+					}
+					else
+					{
+						BOOL match = NO;
+
+						for (File *aLib in foundEILibs)
+						{
+							// See if the library is already listed
+
+							if (([aLib.filename compare:[elements objectAtIndex:0]] == NSOrderedSame) && ([aLib.path compare:[elements objectAtIndex:1]] == NSOrderedSame)) match = YES;
+						}
+
+						if (!match) [foundEILibs addObject:newLib];
+					}
 				}
 			}
 
@@ -12309,7 +12328,19 @@ didReceiveResponse:(NSURLResponse *)response
 									{
 										// Library versions are not the same, so report the discrepancy
 
-										NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLib.version];
+										NSString *mString;
+
+										if ([eiLib.version compare:@"not set"] == NSOrderedSame)
+										{
+											mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - your code doesn't specify a version.", libName, libVer];
+
+										}
+										else
+										{
+											mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLib.version];
+											[self writeWarningToLog:mString :YES];
+										}
+
 										[self writeWarningToLog:mString :YES];
 										allOKFlag = NO;
 									}

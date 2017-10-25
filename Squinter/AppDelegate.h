@@ -497,6 +497,7 @@
 - (void)presentLogEntry:(NSNotification *)note;
 - (void)endLogging:(NSNotification *)note;
 - (void)logCode;
+- (void)writeStreamToLog:(NSAttributedString *)string;
 
 // Squinter Log Methods
 
@@ -511,15 +512,11 @@
 - (void)printInfoInLog:(NSMutableArray *)lines;
 - (void)writeToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeErrorToLog:(NSString *)string :(BOOL)addTimestamp;
+- (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeStyledToLog:(NSAttributedString *)string :(BOOL)addTimestamp;
+- (NSString *)getDisplayPath:(NSString *)path;
 - (void)showCodeErrors:(NSNotification *)note;
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
-
-
-- (NSString *)getDisplayPath:(NSString *)path;
-- (void)writeStreamToLog:(NSAttributedString *)string;
-
-
 - (void)displayError:(NSNotification *)note;
 
 // UI Update Methods
