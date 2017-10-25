@@ -3271,6 +3271,18 @@
 		return;
 	}
 
+	// Is the device unassigned? If so, it can't be restarted
+
+	NSString *did = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
+
+	if (did == nil || did.length == 0)
+	{
+		[self writeWarningToLog:[NSString stringWithFormat:@"Device \"%@\" can't be restarted as it has not yet been assigned to a device group.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
+		return;
+	}
+
+	// Proceed with the restart
+
 	[self writeToLog:[NSString stringWithFormat:@"Restarting \"%@\"", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
 
 	NSDictionary *dict = @{ @"action" : @"restartdevice",
