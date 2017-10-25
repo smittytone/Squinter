@@ -276,6 +276,7 @@
 	// Upload Code
 
 	IBOutlet NSPanel *uploadSheet;
+	IBOutlet NSTextField *uploadDevicegroupTextField;
 	IBOutlet NSTabView *uploadTab;
 	IBOutlet NSTextField *uploadCommitTextField;
 	IBOutlet NSTextField *uploadCommitCountField;

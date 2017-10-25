@@ -2972,6 +2972,7 @@
 		uploadCommitTextField.stringValue = @"";
 		uploadOriginTextField.stringValue = @"";
 		uploadTagsTextField.stringValue = @"";
+		uploadDevicegroupTextField.stringValue = [NSString stringWithFormat:@"Upload code and extra information to device group “%@”...", currentDevicegroup.name];
 
 		[_window beginSheet:uploadSheet completionHandler:nil];
 
