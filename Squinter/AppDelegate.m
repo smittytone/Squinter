@@ -787,7 +787,7 @@
 
 		[ide logout];
 		[self setToolbar];
-		[self writeToLog:@"You are now logged out of the impCloud." :YES];
+		[self writeStringToLog:@"You are now logged out of the impCloud." :YES];
 	}
 }
 
@@ -811,7 +811,7 @@
 
 		saveDetailsCheckbox.state = NSOffState;
 
-		[self writeToLog:@"Automatically logging you into the impCloud. This can be disabled in Preferences." :YES];
+		[self writeStringToLog:@"Automatically logging you into the impCloud. This can be disabled in Preferences." :YES];
 		[self login:nil];
 	}
 }
@@ -1067,7 +1067,7 @@
 		// User wants to create a new product for this project. We will pick up saving
 		// this project AFTER the product has been created (to make sure it is created)
 
-		[self writeToLog:@"Creating Project's Product on the server..." :YES];
+		[self writeStringToLog:@"Creating Project's Product on the server..." :YES];
 
 		NSDictionary *dict = @{ @"action" : @"newproject",
 								@"project" : currentProject };
@@ -1317,7 +1317,7 @@
 
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -1402,7 +1402,7 @@
 		// If there is only one open project, which we're about to close,
 		// we can clear everything project-related in the UI
 
-		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no open Projects.", closedName] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no open Projects.", closedName] :YES];
 		[projectArray removeAllObjects];
 		[fileWatchQueue kill];
 		fileWatchQueue = nil;
@@ -1448,7 +1448,7 @@
 				confirmMessage = [confirmMessage stringByAppendingFormat:@" There are %li open Projects.", projectArray.count];
 			}
 
-			[self writeToLog:confirmMessage :YES];
+			[self writeStringToLog:confirmMessage :YES];
 		}
 
 		[saveLight needSave:currentProject.haschanged];
@@ -1470,7 +1470,7 @@
 {
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -1605,7 +1605,7 @@
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
 			}
 		}
 		else
@@ -1632,7 +1632,7 @@
 				[self refreshOpenProjectsMenu];
 			}
 
-			if (!currentProject.haschanged) [self writeToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
+			if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
 
 			// Update the save indicator if anything has changed
 
@@ -1686,7 +1686,7 @@
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
 			}
 		}
 		else
@@ -1714,7 +1714,7 @@
 				[self refreshOpenProjectsMenu];
 			}
 
-			if (!currentProject.haschanged) [self writeToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
+			if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
 
 			// Update the save indicator if anything has changed
 
@@ -1733,7 +1733,7 @@
 
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -1756,7 +1756,7 @@
 	{
 		// Project has no PID so just create a new product
 
-		[self writeToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
 
 		// Start by creating the product
 
@@ -1777,7 +1777,7 @@
 		{
 			// We don't have the products list populated yet, so we need to get it first
 
-			[self writeToLog:@"Retrieving a list of your Products" :YES];
+			[self writeStringToLog:@"Retrieving a list of your Products" :YES];
 
 			NSDictionary *dict = @{ @"action" : @"uploadproject",
 									@"project" : currentProject };
@@ -1857,7 +1857,7 @@
 		{
 			// We need to get the list of products to match because we have no such list yet
 
-			[self writeToLog:@"Retrieving a list of your Products" :YES];
+			[self writeStringToLog:@"Retrieving a list of your Products" :YES];
 
 			NSDictionary *dict = @{ @"action" : @"syncproject",
 									@"project" : project };
@@ -2014,7 +2014,7 @@
 			{
 				if (url != nil)
 				{
-					[self writeToLog:[NSString stringWithFormat:@"Updating location of Project file \"%@\".", [recent valueForKey:@"name"]] :YES];
+					[self writeStringToLog:[NSString stringWithFormat:@"Updating location of Project file \"%@\".", [recent valueForKey:@"name"]] :YES];
 
 					NSDictionary *newRecent = @{ @"name" : [recent valueForKey:@"name"],
 												 @"path" : [url.path stringByDeletingLastPathComponent],
@@ -2161,7 +2161,7 @@
 		return;
 	}
 
-	[self writeToLog:@"Getting a list of Products from the impCloud..." :YES];
+	[self writeStringToLog:@"Getting a list of Products from the impCloud..." :YES];
 	[ide getProducts];
 
 	// Pick up the action in 'listProducts:'
@@ -2173,7 +2173,7 @@
 {
 	if (selectedProduct == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
 		return;
 	}
 
@@ -2235,7 +2235,7 @@
 				NSDictionary *dict = @{ @"action" : @"deleteproduct",
 										@"product" : dp };
 
-				[self writeToLog:[NSString stringWithFormat:@"Deleting Product \"%@\" - checking its Device Groups...", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Deleting Product \"%@\" - checking its Device Groups...", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
 
 				[ide getDevicegroupsWithFilter:@"product.id" :[selectedProduct objectForKey:@"id"] :dict];
 
@@ -2259,8 +2259,8 @@
 		return;
 	}
 
-	[self writeToLog:[NSString stringWithFormat:@"Retrieving Device Groups and source code for Product \"%@\".", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
-	[self writeToLog:@"This may take a moment or two..." :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Retrieving Device Groups and source code for Product \"%@\".", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+	[self writeStringToLog:@"This may take a moment or two..." :YES];
 
 	Project *newProject = [[Project alloc] init];
 
@@ -2321,13 +2321,13 @@
 {
 	if (selectedProduct == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
 		return;
 	}
 
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -2335,7 +2335,7 @@
 
 	if (currentProject.pid != nil && [currentProject.pid compare:pid] == NSOrderedSame)
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is already linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is already linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
 	}
 	else
 	{
@@ -2343,7 +2343,7 @@
 		currentProject.haschanged = YES;
 		[self refreshOpenProjectsMenu];
 
-		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
 	}
 
 	// Update UI
@@ -2361,7 +2361,7 @@
 {
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -2515,7 +2515,7 @@
 								@"project" : currentProject,
 								@"files" : [NSNumber numberWithBool:makeNewFiles] };
 
-		[self writeToLog:[NSString stringWithFormat:@"Uploading Device Group \"%@\" to the impCloud.", newdg.name] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Uploading Device Group \"%@\" to the impCloud.", newdg.name] :YES];
 
 		NSDictionary *details;
 
@@ -2808,7 +2808,7 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -2818,7 +2818,7 @@
 		{
 			// The user is not logged in, but the device group is associated with a device group on the server.
 
-			[self writeToLog:[NSString stringWithFormat:@"You are not logged in to the impCloud. You must be logged in to delete Device Group \"%@\".", currentDevicegroup.name] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"You are not logged in to the impCloud. You must be logged in to delete Device Group \"%@\".", currentDevicegroup.name] :YES];
 			return;
 		}
 
@@ -2917,7 +2917,7 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -2936,7 +2936,7 @@
 
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -3080,7 +3080,7 @@
 
 				if (result == nil)
 				{
-					[self writeToLog:[NSString stringWithFormat:@"Tag \"%@\" is illegal and will be removed.", part] :YES];
+					[self writeStringToLog:[NSString stringWithFormat:@"Tag \"%@\" is illegal and will be removed.", part] :YES];
 
 					indices[i] = 0;
 				}
@@ -3153,7 +3153,7 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -3185,7 +3185,7 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -3203,7 +3203,7 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -3253,7 +3253,7 @@
 		return;
 	}
 
-	[self writeToLog:@"Updating devices’ status information - this may take a moment..." :YES];
+	[self writeStringToLog:@"Updating devices’ status information - this may take a moment..." :YES];
 
 	// Get all the devices from development device groups and unassigned devices
 
@@ -3274,13 +3274,13 @@
 
 	if (selectedDevice == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
 	// Is the device unassigned? If so, it can't be restarted
 
-	NSString *did = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
+	NSString *did = [self getValueFrom:selectedDevice withKey:@"id"];
 
 	if (did == nil || did.length == 0)
 	{
@@ -3290,7 +3290,7 @@
 
 	// Proceed with the restart
 
-	[self writeToLog:[NSString stringWithFormat:@"Restarting \"%@\"", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Restarting \"%@\"", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
 
 	NSDictionary *dict = @{ @"action" : @"restartdevice",
 							@"device" : selectedDevice };
@@ -3312,7 +3312,7 @@
 
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -3336,7 +3336,7 @@
 
 	if (selectedDevice == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
@@ -3765,7 +3765,7 @@
 {
 	if (selectedDevice == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
@@ -3793,7 +3793,7 @@
 {
 	if (selectedDevice == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
@@ -3996,7 +3996,7 @@
 			// which uses 'devicegroups' to store old file location data and 'description' to
 			// hold the number and type of files
 
-			[self writeToLog:[NSString stringWithFormat:@"Converting an earlier Squirrel project file (%@) to a current one (%@)", aProject.version, kSquinterCurrentVersion] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Converting an earlier Squirrel project file (%@) to a current one (%@)", aProject.version, kSquinterCurrentVersion] :YES];
 
 			NSString *agentPath, *devicePath;
 			Model *model;
@@ -4082,7 +4082,7 @@
 
 			if (aProject.path == nil || aProject.path.length == 0) aProject.path = [filePath stringByDeletingLastPathComponent];
 
-			[self writeToLog:@"Project converted." :YES];
+			[self writeStringToLog:@"Project converted." :YES];
 		}
 
 		// Check for a change of project name via project filename
@@ -4112,7 +4112,7 @@
 					{
 						// Filename-derived project name doesn't match an existing name, so use that
 
-						[self writeToLog:[NSString stringWithFormat:@"A Project called \"%@\" is already loaded so the new Project's filename, \"%@.squirrelproj\", will be used", aName, newName] :YES];
+						[self writeStringToLog:[NSString stringWithFormat:@"A Project called \"%@\" is already loaded so the new Project's filename, \"%@.squirrelproj\", will be used", aName, newName] :YES];
 					}
 					else
 					{
@@ -4195,7 +4195,7 @@
 		{
 			// Full path (path + name) matches so user is trying to open an already open project
 
-			[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" is already open.", aProject.name] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is already open.", aProject.name] :YES];
 			aProject = nil;
 			gotFlag = YES;
 		}
@@ -4215,13 +4215,13 @@
 			currentProject.path = [filePath stringByDeletingLastPathComponent];
 			currentProject.filename = [filePath lastPathComponent];
 
-			[self writeToLog:[NSString stringWithFormat:@"Loading Project \"%@\" from file \"%@\".", currentProject.name, filePath] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Loading Project \"%@\" from file \"%@\".", currentProject.name, filePath] :YES];
 
 			// Are the loaded and stored paths different?
 
 			if ([oldPath compare:currentProject.path] != NSOrderedSame)
 			{
-				[self writeToLog:[NSString stringWithFormat:@"Project file has moved from %@ to %@ since it was last opened.", oldPath, currentProject.path] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Project file has moved from %@ to %@ since it was last opened.", oldPath, currentProject.path] :YES];
 				projectMoved = YES;
 				//currentProject.haschanged = YES;
 			}
@@ -4242,7 +4242,7 @@
 
 					if (ide.isLoggedIn)
 					{
-						[self writeToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
+						[self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
 
 						// Run the transfer as a standard upload, though we bypass uploadProject: at first
 
@@ -4300,7 +4300,7 @@
 
 				if ([defaults boolForKey:@"com.bps.squinter.autocompile"])
 				{
-					[self writeToLog:@"Auto-compiling the Project's Device Groups. This can be disabled in Preferences." :YES];
+					[self writeStringToLog:@"Auto-compiling the Project's Device Groups. This can be disabled in Preferences." :YES];
 
 					for (Devicegroup *dg in currentProject.devicegroups)
 					{
@@ -4371,7 +4371,7 @@
 
 									[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find source file \"%@\" at expected location %@.", md.filename, [self getPrintPath:currentProject.path :md.path]] :YES];
 
-									[self writeToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
+									[self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
 
 									md.hasMoved = YES;
 								}
@@ -4387,7 +4387,7 @@
 
 											md.path = [self getRelativeFilePath:currentProject.path :modelAbsPath];
 
-											[self writeToLog:[NSString stringWithFormat:@"Updating saved source file \"%@\" path to %@ - source or project file has moved.", md.filename, [self getPrintPath:currentProject.path :md.path]] :YES];
+											[self writeStringToLog:[NSString stringWithFormat:@"Updating saved source file \"%@\" path to %@ - source or project file has moved.", md.filename, [self getPrintPath:currentProject.path :md.path]] :YES];
 
 											currentProject.haschanged = YES;
 										}
@@ -4432,7 +4432,7 @@
 											{
 												[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find library \"%@\" at expected location %@ - source or project file has moved.", fl.filename, [self getPrintPath:currentProject.path :fl.path]] :YES];
 
-												[self writeToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
+												[self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
 
 												fl.hasMoved = YES;
 											}
@@ -4446,7 +4446,7 @@
 
 														fl.path = [self getRelativeFilePath:currentProject.path :fileAbsPath];
 
-														[self writeToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
+														[self writeStringToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
 
 														currentProject.haschanged = YES;
 
@@ -4489,7 +4489,7 @@
 											{
 												[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find file \"%@\" at expected location %@ - file or project has moved.", fl.filename, [self getPrintPath:currentProject.path :fl.path]] :YES];
 
-												[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
+												[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
 
 												fl.hasMoved = YES;
 											}
@@ -4503,7 +4503,7 @@
 
 														fl.path = [self getRelativeFilePath:currentProject.path :fileAbsPath];
 
-														[self writeToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
+														[self writeStringToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
 
 														currentProject.haschanged = YES;
 
@@ -4740,7 +4740,7 @@
 
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -4866,7 +4866,7 @@
 	NSString *filePath = [[urls firstObject] path];
 	NSString *fileName = [filePath lastPathComponent];
 
-	[self writeToLog:[NSString stringWithFormat:@"Processing file: \"%@\".", filePath] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Processing file: \"%@\".", filePath] :YES];
 
 	// Try and identify the source type: is the file a *.device.nut file?
 
@@ -5178,7 +5178,7 @@
 			saveAsFlag = NO;
 		}
 
-		[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
 	}
 	else
 	{
@@ -5466,7 +5466,7 @@
 
     if (devicegroup == nil)
     {
-        [self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -5476,7 +5476,7 @@
 	NSString *output, *aPath;
 	NSUInteger squinted = 0;
 
-	[self writeToLog:[NSString stringWithFormat:@"Processing device group \"%@\"...", devicegroup.name] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Processing device group \"%@\"...", devicegroup.name] :YES];
 
 	if (devicegroup.models.count == 0 || devicegroup.models == nil)
 	{
@@ -5530,7 +5530,7 @@
 
 		if (aPath != nil)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"Processing %@ code file: \"%@\"...", model.type, aPath.lastPathComponent] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Processing %@ code file: \"%@\"...", model.type, aPath.lastPathComponent] :YES];
 
 			output = [self processSource:aPath :typeValue :thisProject.path :model :!justACheck];
 
@@ -5608,7 +5608,7 @@
 				resultString = [NSString stringWithFormat:@"Device group \"%@\" source compiled - agent and device code ready to upload.", devicegroup.name];
 		}
 
-		[self writeToLog:resultString :YES];
+		[self writeStringToLog:resultString :YES];
 		devicegroup.squinted = squinted;
 	}
 	
@@ -6122,7 +6122,7 @@
 							newLib.version = libVer;
 
 							[foundLibs addObject:newLib];
-							[self writeToLog:[NSString stringWithFormat:@"Local library \"%@\" found in source.", libName] :YES];
+							[self writeStringToLog:[NSString stringWithFormat:@"Local library \"%@\" found in source.", libName] :YES];
 						}
 					}
 					else
@@ -6148,7 +6148,7 @@
 							newFile.path = libPath;
 
 							[foundFiles addObject:newFile];
-							[self writeToLog:[NSString stringWithFormat:@"Local file \"%@\" found in source.", libName] :YES];
+							[self writeStringToLog:[NSString stringWithFormat:@"Local file \"%@\" found in source.", libName] :YES];
 						}
 					}
 				}
@@ -6238,7 +6238,7 @@
 		[self writeErrorToLog:mString :YES];
 
 		NSString *tString = ((codeType == kCodeTypeDevice) ? @"You should check the library locations specified in your device code." : @"You should check the library locations specified in your agent code.");
-		[self writeToLog:tString :YES];
+		[self writeStringToLog:tString :YES];
 
 		// If we're compiling rather than just checking code, bail and indicate an error condition
 
@@ -6266,8 +6266,8 @@
 			mString = [NSString stringWithFormat:@"%li local files - %@ - can’t be located in the file system.", deadLibs.count, dString];
 		}
 
-		[self writeToLog:mString :YES];
-		[self writeToLog:@"You should check the file locations specified in your source code." :YES];
+		[self writeStringToLog:mString :YES];
+		[self writeStringToLog:@"You should check the file locations specified in your source code." :YES];
 
 		if (returnCode) return nil;
 	}
@@ -6361,7 +6361,7 @@
 					{
 						// Log and record the found library's name
 
-						[self writeToLog:[NSString stringWithFormat:@"Electric Imp Library \"%@\" version %@ included in source.", newLib.filename, newLib.version] :YES];
+						[self writeStringToLog:[NSString stringWithFormat:@"Electric Imp Library \"%@\" version %@ included in source.", newLib.filename, newLib.version] :YES];
 					}
 
 					if (foundEILibs.count == 0)
@@ -6456,18 +6456,18 @@
 		{
 			if (iLibs.count == 1)
 			{
-				[self writeToLog:[NSString stringWithFormat:@"1 Electric Imp library no longer included in this %@ code.", model.type] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"1 Electric Imp library no longer included in this %@ code.", model.type] :YES];
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included in this %@ code.", (long)iLibs.count, model.type] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included in this %@ code.", (long)iLibs.count, model.type] :YES];
 			}
 
 			[iLibs removeAllObjects];
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"No Electric Imp libraries included in this %@ code.", model.type] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"No Electric Imp libraries included in this %@ code.", model.type] :YES];
 		}
 	}
 	else
@@ -6510,7 +6510,7 @@
 					{
 						// Names match but the versions don't
 
-						[self writeToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", aLib.filename, match, aLib.path] :YES];
+						[self writeStringToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", aLib.filename, match, aLib.path] :YES];
 					}
 				}
 			}
@@ -6539,7 +6539,7 @@
 
 		if (removed == 0 && added == 0)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"No Electric Imp libraries added to or removed from the %@ code.", model.type] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"No Electric Imp libraries added to or removed from the %@ code.", model.type] :YES];
 		}
 		else
 		{
@@ -6573,7 +6573,7 @@
 				as = rs;
 			}
 
-			if (as.length > 0) [self writeToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+			if (as.length > 0) [self writeStringToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
 		}
 
 		// Now replace the recorded EI library list with the new one from 'foundEILibs'
@@ -6605,11 +6605,11 @@
 		{
 			if (mLibs.count == 1)
 			{
-				[self writeToLog:[NSString stringWithFormat:@"1 local library no longer referenced in the %@ code.", model.type] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"1 local library no longer referenced in the %@ code.", model.type] :YES];
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the %@ code.", (long)mLibs.count, model.type] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the %@ code.", (long)mLibs.count, model.type] :YES];
 			}
 
 			thisProject.haschanged = YES;
@@ -6617,7 +6617,7 @@
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"No local libraries included in this %@ code.", model.type] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"No local libraries included in this %@ code.", model.type] :YES];
 		}
 	}
 	else
@@ -6661,7 +6661,7 @@
 
 		if (removed == 0 && added == 0)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"No local libraries added to or removed from the %@ code.", model.type] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"No local libraries added to or removed from the %@ code.", model.type] :YES];
 		}
 		else
 		{
@@ -6697,7 +6697,7 @@
 				as = rs;
 			}
 
-			if (as.length > 0) [self writeToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+			if (as.length > 0) [self writeStringToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
 		}
 
 		// Now replace the recorded EI library list with the new one from 'foundEILibs'
@@ -6725,11 +6725,11 @@
 		{
 			if (mFiles.count == 1)
 			{
-				[self writeToLog:[NSString stringWithFormat:@"1 local file no longer referenced in the %@ code.", model.type] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"1 local file no longer referenced in the %@ code.", model.type] :YES];
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"%li local file no longer referenced in the %@ code.", (long)mFiles.count, model.type] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"%li local file no longer referenced in the %@ code.", (long)mFiles.count, model.type] :YES];
 			}
 
 			thisProject.haschanged = YES;
@@ -6737,7 +6737,7 @@
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"No local files included in this %@ code.", model.type] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"No local files included in this %@ code.", model.type] :YES];
 		}
 	}
 	else
@@ -6778,7 +6778,7 @@
 
 		if (removed == 0 && added == 0)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"No local files added to or removed from the %@ code.", model.type] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"No local files added to or removed from the %@ code.", model.type] :YES];
 		}
 		else
 		{
@@ -6814,7 +6814,7 @@
 				as = rs;
 			}
 
-			if (as.length > 0) [self writeToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+			if (as.length > 0) [self writeStringToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
 		}
 
 		// Now replace the recorded EI library list with the new one from 'foundEILibs'
@@ -6927,96 +6927,6 @@
 
 
 
-#pragma mark - Pasteboard Methods
-
-
-- (IBAction)copyDeviceCodeToPasteboard:(id)sender
-{
-    if (currentDevicegroup == nil)
-	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
-		return;
-	}
-
-	BOOL flag = NO;
-
-	for (Model *model in currentDevicegroup.models)
-	{
-		if ([model.type compare:@"device"] == NSOrderedSame)
-		{
-			if (model.squinted && model.code.length > 0)
-			{
-				NSPasteboard *pb = [NSPasteboard generalPasteboard];
-				NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
-				[pb declareTypes:types owner:self];
-				[pb setString:model.code forType:NSStringPboardType];
-				[self writeToLog:@"Compiled device code copied to clipboard." :YES];
-				flag = YES;
-			}
-
-			break;
-		}
-	}
-
-	if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled device code to copy." :YES];
-}
-
-
-
-- (IBAction)copyAgentCodeToPasteboard:(id)sender
-{
-    if (currentDevicegroup == nil)
-	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
-		return;
-	}
-
-	BOOL flag = NO;
-
-	for (Model *model in currentDevicegroup.models)
-	{
-		if ([model.type compare:@"agent"] == NSOrderedSame)
-		{
-			if (model.squinted && model.code.length > 0)
-			{
-				NSPasteboard *pb = [NSPasteboard generalPasteboard];
-				NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
-				[pb declareTypes:types owner:self];
-				[pb setString:model.code forType:NSStringPboardType];
-				[self writeToLog:@"Compiled agent code copied to clipboard." :YES];
-				flag = YES;
-			}
-
-			break;
-		}
-	}
-
-	if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled agent code to copy." :YES];
-}
-
-
-
-- (IBAction)copyAgentURL:(id)sender
-{
-	if (selectedDevice == nil)
-	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
-		return;
-	}
-
-	NSString *agentid = [self getValueFrom:selectedDevice withKey:@"agent_id"];
-	NSString *ustring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", agentid];
-	NSPasteboard *pb = [NSPasteboard generalPasteboard];
-	NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
-
-	[pb declareTypes:ptypes owner:self];
-	[pb setString:ustring forType:NSStringPboardType];
-
-	[self writeToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
-}
-
-
-
 #pragma mark - API Response Handler Methods
 
 - (void)listProducts:(NSNotification *)note
@@ -7073,11 +6983,11 @@
 
 			// Inform the user
 
-			[self writeToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
+			[self writeStringToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
 		}
 		else
 		{
-			[self writeToLog:@"There are no products listed on the server." :YES];
+			[self writeStringToLog:@"There are no products listed on the server." :YES];
 		}
 
 		[self refreshProductsMenu];
@@ -7177,7 +7087,7 @@
 			[dp setObject:[NSNumber numberWithInteger:dgs.count] forKey:@"count"];
 			[dp setObject:dgs forKey:@"devicegroups"];
 
-			[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking devicegroups for assigned devices...", [self getValueFrom:pd withKey:@"name"]] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking devicegroups for assigned devices...", [self getValueFrom:pd withKey:@"name"]] :YES];
 
 			for (NSDictionary *dg in dgs)
 			{
@@ -7195,7 +7105,7 @@
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (productToProjectStageTwo:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (productToProjectStageTwo:)"] :YES];
 	}
 }
 
@@ -7358,8 +7268,8 @@
 
 			selectedProduct = nil;
 
-			[self writeToLog:[NSString stringWithFormat:@"Created product for project \"%@\".", pr.name] :YES];
-			[self writeToLog:@"Refreshing your list of products..." :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Created product for project \"%@\".", pr.name] :YES];
+			[self writeStringToLog:@"Refreshing your list of products..." :YES];
 			[self getProductsFromServer:nil];
 
 			// Add the new project to the project menu. We've already checked for a name clash,
@@ -7395,13 +7305,13 @@
 
 			NSString *createdItem = [self getValueFrom:data withKey:@"name"];
 
-			[self writeToLog:[NSString stringWithFormat:@"Uploaded project \"%@\" to the impCloud.", createdItem] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Uploaded project \"%@\" to the impCloud.", createdItem] :YES];
 
 			selectedProduct = nil;
 
-			[self writeToLog:@"Refreshing your list of products..." :YES];
+			[self writeStringToLog:@"Refreshing your list of products..." :YES];
 			[self getProductsFromServer:nil];
-			[self writeToLog:@"Uploading the project's device groups..." :YES];
+			[self writeStringToLog:@"Uploading the project's device groups..." :YES];
 
 			if (pr.devicegroups.count > 0)
 			{
@@ -7409,7 +7319,7 @@
 
 				for (Devicegroup *dg in pr.devicegroups)
 				{
-					[self writeToLog:[NSString stringWithFormat:@"Uploading device group \"%@\"...", dg.name] :YES];
+					[self writeStringToLog:[NSString stringWithFormat:@"Uploading device group \"%@\"...", dg.name] :YES];
 
 					NSDictionary *dict = @{ @"action" : @"uploadproject",
 											@"project" : pr,
@@ -7429,7 +7339,7 @@
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createProductStageTwo:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createProductStageTwo:)"] :YES];
 	}
 }
 
@@ -7444,7 +7354,7 @@
 
 	[dict setObject:[NSNumber numberWithInteger:devicegroups.count] forKey:@"count"];
 
-	[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - deleting devicegroups...", [self getValueFrom:product withKey:@"name"]] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - deleting devicegroups...", [self getValueFrom:product withKey:@"name"]] :YES];
 
 	// Run through the device groups in the list and delete them
 
@@ -7473,8 +7383,8 @@
 
 	selectedProduct = nil;
 
-	[self writeToLog:[NSString stringWithFormat:@"Deleted product \"%@\".", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
-	[self writeToLog:@"Refreshing your list of products..." :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Deleted product \"%@\".", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
+	[self writeStringToLog:@"Refreshing your list of products..." :YES];
 	[ide getProducts];
 }
 
@@ -7500,20 +7410,20 @@
 				project.name = [self getValueFrom:response withKey:@"name"];
 				project.description = [self getValueFrom:response withKey:@"description"];
 
-				[self writeToLog:[NSString stringWithFormat:@"Project and product \"%@\" updated.", project.name] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Project and product \"%@\" updated.", project.name] :YES];
 			}
 			else
 			{
 				// Separate response text for when we're updating a product
 
-				[self writeToLog:[NSString stringWithFormat:@"Product \"%@\" updated.", [self getValueFrom:response withKey:@"name"]] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Product \"%@\" updated.", [self getValueFrom:response withKey:@"name"]] :YES];
 			}
 
 			if (productsArray.count > 0)
 			{
 				// Update the local products list, if we have one (we may not)
 
-				[self writeToLog:@"Refreshing your list of products..." :YES];
+				[self writeStringToLog:@"Refreshing your list of products..." :YES];
 				[self getProductsFromServer:nil];
 			}
 		}
@@ -7521,7 +7431,7 @@
 		{
 			// Update the local products list, if we have one (we may not)
 
-			[self writeToLog:@"Refreshing your list of products..." :YES];
+			[self writeStringToLog:@"Refreshing your list of products..." :YES];
 			[self getProductsFromServer:nil];
 
 			project.count = project.devicegroups.count;
@@ -7557,7 +7467,7 @@
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateProductStageTwo:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateProductStageTwo:)"] :YES];
 	}
 }
 
@@ -7588,7 +7498,7 @@
 			{
 				// If the name has changed, report it
 
-				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" renamed \"%@\".", devicegroup.name, newName] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" renamed \"%@\".", devicegroup.name, newName] :YES];
 				devicegroup.name = newName;
 				updated = YES;
 			}
@@ -7596,14 +7506,14 @@
 			{
 				// Only report a description update if the name hasn't changed too
 
-				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" description updated.", devicegroup.name] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" description updated.", devicegroup.name] :YES];
 				updated = YES;
 			}
 		}
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateDevicegroupStageTwo:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateDevicegroupStageTwo:)"] :YES];
 	}
 
 	if (updated)
@@ -7665,7 +7575,7 @@
 					}
 				}
 
-				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" deleted.", devicegroup.name] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" deleted.", devicegroup.name] :YES];
 
 				project.haschanged = YES;
 
@@ -7695,7 +7605,7 @@
 
 			NSDictionary *deletedProduct = [product objectForKey:@"product"];
 
-			[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:deletedProduct withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:deletedProduct withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
 
 			[product setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
 
@@ -7703,7 +7613,7 @@
 			{
 				// All the device groups are gone, now for the final product... phew
 
-				[self writeToLog:[NSString stringWithFormat:@"Deleting product \"%@\"...", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\"...", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
 
 				[ide deleteProduct:[deletedProduct objectForKey:@"id"] :source];
 
@@ -7713,7 +7623,7 @@
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (deleteDevicegroupStageTwo:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (deleteDevicegroupStageTwo:)"] :YES];
 	}
 }
 
@@ -7787,7 +7697,7 @@
 
 				NSDictionary *devicegroup = [source objectForKey:@"devicegroup"];
 
-				[self writeToLog:[NSString stringWithFormat:@"Product \"%@\" can't be deleted because device group \"%@\" has devices assigned. Aborting delete attempt.", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"]] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Product \"%@\" can't be deleted because device group \"%@\" has devices assigned. Aborting delete attempt.", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"]] :YES];
 			}
 			else
 			{
@@ -7839,11 +7749,11 @@
 					line = [line stringByAppendingString:devs];
 				}
 
-				[self writeToLog:line :YES];
+				[self writeStringToLog:line :YES];
 			}
 			else
 			{
-				[self writeToLog:@"This Device Group has no devices assigned to it." :YES];
+				[self writeStringToLog:@"This Device Group has no devices assigned to it." :YES];
 			}
 
 			return;
@@ -7952,7 +7862,7 @@
 			}
 		}
 
-		[self writeToLog:@"List of devices loaded: see 'Current Device' and 'Devices' > 'Unassigned Devices'." :YES];
+		[self writeStringToLog:@"List of devices loaded: see 'Current Device' and 'Devices' > 'Unassigned Devices'." :YES];
 
 		// Update the UI
 
@@ -7963,7 +7873,7 @@
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
 	}
 }
 
@@ -8056,7 +7966,7 @@
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
 	}
 }
 
@@ -8067,7 +7977,7 @@
 	// NOTE We can't get here without one or more device groups
 	// and there will be one deployment per devicegroup
 
-	[self writeToLog:[NSString stringWithFormat:@"Uploading project \"%@\" code...", project.name] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" code...", project.name] :YES];
 
 	project.count = project.devicegroups.count;
 
@@ -8079,7 +7989,7 @@
 
 			if (devicegroup.models > 0)
 			{
-				[self writeToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
 
 				NSString *agentCode = @"";
 				NSString *deviceCode = @"";
@@ -8128,12 +8038,12 @@
 			}
 			else
 			{
-				[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" has no code to upload.", devicegroup.name] :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has no code to upload.", devicegroup.name] :YES];
 			}
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"The code for device group \"%@\" has not been compiled - it will not be uploaded.", devicegroup.name] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"The code for device group \"%@\" has not been compiled - it will not be uploaded.", devicegroup.name] :YES];
 		}
 	}
 }
@@ -8157,19 +8067,19 @@
 			// The returned entity is a device - we originally called 'restartDevice:'
 
 			NSDictionary *device = [source objectForKey:@"device"];
-			[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" has restarted.", [self getValueFrom:device withKey:@"name"]] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" has restarted.", [self getValueFrom:device withKey:@"name"]] :YES];
 		}
 		else
 		{
 			// The returned entity is a device group - we originally called 'restartDevices:'
 
 			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-			[self writeToLog:[NSString stringWithFormat:@"The devices assigned to device group \"%@\" have restarted.", devicegroup.name] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"The devices assigned to device group \"%@\" have restarted.", devicegroup.name] :YES];
 		}
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (restarted:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (restarted:)"] :YES];
 	}
 }
 
@@ -8194,7 +8104,7 @@
 
 			NSString *result = [data objectForKey:@"data"];
 
-			[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" %@.", [self getValueFrom:device withKey:@"name"], result] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" %@.", [self getValueFrom:device withKey:@"name"], result] :YES];
 		}
 		else
 		{
@@ -8203,7 +8113,7 @@
 
 			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
 
-			[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" assigned to device group \"%@\".", [self getValueFrom:device withKey:@"name"], devicegroup.name] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" assigned to device group \"%@\".", [self getValueFrom:device withKey:@"name"], devicegroup.name] :YES];
 		}
 
 		// Update the device lists to reflect the change - this will update UI
@@ -8212,7 +8122,7 @@
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (reassigned:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (reassigned:)"] :YES];
 	}
 }
 
@@ -8225,7 +8135,7 @@
 	NSDictionary *data = (NSDictionary *)note.object;
 	NSDictionary *source = [data objectForKey:@"object"];
 
-	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
 
 	selectedDevice = nil;
 
@@ -8244,7 +8154,7 @@
 	NSDictionary *source = [data objectForKey:@"object"];
 	NSDictionary *device = [source objectForKey:@"device"];
 
-	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" removed from your account.", [self getValueFrom:device withKey:@"name"]] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from your account.", [self getValueFrom:device withKey:@"name"]] :YES];
 
 	// If the selected device is the one we've just delete - likely it is
 
@@ -8301,19 +8211,19 @@
 			{
 				// All done!
 
-				[self writeToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
-				[self writeToLog:@"Refreshing product list." :YES];
+				[self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
+				[self writeStringToLog:@"Refreshing product list." :YES];
 				[ide getProducts];
 			}
 		}
 		else
 		{
-			[self writeToLog:[NSString stringWithFormat:@"Code uploaded to device group \"%@\". Restart its assigned device(s) to run the new code.", devicegroup.name] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"Code uploaded to device group \"%@\". Restart its assigned device(s) to run the new code.", devicegroup.name] :YES];
 		}
 	}
 	else
 	{
-		[self writeToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (uploadCodeStageTwo:)"] :YES];
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (uploadCodeStageTwo:)"] :YES];
 	}
 }
 
@@ -8358,7 +8268,7 @@
 			flag = YES;
 		}
 
-		if (flag) [self writeToLog:@"impCloud credentials saved in your keychain." :YES];
+		if (flag) [self writeStringToLog:@"impCloud credentials saved in your keychain." :YES];
 	}
 
 	// Set the 'Accounts' menu
@@ -8373,7 +8283,7 @@
 
 	// Inform the user he or she is logged in
 
-	[self writeToLog:@"You now are logged in to the impCloud." :YES];
+	[self writeStringToLog:@"You now are logged in to the impCloud." :YES];
 
 	// Check for any post-login actions that need to be performed
 
@@ -8545,7 +8455,7 @@
 	{
 		NSString *items = ([action compare:@"gethistory"] == NSOrderedSame) ? @"history" : @"logs";
 
-		[self writeToLog:[NSString stringWithFormat:@"There are no %@ entries for device \"%@\"", items, [self getValueFrom:device withKey:@"name"]] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"There are no %@ entries for device \"%@\"", items, [self getValueFrom:device withKey:@"name"]] :YES];
 	}
 }
 
@@ -8553,7 +8463,7 @@
 
 - (void)logLogs:(NSString *)logLine
 {
-	[self writeToLog:logLine :NO];
+	[self writeStringToLog:logLine :NO];
 }
 
 
@@ -8605,7 +8515,7 @@
 
 - (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo
 {
-	if (success) [self writeToLog:@"Log contents sent to print system." :YES];
+	if (success) [self writeStringToLog:@"Log contents sent to print system." :YES];
 }
 
 
@@ -8629,7 +8539,7 @@
 		}
 	}
 
-	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
 
 	if (device == selectedDevice)
 	{
@@ -8663,7 +8573,7 @@
 		}
 	}
 
-	[self writeToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
+	[self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
 
 	if (device == selectedDevice)
 	{
@@ -8783,13 +8693,9 @@
 		[streamLogsItem validate];
 		[self refreshDevicesMenus];
 		[self refreshDevicesPopup];
-		[self updateDeviceLists];
 	}
 }
 
-
-
-#pragma mark - Log Methods
 
 
 - (IBAction)showProjectInfo:(id)sender
@@ -8798,7 +8704,7 @@
 
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -8934,13 +8840,13 @@
 {
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -9205,7 +9111,7 @@
 {
 	if (selectedDevice == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
@@ -9293,13 +9199,13 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
 	if (currentDevicegroup.models.count == 0)
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
 		return;
 	}
 
@@ -9309,17 +9215,17 @@
 	{
 		if ([model.type compare:@"device"] == NSOrderedSame)
 		{
-			if ((currentDevicegroup.squinted & kDeviceCodeSquinted) == 0) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest device code.", currentDevicegroup.name] :YES];
+			if ((currentDevicegroup.squinted & kDeviceCodeSquinted) == 0) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest device code.", currentDevicegroup.name] :YES];
 
 			done = YES;
-			[self writeToLog:@"Device Code:" :NO];
-			[self writeToLog:@" " :NO];
+			[self writeStringToLog:@"Device Code:" :NO];
+			[self writeStringToLog:@" " :NO];
 			[extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
 			break;
 		}
 	}
 
-	if (!done) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
+	if (!done) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
 }
 
 
@@ -9328,13 +9234,13 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
 	if (currentDevicegroup.models.count == 0)
 	{
-		[self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
+		[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
 		return;
 	}
 
@@ -9344,17 +9250,17 @@
 	{
 		if ([model.type compare:@"agent"] == NSOrderedSame)
 		{
-			if ((currentDevicegroup.squinted & kAgentCodeSquinted) == 0) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest agent code.", currentDevicegroup.name] :YES];
+			if ((currentDevicegroup.squinted & kAgentCodeSquinted) == 0) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest agent code.", currentDevicegroup.name] :YES];
 
 			done = YES;
-			[self writeToLog:@"Agent Code:" :NO];
-			[self writeToLog:@" " :NO];
+			[self writeStringToLog:@"Agent Code:" :NO];
+			[self writeStringToLog:@" " :NO];
 			[extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
 			break;
 		}
 	}
 
-	if (!done) [self writeToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
+	if (!done) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
 }
 
 
@@ -9388,41 +9294,50 @@
 
 	// Write out the dashes
 
-	[self writeToLog:dashes :NO];
+	[self writeStringToLog:dashes :NO];
 
 	// Write out the lines themselves
 
 	for (NSString *string in lines)
 	{
-		[self writeToLog:string :NO];
+		[self writeStringToLog:string :NO];
 	}
 
 	// Write out the dashes
 
-	[self writeToLog:dashes :NO];
+	[self writeStringToLog:dashes :NO];
 }
 
 
 
-- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp
+- (void)writeStringToLog:(NSString *)string :(BOOL)addTimestamp
 {
 	logTextView.editable = YES;
 
+	//NSTextStorage *ts = [logTextView textStorage];
+
 	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
-	[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
+	// [logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
 
 	if (addTimestamp)
 	{
 		NSString *date = [def stringFromDate:[NSDate date]];
-		//date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+		date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 		[logTextView insertText:date replacementRange:NSMakeRange(logTextView.string.length, 0)];
 		[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
+
+		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:date];
+		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:@" "];
 	}
 
-	if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+	if (string != nil) {
+		[logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:string];
+	}
 
 	[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+	//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:@"\n"];
 
 	logTextView.editable = NO;
 }
@@ -9431,49 +9346,52 @@
 
 - (void)writeErrorToLog:(NSString *)string :(BOOL)addTimestamp
 {
-	NSArray *values = [NSArray arrayWithObjects:[NSColor redColor], nil];
-	NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
-	NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
-	[self writeStyledToLog:attrString :addTimestamp];
+	[self writeNoteToLog:string :[NSColor redColor] :addTimestamp];
 }
 
 
 
 - (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp
 {
-	NSArray *values = [NSArray arrayWithObjects:[NSColor orangeColor], nil];
-	NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
-	NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
-	[self writeStyledToLog:attrString :addTimestamp];
+	[self writeNoteToLog:string :[NSColor orangeColor] :addTimestamp];
 }
 
 
 
-- (void)writeStyledToLog:(NSAttributedString *)string :(BOOL)addTimestamp
+- (void)writeNoteToLog:(NSString *)string :(NSColor *)colour :(BOOL)addTimestamp
+{
+	NSArray *values = [NSArray arrayWithObjects:colour, nil];
+	NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
+	[self writeStyledStringToLog:attrString :addTimestamp];
+}
+
+
+
+- (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp
 {
 	logTextView.editable = YES;
 
 	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
-	[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
+	//[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
 
 	NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
 
 	if (addTimestamp)
 	{
 		NSString *date = [def stringFromDate:[NSDate date]];
-		//date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
-		[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes]
-			   replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+
+		[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes] replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withAttributedString:[[NSAttributedString alloc] initWithString:date attributes:attributes]];
+		
 		[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:@" "];
 	}
 
-	if (string != nil)
-	{
-		[logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
-	}
+	if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
 	[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
@@ -9644,8 +9562,8 @@
 
 - (void)logCode
 {
-	[self writeToLog:listString :NO];
-	[self writeToLog:@" " :NO];
+	[self writeStringToLog:listString :NO];
+	[self writeStringToLog:@" " :NO];
 }
 
 
@@ -9717,7 +9635,7 @@
 				flag = YES;
 			}
 
-			if (flag) [self writeToLog:@"impCloud credentials saved in your keychain." :YES];
+			if (flag) [self writeStringToLog:@"impCloud credentials saved in your keychain." :YES];
 		}
 
 		// Notify the user
@@ -9760,7 +9678,7 @@
 
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -9941,7 +9859,7 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -9965,7 +9883,7 @@
 {
 	if (selectedDevice == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
 		return;
 	}
 
@@ -9980,7 +9898,7 @@
 {
 	if (currentProject == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
 		return;
 	}
 
@@ -9993,7 +9911,7 @@
 {
 	if (currentDevicegroup == nil)
 	{
-		[self writeToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -10012,6 +9930,13 @@
 			if ([mPath compare:mPath2] != NSOrderedSame) [nswsw selectFile:[NSString stringWithFormat:@"%@/%@", mPath2, md.filename] inFileViewerRootedAtPath:mPath2];
 		}
 	}
+}
+
+
+
+- (void)launchLibsPage
+{
+	[nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/libraries/"]];
 }
 
 
@@ -10892,40 +10817,6 @@
 
 
 
-- (void)updateDeviceLists
-{
-	// Rename all menus based on online state and logging state
-	// Note we only use the existing info; we don't reload the device
-	// list from the server. Status string added via 'menuString:'
-
-	// Do the popup
-
-	NSUInteger truncateLength = 24;
-
-	if (devicesArray.count > 0)
-	{
-		for (NSMutableDictionary *device in devicesArray)
-		{
-			NSString *dname = [self getValueFrom:device withKey:@"name"];
-			if (dname.length > truncateLength) truncateLength = dname.length;
-		}
-
-		for (NSMenuItem *item in devicesPopUp.itemArray)
-		{
-			for (NSMutableDictionary *device in devicesArray)
-			{
-				NSString *dname = [self getValueFrom:device withKey:@"name"];
-
-				if (dname == nil) dname = [self getValueFrom:device withKey:@"id"];
-
-				if ([item.title compare:dname] == NSOrderedSame) item.title = dname;
-			}
-		}
-	}
-}
-
-
-
 - (void)refreshRecentFilesMenu
 {
 	NSMenuItem *item;
@@ -10966,7 +10857,28 @@
 
 
 
+- (IBAction)showHideToolbar:(id)sender
+{
+	// Flip the menu item in the View menu
+
+	if (squinterToolbar.isVisible)
+	{
+		squinterToolbar.visible = NO;
+		showHideToolbarMenuItem.title = @"Show Toolbar";
+		[defaults setValue:[NSNumber numberWithBool:NO] forKey:@"com.bps.squinter.toolbarstatus"];
+	}
+	else
+	{
+		squinterToolbar.visible = YES;
+		showHideToolbarMenuItem.title = @"Hide Toolbar";
+		[defaults setValue:[NSNumber numberWithBool:YES] forKey:@"com.bps.squinter.toolbarstatus"];
+	}
+}
+
+
+
 #pragma mark Imported Library and File List Methods
+
 
 - (void)refreshLibraryMenus
 {
@@ -11335,15 +11247,6 @@
 
 
 
-- (void)launchLibsPage
-{
-	[nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/libraries/"]];
-}
-
-
-
-# pragma mark Toolbar Update Methods
-
 - (void)setToolbar
 {
     // Enable or disable project-specific toolbar items
@@ -11383,6 +11286,7 @@
 
 #pragma mark Logging Area Methods
 
+
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold
 {
 	// Set the log window's basic text settings based on preferences
@@ -11390,17 +11294,9 @@
 	NSFontManager *fontManager = [NSFontManager sharedFontManager];
 	NSFont *font;
 
-	if (isBold)
-	{
-		font = [fontManager fontWithFamily:fontName
-									traits:NSBoldFontMask
-									weight:0
-									  size:fontSize];
-	}
-	else
-	{
-		font = [NSFont fontWithName:fontName size:fontSize];
-	}
+	font = isBold
+	? [fontManager fontWithFamily:fontName traits:NSBoldFontMask weight:0 size:fontSize]
+	: [NSFont fontWithName:fontName size:fontSize];
 
 	return font;
 }
@@ -11411,12 +11307,12 @@
 {
 	// Populate the 'colors' array with a set of colours for logging different devices
 
+	[colors addObject:[NSColor yellowColor]];
 	[colors addObject:[NSColor cyanColor]];
 	[colors addObject:[NSColor magentaColor]];
-	[colors addObject:[NSColor yellowColor]];
 	[colors addObject:[NSColor purpleColor]];
-	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green)
 	[colors addObject:[NSColor blueColor]];
+	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green)
 	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry
 	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine
 	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green)
@@ -11432,12 +11328,15 @@
 
 - (void)setLoggingColours
 {
+	// Pick colours from the 'colours' array that are darker/lighter than the log background
+	// as approrpriate
+
 	[logColors removeAllObjects];
 
 	NSInteger back = [self perceivedBrightness:backColour];
 	// NSInteger fore = [self perceivedBrightness:textColour];
 
-	if (back > 130)
+	if (back > 200)
 	{
 		// Background is light
 
@@ -11532,25 +11431,8 @@
 
 
 
-- (IBAction)showHideToolbar:(id)sender
-{
-	if (squinterToolbar.isVisible)
-	{
-		squinterToolbar.visible = NO;
-		showHideToolbarMenuItem.title = @"Show Toolbar";
-		[defaults setValue:[NSNumber numberWithBool:NO] forKey:@"com.bps.squinter.toolbarstatus"];
-	}
-	else
-	{
-		squinterToolbar.visible = YES;
-		showHideToolbarMenuItem.title = @"Hide Toolbar";
-		[defaults setValue:[NSNumber numberWithBool:YES] forKey:@"com.bps.squinter.toolbarstatus"];
-	}
-}
-
-
-
 #pragma mark Help Menu Methods
+
 
 - (IBAction)showAuthor:(id)sender
 {
@@ -11736,14 +11618,8 @@
 	if (g == 0) g = 0.1;
 
 	NSUInteger a = 100 * r * b * g;
-	if (a < 30)
-	{
-		[logScrollView setScrollerKnobStyle:NSScrollerKnobStyleLight];
-	}
-	else
-	{
-		[logScrollView setScrollerKnobStyle:NSScrollerKnobStyleDark];
-	}
+
+	[logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
 
 	NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
 	NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
@@ -11880,7 +11756,7 @@
 #pragma mark - File Watching Methods
 
 
--(void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
+- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
 {
     // A file has changed so notify the user
 	// IMPORTANT: fpath is the MONITORED location. VDKQueue will continue watching this file wherever it is moved
@@ -12084,21 +11960,6 @@
 
 
 
-- (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath
-{
-	NSArray *keys = [set allKeys];
-
-	for (NSUInteger i = 0 ; i < keys.count ; ++i)
-	{
-		NSString *key = [keys objectAtIndex:i];
-		NSString *path = [set objectForKey:key];
-		path = [self getRelativeFilePath:relPath :path];
-		[set setObject:path forKey:key];
-	}
-}
-
-
-
 - (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath
 {
 	// Takes an absolute path to a project and a file path relative to that same project,
@@ -12158,7 +12019,7 @@
 
 
 
-#pragma mark - Check EI Libs Methods
+#pragma mark - Check Electric Imp Libraries Methods
 
 
 - (IBAction)checkElectricImpLibraries:(id)sender
@@ -12386,7 +12247,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 		if (allOKFlag)
 		{
-			[self writeToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", currentDevicegroup.name] :YES];
+			[self writeStringToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", currentDevicegroup.name] :YES];
 		}
 	}
 }
@@ -12515,10 +12376,101 @@ didReceiveResponse:(NSURLResponse *)response
 		if (renameName.stringValue.length > 140)
 		{
 			renameName.stringValue = [renameName.stringValue substringToIndex:140];
+			NSBeep();
 		}
 
 		renameNameLength.stringValue = [NSString stringWithFormat:@"%li/140", (long)renameName.stringValue.length];
 	}
+}
+
+
+
+#pragma mark - Pasteboard Methods
+
+
+- (IBAction)copyDeviceCodeToPasteboard:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	BOOL flag = NO;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"device"] == NSOrderedSame)
+		{
+			if (model.squinted && model.code.length > 0)
+			{
+				NSPasteboard *pb = [NSPasteboard generalPasteboard];
+				NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+				[pb declareTypes:types owner:self];
+				[pb setString:model.code forType:NSStringPboardType];
+				[self writeStringToLog:@"Compiled device code copied to clipboard." :YES];
+				flag = YES;
+			}
+
+			break;
+		}
+	}
+
+	if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled device code to copy." :YES];
+}
+
+
+
+- (IBAction)copyAgentCodeToPasteboard:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	BOOL flag = NO;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			if (model.squinted && model.code.length > 0)
+			{
+				NSPasteboard *pb = [NSPasteboard generalPasteboard];
+				NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+				[pb declareTypes:types owner:self];
+				[pb setString:model.code forType:NSStringPboardType];
+				[self writeStringToLog:@"Compiled agent code copied to clipboard." :YES];
+				flag = YES;
+			}
+
+			break;
+		}
+	}
+
+	if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled agent code to copy." :YES];
+}
+
+
+
+- (IBAction)copyAgentURL:(id)sender
+{
+	if (selectedDevice == nil)
+	{
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+		return;
+	}
+
+	NSString *agentid = [self getValueFrom:selectedDevice withKey:@"agent_id"];
+	NSString *ustring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", agentid];
+	NSPasteboard *pb = [NSPasteboard generalPasteboard];
+	NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
+
+	[pb declareTypes:ptypes owner:self];
+	[pb setString:ustring forType:NSStringPboardType];
+
+	[self writeStringToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
 }
 
 
@@ -12569,10 +12521,12 @@ didReceiveResponse:(NSURLResponse *)response
 	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
 	if ([key compare:@"last_blinkup_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.last_blinkup_at"]];
 
-	// Attributes Deployment properties
+	// Attributes Deployment properties - non-nullable
 
 	if ([key compare:@"flagged"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.flagged"] boolValue]];
 	if ([key compare:@"sha"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.sha"];
+
+	// Attributes Deployment properties - nullable
 
 	if ([key compare:@"agent_code"] == NSOrderedSame)
 	{
@@ -12616,7 +12570,8 @@ didReceiveResponse:(NSURLResponse *)response
 
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
 {
-	NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup", @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
+	NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup",
+						  @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
 	NSArray *dgnames = @[ @"Production", @"Factory Fixture", @"Development", @"Factory Test", @"Production Test"];
 
 	for (NSUInteger i = 0 ; i < dgtypes.count ; ++i)
@@ -12742,6 +12697,7 @@ didReceiveResponse:(NSURLResponse *)response
 }
 
 
+
 - (void)setDevicegroupDevices:(Devicegroup *)devicegroup
 {
 	if (devicesArray.count > 0)
@@ -12759,18 +12715,20 @@ didReceiveResponse:(NSURLResponse *)response
 
 				NSString *dvn = [self getValueFrom:device withKey:@"name"];
 
-				if (dvn == nil) [self getValueFrom:device withKey:@"id"];
+				if (dvn == nil) dvn = [self getValueFrom:device withKey:@"id"];
 
-				for (NSString *ddevice in devicegroup.devices)
+				for (NSString *dgdevice in devicegroup.devices)
 				{
-					if ([dvn compare:ddevice] == NSOrderedSame)
+					if ([dvn compare:dgdevice] == NSOrderedSame)
 					{
-						// Already on the list
+						// Device is already on the list
 
 						flag = YES;
 						break;
 					}
 				}
+
+				// Add the name to the list of device group devices as it's not already present
 
 				if (!flag && dvn != nil) [devicegroup.devices addObject:dvn];
 			}

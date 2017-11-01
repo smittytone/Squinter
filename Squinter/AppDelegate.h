@@ -360,8 +360,8 @@
 - (void)chooseProject:(id)sender;
 - (IBAction)openProject:(id)sender;
 - (IBAction)closeProject:(id)sender;
-- (void)renameProject:(id)sender;
 - (IBAction)renameCurrentProject:(id)sender;
+- (void)renameProject:(id)sender;
 - (IBAction)closeRenameProjectSheet:(id)sender;
 - (IBAction)saveRenameProjectSheet:(id)sender;
 - (IBAction)doSync:(id)sender;
@@ -369,8 +369,8 @@
 - (void)syncProject:(Project *)project;
 - (IBAction)cancelSync:(id)sender;
 - (IBAction)openRecent:(id)sender;
-- (IBAction)clearRecent:(id)sender;
 - (void)openRecentAll;
+- (IBAction)clearRecent:(id)sender;
 - (void)addToRecentMenu:(NSString *)filename :(NSString *)path;
 
 // Product Methods
@@ -381,7 +381,7 @@
 - (IBAction)downloadProduct:(id)sender;
 - (IBAction)linkProjectToProduct:(id)sender;
 
-// New Device Group Methods
+// New Device Group Mehods
 
 - (IBAction)newDevicegroup:(id)sender;
 - (IBAction)newDevicegroupSheetCancel:(id)sender;
@@ -389,7 +389,7 @@
 - (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype;
 - (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action;
 
-// Existing Device Group methods
+// Existing Device Group Methods
 
 - (void)chooseDevicegroup:(id)sender;
 - (IBAction)deleteDevicegroup:(id)sender;
@@ -399,6 +399,8 @@
 - (IBAction)uploadCodeExtraSkip:(id)sender;
 - (IBAction)uploadCodeExtraUpload:(id)sender;
 - (IBAction)removeSource:(id)sender;
+- (IBAction)getCommits:(id)sender;
+- (IBAction)updateCode:(id)sender;
 
 // Existing Device Methods
 
@@ -416,24 +418,24 @@
 - (IBAction)chooseDevice:(id)sender;
 - (IBAction)deleteDevice:(id)sender;
 - (IBAction)getLogs:(id)sender;
+- (IBAction)streamLogs:(id)sender;
 
-// File Location, Opening Methods
+// File Location and Opening Methods
 
 - (void)presentOpenFilePanel:(NSInteger)openActionType;
 - (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
 - (void)openSquirrelProjects:(NSMutableArray *)urls;
-
+- (void)watchfiles:(Project *)project;
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
 - (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orName;
 - (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName;
 - (BOOL)checkFile:(NSString *)filePath;
-
 - (IBAction)selectFile:(id)sender;
 - (IBAction)newDevicegroupCheckboxHander:(id)sender;
 - (void)processAddedFiles:(NSMutableArray *)urls;
-- (void)processAddedFilesStageTwo:(NSMutableArray *)urls :(NSString *)fileType;
 - (IBAction)endSourceTypeSheet:(id)sender;
 - (IBAction)cancelSourceTypeSheet:(id)sender;
+- (void)processAddedFilesStageTwo:(NSMutableArray *)urls :(NSString *)fileType;
 
 // Save Project Methods
 
@@ -448,21 +450,16 @@
 
 // Squint Methods
 
-- (void)compile:(Devicegroup *)devicegroup :(BOOL)doCheck;
+- (IBAction)squint:(id)sender;
+- (void)compile:(Devicegroup *)devicegroup :(BOOL)justACheck;
 - (NSString *)processSource:(NSString *)codePath :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode;
-- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode;
+- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode ;
 - (void)processRequires:(NSString *)sourceCode;
 - (void)processLibraries:(Model *)model;
 - (NSUInteger)getLineNumber:(NSString *)code :(NSInteger)index;
 - (NSString *)getLibraryVersionNumber:(NSString *)libcode;
 
-// Pasteboard Methods
-
-- (IBAction)copyDeviceCodeToPasteboard:(id)sender;
-- (IBAction)copyAgentCodeToPasteboard:(id)sender;
-- (IBAction)copyAgentURL:(id)sender;
-
-// API Response Handler Methods
+// BuildAPIAccess Response Handler Methods
 
 - (void)listProducts:(NSNotification *)note;
 - (void)productToProjectStageTwo:(NSNotification *)note;
@@ -472,36 +469,31 @@
 - (void)deleteProductStageTwo:(NSMutableDictionary *)dict;
 - (void)deleteProductStageThree:(NSNotification *)note;
 - (void)updateProductStageTwo:(NSNotification *)note;
-- (void)updateDevicegroupStageTwo:(NSNotification *)note;
-- (void)deleteDevicegroupStageTwo:(NSNotification *)note;
-- (void)listDevices:(NSNotification *)note;
 - (void)createDevicegroupStageTwo:(NSNotification *)note;
+- (void)deleteDevicegroupStageTwo:(NSNotification *)note;
+- (void)updateDevicegroupStageTwo:(NSNotification *)note;
+- (void)uploadCodeStageTwo:(NSNotification *)note;
+- (void)updateCodeStageTwo:(NSNotification *)note;
 - (void)uploadProjectStageThree:(Project *)project;
+- (void)listDevices:(NSNotification *)note;
 - (void)restarted:(NSNotification *)note;
 - (void)reassigned:(NSNotification *)note;
 - (void)renameDeviceStageTwo:(NSNotification *)note;
 - (void)deleteDeviceStageTwo:(NSNotification *)note;
-- (void)uploadCodeStageTwo:(NSNotification *)note;
 - (void)loggedIn:(NSNotification *)note;
 
-// API Log methods
+// Log and Logging Methods
 
 - (void)listCommits:(NSNotification *)note;
 - (void)listLogs:(NSNotification *)note;
 - (void)logLogs:(NSString *)logLine;
 - (void)parseLog;
 - (IBAction)printLog:(id)sender;
-- (void)printDone:(NSPrintOperation *)printOperation  success:(BOOL)success  contextInfo:(void *)contextInfo;
-- (IBAction)streamLogs:(id)sender;
+- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo;
 - (void)loggingStarted:(NSNotification *)note;
 - (void)loggingStopped:(NSNotification *)note;
 - (void)presentLogEntry:(NSNotification *)note;
 - (void)endLogging:(NSNotification *)note;
-- (void)logCode;
-- (void)writeStreamToLog:(NSAttributedString *)string;
-
-// Squinter Log Methods
-
 - (IBAction)showProjectInfo:(id)sender;
 - (IBAction)showDeviceGroupInfo:(id)sender;
 - (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines;
@@ -511,14 +503,29 @@
 - (IBAction)logAgentCode:(id)sender;
 - (IBAction)clearLog:(id)sender;
 - (void)printInfoInLog:(NSMutableArray *)lines;
-- (void)writeToLog:(NSString *)string :(BOOL)addTimestamp;
+- (void)writeStringToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeErrorToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp;
-- (void)writeStyledToLog:(NSAttributedString *)string :(BOOL)addTimestamp;
+- (void)writeNoteToLog:(NSString *)string :(NSColor *)colour :(BOOL)addTimestamp;
+- (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp;
 - (NSString *)getDisplayPath:(NSString *)path;
 - (void)showCodeErrors:(NSNotification *)note;
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
+- (void)logCode;
+- (void)writeStreamToLog:(NSAttributedString *)string;
 - (void)displayError:(NSNotification *)note;
+
+// External Editor Methods
+
+- (IBAction)externalOpen:(id)sender;
+- (void)switchToEditor:(Model *)model;
+- (IBAction)externalLibOpen:(id)sender;
+- (IBAction)externalFileOpen:(id)sender;
+- (IBAction)externalOpenAll:(id)sender;
+- (IBAction)openAgentURL:(id)sender;
+- (IBAction)showProjectInFinder:(id)sender;
+- (IBAction)showModelFilesInFinder:(id)sender;
+- (void)launchLibsPage;
 
 // UI Update Methods
 
@@ -532,24 +539,18 @@
 - (void)refreshDevicesMenus;
 - (void)refreshDeviceMenu;
 - (void)refreshDevicesPopup;
+- (NSImage *)menuImage:(NSMutableDictionary *)device;
+- (NSString *)menuString:(NSMutableDictionary *)device;
 - (void)refreshUnassignedDevicesMenu;
 - (void)refreshViewMenu;
-- (void)updateDeviceLists;
 - (void)refreshRecentFilesMenu;
-
-// Imported Library and File List Methods
-
+- (IBAction)showHideToolbar:(id)sender;
 - (void)refreshLibraryMenus;
 - (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib;
 - (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive;
-- (NSString *)menuString:(NSMutableDictionary *)device;
 - (void)refreshFilesMenu;
 - (void)fileAdder:(NSMutableArray *)models;
 - (void)addFileToMenu:(NSString *)filename :(BOOL)isActive;
-- (void)launchLibsPage;
-
-// Toolbar Update Methods
-
 - (void)setToolbar;
 
 // Logging Area Methods
@@ -564,15 +565,17 @@
 - (void)startProgress;
 - (void)stopProgress;
 
-// About and Help Sheet Methods
+// About Sheet Methods
 
 - (IBAction)showAboutSheet:(id)sender;
 - (IBAction)viewSquinterSite:(id)sender;
 - (IBAction)closeAboutSheet:(id)sender;
-- (IBAction)showHideToolbar:(id)sender;
+
+// Help Menu Methods
+
 - (IBAction)showAuthor:(id)sender;
 
-// Preferences Methods
+// Preferences Sheet Methods
 
 - (IBAction)showPrefs:(id)sender;
 - (IBAction)cancelPrefs:(id)sender;
@@ -583,22 +586,9 @@
 - (void)showPanelForText;
 - (void)showPanelForBack;
 
-// Library Checking
+// File Watching Methods
 
-- (IBAction)checkElectricImpLibraries:(id)sender;
-- (void)checkElectricImpLibs;
-- (void)compareElectricImpLibs;
-
-// External Editor Methods
-
-- (IBAction)externalOpen:(id)sender;
-- (void)switchToEditor:(Model *)model;
-- (IBAction)externalLibOpen:(id)sender;
-- (IBAction)externalFileOpen:(id)sender;
-- (IBAction)externalOpenAll:(id)sender;
-- (IBAction)openAgentURL:(id)sender;
-- (IBAction)showProjectInFinder:(id)sender;
-- (IBAction)showModelFilesInFinder:(id)sender;
+- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
 
 // File Path Methods
 
@@ -606,10 +596,23 @@
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
 - (NSInteger)numberOfFoldersInPath:(NSString *)path;
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
-- (void)updatePaths:(NSMutableDictionary *)set :(NSString *)relPath;
 - (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath;
+- (NSData *)bookmarkForURL:(NSURL *)url;
+- (NSURL *)urlForBookmark:(NSData *)bookmark;
 
-// Utility Methods
+// Check Electric Imp Libraries Methods
+
+- (IBAction)checkElectricImpLibraries:(id)sender;
+- (void)checkElectricImpLibs;
+- (void)compareElectricImpLibs;
+
+// Pasteboard Methods
+
+- (IBAction)copyDeviceCodeToPasteboard:(id)sender;
+- (IBAction)copyAgentCodeToPasteboard:(id)sender;
+- (IBAction)copyAgentURL:(id)sender;
+
+// Utilty Methods
 
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
@@ -617,6 +620,7 @@
 - (NSDate *)convertTimestring:(NSString *)dateString;
 - (NSString *)getErrorMessage:(NSUInteger)index;
 - (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces;
+- (void)setDevicegroupDevices:(Devicegroup *)devicegroup;
 
 
 @end
