@@ -8414,6 +8414,7 @@
 					NSString *timestamp = [entry objectForKey:@"timestamp"];
 					timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
 					timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+					timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
 					NSString *event = [entry objectForKey:@"event"];
 					NSString *owner = [entry objectForKey:@"owner_id"];
@@ -8435,6 +8436,7 @@
 					NSString *timestamp = [entry objectForKey:@"ts"];
 					timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
 					timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+					timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
 					NSString *type = [entry objectForKey:@"type"];
 					NSString *msg = [entry objectForKey:@"msg"];
@@ -8613,6 +8615,7 @@
 		NSString *timestamp = [parts objectAtIndex:1];
 		timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
 		timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+		timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
 		if (type.length > width) width = type.length;
 
