@@ -270,7 +270,7 @@
 							@"xxxxxxxxxxxxxxxxx",
 							@"xxxxxxxxxxxxxxxxx",
 							[NSNumber numberWithBool:NO],
-							[NSNumber numberWithBool:YES],
+							[NSNumber numberWithBool:NO],
 							[NSNumber numberWithInteger:NSToolbarSizeModeRegular],
 							[NSNumber numberWithInteger:NSToolbarDisplayModeIconAndLabel],
 							[NSNumber numberWithInteger:1],
