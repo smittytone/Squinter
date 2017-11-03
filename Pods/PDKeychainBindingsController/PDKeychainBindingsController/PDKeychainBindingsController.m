@@ -42,15 +42,20 @@ static PDKeychainBindingsController *sharedInstance = nil;
     status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef*)&stringData);
 #else //OSX
     //SecKeychainItemRef item = NULL;
-    UInt32 stringLength;
-    void *stringBuffer;
-    status = SecKeychainFindGenericPassword(NULL, (uint) [[self serviceName] lengthOfBytesUsingEncoding:NSUTF8StringEncoding], [[self serviceName] UTF8String],
-                                            (uint) [key lengthOfBytesUsingEncoding:NSUTF8StringEncoding], [key UTF8String],
-                                            &stringLength, &stringBuffer, NULL);
-    #endif
-	if(status)
+    UInt32 stringLength = 0;
+    void *stringBuffer = NULL;
+    status = SecKeychainFindGenericPassword(NULL,
+                                            (uint) [[self serviceName] lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+                                            [[self serviceName] UTF8String],
+                                            (uint) [key lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+                                            [key UTF8String],
+                                            &stringLength,
+                                            &stringBuffer,
+                                            NULL);
+#endif
+	if (status)
     {
-        SecKeychainItemFreeContent(NULL, stringBuffer);
+        if (stringLength != 0) SecKeychainItemFreeContent(NULL, stringBuffer);
         return nil;
     }
 #if TARGET_OS_IPHONE
