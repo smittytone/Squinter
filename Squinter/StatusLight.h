@@ -17,6 +17,7 @@
 
 @property (nonatomic, strong) NSImage *theCurrentImage;
 
+
 - (void)show;
 - (void)hide;
 - (void)setLight:(BOOL)onOrOff;
