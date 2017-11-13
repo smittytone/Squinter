@@ -28,6 +28,7 @@
 															//  1		Device Code compiled
 															//  2		Agent Code compiled
 															//  3		Each model's code fields need saving (product to project)
+															//  4        Model has just been uploaded successfully
 
 
 @end
