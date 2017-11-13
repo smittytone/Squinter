@@ -345,6 +345,7 @@
 - (void)setLoginCreds;
 - (IBAction)cancelLogin:(id)sender;
 - (IBAction)login:(id)sender;
+- (void)loginAlert:(NSString *)extra;
 - (IBAction)setSecureEntry:(id)sender;
 
 // New Project Methods

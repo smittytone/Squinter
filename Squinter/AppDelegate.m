@@ -877,6 +877,21 @@
 
 
 
+- (void)loginAlert:(NSString *)extra
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	alert.messageText = @"You are not logged in to the impCloud";
+	alert.messageText = [NSString stringWithFormat:@"You must be logged in to %@. Do you wish to log in now?", extra];
+	[alert addButtonWithTitle:@"Yes"];
+	[alert addButtonWithTitle:@"No"];
+
+	[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+		if (returnCode == 1000) [self autoLogin];
+	}];
+}
+
+
+
 - (IBAction)setSecureEntry:(id)sender
 {
 	if (showPassCheckbox.state == NSOnState)
@@ -1748,7 +1763,7 @@
 
 	if (!ide.isLoggedIn)
 	{
-		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You cannot upload this Project until you have logged in." :YES];
+		[self loginAlert:@"upload this Project"];
 		return;
 	}
 
@@ -1847,7 +1862,7 @@
 
 	if (!ide.isLoggedIn)
 	{
-		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You cannot uploade or sync this Project until you have logged in." :YES];
+		[self loginAlert:@"upload or sync this Project"];
 		return;
 	}
 
@@ -2157,7 +2172,7 @@
 
 	if (!ide.isLoggedIn)
 	{
-		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to restart devices." :YES];
+		[self loginAlert:@"restart devices"];
 		return;
 	}
 
@@ -2818,7 +2833,7 @@
 		{
 			// The user is not logged in, but the device group is associated with a device group on the server.
 
-			[self writeStringToLog:[NSString stringWithFormat:@"You are not logged in to the impCloud. You must be logged in to delete Device Group \"%@\".", currentDevicegroup.name] :YES];
+			[self loginAlert:[NSString stringWithFormat:@"delete device group \"%@\"", currentDevicegroup.name]];
 			return;
 		}
 
@@ -2930,13 +2945,13 @@
 {
 	if (!ide.isLoggedIn)
 	{
-		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to upload code." :YES];
+		[self loginAlert:@"upload code"];
 		return;
 	}
 
 	if (currentDevicegroup == nil)
 	{
-		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
@@ -2949,6 +2964,27 @@
 	if (currentDevicegroup.models.count == 0)
 	{
 		[self writeErrorToLog:@"[ERROR] The selected Device Group contains no code to upload." :YES];
+		return;
+	}
+
+	if ((currentDevicegroup.squinted & 0x08) != 0)
+	{
+		// Project has been uploaded, so do we want to continue?
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = @"You have already uploded this code";
+		alert.informativeText = @"This code has been uploaded to the device group. Are you sure you want to upload it again?";
+		[alert addButtonWithTitle:@"Upload"];
+		[alert addButtonWithTitle:@"Cancel"];
+		[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+			// If user hits Upload, re-run the method
+			if (returnCode == 1000)
+			{
+				currentDevicegroup.squinted = currentDevicegroup.squinted - 0x08;
+				[self uploadCode:nil];
+			}
+		}];
+
 		return;
 	}
 
@@ -3011,7 +3047,7 @@
 
 	[ide createDeployment:data :dict];
 
-	// Pick up the action at
+	// Pick up the action at uploadCodeStageTwo:
 }
 
 
@@ -3145,6 +3181,8 @@
 							@"devicegroup" : currentDevicegroup };
 
 	[ide createDeployment:data :dict];
+
+	// Pick up the action at uploadCodeStageTwo:
 }
 
 
@@ -3249,7 +3287,7 @@
 {
 	if (!ide.isLoggedIn)
 	{
-		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to update devices' status information." :YES];
+		[self loginAlert:@"update devices' status information"];
 		return;
 	}
 
@@ -3268,7 +3306,7 @@
 {
 	if (!ide.isLoggedIn)
 	{
-		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to restart devices." :YES];
+		[self loginAlert:@"restart devices"];
 		return;
 	}
 
@@ -3306,7 +3344,7 @@
 {
 	if (!ide.isLoggedIn)
 	{
-		[self writeWarningToLog:@"[WARNING] You are not logged in to the impCloud. You must be logged in to restart devices." :YES];
+		[self loginAlert:@"restart devices"];
 		return;
 	}
 
@@ -3330,7 +3368,7 @@
 {
 	if (!ide.isLoggedIn)
 	{
-		[self writeWarningToLog:@"[WARNING] You are not logged in to the impCloud. You must be logged in to unassign a device." :YES];
+		[self loginAlert:@"unassign a device"];
 		return;
 	}
 
@@ -3365,7 +3403,7 @@
 
 	if (!ide.isLoggedIn)
 	{
-		[self writeErrorToLog:@"[ERROR] You are not logged in to the impCloud. You must be logged in to assign a device." :YES];
+		[self loginAlert:@"assign a device"];
 		return;
 	}
 
@@ -5587,6 +5625,7 @@
 		}
 			
 		// Update project's compilation status record, 'devicegroup.squinted'
+		// NOTE this clears bit 4, ie. the uploaded marker is set to 'not uploaded'
 		
 		NSString *resultString = @"";
 		
@@ -7631,7 +7670,7 @@
 
 - (void)updateCodeStageTwo:(NSNotification *)note
 {
-	// This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
+	// This method should ONLY be called by the BuildAPIAccess object instance AFTER uploading code
 
 	NSDictionary *data = (NSDictionary *)note.object;
 	NSDictionary *devicegroup = [data objectForKey:@"data"];
@@ -8193,6 +8232,10 @@
 
 	Project *project = [self getParentProject:devicegroup];
 	project.haschanged = YES;
+
+	// Mark the devicegroup as uploaded
+
+	devicegroup.squinted = devicegroup.squinted | 0x08;
 
 	// Update the UI
 
