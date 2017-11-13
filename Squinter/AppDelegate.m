@@ -73,6 +73,7 @@
     logDeviceCodeMenuItem.menu.autoenablesItems = NO;
     logAgentCodeMenuItem.menu.autoenablesItems = NO;
     externalOpenMenuItem.menu.autoenablesItems = NO;
+	deviceGroupsMenu.autoenablesItems = NO;
 
 	// Hide the Dictation and Emoji items in the Edit menu
 	
@@ -10411,15 +10412,9 @@
 	}
 	else
 	{
-		for (Devicegroup *dg in currentProject.devicegroups)
-		{
-			item = [[NSMenuItem alloc] initWithTitle:dg.name
-											  action:@selector(chooseDevicegroup:)
-									   keyEquivalent:@""];
-			item.representedObject = dg;
-			item.state = (dg == currentDevicegroup) ? NSOnState : NSOffState;
-			[deviceGroupsMenu addItem:item];
-		}
+		[self refreshDevicegroupByType:@"development_devicegroup"];
+		[self refreshDevicegroupByType:@"production_devicegroup"];
+		[self refreshDevicegroupByType:@"factoryfixture_devicegroup"];
 
 		// Add the 'fixed' menu entries
 
@@ -10455,6 +10450,38 @@
 }
 
 
+
+- (void)refreshDevicegroupByType:(NSString *)type
+{
+	BOOL first = NO;
+	NSMenuItem *item = nil;
+
+	for (Devicegroup *dg in currentProject.devicegroups)
+	{
+		if ([dg.type compare:type] == NSOrderedSame)
+		{
+			if (!first)
+			{
+				first = YES;
+				item = [[NSMenuItem alloc] initWithTitle:[self convertDevicegroupType:type :NO]
+												  action:@selector(chooseDevicegroup:)
+										   keyEquivalent:@""];
+				item.representedObject = nil;
+				item.state = NSOffState;
+				item.enabled = NO;
+
+				[deviceGroupsMenu addItem:item];
+			}
+
+			item = [[NSMenuItem alloc] initWithTitle:dg.name
+											  action:@selector(chooseDevicegroup:)
+									   keyEquivalent:@""];
+			item.representedObject = dg;
+			item.state = (dg == currentDevicegroup) ? NSOnState : NSOffState;
+			[deviceGroupsMenu addItem:item];
+		}
+	}
+}
 
 
 - (void)refreshMainDevicegroupsMenu
