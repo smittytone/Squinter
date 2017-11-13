@@ -224,6 +224,8 @@
 	IBOutlet NSTextField *newDevicegroupDescCountField;
 	IBOutlet NSButton *newDevicegroupCheckbox;
 	IBOutlet NSPopUpButton *newDevicegroupTypeMenu;
+	IBOutlet NSTextField *targetAccessoryLabel;
+	IBOutlet NSPopUpButton *targetAccessoryPopup;
     
     // About
     
@@ -389,6 +391,7 @@
 - (IBAction)newDevicegroupSheetCreate:(id)sender;
 - (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype;
 - (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action;
+- (IBAction)chooseType:(id)sender;
 
 // Existing Device Group Methods
 

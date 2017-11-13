@@ -2401,6 +2401,25 @@
 		newDevicegroupCheckbox.enabled = YES;
 	}
 
+	targetAccessoryLabel.enabled = NO;
+	targetAccessoryLabel.textColor = [NSColor grayColor];
+
+	[targetAccessoryPopup removeAllItems];
+
+	for (Devicegroup *devicegroup in currentProject.devicegroups)
+	{
+		if ([devicegroup.type compare:@"production_devicegroup"] == NSOrderedSame) [targetAccessoryPopup addItemWithTitle:devicegroup.name];
+	}
+
+	if (targetAccessoryPopup.itemArray.count == 0)
+	{
+		[targetAccessoryPopup addItemWithTitle:@"No production device groups in this project"];
+		NSMenuItem *item = [targetAccessoryPopup.itemArray objectAtIndex:0];
+		item.tag = 99;
+	}
+
+	targetAccessoryPopup.enabled = NO;
+
 	[_window beginSheet:newDevicegroupSheet completionHandler:nil];
 }
 
@@ -2754,6 +2773,31 @@
 	}
 }
 
+
+
+- (IBAction)chooseType:(id)sender
+{
+	NSInteger type = [newDevicegroupTypeMenu indexOfSelectedItem];
+
+	if (type == 1)
+	{
+		// Only activate the accessory items for factory fixture device groups
+
+		targetAccessoryLabel.textColor = [NSColor blackColor];
+		targetAccessoryLabel.enabled = YES;
+
+		// If the target list is empty, don't enable it
+
+		NSMenuItem *item = [targetAccessoryPopup.itemArray objectAtIndex:0];
+		targetAccessoryPopup.enabled = item.tag == 99 ? NO : YES;
+	}
+	else
+	{
+		targetAccessoryLabel.textColor = [NSColor grayColor];
+		targetAccessoryLabel.enabled = NO;
+		targetAccessoryPopup.enabled = NO;
+	}
+}
 
 
 #pragma mark - Existing Device Group Methods
