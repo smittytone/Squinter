@@ -9403,34 +9403,7 @@
 
 - (void)writeStringToLog:(NSString *)string :(BOOL)addTimestamp
 {
-	logTextView.editable = YES;
-
-	//NSTextStorage *ts = [logTextView textStorage];
-
-	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
-
-	// [logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
-
-	if (addTimestamp)
-	{
-		NSString *date = [def stringFromDate:[NSDate date]];
-		date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-		[logTextView insertText:date replacementRange:NSMakeRange(logTextView.string.length, 0)];
-		[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
-
-		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:date];
-		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:@" "];
-	}
-
-	if (string != nil) {
-		[logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
-		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:string];
-	}
-
-	[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
-	//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:@"\n"];
-
-	logTextView.editable = NO;
+	[self writeNoteToLog:string :textColour :addTimestamp];
 }
 
 
@@ -9466,8 +9439,6 @@
 
 	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
-	//[logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
-
 	NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
 
 	if (addTimestamp)
@@ -9476,10 +9447,8 @@
 		date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
 		[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes] replacementRange:NSMakeRange(logTextView.string.length, 0)];
-		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withAttributedString:[[NSAttributedString alloc] initWithString:date attributes:attributes]];
 		
 		[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
-		//[ts replaceCharactersInRange:NSMakeRange(ts.length, 0) withString:@" "];
 	}
 
 	if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
