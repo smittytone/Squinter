@@ -244,6 +244,11 @@
     IBOutlet NSPopUpButton *sizeMenu;
     IBOutlet NSColorWell *textColorWell;
     IBOutlet NSColorWell *backColorWell;
+	IBOutlet NSColorWell *dev1ColorWell;
+	IBOutlet NSColorWell *dev2ColorWell;
+	IBOutlet NSColorWell *dev3ColorWell;
+	IBOutlet NSColorWell *dev4ColorWell;
+	IBOutlet NSColorWell *dev5ColorWell;
 	IBOutlet NSButton *autoUpdateCheckCheckbox;
 	IBOutlet NSButton *autoLoadListsCheckbox;
 	IBOutlet NSButton *boldTestCheckbox;
@@ -590,6 +595,12 @@
 - (NSString *)getFontName:(NSInteger)index;
 - (void)showPanelForText;
 - (void)showPanelForBack;
+- (void)showPanelForDev1;
+- (void)showPanelForDev2;
+- (void)showPanelForDev3;
+- (void)showPanelForDev4;
+- (void)showPanelForDev5;
+
 
 // File Watching Methods
 

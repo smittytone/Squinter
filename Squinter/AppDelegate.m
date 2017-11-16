@@ -66,7 +66,6 @@
 
 	colors = [[NSMutableArray alloc] init];
 	logColors = [[NSMutableArray alloc] init];
-	[self setColours];
 
     // Initialize the UI
 
@@ -262,7 +261,22 @@
 						 @"com.bps.squinter.autoloaddevlists",
 						 @"com.bps.squinter.recentFiles",
 						 @"com.bps.squinter.recentFilesCount",
-						 @"com.bps.squinter.logListCount",nil];
+						 @"com.bps.squinter.logListCount",
+						 @"com.bps.squinter.dev1.red",
+						 @"com.bps.squinter.dev1.blue",
+						 @"com.bps.squinter.dev1.green",
+						 @"com.bps.squinter.dev2.red",
+						 @"com.bps.squinter.dev2.blue",
+						 @"com.bps.squinter.dev2.green",
+						 @"com.bps.squinter.dev3.red",
+						 @"com.bps.squinter.dev3.blue",
+						 @"com.bps.squinter.dev3.green",
+						 @"com.bps.squinter.dev4.red",
+						 @"com.bps.squinter.dev4.blue",
+						 @"com.bps.squinter.dev4.green",
+						 @"com.bps.squinter.dev5.red",
+						 @"com.bps.squinter.dev5.blue",
+						 @"com.bps.squinter.dev5.green", nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
 							[NSString stringWithString:NSStringFromRect(_window.frame)],
@@ -278,10 +292,10 @@
 							[NSNumber numberWithInteger:12],
 							[NSNumber numberWithFloat:0.0],
 							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:1.0],
 							[NSNumber numberWithFloat:0.0],
-							[NSNumber numberWithFloat:1.0],
-							[NSNumber numberWithFloat:1.0],
-							[NSNumber numberWithFloat:1.0],
+							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:0.0],
 							[NSNumber numberWithBool:YES],
 							[NSNumber numberWithBool:NO],
 							[NSNumber numberWithBool:NO],
@@ -291,12 +305,28 @@
 							[NSNumber numberWithBool:NO],
 							[[NSArray alloc] init],
 							[NSNumber numberWithInteger:5],
-							[NSNumber numberWithInteger:200],nil];
+							[NSNumber numberWithInteger:200],
+							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:0.6],
+							[NSNumber numberWithFloat:0.6],
+							[NSNumber numberWithFloat:0.6],
+							[NSNumber numberWithFloat:1.0],
+							[NSNumber numberWithFloat:0.2],
+							[NSNumber numberWithFloat:0.3],
+							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:0.6],
+							[NSNumber numberWithFloat:0.5],
+							[NSNumber numberWithFloat:1.0],
+							[NSNumber numberWithFloat:0.8],
+							[NSNumber numberWithFloat:1.0],
+							[NSNumber numberWithFloat:0.0],
+							[NSNumber numberWithFloat:0.6], nil];
 
     // Drop the arrays into the Defauts
 
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjects:objectArray forKeys:keyArray];
     [defaults registerDefaults:appDefaults];
+	[defaults synchronize];
 
     // Prepare the main window
 
@@ -353,6 +383,7 @@
 
     [logTextView setTextColor:textColour];
     [logClipView setBackgroundColor:backColour];
+	[self setColours];
 
 	// Set the selection colour to mirror the fore-back setup
 
@@ -3885,7 +3916,7 @@
 
 	if (![ide isDeviceLogging:devid])
 	{
-		if (ide.numberOfLogStreams == 0) [self setLoggingColours];
+		// if (ide.numberOfLogStreams == 0) [self setLoggingColours];
 
 		if (ide.numberOfLogStreams == 5)
 		{
@@ -8729,9 +8760,9 @@
 
 		while (done == NO)
 		{
-			if (index > logColors.count)
+			if (index > colors.count)
 			{
-				index = index - logColors.count;
+				index = index - colors.count;
 			}
 			else
 			{
@@ -8746,12 +8777,12 @@
 		{
 			NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
 			log = [NSString stringWithFormat:@"\"%@\"%@: [%@] %@%@", device, subspacer, type, spacer, message];
-			values = [NSArray arrayWithObjects:[logColors objectAtIndex:index], nil];
+			values = [NSArray arrayWithObjects:[colors objectAtIndex:index], nil];
 		}
 		else
 		{
 			log = [NSString stringWithFormat:@"\"%@\": [%@] %@%@", device, type, spacer, message];
-			values = [NSArray arrayWithObjects:[logColors objectAtIndex:index], nil];
+			values = [NSArray arrayWithObjects:[colors objectAtIndex:index], nil];
 		}
 
 		log = [timestamp stringByAppendingFormat:@" %@", log];
@@ -11393,6 +11424,26 @@
 {
 	// Populate the 'colors' array with a set of colours for logging different devices
 
+	NSString *start = @"com.bps.squinter.dev";
+
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+	for (NSUInteger i = 1 ; i < 6 ; ++i)
+	{
+		NSString *key = [start stringByAppendingFormat:@"%li.red", (long)i];
+		NSNumber *red = [defaults objectForKey:key];
+		key = [start stringByAppendingFormat:@"%li.green", (long)i];
+		NSNumber *green = [defaults objectForKey:key];
+		key = [start stringByAppendingFormat:@"%li.blue", (long)i];
+		NSNumber *blue = [defaults objectForKey:key];
+
+		[colors addObject:[NSColor colorWithSRGBRed:red.floatValue
+											  green:green.floatValue
+											   blue:blue.floatValue
+											  alpha:1.0]];
+	}
+
+	/*
 	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry (138)
 	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine (213)
 	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green) (200)
@@ -11408,16 +11459,7 @@
 	[colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.5 blue:1.0 alpha:1.0]]; // Lavender ()
 	[colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.6 blue:0.6 alpha:1.0]]; // Teal ()
 	[colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.6 blue:0.0 alpha:1.0]]; // Fern ()
-
-	// Randomize the list
-
-	NSUInteger count = colors.count;
-	if (count <= 1) return;
-
-	for (NSUInteger i = 0 ; i < count - 1 ; ++i) {
-		NSInteger exchangeIndex = i + arc4random_uniform((u_int32_t )(count - i));
-		[colors exchangeObjectAtIndex:i withObjectAtIndex:exchangeIndex];
-	}
+	*/
 }
 
 
@@ -11558,16 +11600,45 @@
 	float b = [[defaults objectForKey:@"com.bps.squinter.text.blue"] floatValue];
 	float g = [[defaults objectForKey:@"com.bps.squinter.text.green"] floatValue];
 	textColour = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
+	textColorWell.color = textColour;
+	[textColorWell setAction:@selector(showPanelForText)];
 
 	r = [[defaults objectForKey:@"com.bps.squinter.back.red"] floatValue];
 	b = [[defaults objectForKey:@"com.bps.squinter.back.blue"] floatValue];
 	g = [[defaults objectForKey:@"com.bps.squinter.back.green"] floatValue];
 	backColour = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
-
-	textColorWell.color = textColour;
-	[textColorWell setAction:@selector(showPanelForText)];
 	backColorWell.color = backColour;
 	[backColorWell setAction:@selector(showPanelForBack)];
+
+	r = [[defaults objectForKey:@"com.bps.squinter.dev1.red"] floatValue];
+	b = [[defaults objectForKey:@"com.bps.squinter.dev1.blue"] floatValue];
+	g = [[defaults objectForKey:@"com.bps.squinter.dev1.green"] floatValue];
+	dev1ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
+	[dev1ColorWell setAction:@selector(showPanelForDev1)];
+
+	r = [[defaults objectForKey:@"com.bps.squinter.dev2.red"] floatValue];
+	b = [[defaults objectForKey:@"com.bps.squinter.dev2.blue"] floatValue];
+	g = [[defaults objectForKey:@"com.bps.squinter.dev2.green"] floatValue];
+	dev2ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
+	[dev2ColorWell setAction:@selector(showPanelForDev2)];
+
+	r = [[defaults objectForKey:@"com.bps.squinter.dev3.red"] floatValue];
+	b = [[defaults objectForKey:@"com.bps.squinter.dev3.blue"] floatValue];
+	g = [[defaults objectForKey:@"com.bps.squinter.dev3.green"] floatValue];
+	dev3ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
+	[dev3ColorWell setAction:@selector(showPanelForDev3)];
+
+	r = [[defaults objectForKey:@"com.bps.squinter.dev4.red"] floatValue];
+	b = [[defaults objectForKey:@"com.bps.squinter.dev4.blue"] floatValue];
+	g = [[defaults objectForKey:@"com.bps.squinter.dev4.green"] floatValue];
+	dev4ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
+	[dev4ColorWell setAction:@selector(showPanelForDev4)];
+
+	r = [[defaults objectForKey:@"com.bps.squinter.dev5.red"] floatValue];
+	b = [[defaults objectForKey:@"com.bps.squinter.dev5.blue"] floatValue];
+	g = [[defaults objectForKey:@"com.bps.squinter.dev5.green"] floatValue];
+	dev5ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
+	[dev5ColorWell setAction:@selector(showPanelForDev5)];
 
 	// Set font name and size menus
 
@@ -11693,17 +11764,17 @@
 	textColour = textColorWell.color;
 	backColour = backColorWell.color;
 
-	float r = (float)[textColour redComponent];
-	float b = (float)[textColour blueComponent];
-	float g = (float)[textColour greenComponent];
+	float r = (float)textColour.redComponent;
+	float b = (float)textColour.blueComponent;
+	float g = (float)textColour.greenComponent;
 
 	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.text.red"];
 	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.text.green"];
 	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.text.blue"];
 
-	r = (float)[backColour redComponent];
-	b = (float)[backColour blueComponent];
-	g = (float)[backColour greenComponent];
+	r = (float)backColour.redComponent;
+	b = (float)backColour.blueComponent;
+	g = (float)backColour.greenComponent;
 
 	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.back.red"];
 	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.back.green"];
@@ -11716,6 +11787,46 @@
 	NSUInteger a = 100 * r * b * g;
 
 	[logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
+
+	r = (float)dev1ColorWell.color.redComponent;
+	b = (float)dev1ColorWell.color.blueComponent;
+	g = (float)dev1ColorWell.color.greenComponent;
+
+	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev1.red"];
+	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev1.green"];
+	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev1.blue"];
+
+	r = (float)dev2ColorWell.color.redComponent;
+	b = (float)dev2ColorWell.color.blueComponent;
+	g = (float)dev2ColorWell.color.greenComponent;
+
+	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev2.red"];
+	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev2.green"];
+	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev2.blue"];
+
+	r = (float)dev3ColorWell.color.redComponent;
+	b = (float)dev3ColorWell.color.blueComponent;
+	g = (float)dev3ColorWell.color.greenComponent;
+
+	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev3.red"];
+	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev3.green"];
+	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev3.blue"];
+
+	r = (float)dev4ColorWell.color.redComponent;
+	b = (float)dev4ColorWell.color.blueComponent;
+	g = (float)dev4ColorWell.color.greenComponent;
+
+	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev4.red"];
+	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev4.green"];
+	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev4.blue"];
+
+	r = (float)dev5ColorWell.color.redComponent;
+	b = (float)dev5ColorWell.color.blueComponent;
+	g = (float)dev5ColorWell.color.greenComponent;
+
+	[defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev5.red"];
+	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev5.green"];
+	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev5.blue"];
 
 	NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
 	NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
@@ -11754,6 +11865,10 @@
 	// Close the sheet
 
 	[_window endSheet:preferencesSheet];
+
+	// Update the colors array
+
+	[self setColours];
 }
 
 
@@ -11845,6 +11960,41 @@
 - (void)showPanelForBack
 {
 	[backColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev1
+{
+	[dev1ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev2
+{
+	[dev2ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev3
+{
+	[dev3ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev4
+{
+	[dev4ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev5
+{
+	[dev5ColorWell setColor:[NSColorPanel sharedColorPanel].color];
 }
 
 
