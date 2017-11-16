@@ -11424,21 +11424,31 @@
 {
 	// Populate the 'colors' array with a set of colours for logging different devices
 
-	[colors addObject:[NSColor yellowColor]];
-	[colors addObject:[NSColor cyanColor]];
-	[colors addObject:[NSColor magentaColor]];
-	[colors addObject:[NSColor purpleColor]];
-	[colors addObject:[NSColor blueColor]];
-	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green)
-	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry
-	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine
-	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green)
-	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:1.0 blue:1.0 alpha:1.0]]; // White
-	[colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:1.0]]; // Black
-	[colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.5 blue:0.5 alpha:1.0]]; // Mid-grey
-	[colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1.0]]; // Light-grey
-	[colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.3 blue:0.3 alpha:1.0]]; // Dark-grey
-	[colors addObject:[NSColor brownColor]];
+	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry (138)
+	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine (213)
+	[colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green) (200)
+	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:1.0 blue:1.0 alpha:1.0]]; // White (255)
+	[colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:1.0]]; // Black (0)
+	[colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.5 blue:0.5 alpha:1.0]]; // Mid-grey (127)
+	[colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1.0]]; // Light-grey (204)
+	[colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.3 blue:0.3 alpha:1.0]]; // Dark-grey (76)
+	[colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.9 blue:0.5 alpha:1.0]]; // Banana ()
+	[colors addObject:[NSColor colorWithSRGBRed:0.6 green:0.2 blue:1.0 alpha:1.0]]; // Grape ()
+	[colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.6 blue:1.0 alpha:1.0]]; // Aqua ()
+	[colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.8 blue:1.0 alpha:1.0]]; // Sky ()
+	[colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.5 blue:1.0 alpha:1.0]]; // Lavender ()
+	[colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.6 blue:0.6 alpha:1.0]]; // Teal ()
+	[colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.6 blue:0.0 alpha:1.0]]; // Fern ()
+
+	// Randomize the list
+
+	NSUInteger count = colors.count;
+	if (count <= 1) return;
+
+	for (NSUInteger i = 0 ; i < count - 1 ; ++i) {
+		NSInteger exchangeIndex = i + arc4random_uniform((u_int32_t )(count - i));
+		[colors exchangeObjectAtIndex:i withObjectAtIndex:exchangeIndex];
+	}
 }
 
 
@@ -11461,7 +11471,7 @@
 		{
 			NSInteger stock = [self perceivedBrightness:colour];
 
-			if (back - stock > 40)
+			if (back - stock > 100)
 			{
 				// Colour is dark enough to use against this background
 				// But is it too close to the text colour ?
@@ -11478,7 +11488,7 @@
 		{
 			NSInteger stock = [self perceivedBrightness:colour];
 
-			if (stock - back > 40) [logColors addObject:colour];
+			if (stock - back > 100) [logColors addObject:colour];
 		}
 	}
 }
