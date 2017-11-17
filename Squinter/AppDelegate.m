@@ -326,7 +326,6 @@
 
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjects:objectArray forKeys:keyArray];
     [defaults registerDefaults:appDefaults];
-	[defaults synchronize];
 
     // Prepare the main window
 
@@ -684,21 +683,21 @@
 {
 	// Stop watching for file-changes
 
-    [fileWatchQueue removeAllPaths];
+	[fileWatchQueue removeAllPaths];
 
 	// Kill any connections to the API
 
 	[ide killAllConnections];
 
-    // Record settings that are not set by the Prefs dialog
+	// Record settings that are not set by the Prefs dialog
 
-    [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
-    [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
+	[defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
+	[defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
 	[defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
-    // Stop watching for notifications
+	// Stop watching for notifications
 
-    [nsncdc removeObserver:self];
+	[nsncdc removeObserver:self];
 }
 
 
@@ -9470,6 +9469,8 @@
 
 	// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
+	[logTextView setSelectedRange:NSMakeRange(logTextView.string.length,0)];
+
 	NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
 
 	if (addTimestamp)
@@ -11426,6 +11427,8 @@
 
 	NSString *start = @"com.bps.squinter.dev";
 
+	if (colors.count > 0) [colors removeAllObjects];
+
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
 	for (NSUInteger i = 1 ; i < 6 ; ++i)
@@ -11828,6 +11831,8 @@
 	[defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev5.green"];
 	[defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev5.blue"];
 
+	[self setColours];
+
 	NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
 	NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
 	if (fontSize == 15) fontSize = 18;
@@ -11865,10 +11870,6 @@
 	// Close the sheet
 
 	[_window endSheet:preferencesSheet];
-
-	// Update the colors array
-
-	[self setColours];
 }
 
 
