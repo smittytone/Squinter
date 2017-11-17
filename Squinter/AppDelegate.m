@@ -9753,9 +9753,14 @@
 	{
 		// The error was not specifically related to log in
 
-		NSString *errString = (errorCode == kErrorNetworkError) ? @"[NETWORK ERROR] " : @"";
+		NSString *errString = (errorCode == kErrorNetworkError) ? @"[NETWORK ERROR] " : @"[ERROR] ";
 
 		[self writeErrorToLog:[errString stringByAppendingString:errorMessage] :YES];
+
+		// Just in case we are attemmpting to log stream from the current device
+		
+		streamLogsItem.state = 0;
+		[squinterToolbar validateVisibleItems];
 	}
 }
 
