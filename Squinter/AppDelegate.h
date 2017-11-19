@@ -24,6 +24,7 @@
 #import "PDKeychainBindings.h"
 
 
+
 @interface AppDelegate : NSObject <NSApplicationDelegate,
 								   NSOpenSavePanelDelegate,
                                    NSFileManagerDelegate,
@@ -340,6 +341,7 @@
 
 @property (assign) IBOutlet NSWindow *window;
 
+
 // Dock Menu Methods
 
 - (void)dockMenuAction:(id)sender;
@@ -496,7 +498,6 @@
 - (void)listCommits:(NSNotification *)note;
 - (void)listLogs:(NSNotification *)note;
 - (void)logLogs:(NSString *)logLine;
-- (void)parseLog;
 - (IBAction)printLog:(id)sender;
 - (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo;
 - (void)loggingStarted:(NSNotification *)note;
@@ -568,7 +569,6 @@
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
 - (void)setColours;
 - (void)setLoggingColours;
-- (NSInteger)perceivedBrightness:(NSColor *)colour;
 
 // Progress Methods
 
@@ -591,8 +591,6 @@
 - (IBAction)cancelPrefs:(id)sender;
 - (IBAction)setPrefs:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;
-- (void)setWorkingDirectory:(NSArray *)urls;
-- (NSString *)getFontName:(NSInteger)index;
 - (void)showPanelForText;
 - (void)showPanelForBack;
 - (void)showPanelForDev1;
@@ -600,21 +598,6 @@
 - (void)showPanelForDev3;
 - (void)showPanelForDev4;
 - (void)showPanelForDev5;
-
-
-// File Watching Methods
-
-- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
-
-// File Path Methods
-
-- (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
-- (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
-- (NSInteger)numberOfFoldersInPath:(NSString *)path;
-- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
-- (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath;
-- (NSData *)bookmarkForURL:(NSURL *)url;
-- (NSURL *)urlForBookmark:(NSData *)bookmark;
 
 // Check Electric Imp Libraries Methods
 
@@ -628,15 +611,9 @@
 - (IBAction)copyAgentCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentURL:(id)sender;
 
-// Utilty Methods
+// File Watching Methods
 
-- (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;
-- (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
-- (Project *)getParentProject:(Devicegroup *)devicegroup;
-- (NSDate *)convertTimestring:(NSString *)dateString;
-- (NSString *)getErrorMessage:(NSUInteger)index;
-- (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces;
-- (void)setDevicegroupDevices:(Devicegroup *)devicegroup;
+- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
 
 
 @end

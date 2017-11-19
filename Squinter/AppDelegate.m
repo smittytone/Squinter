@@ -1,6 +1,7 @@
 
 
 #import "AppDelegate.h"
+#import "AppDelegateUtilities.h"
 
 
 @implementation AppDelegate
@@ -11,10 +12,7 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
 {
-	//NSDocumentController *sc = [NSDocumentController sharedDocumentController];
-	//[sc clearRecentDocuments:self];
-
-	// Set up stock date formatter
+	// Set up stock date formatters
 
     def = [[NSDateFormatter alloc] init];
     def.dateFormat = @"yyyy-MM-dd HH:mm:ss ZZZZZ";
@@ -371,15 +369,7 @@
 
     NSUInteger a = [self perceivedBrightness:backColour];
 
-    if (a < 30)
-    {
-        [logScrollView setScrollerKnobStyle:NSScrollerKnobStyleLight];
-    }
-    else
-    {
-        [logScrollView setScrollerKnobStyle:NSScrollerKnobStyleDark];
-    }
-
+	[logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
     [logTextView setTextColor:textColour];
     [logClipView setBackgroundColor:backColour];
 	[self setColours];
@@ -538,7 +528,6 @@
 			   selector:@selector(updateCodeStageTwo:)
 				   name:@"BuildAPIGotDevicegroup"
 				 object:ide];
-
 
 	// **************
 
@@ -937,7 +926,6 @@
 		passwordTextField.cell = [[NSSecureTextFieldCell alloc] initTextCell:text];
 		passwordTextField.stringValue = text;
 	}
-
 }
 
 
@@ -947,15 +935,15 @@
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:NSBorderlessWindowMask];
+	[_window setStyleMask:NSBorderlessWindowMask];
 }
 
 
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:(NSTitledWindowMask | NSMiniaturizableWindowMask | NSClosableWindowMask)];
-    [_window setTitle:@"Squinter"];
+	[_window setStyleMask:(NSTitledWindowMask | NSMiniaturizableWindowMask | NSClosableWindowMask)];
+	[_window setTitle:@"Squinter"];
 }
 
 
@@ -8588,15 +8576,6 @@
 
 
 
-- (void)parseLog
-{
-	logTextView.editable = YES;
-	[logTextView checkTextInDocument:nil];
-	logTextView.editable = NO;
-}
-
-
-
 - (IBAction)printLog:(id)sender
 {
 	// Get and update the app's NSPrintInfo object
@@ -11514,22 +11493,6 @@
 
 
 
-- (NSInteger)perceivedBrightness:(NSColor *)colour
-{
-	// Returns the perceived brightness of the specified colour
-	// Used to pick colours that will stand out against the log's background color
-
-	CGFloat red, blue, green, alpha;
-	[colour colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
-	[colour getRed:&red green:&green blue:&blue alpha:&alpha];
-	red = red * 255;
-	blue = blue * 255;
-	green = green * 255;
-	return (NSInteger)sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068));
-}
-
-
-
 #pragma mark Progress Methods
 
 
@@ -11911,51 +11874,6 @@
 
 
 
-- (void)setWorkingDirectory:(NSArray *)urls
-{
-	NSURL *url = [urls objectAtIndex:0];
-	NSString *path = [url path];
-	workingDirectoryField.stringValue = path;
-}
-
-
-
-- (NSString *)getFontName:(NSInteger)index
-{
-	NSString *fontName = @"";
-
-	switch (index)
-	{
-		case 0:
-			fontName = @"Andale Mono";
-			break;
-
-		case 1:
-			fontName = @"Courier";
-			break;
-
-		case 2:
-			fontName = @"Menlo";
-			break;
-
-		case 3:
-			fontName = @"Monaco";
-			break;
-
-		case 4:
-			fontName = @"Source Code Pro";
-			break;
-
-		default:
-			fontName = @"Menlo";
-			break;
-	}
-
-	return fontName;
-}
-
-
-
 - (void)showPanelForText
 {
 	[textColorWell setColor:[NSColorPanel sharedColorPanel].color];
@@ -12001,272 +11919,6 @@
 - (void)showPanelForDev5
 {
 	[dev5ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-#pragma mark - File Watching Methods
-
-
-- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
-{
-    // A file has changed so notify the user
-	// IMPORTANT: fpath is the MONITORED location. VDKQueue will continue watching this file wherever it is moved
-	// or whatever it is renamed
-	// TODO Review for new archtecture
-
-#ifdef DEBUG
-	NSLog(@"File change: %@", fpath);
-#endif
-
-	if ([noteName compare:VDKQueueRenameNotification] == NSOrderedSame)
-    {
-        // Called when the file is MOVED or RENAMED
-
-        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been renamed or moved. You will need to re-add it to this device group.", [fpath lastPathComponent]] :YES];
-    }
-	
-	if ([noteName compare:VDKQueueDeleteNotification] == NSOrderedSame)
-	{
-		// Only called when Trash is emptied/GitHub desktop deletes a file before saving a new version
-		
-		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been deleted.", [fpath lastPathComponent]] :YES];
-	}
-	
-	if ([noteName compare:VDKQueueWriteNotification] == NSOrderedSame)
-	{
-		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this device group's code.", [fpath lastPathComponent]] :YES];
-	}
-}
-
-
-
-#pragma mark - File Path Methods
-
-
-- (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath
-{
-	// This method takes an absolute location ('filePath') and returns a location relative
-	// to another location ('basePath'). Typically, this is the path to the host
-	// project
-
-	basePath = [basePath stringByStandardizingPath];
-	filePath = [filePath stringByStandardizingPath];
-
-	NSString *theFilePath = filePath;
-
-	NSInteger nf = [self numberOfFoldersInPath:theFilePath];
-	NSInteger nb = [self numberOfFoldersInPath:basePath];
-
-	if (nf > nb) // theFilePath.length > basePath.length
-	{
-		// The file path is longer than the base path
-		NSRange r = [theFilePath rangeOfString:basePath];
-
-		if (r.location != NSNotFound)
-		{
-			// The file path contains the base path, eg.
-			// '/Users/smitty/documents/github/squinter/files'
-			// contains
-			// '/Users/smitty/documents/github/squinter'
-
-			theFilePath = [theFilePath substringFromIndex:r.length];
-			//theFilePath = [theFilePath stringByAppendingFormat:@"/%@", theFileName];
-		}
-		else
-		{
-			// The file path does not contain the base path, eg.
-			// '/Users/smitty/downloads'
-			// doesn't contain
-			// '/Users/smitty/documents/github/squinter'
-
-			theFilePath = [self getPathDelta:basePath :theFilePath];
-			//theFilePath = [theFilePath stringByAppendingString:theFileName];
-		}
-	}
-	else if (nf < nb) // theFilePath.length < basePath.length
-	{
-		NSRange r = [basePath rangeOfString:theFilePath];
-
-		if (r.location != NSNotFound)
-		{
-			// The base path contains the file path, eg.
-			// '/Users/smitty/documents/github/squinter/files'
-			// contains
-			// '/Users/smitty/documents'
-
-			theFilePath = [basePath substringFromIndex:r.length];
-			NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
-			//theFilePath = theFileName;
-
-			// Add in '../' for each directory in the base path but not in the file path
-
-			for (NSInteger i = 0 ; i < filePathParts.count - 1 ; ++i)
-			{
-				theFilePath = [@"../" stringByAppendingString:theFilePath];
-			}
-		}
-		else
-		{
-			// The base path doesn't contains the file path, eg.
-			// '/Users/smitty/documents/github/squinter/files'
-			// doesn't contain
-			// '/Users/smitty/downloads'
-
-			theFilePath = [self getPathDelta:basePath :theFilePath];
-			//theFilePath = [theFilePath stringByAppendingString:theFileName];
-		}
-	}
-	else
-	{
-		// The two paths are the same length
-
-		if ([theFilePath compare:basePath] == NSOrderedSame)
-		{
-			// The file path and the base patch are the same, eg.
-			// '/Users/smitty/documents/github/squinter'
-			// matches
-			// '/Users/smitty/documents/github/squinter'
-
-			theFilePath = @"";
-		}
-		else
-		{
-			// The file path and the base patch are not the same, eg.
-			// '/Users/smitty/documents/github/squinter'
-			// matches
-			// '/Users/smitty/downloads/archive/nofiles'
-
-			theFilePath = [self getPathDelta:basePath :theFilePath];
-			//theFilePath = [theFilePath stringByAppendingString:theFileName];
-		}
-	}
-
-	return theFilePath;
-}
-
-
-
-- (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath
-{
-	NSInteger location = -1;
-	NSArray *fileParts = [filePath componentsSeparatedByString:@"/"];
-	NSArray *baseParts = [basePath componentsSeparatedByString:@"/"];
-
-	for (NSUInteger i = 0 ; i < fileParts.count ; ++i)
-	{
-		// Compare the two paths, directory by directory, starting at the left
-		// then break when they no longer match
-
-		NSString *filePart = [fileParts objectAtIndex:i];
-		NSString *basePart = [baseParts objectAtIndex:i];
-
-		if ([filePart compare:basePart] != NSOrderedSame)
-		{
-			location = i;
-			break;
-		}
-	}
-
-	NSString *path = @"";
-
-	for (NSUInteger i = location ; i < baseParts.count ; ++i)
-	{
-		// Add a '../' for every non-matching base path directory
-
-		path = [path stringByAppendingString:@"../"];
-	}
-
-	for (NSUInteger i = location ; i < fileParts.count ; ++i)
-	{
-		// Then add the actual file path directries from the no matching part
-
-		path = [path stringByAppendingFormat:@"%@/", [fileParts objectAtIndex:i]];
-	}
-
-	// Remove the final /
-
-	path = [path substringToIndex:(path.length - 1)];
-
-	return path;
-}
-
-
-
-- (NSInteger)numberOfFoldersInPath:(NSString *)path
-{
-	NSArray *parts = [path componentsSeparatedByString:@"/"];
-	return (parts.count - 1);
-}
-
-
-
-- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
-{
-	// Expand a relative path that is relative to the base path to an absolute path
-
-	NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
-	absolutePath = [absolutePath stringByStandardizingPath];
-	return absolutePath;
-}
-
-
-
-- (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath
-{
-	// Takes an absolute path to a project and a file path relative to that same project,
-	// and returns the user's preferred style of path for printing
-
-	NSInteger pathType = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
-
-	switch (pathType)
-	{
-		case 0:
-			// Absolute Path
-			return [self getAbsolutePath:projectPath :filePath];
-		case 1:
-			// Path relative to project DEFAULT
-			return filePath;
-			break;
-
-		default:
-			// Path relative to home
-			return [@"~" stringByAppendingString:[self getRelativeFilePath:@"~" :[self getAbsolutePath:projectPath :filePath]]];
-			break;
-	}
-}
-
-
-
-- (NSData *)bookmarkForURL:(NSURL *)url
-{
-	NSError *error = nil;
-	NSData *bookmark = [url bookmarkDataWithOptions: NSURLBookmarkCreationSuitableForBookmarkFile
-					 includingResourceValuesForKeys: nil
-									  relativeToURL: nil
-											  error: &error];
-
-	if (error != nil) return nil;
-	return bookmark;
-}
-
-
-
-- (NSURL *)urlForBookmark:(NSData *)bookmark
-{
-	NSError *error = nil;
-	BOOL isStale = NO;
-	NSURL *url = [NSURL URLByResolvingBookmarkData: bookmark
-										   options: NSURLBookmarkResolutionWithoutUI
-									 relativeToURL: nil
-							   bookmarkDataIsStale: &isStale
-											 error: &error];
-
-	// There was an error, so return 'nil' as a warning
-
-	if (error != nil) return nil;
-	stale = isStale;
-	return url;
 }
 
 
@@ -12636,7 +12288,6 @@ didReceiveResponse:(NSURLResponse *)response
 }
 
 
-
 #pragma mark - Pasteboard Methods
 
 
@@ -12727,264 +12378,37 @@ didReceiveResponse:(NSURLResponse *)response
 
 
 
-#pragma mark - Utilty Methods
+#pragma mark - File Watching Methods
 
 
-- (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key
+- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
 {
-	NSDictionary *rd = nil;
+	// A file has changed so notify the user
+	// IMPORTANT: fpath is the MONITORED location. VDKQueue will continue watching this file wherever it is moved
+	// or whatever it is renamed
+	// TODO Review for new archtecture
 
-	// This extracts the required key, wherever it is in the source (API) data
+#ifdef DEBUG
+	NSLog(@"File change: %@", fpath);
+#endif
 
-	if ([key compare:@"id"] == NSOrderedSame) return [apiDict objectForKey:@"id"];
-	if ([key compare:@"type"] == NSOrderedSame) return [apiDict objectForKey:@"type"];
-
-	// Attributes General properties
-
-	if ([key compare:@"created_at"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.created_at"];
-	if ([key compare:@"updated_at"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.updated_at"];
-
-	if ([key compare:@"name"] == NSOrderedSame)
+	if ([noteName compare:VDKQueueRenameNotification] == NSOrderedSame)
 	{
-		NSString *name = [apiDict valueForKeyPath:@"attributes.name"];
-		if ((NSNull *)name == [NSNull null]) return nil;
-		return name;
+		// Called when the file is MOVED or RENAMED
+
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been renamed or moved. You will need to re-add it to this device group.", [fpath lastPathComponent]] :YES];
 	}
 
-	if ([key compare:@"description"] == NSOrderedSame)
+	if ([noteName compare:VDKQueueDeleteNotification] == NSOrderedSame)
 	{
-		NSString *desc = [apiDict valueForKeyPath:@"attributes.description"];
-		if ((NSNull *)desc == [NSNull null]) return nil;
-		return desc;
+		// Only called when Trash is emptied/GitHub desktop deletes a file before saving a new version
+
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been deleted.", [fpath lastPathComponent]] :YES];
 	}
 
-	// Attributes Device properties
-
-	if ([key compare:@"device_online"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.device_online"];
-	if ([key compare:@"mac_address"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.mac_address"];
-	if ([key compare:@"ip_address"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.ip_address"];
-	if ([key compare:@"imp_type"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.imp_type"];
-	if ([key compare:@"agent_id"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.agent_id"];
-	if ([key compare:@"agent_running"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.agent_running"] boolValue]];
-	if ([key compare:@"swversion"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.swversion"];
-
-	// if ([key compare:@"free_memory"] == NSOrderedSame) return (NSNumber *)[NSNumber numberWithInteger:[[apiDict valueForKeyPath:@"attributes.free_memory"] integerValue]];
-
-	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
-	if ([key compare:@"last_blinkup_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.last_blinkup_at"]];
-
-	// Attributes Deployment properties - non-nullable
-
-	if ([key compare:@"flagged"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.flagged"] boolValue]];
-	if ([key compare:@"sha"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.sha"];
-
-	// Attributes Deployment properties - nullable
-
-	if ([key compare:@"agent_code"] == NSOrderedSame)
+	if ([noteName compare:VDKQueueWriteNotification] == NSOrderedSame)
 	{
-		NSString *ac = [apiDict valueForKeyPath:@"attributes.agent_code"];
-		if ((NSNull *)ac == [NSNull null]) return nil;
-		return ac;
-	}
-
-	if ([key compare:@"device_code"] == NSOrderedSame)
-	{
-		NSString *dc = [apiDict valueForKeyPath:@"attributes.device_code"];
-		if ((NSNull *)dc == [NSNull null]) return nil;
-		return dc;
-	}
-
-	if ([key compare:@"origin"] == NSOrderedSame)
-	{
-		NSString *or = [apiDict valueForKeyPath:@"attributes.origin"];
-		if ((NSNull *)or == [NSNull null]) return nil;
-		return or;
-	}
-
-	if ([key compare:@"tags"] == NSOrderedSame)
-	{
-		NSArray *tags = [apiDict valueForKeyPath:@"attributes.tags"];
-		if ((NSNull *)tags == [NSNull null]) return nil;
-		return tags;
-	}
-
-	// Relationships properties
-
-	if ([key compare:@"product"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.product"];
-	if ([key compare:@"devicegroup"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.devicegroup"];
-	if ([key compare:@"current_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.current_deployment"];
-
-	if ((NSNull *)rd == [NSNull null]) return nil;
-	return rd;
-}
-
-
-
-- (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
-{
-	NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup",
-						  @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
-	NSArray *dgnames = @[ @"Production", @"Factory Fixture", @"Development", @"Factory Test", @"Production Test"];
-
-	for (NSUInteger i = 0 ; i < dgtypes.count ; ++i)
-	{
-		NSString *dgtype = back ? [dgnames objectAtIndex:i] : [dgtypes objectAtIndex:i];
-
-		if ([dgtype compare:type] == NSOrderedSame) return (back ? [dgtypes objectAtIndex:i] : [dgnames objectAtIndex:i]);
-	}
-
-	if (!back) return @"Unknown";
-	return @"development_devicegroup";
-}
-
-
-
-- (Project *)getParentProject:(Devicegroup *)devicegroup
-{
-	for (Project *ap in projectArray)
-	{
-		if (ap.devicegroups.count > 0)
-		{
-			for (Devicegroup *adg in ap.devicegroups)
-			{
-				if (adg == devicegroup) return ap;
-			}
-		}
-	}
-
-	return nil;
-}
-
-
-
-- (NSDate *)convertTimestring:(NSString *)dateString
-{
-	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-	[dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
-	NSLog(@"convertTimestring: %@", dateString);
-	return [logDef dateFromString:dateString];
-}
-
-
-
-- (NSString *)getErrorMessage:(NSUInteger)index
-{
-	switch (index)
-	{
-		case kErrorMessageNoSelectedDevice:
-			return @"[ERROR] You have not selected a device. Choose one from the 'Current Device' pop-up below.";
-
-		case kErrorMessageNoSelectedDevicegroup:
-			return @"[ERROR] You have not selected a device group. Go to 'Device Groups'  > 'Project's Device Groups' to select one.";
-
-		case kErrorMessageNoSelectedProject:
-			return @"[ERROR] You have not selected a project. Go to 'Projects' > 'Open Projects' to select one.";
-
-		case kErrorMessageNoSelectedProduct:
-			return @"[ERROR] You have not selected a product. Go to 'Projects' > 'Current Products' to select one.";
-
-		case kErrorMessageMalformedOperation:
-			return @"[ERROR] Malformed action request - no action specified.";
-	}
-
-	return @"No Error";
-}
-
-
-
-- (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces
-{
-	// Takes a device group or project description, adds a caption, and formats it as a series
-	// of lines up to the specified length 'maxWidth', breaking at spaces not mid-word
-	// Used by the 'showProjectInfo:' and 'showDevicegroupInfo:' methods
-
-	description = [NSString stringWithFormat:@"Description: %@", description];
-
-	NSInteger count = 0;
-	NSMutableArray *lines = [[NSMutableArray alloc] init];
-
-	while (count < description.length)
-	{
-		NSRange range = NSMakeRange(count, maxWidth);
-
-		if (count + maxWidth > description.length) range = NSMakeRange(count, description.length - count);
-
-		NSString *line = [description substringWithRange:range];
-		NSInteger back = 1;
-		BOOL done = NO;
-
-		if (line.length == maxWidth)
-		{
-			// Only process a line if it's the full width
-
-			do
-			{
-				// Work back from the list line character
-
-				range = NSMakeRange(line.length - back, 1);
-				NSString *last = [line substringWithRange:range];
-
-				if ([last compare:@" "] == NSOrderedSame)
-				{
-					// Found a space
-
-					done = YES;
-					line = [line substringToIndex:line.length - back];
-				}
-				else
-				{
-					back++;
-				}
-
-			}
-			while (!done);
-		}
-
-		[lines addObject:[spaces stringByAppendingString:line]];
-
-		count = count + line.length + 1;
-	}
-
-	return lines;
-}
-
-
-
-- (void)setDevicegroupDevices:(Devicegroup *)devicegroup
-{
-	if (devicesArray.count > 0)
-	{
-		for (NSMutableDictionary *device in devicesArray)
-		{
-			NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-			NSString *dgid = [self getValueFrom:dg withKey:@"id"];
-
-			if (devicegroup.did != nil && devicegroup.did.length > 0 && ([devicegroup.did compare:dgid] == NSOrderedSame))
-			{
-				if (devicegroup.devices == nil) devicegroup.devices = [[NSMutableArray alloc] init];
-
-				BOOL flag = NO;
-
-				NSString *dvn = [self getValueFrom:device withKey:@"name"];
-
-				if (dvn == nil) dvn = [self getValueFrom:device withKey:@"id"];
-
-				for (NSString *dgdevice in devicegroup.devices)
-				{
-					if ([dvn compare:dgdevice] == NSOrderedSame)
-					{
-						// Device is already on the list
-
-						flag = YES;
-						break;
-					}
-				}
-
-				// Add the name to the list of device group devices as it's not already present
-
-				if (!flag && dvn != nil) [devicegroup.devices addObject:dvn];
-			}
-		}
+		[self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this device group's code.", [fpath lastPathComponent]] :YES];
 	}
 }
 
