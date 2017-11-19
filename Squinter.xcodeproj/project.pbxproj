@@ -20,6 +20,7 @@
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
 		3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */; };
 		3B6AF0DB197127B10083744C /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6AF0DA197127B10083744C /* Project.m */; };
+		3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */; };
 		3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7ACF801CFF0A980080C3DB /* Connexion.m */; };
 		3B82AA0E1CB663EA0098A959 /* SquinterHelp in Resources */ = {isa = PBXBuildFile; fileRef = 3B82AA0D1CB663EA0098A959 /* SquinterHelp */; };
 		3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */; };
@@ -107,6 +108,8 @@
 		3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginToolbarItem.m; sourceTree = "<group>"; };
 		3B6AF0D9197127B10083744C /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Project.h; sourceTree = "<group>"; };
 		3B6AF0DA197127B10083744C /* Project.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Project.m; sourceTree = "<group>"; };
+		3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegateUtilities.h; sourceTree = "<group>"; };
+		3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegateUtilities.m; sourceTree = "<group>"; };
 		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Connexion.h; path = ../../BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
 		3B7ACF801CFF0A980080C3DB /* Connexion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Connexion.m; path = ../BuildAPIAccess/Connexion.m; sourceTree = SOURCE_ROOT; };
 		3B82AA0D1CB663EA0098A959 /* SquinterHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SquinterHelp; sourceTree = SOURCE_ROOT; };
@@ -298,6 +301,8 @@
 				3BE520BA19752883000BAD52 /* Constants.h */,
 				3B36D1D41970A0990029CEC0 /* AppDelegate.h */,
 				3B36D1D51970A0990029CEC0 /* AppDelegate.m */,
+				3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */,
+				3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */,
 				3B6AF0D9197127B10083744C /* Project.h */,
 				3B6AF0DA197127B10083744C /* Project.m */,
 				3B8B8E0E1E9527D6009363C8 /* Devicegroup.h */,
@@ -515,21 +520,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
-				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
-				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
-				3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */,
-				3B6AF0DB197127B10083744C /* Project.m in Sources */,
-				3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */,
-				3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */,
-				3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */,
-				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
-				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
+				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
+				3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
+				3B6AF0DB197127B10083744C /* Project.m in Sources */,
 				3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */,
+				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
+				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
+				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
+				3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */,
+				3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */,
+				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
+				3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */,
+				3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
