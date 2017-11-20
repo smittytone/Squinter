@@ -22,7 +22,7 @@
 #import "StreamToolbarItem.h"
 #import "LoginToolbarItem.h"
 #import "PDKeychainBindings.h"
-
+#import "CommitWindowViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -293,13 +293,19 @@
 	IBOutlet NSTextField *uploadTagsTextField;
 	IBOutlet NSTextField *uploadTagsCountField;
 
+	// Set Minimum Deployment
+
+	IBOutlet NSWindow *commitSheet;
+
 	// Connection Variables
     
     BuildAPIAccess *ide;
 
     // Update Tracking
 	
-	IBOutlet SUUpdater *sparkler; 
+	IBOutlet SUUpdater *sparkler;
+
+	IBOutlet CommitWindowViewController *cwvc;
 
 	Project *currentProject, *creatingProject, *savingProject;
 	Devicegroup *currentDevicegroup;
@@ -412,6 +418,7 @@
 - (IBAction)removeSource:(id)sender;
 - (IBAction)getCommits:(id)sender;
 - (IBAction)updateCode:(id)sender;
+- (IBAction)setMinimumDeployment:(id)sender;
 
 // Existing Device Methods
 

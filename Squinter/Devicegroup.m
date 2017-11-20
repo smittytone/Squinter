@@ -11,7 +11,7 @@
 
 
 @synthesize name, description, did, squinted;
-@synthesize models, data, type;
+@synthesize models, data, type, history;
 
 
 - (instancetype)init
@@ -24,6 +24,7 @@
 		type = @"development_devicegroup";
 		models = nil;
 		data = nil;
+		history = nil;
 		squinted = 0;
 	}
 
@@ -46,6 +47,7 @@
 
 		squinted = 0;
 		data = nil;
+		history = nil;
 	}
 
 	return self;
@@ -74,6 +76,7 @@
 	dgcopy.did = [self.did mutableCopy];
 	dgcopy.models = [self.models mutableCopy];
 	dgcopy.data = [self.data mutableCopy];
+	dgcopy.history = [self.history mutableCopy];
 	dgcopy.squinted = self.squinted;
 
 	return dgcopy;

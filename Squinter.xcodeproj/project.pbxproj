@@ -20,6 +20,8 @@
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
 		3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */; };
 		3B6AF0DB197127B10083744C /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6AF0DA197127B10083744C /* Project.m */; };
+		3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */; };
+		3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */; };
 		3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */; };
 		3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7ACF801CFF0A980080C3DB /* Connexion.m */; };
 		3B82AA0E1CB663EA0098A959 /* SquinterHelp in Resources */ = {isa = PBXBuildFile; fileRef = 3B82AA0D1CB663EA0098A959 /* SquinterHelp */; };
@@ -108,6 +110,10 @@
 		3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginToolbarItem.m; sourceTree = "<group>"; };
 		3B6AF0D9197127B10083744C /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Project.h; sourceTree = "<group>"; };
 		3B6AF0DA197127B10083744C /* Project.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Project.m; sourceTree = "<group>"; };
+		3B6F3AC41FC31A7700A7F5C1 /* CommitTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommitTableCellView.h; sourceTree = "<group>"; };
+		3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommitTableCellView.m; sourceTree = "<group>"; };
+		3B6F3AC71FC31BF000A7F5C1 /* CommitWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommitWindowViewController.h; sourceTree = "<group>"; };
+		3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommitWindowViewController.m; sourceTree = "<group>"; };
 		3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegateUtilities.h; sourceTree = "<group>"; };
 		3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegateUtilities.m; sourceTree = "<group>"; };
 		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Connexion.h; path = ../../BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
@@ -291,6 +297,10 @@
 				3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */,
 				3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */,
 				3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */,
+				3B6F3AC71FC31BF000A7F5C1 /* CommitWindowViewController.h */,
+				3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */,
+				3B6F3AC41FC31A7700A7F5C1 /* CommitTableCellView.h */,
+				3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -521,12 +531,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
+				3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */,
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
 				3B6AF0DB197127B10083744C /* Project.m in Sources */,
+				3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */,
 				3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */,
 				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
 				3B8B8E161E952E5A009363C8 /* File.m in Sources */,

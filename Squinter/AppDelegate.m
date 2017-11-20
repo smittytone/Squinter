@@ -2878,6 +2878,14 @@
 	[self refreshDevicegroupMenu];
 	[self refreshMainDevicegroupsMenu];
 	[self setToolbar];
+
+	// Update the device group data
+	if (currentDevicegroup.data == nil)
+	{
+		NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
+							   @"devicegroup": currentDevicegroup };
+		[ide getDevicegroup:currentDevicegroup.did :dict];
+	}
 }
 
 
@@ -3290,7 +3298,7 @@
 		return;
 	}
 
-	NSDictionary *dict = @{ @"action" : @"getcommits",
+	NSDictionary *dict = @{ @"action" : @"listcommits",
 							@"devicegroup" : currentDevicegroup };
 
 	[ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
@@ -3314,6 +3322,43 @@
 	[ide getDevicegroup:currentDevicegroup.did :dict];
 
 	// Pick up the action in updateCodeStageTwo:
+}
+
+
+
+- (IBAction)showMinimumDeploymentSheet:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	[cwvc prepSheet];
+	[_window beginSheet:commitSheet completionHandler:nil];
+
+	NSDictionary *dict = @{ @"action" : @"getcommits",
+						   @"devicegroup" : currentDevicegroup };
+
+	[ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
+
+	// Pick up the action in getCommitsStageTwo:
+}
+
+
+
+- (IBAction)cancelMinimumDeploymentSheet:(id)sender
+{
+	[_window endSheet:commitSheet];
+}
+
+
+
+- (IBAction)setMinimumDeployment:(id)sender
+{
+	NSInteger minumum = cwvc.indexOfMinimum;
+	
+	[_window endSheet:commitSheet];
 }
 
 
@@ -7738,8 +7783,15 @@
 	NSDictionary *data = (NSDictionary *)note.object;
 	NSDictionary *devicegroup = [data objectForKey:@"data"];
 	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
 
-	if (devicegroup != nil)
+	if (action != nil && [action compare:@"updatedevicegroup"] == NSOrderedSame)
+	{
+		// We're updating the device group
+		Devicegroup *dg = [source objectForKey:@"devicegroup"];
+		dg.data = [NSMutableDictionary dictionaryWithDictionary:devicegroup];
+	}
+	else if (devicegroup != nil)
 	{
 		NSDictionary *currentDeployment = [self getValueFrom:devicegroup withKey:@"current_deployment"];
 
@@ -8417,9 +8469,18 @@
 {
 	NSDictionary *data = (NSDictionary *)note.object;
 	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
 
 	__block Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
 	__block NSMutableArray *deployments = [data objectForKey:@"data"];
+
+	if (action != nil && [action compare:@"getcommits"] == NSOrderedSame)
+	{
+		cwvc.commits = deployments;
+		return;
+	}
+
+	devicegroup.history = deployments;
 
 	if (deployments.count > 0)
 	{
@@ -8432,6 +8493,12 @@
 			[self performSelectorOnMainThread:@selector(logLogs:)
 								   withObject:[NSString stringWithFormat:@"Commits to Device Group \"%@\":", devicegroup.name]
 								waitUntilDone:NO];
+
+			NSDictionary *min = [self getValueFrom:devicegroup.data withKey:@"min_supported_deployment"];
+			NSString *mid = min != nil ? [min objectForKey:@"id"] : @"";
+
+			NSDictionary *cur = [self getValueFrom:devicegroup.data withKey:@"current_deployment"];
+			NSString *cid = cur != nil ? [cur objectForKey:@"id"] : @"";
 
 			for (NSUInteger i = deployments.count ; i > 0 ; --i)
 			{
@@ -8468,6 +8535,13 @@
 				if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
 				if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
 				if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
+
+				if (mid.length > 0 || cid.length > 0)
+				{
+					NSString *did = [deployment objectForKey:@"id"];
+					if ([did compare:mid] == NSOrderedSame	) cs = [cs stringByAppendingString:@"\n     **This device group’s MINIMUM deployment**"];
+					if ([did compare:cid] == NSOrderedSame	) cs = [cs stringByAppendingString:@"\n     **This device group’s CURRENT deployment**"];
+				}
 
 				[self performSelectorOnMainThread:@selector(logLogs:)
 									   withObject:cs
