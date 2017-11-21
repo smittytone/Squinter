@@ -74,6 +74,7 @@
 	IBOutlet NSMenuItem *listCommitsMenuItem;
 	IBOutlet NSMenuItem *showModelFilesFinderMenuItem;
 	IBOutlet NSMenuItem *restartDeviceGroupMenuItem;
+	IBOutlet NSMenuItem *conRestartDeviceGroupMenuItem;
 	IBOutlet NSMenuItem *deleteDeviceGroupMenuItem;
 	IBOutlet NSMenuItem *renameDeviceGroupMenuItem;
 	IBOutlet NSMenuItem *compileMenuItem;

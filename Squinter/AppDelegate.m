@@ -528,6 +528,10 @@
 			   selector:@selector(updateCodeStageTwo:)
 				   name:@"BuildAPIGotDevicegroup"
 				 object:ide];
+	[nsncdc addObserver:self
+			   selector:@selector(setMinimumDeploymentStageTwo:)
+				   name:@"BuildAPISetMinDeployment"
+				 object:ide];
 
 	// **************
 
@@ -3096,6 +3100,7 @@
 	// We're doing a direct upload, so just prep the deployment data and send it
 
 	NSString *dt = [def stringFromDate:[NSDate date]];
+	dt = [dt stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
 	NSDictionary *dg = @{ @"type" : currentDevicegroup.type,
 						  @"id" : currentDevicegroup.did };
@@ -3356,9 +3361,41 @@
 
 - (IBAction)setMinimumDeployment:(id)sender
 {
-	NSInteger minumum = cwvc.indexOfMinimum;
+	NSDictionary *newMinimum = cwvc.minimumDeployment;
 	
 	[_window endSheet:commitSheet];
+
+	NSDictionary *dg = [self getValueFrom:newMinimum withKey:@"devicegroup"];
+	NSString *did = [dg objectForKey:@"id"];
+	Devicegroup *devicegroup = nil;
+
+	for (Project *project in projectArray)
+	{
+		if (project.devicegroups.count > 0)
+		{
+			for (Devicegroup *adg in project.devicegroups)
+			{
+				if ([adg.did compare:did] == NSOrderedSame)
+				{
+					devicegroup = adg;
+					break;
+				}
+			}
+		}
+	}
+
+	if (devicegroup	== nil)
+	{
+		[self writeErrorToLog:[NSString stringWithFormat:@"Device group \"%@\" cannot be found", did] :YES];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"setmindeploy",
+							@"devicegroup" : devicegroup };
+
+	[ide setMinimumDeployment:[newMinimum objectForKey:@"id"] :dict];
+
+	// Pick up the action at
 }
 
 
@@ -3466,6 +3503,30 @@
 							@"devicegroup" : currentDevicegroup };
 
 	[ide restartDevices:currentDevicegroup.did :dict];
+
+	// Pick up the action at 'restarted:'
+}
+
+
+
+- (IBAction)conditionalRestartDevices:(id)sender
+{
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"conditionally restart devices"];
+		return;
+	}
+
+	if (currentDevicegroup == nil)
+	{
+		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"conrestartdevices",
+							@"devicegroup" : currentDevicegroup };
+
+	[ide conditionalRestartDevices:currentDevicegroup.did :dict];
 
 	// Pick up the action at 'restarted:'
 }
@@ -8228,7 +8289,12 @@
 			// The returned entity is a device group - we originally called 'restartDevices:'
 
 			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-			[self writeStringToLog:[NSString stringWithFormat:@"The devices assigned to device group \"%@\" have restarted.", devicegroup.name] :YES];
+
+			NSString *fString = ([action compare:@"conrestartdevice"] == NSOrderedSame)
+			? @"The devices assigned to device group \"%@\" have conditionally restarted."
+			: @"The devices assigned to device group \"%@\" have restarted.";
+
+			[self writeStringToLog:[NSString stringWithFormat:fString, devicegroup.name] :YES];
 		}
 	}
 	else
@@ -8462,6 +8528,25 @@
 
 
 
+- (void)setMinimumDeploymentStageTwo:(NSNotification *)note
+{
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+
+	if (action != nil && [action compare:@"setmindeploy"])
+	{
+		Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+
+		[self writeStringToLog:[NSString stringWithFormat:@"Minimum deployment set for device group \"%@\".", devicegroup.name] :YES];
+
+		NSDictionary *dp = [data objectForKey:@"data"];
+		devicegroup.mdid = [dp objectForKey:@"id"];
+	}
+}
+
+
+
 #pragma mark - Log and Logging Methods
 
 
@@ -8517,7 +8602,6 @@
 					for (NSString *tag in tags) tagString = [tagString stringByAppendingFormat:@"%@, ", tag];
 					tagString = [tagString substringToIndex:tagString.length - 2];
 				}
-
 
 				NSString *ns = [NSString stringWithFormat:@"%03lu. ", (deployments.count - i + 1)];
 				NSString *ss = [@"                               " substringToIndex:ns.length];
@@ -9057,6 +9141,11 @@
 	else
 	{
 		[lines addObject:[NSString stringWithFormat:@"%@Device group not uploaded to the impCloud", spaces]];
+	}
+
+	if (devicegroup.mdid != nil || devicegroup.mdid.length > 0)
+	{
+		[lines addObject:[NSString stringWithFormat:@"%@Minimum Supported Deployment Set (ID: %@)", spaces, devicegroup.mdid]];
 	}
 
 	[lines addObject:[NSString stringWithFormat:@"%@Device group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
@@ -10608,6 +10697,7 @@
 	showDeviceGroupInfoMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
 	showModelFilesFinderMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
 	restartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	conRestartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
 	listCommitsMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
 	deleteDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
 	renameDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
