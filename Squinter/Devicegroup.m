@@ -11,7 +11,7 @@
 
 
 @synthesize name, description, did, squinted;
-@synthesize models, data, type, history;
+@synthesize models, data, type, history, mdid;
 
 
 - (instancetype)init

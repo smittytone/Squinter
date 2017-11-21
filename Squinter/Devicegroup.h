@@ -23,7 +23,8 @@
 // Properties that are NOT saved
 
 @property (nonatomic, strong) NSMutableDictionary *data;	// The API representation
-@property (nonatomic, strong) NSArray *history;			// The device group's deployment history
+@property (nonatomic, strong) NSArray *history;				// The device group's deployment history
+@property (nonatomic, strong) NSString *mdid;				// The minimum deployment ID
 @property (nonatomic, readwrite) char squinted;			// Has the Device Group's code (if any) been compiled + other status
 														// Bit		Meaning
 														//  1		Device Code compiled
