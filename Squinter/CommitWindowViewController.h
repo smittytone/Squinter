@@ -27,7 +27,7 @@
 
 
 @property (nonatomic, weak, setter=setCommits:) NSArray *commits;
-@property (nonatomic, readwrite) NSInteger indexOfMinimum;
+@property (nonatomic, strong) NSDictionary *minimumDeployment;
 
 
 @end

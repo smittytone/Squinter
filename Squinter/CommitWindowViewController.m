@@ -14,13 +14,12 @@
 
 @implementation CommitWindowViewController
 
-@synthesize commits, indexOfMinimum;
+@synthesize commits, minimumDeployment;
 
 
 - (void)prepSheet
 {
 	if (commits != nil) commits = nil;
-	indexOfMinimum = -1;
 
 	[commitIndicator startAnimation:nil];
 	[commitTable reloadData];
@@ -33,7 +32,7 @@
 	{
 		commitDef = [[NSDateFormatter alloc] init];
 		commitDef.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZZ"; // @"yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'";
-		commitDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+		//commitDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
 	}
 }
 
@@ -47,7 +46,7 @@
 	[commitTable reloadData];
 
 	commitIndicator.hidden = YES;
-	commitLabel.stringValue = @"Choose the device group’s minimum deployment:";
+	commitLabel.stringValue = @"Choose the device group’s minimum deployment (most recent first):";
 	commitTable.needsDisplay = YES;
 }
 
@@ -70,7 +69,7 @@
 		}
 		else
 		{
-			indexOfMinimum = i;
+			minimumDeployment = [commits objectAtIndex:i];
 		}
 	}
 }
@@ -96,16 +95,25 @@
 		NSString *sha = [deployment valueForKeyPath:@"attributes.updated_at"];
 		if (sha == nil) sha = [deployment valueForKeyPath:@"attributes.created_at"];
 		sha = [commitDef stringFromDate:[commitDef dateFromString:sha]];
-		sha = [sha stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+		sha = [sha stringByReplacingOccurrencesOfString:@"GMT" withString:@"+00:00"];
 		sha = [sha stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+		sha = [sha stringByReplacingOccurrencesOfString:@"T" withString:@" "];
 
-		cell.minimumCheckbox.title = sha;
+		if (commits.count < 100)
+		{
+			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%02li Committed at %@", (long)row, sha];
+		}
+		else if (commits.count < 1000)
+		{
+			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%03li Committed at %@", (long)row, sha];
+		}
+		else
+		{
+			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%05li Committed at %@", (long)row, sha];
+		}
+
 		cell.minimumCheckbox.state = NSOffState;
 		cell.minimumCheckbox.action = @selector(checkMinimum:);
-	}
-	else
-	{
-
 	}
 
 	return cell;
