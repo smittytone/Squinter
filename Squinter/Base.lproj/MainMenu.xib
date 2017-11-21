@@ -570,7 +570,7 @@
                                     <action selector="conditionalRestartDevices:" target="Voe-Tx-rLC" id="hQo-j2-loH"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Set Mimimum Deployment" id="MtS-R8-cbC">
+                            <menuItem title="Set Minimum Deployment" id="MtS-R8-cbC">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="showMinimumDeploymentSheet:" target="Voe-Tx-rLC" id="UWJ-1G-ZcH"/>
