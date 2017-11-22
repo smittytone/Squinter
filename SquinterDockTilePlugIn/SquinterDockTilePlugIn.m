@@ -114,7 +114,7 @@
 				break;
 
 			case 2:
-				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://developer.electricimp.com/"]];
 				break;
 
 			case 3:

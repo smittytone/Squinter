@@ -777,7 +777,7 @@
                 break;
 
             case 2:
-                [nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
+                [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/"]];
                 break;
 
             case 3:
@@ -8718,7 +8718,7 @@
 
 - (void)launchLibsPage
 {
-    [nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/libraries/"]];
+    [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/codelibraries/"]];
 }
 
 
@@ -10255,7 +10255,7 @@
     if (sender == author01) [nswsw openURL:[NSURL URLWithString:@"https://github.com/carlbrown/PDKeychainBindingsController"]];
     if (sender == author02) [nswsw openURL:[NSURL URLWithString:@"https://github.com/bdkjones/VDKQueue"]];
     if (sender == author03) [nswsw openURL:[NSURL URLWithString:@"https://github.com/uliwitness/UliKit"]];
-    if (sender == author04) [nswsw openURL:[NSURL URLWithString:@"https://electricimp.com/docs/"]];
+    if (sender == author04) [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/"]];
     if (sender == author05) [nswsw openURL:[NSURL URLWithString:@"https://github.com/adobe-fonts/source-code-pro"]];
     if (sender == author06) [nswsw openURL:[NSURL URLWithString:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"]];
 }
