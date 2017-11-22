@@ -18,6 +18,7 @@
 		3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B36D1D51970A0990029CEC0 /* AppDelegate.m */; };
 		3B36D1D91970A0990029CEC0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1D71970A0990029CEC0 /* MainMenu.xib */; };
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
+		3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */; };
 		3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */; };
 		3B6AF0DB197127B10083744C /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6AF0DA197127B10083744C /* Project.m */; };
 		3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */; };
@@ -106,6 +107,8 @@
 		3B36D1E81970A0990029CEC0 /* SquinterTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SquinterTests-Info.plist"; sourceTree = "<group>"; };
 		3B36D1EA1970A0990029CEC0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3B36D1EC1970A0990029CEC0 /* SquinterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SquinterTests.m; sourceTree = "<group>"; };
+		3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegateSquinting.h; sourceTree = "<group>"; };
+		3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegateSquinting.m; sourceTree = "<group>"; };
 		3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginToolbarItem.h; sourceTree = "<group>"; };
 		3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginToolbarItem.m; sourceTree = "<group>"; };
 		3B6AF0D9197127B10083744C /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Project.h; sourceTree = "<group>"; };
@@ -311,6 +314,8 @@
 				3BE520BA19752883000BAD52 /* Constants.h */,
 				3B36D1D41970A0990029CEC0 /* AppDelegate.h */,
 				3B36D1D51970A0990029CEC0 /* AppDelegate.m */,
+				3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */,
+				3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */,
 				3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */,
 				3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */,
 				3B6AF0D9197127B10083744C /* Project.h */,
@@ -531,6 +536,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
+				3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */,
 				3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */,
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */,
