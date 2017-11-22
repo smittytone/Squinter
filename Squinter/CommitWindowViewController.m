@@ -31,9 +31,16 @@
     if (commitDef == nil)
     {
         commitDef = [[NSDateFormatter alloc] init];
-        commitDef.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZZ"; // @"yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'";
-        //commitDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+        commitDef.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZZ";
+		commitDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
     }
+
+	if (def == nil)
+	{
+		def = [[NSDateFormatter alloc] init];
+		def.dateFormat = @"yyyy-MM-dd HH:mm:ss ZZZZZ";
+		def.timeZone = [NSTimeZone localTimeZone];
+	}
 }
 
 
@@ -151,8 +158,8 @@
 			NSDictionary *deployment = [commits objectAtIndex:(commits.count - 1 - row)];
 			NSString *sha = [deployment valueForKeyPath:@"attributes.updated_at"];
 			if (sha == nil) sha = [deployment valueForKeyPath:@"attributes.created_at"];
-			sha = [commitDef stringFromDate:[commitDef dateFromString:sha]];
-			sha = [sha stringByReplacingOccurrencesOfString:@"GMT" withString:@"+00:00"];
+			sha = [def stringFromDate:[commitDef dateFromString:sha]];
+			sha = [sha stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
 			sha = [sha stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 			sha = [sha stringByReplacingOccurrencesOfString:@"T" withString:@" "];
 

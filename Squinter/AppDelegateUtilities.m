@@ -400,7 +400,17 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
     NSLog(@"convertTimestring: %@", dateString);
-    return [logDef dateFromString:dateString];
+    return [inLogDef dateFromString:dateString];
+}
+
+
+
+- (NSString *)formatTimestamp:(NSString *)timestamp
+{
+	timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
+	timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+	timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+	return timestamp;
 }
 
 

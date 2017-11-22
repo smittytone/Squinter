@@ -17,16 +17,23 @@
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
 {
     // Set up stock date formatters
-	// The first, 'def', is used to format app-issued timestamps in the log
-	// The second, 'logDef', is used to format timestamps from impCentral
+	// The first, 'def', is used to format app-issued timestamps in the log.
+	// The second, 'inLogDef', sets the format for incoming timestamps from impCentral.
+	// The third, 'outLogDef', is used to present timestamps from impCentral;
+	// It is the same as 'def' but adds three decimals to the seconds count
 
     def = [[NSDateFormatter alloc] init];
     def.dateFormat = @"yyyy-MM-dd HH:mm:ss ZZZZZ";
     def.timeZone = [NSTimeZone localTimeZone];
 
-    logDef = [[NSDateFormatter alloc] init];
-    logDef.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZZ"; // @"yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'";
-    logDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+    inLogDef = [[NSDateFormatter alloc] init];
+    inLogDef.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZZ";
+    inLogDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+
+	outLogDef = [[NSDateFormatter alloc] init];
+	outLogDef.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS ZZZZZ";
+	outLogDef.timeZone = [NSTimeZone localTimeZone];
+
 
     // Initialize app properties
     // NOTE 'currentXXX' indicates a selected Squinter object
@@ -5874,13 +5881,13 @@
             NSString *sha = [self getValueFrom:deployment withKey:@"sha"];
             NSString *updated = [self getValueFrom:deployment withKey:@"updated_at"];
             if (updated == nil) updated = [self getValueFrom:deployment withKey:@"created_at"];
-            NSDate *deployDate = [logDef dateFromString:updated];
+            NSDate *deployDate = [inLogDef dateFromString:updated];
 
             for (Model *model in newDevicegroup.models)
             {
                 // Check dates
 
-                NSDate *modelDate = [logDef dateFromString:model.updated];
+                NSDate *modelDate = [inLogDef dateFromString:model.updated];
 
                 if ([modelDate earlierDate:deployDate] == modelDate)
                 {
@@ -7135,7 +7142,7 @@
                 NSDictionary *deployment = [deployments objectAtIndex:(i - 1)];
                 NSString *sha = [self getValueFrom:deployment withKey:@"sha"];
                 NSString *message = [self getValueFrom:deployment withKey:@"description"];
-                NSString *timestamp = [self getValueFrom:deployment withKey:@"created_at"];
+                NSString *timestamp = [self formatTimestamp:[self getValueFrom:deployment withKey:@"created_at"]];
                 NSString *origin = [self getValueFrom:deployment withKey:@"origin"];
                 NSArray *tags = [self getValueFrom:deployment withKey:@"tags"];
                 NSString *tagString = @"";
@@ -7220,11 +7227,7 @@
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
                 {
                     NSDictionary *entry = [theLogs objectAtIndex:(i - 1)];
-                    NSString *timestamp = [entry objectForKey:@"timestamp"];
-                    timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
-                    timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
-                    timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-
+                    NSString *timestamp = [self formatTimestamp:[entry objectForKey:@"timestamp"]];
                     NSString *event = [entry objectForKey:@"event"];
                     NSString *owner = [entry objectForKey:@"owner_id"];
                     NSString *actor = [entry objectForKey:@"actor_id"];
@@ -7242,10 +7245,7 @@
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
                 {
                     NSDictionary *entry = [theLogs objectAtIndex:(i - 1)];
-                    NSString *timestamp = [entry objectForKey:@"ts"];
-                    timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
-                    timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
-                    timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+                    NSString *timestamp = [self formatTimestamp:[entry objectForKey:@"ts"]];
 
                     NSString *type = [entry objectForKey:@"type"];
                     NSString *msg = [entry objectForKey:@"msg"];
@@ -7413,7 +7413,7 @@
 
         NSString *type = [parts objectAtIndex:3];
         NSString *timestamp = [parts objectAtIndex:1];
-        timestamp = [def stringFromDate:[logDef dateFromString:timestamp]];
+        timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
         timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
         timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 

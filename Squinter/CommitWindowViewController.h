@@ -18,7 +18,7 @@
     IBOutlet NSTextField *commitLabel;
     IBOutlet NSProgressIndicator *commitIndicator;
 
-    NSDateFormatter *commitDef;
+    NSDateFormatter *commitDef, *def;
 
 	NSInteger minIndex;
 }

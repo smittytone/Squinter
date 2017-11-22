@@ -321,7 +321,7 @@
     NSNotificationCenter *nsncdc;
     NSUserDefaults *defaults;
 
-    NSDateFormatter *def, *logDef;
+    NSDateFormatter *def, *inLogDef, *outLogDef;
 
     NSOperationQueue *extraOpQueue;
 
