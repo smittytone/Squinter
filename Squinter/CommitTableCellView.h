@@ -7,5 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface CommitTableCellView : NSTableCellView
+
 @property (nonatomic, strong) IBOutlet NSButton *minimumCheckbox;
+
 @end

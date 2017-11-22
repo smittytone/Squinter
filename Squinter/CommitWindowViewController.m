@@ -41,12 +41,21 @@
 - (void)setCommits:(NSArray *)input
 {
     commits = input;
+	minIndex = -1;
+
+	for (NSUInteger i = 0 ; i < commits.count ; ++i)
+	{
+		NSDictionary *deployment = [commits objectAtIndex:i];
+		NSString *depid = [deployment objectForKey:@"id"];
+
+		if (devicegroup.mdid != nil && [devicegroup.mdid compare:depid] == NSOrderedSame) minIndex = commits.count - 1 - i;
+	}
 
     [commitIndicator stopAnimation:nil];
     [commitTable reloadData];
 
     commitIndicator.hidden = YES;
-    commitLabel.stringValue = @"Choose the device group’s minimum deployment (most recent first):";
+    commitLabel.stringValue = @"Choose the device group’s minimum deployment (most recent last):";
     commitTable.needsDisplay = YES;
 }
 
@@ -69,7 +78,7 @@
         }
         else
         {
-            minimumDeployment = [commits objectAtIndex:i];
+            minimumDeployment = [commits objectAtIndex:(commits.count - 1 - i)];
         }
     }
 }
@@ -85,39 +94,77 @@
 
 
 
+- (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
+{
+	return NO;
+}
+
+
+
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    CommitTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcell" owner:nil];
+	if ([tableColumn.identifier compare:@"commitcolumncheck"] == NSOrderedSame)
+	{
+		CommitTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcellcheck" owner:nil];
 
-    if (cell != nil)
-    {
-        NSDictionary *deployment = [commits objectAtIndex:(commits.count - 1 - row)];
-        NSString *sha = [deployment valueForKeyPath:@"attributes.updated_at"];
-        if (sha == nil) sha = [deployment valueForKeyPath:@"attributes.created_at"];
-        sha = [commitDef stringFromDate:[commitDef dateFromString:sha]];
-        sha = [sha stringByReplacingOccurrencesOfString:@"GMT" withString:@"+00:00"];
-        sha = [sha stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-        sha = [sha stringByReplacingOccurrencesOfString:@"T" withString:@" "];
+		if (cell != nil)
+		{
+			cell.minimumCheckbox.title = @"";
+			cell.minimumCheckbox.state = row == minIndex ? NSOnState : NSOffState;
+			cell.minimumCheckbox.action = @selector(checkMinimum:);
+			if (row < minIndex) cell.minimumCheckbox.enabled = NO;
 
-        if (commits.count < 100)
-        {
-            cell.minimumCheckbox.title = [NSString stringWithFormat:@"%02li Committed at %@", (long)(row + 1), sha];
-        }
-        else if (commits.count < 1000)
-        {
-            cell.minimumCheckbox.title = [NSString stringWithFormat:@"%03li Committed at %@", (long)(row + 1), sha];
-        }
-        else
-        {
-            cell.minimumCheckbox.title = [NSString stringWithFormat:@"%05li Committed at %@", (long)(row + 1), sha];
-        }
+			return cell;
+		}
+	}
+	else if ([tableColumn.identifier compare:@"commitcolumnnum"] == NSOrderedSame)
+	{
+		NSTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcellnum" owner:nil];
 
-        NSString *depid = [deployment objectForKey:@"id"];
-        cell.minimumCheckbox.state = (devicegroup.mdid != nil && [devicegroup.mdid compare:depid] == NSOrderedSame) ? NSOnState : NSOffState;
-        cell.minimumCheckbox.action = @selector(checkMinimum:);
-    }
+		if (cell != nil)
+		{
+			if (commits.count < 100)
+			{
+				cell.textField.stringValue = [NSString stringWithFormat:@"%02li", (long)(row + 1)];
+			}
+			else if (commits.count < 1000)
+			{
+				cell.textField.stringValue = [NSString stringWithFormat:@"%03li", (long)(row + 1)];
+			}
+			else
+			{
+				cell.textField.stringValue = [NSString stringWithFormat:@"%05li", (long)(row + 1)];
+			}
 
-    return cell;
+			cell.textField.enabled = NO;
+			cell.textField.textColor = row < minIndex ? NSColor.grayColor : NSColor.blackColor;
+		}
+
+		return cell;
+	}
+	else
+	{
+		NSTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcelltext" owner:nil];
+
+		if (cell != nil)
+		{
+			NSDictionary *deployment = [commits objectAtIndex:(commits.count - 1 - row)];
+			NSString *sha = [deployment valueForKeyPath:@"attributes.updated_at"];
+			if (sha == nil) sha = [deployment valueForKeyPath:@"attributes.created_at"];
+			sha = [commitDef stringFromDate:[commitDef dateFromString:sha]];
+			sha = [sha stringByReplacingOccurrencesOfString:@"GMT" withString:@"+00:00"];
+			sha = [sha stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+			sha = [sha stringByReplacingOccurrencesOfString:@"T" withString:@" "];
+
+			cell.textField.stringValue = [NSString stringWithFormat:@"Committed at %@", sha];
+			cell.textField.enabled = NO;
+			cell.textField.textColor = row < minIndex ? NSColor.grayColor : NSColor.blackColor;
+		}
+
+		return cell;
+	}
+
+	return nil;
 }
 
 

@@ -19,6 +19,8 @@
     IBOutlet NSProgressIndicator *commitIndicator;
 
     NSDateFormatter *commitDef;
+
+	NSInteger minIndex;
 }
 
 
