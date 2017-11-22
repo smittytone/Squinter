@@ -10,7 +10,7 @@
 @interface SquinterToolbarItem : NSToolbarItem <NSCopying>
 
 {
-	BOOL isForeground;
+    BOOL isForeground;
 }
 
 

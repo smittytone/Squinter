@@ -13,9 +13,7 @@
 
 - (BOOL)knowsPageRange:(NSRangePointer)range
 {
-	
-
-	BOOL wrappingToFit = self.printPanelAccessoryController.wrappingToFit;
+    BOOL wrappingToFit = self.printPanelAccessoryController.wrappingToFit;
 }
 
 

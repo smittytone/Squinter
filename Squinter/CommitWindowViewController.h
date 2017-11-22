@@ -14,11 +14,11 @@
 @interface CommitWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
 
 {
-	IBOutlet NSTableView *commitTable;
-	IBOutlet NSTextField *commitLabel;
-	IBOutlet NSProgressIndicator *commitIndicator;
+    IBOutlet NSTableView *commitTable;
+    IBOutlet NSTextField *commitLabel;
+    IBOutlet NSProgressIndicator *commitIndicator;
 
-	NSDateFormatter *commitDef;
+    NSDateFormatter *commitDef;
 }
 
 

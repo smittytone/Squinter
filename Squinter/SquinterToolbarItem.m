@@ -14,18 +14,18 @@
 
 - (instancetype)initWithItemIdentifier:(NSString *)itemIdentifier
 {
-	self = [super initWithItemIdentifier:itemIdentifier];
-	if (self)
-	{
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(appWillResignActive)
-													 name:NSApplicationWillResignActiveNotification
-												   object:nil];
+    self = [super initWithItemIdentifier:itemIdentifier];
+    if (self)
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appWillResignActive)
+                                                     name:NSApplicationWillResignActiveNotification
+                                                   object:nil];
 
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(appWillBecomeActive)
-													 name:NSApplicationWillBecomeActiveNotification
-												   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appWillBecomeActive)
+                                                     name:NSApplicationWillBecomeActiveNotification
+                                                   object:nil];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(appWillQuit)
@@ -33,32 +33,32 @@
                                                    object:nil];
 
         isForeground = YES;
-		onImageName= @"compile";
-		offImageName = @"compile";
-	}
+        onImageName= @"compile";
+        offImageName = @"compile";
+    }
 
-	return self;
+    return self;
 }
 
 
 
 -(void)validate
 {
-	if (isForeground)
-	{
-		[self setImage:[NSImage imageNamed:onImageName]];
-	}
-	else
-	{
-		[self setImage:[NSImage imageNamed:offImageName]];
-	}
+    if (isForeground)
+    {
+        [self setImage:[NSImage imageNamed:onImageName]];
+    }
+    else
+    {
+        [self setImage:[NSImage imageNamed:offImageName]];
+    }
 }
 
 
 
 - (void)appWillBecomeActive
 {
-	isForeground = YES;
+    isForeground = YES;
     [self validate];
 }
 
@@ -66,7 +66,7 @@
 
 - (void)appWillResignActive
 {
-	isForeground = NO;
+    isForeground = NO;
     [self validate];
 }
 
@@ -83,10 +83,10 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	SquinterToolbarItem *copiedItem = [super copyWithZone:zone];
-	copiedItem->onImageName = [self.onImageName copyWithZone:zone];
-	copiedItem->offImageName = [self.onImageName copyWithZone:zone];
-	return copiedItem;
+    SquinterToolbarItem *copiedItem = [super copyWithZone:zone];
+    copiedItem->onImageName = [self.onImageName copyWithZone:zone];
+    copiedItem->offImageName = [self.onImageName copyWithZone:zone];
+    return copiedItem;
 }
 
 

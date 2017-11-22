@@ -15,18 +15,18 @@
 
 - (instancetype)initWithItemIdentifier:(NSString *)itemIdentifier
 {
-	self = [super initWithItemIdentifier:itemIdentifier];
-	if (self)
-	{
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(appWillResignActive)
-													 name:NSApplicationWillResignActiveNotification
-												   object:nil];
+    self = [super initWithItemIdentifier:itemIdentifier];
+    if (self)
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appWillResignActive)
+                                                     name:NSApplicationWillResignActiveNotification
+                                                   object:nil];
 
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(appWillBecomeActive)
-													 name:NSApplicationWillBecomeActiveNotification
-												   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appWillBecomeActive)
+                                                     name:NSApplicationWillBecomeActiveNotification
+                                                   object:nil];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(appWillQuit)
@@ -34,60 +34,60 @@
                                                    object:nil];
 
         isForeground = YES;
-		onImageName = @"log_flagged";
-		offImageName = @"streamon";
-		midImageName = @"log_flagging";
-		midImageNameGrey = @"log_flagging_grey";
-		onImageNameGrey = @"log_flagged_grey";
-		offImageNameGrey = @"streamon_grey";
-	}
+        onImageName = @"log_flagged";
+        offImageName = @"streamon";
+        midImageName = @"log_flagging";
+        midImageNameGrey = @"log_flagging_grey";
+        onImageNameGrey = @"log_flagged_grey";
+        offImageNameGrey = @"streamon_grey";
+    }
 
-	return self;
+    return self;
 }
 
 
 
 - (void)validate
 {
-	if (isForeground)
-	{
-		switch (state)
-		{
-			case kStreamToolbarItemStateOff:
-				[self setImage:[NSImage imageNamed:offImageName]];
-				break;
+    if (isForeground)
+    {
+        switch (state)
+        {
+            case kStreamToolbarItemStateOff:
+                [self setImage:[NSImage imageNamed:offImageName]];
+                break;
 
-			case kStreamToolbarItemStateMid:
-				[self setImage:[NSImage imageNamed:midImageName]];
-				break;
+            case kStreamToolbarItemStateMid:
+                [self setImage:[NSImage imageNamed:midImageName]];
+                break;
 
-			default:
-				[self setImage:[NSImage imageNamed:onImageName]];
-		}
-	}
-	else
-	{
-		switch (state)
-		{
-			case kStreamToolbarItemStateOff:
-				[self setImage:[NSImage imageNamed:offImageNameGrey]];
-				break;
+            default:
+                [self setImage:[NSImage imageNamed:onImageName]];
+        }
+    }
+    else
+    {
+        switch (state)
+        {
+            case kStreamToolbarItemStateOff:
+                [self setImage:[NSImage imageNamed:offImageNameGrey]];
+                break;
 
-			case kStreamToolbarItemStateMid:
-				[self setImage:[NSImage imageNamed:midImageNameGrey]];
-				break;
+            case kStreamToolbarItemStateMid:
+                [self setImage:[NSImage imageNamed:midImageNameGrey]];
+                break;
 
-			default:
-				[self setImage:[NSImage imageNamed:onImageNameGrey]];
-		}
-	}
+            default:
+                [self setImage:[NSImage imageNamed:onImageNameGrey]];
+        }
+    }
 }
 
 
 
 - (void)appWillBecomeActive
 {
-	isForeground = YES;
+    isForeground = YES;
     [self validate];
 }
 
@@ -95,7 +95,7 @@
 
 - (void)appWillResignActive
 {
-	isForeground = NO;
+    isForeground = NO;
     [self validate];
 }
 
@@ -112,14 +112,14 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	StreamToolbarItem *copiedItem = [super copyWithZone:zone];
-	copiedItem->onImageName = [self.onImageName copyWithZone:zone];
-	copiedItem->offImageName = [self.onImageName copyWithZone:zone];
-	copiedItem->onImageNameGrey = [self.onImageNameGrey copyWithZone:zone];
-	copiedItem->offImageNameGrey = [self.offImageNameGrey copyWithZone:zone];
-	copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
-	copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
-	return copiedItem;
+    StreamToolbarItem *copiedItem = [super copyWithZone:zone];
+    copiedItem->onImageName = [self.onImageName copyWithZone:zone];
+    copiedItem->offImageName = [self.onImageName copyWithZone:zone];
+    copiedItem->onImageNameGrey = [self.onImageNameGrey copyWithZone:zone];
+    copiedItem->offImageNameGrey = [self.offImageNameGrey copyWithZone:zone];
+    copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
+    copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
+    return copiedItem;
 }
 
 

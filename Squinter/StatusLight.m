@@ -15,27 +15,27 @@
 - (instancetype)initWithFrame:(NSRect)frame
 {
     if (self = [super initWithFrame:frame])
-	{
+    {
         isLightFull = NO;
         isLightOn = NO;
         if (theCurrentImage == nil) theCurrentImage = [NSImage imageNamed:@"light_outline"];
 
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(appWillResignActive)
-													 name:NSApplicationWillResignActiveNotification
-												   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appWillResignActive)
+                                                     name:NSApplicationWillResignActiveNotification
+                                                   object:nil];
 
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(appWillBecomeActive)
-													 name:NSApplicationWillBecomeActiveNotification
-												   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appWillBecomeActive)
+                                                     name:NSApplicationWillBecomeActiveNotification
+                                                   object:nil];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(appWillQuit)
                                                      name:NSApplicationWillTerminateNotification
                                                    object:nil];
     }
-    
+
     return self;
 }
 
@@ -43,34 +43,34 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-	float alpha = 0.2;
+    float alpha = 0.2;
 
-	if (isLightOn == YES) alpha = 1.0;
+    if (isLightOn == YES) alpha = 1.0;
 
     theCurrentImage = nil;
 
-	if (isForeground)
-	{
-		if (isLightFull)
-		{
-			theCurrentImage = [NSImage imageNamed:@"light_full"];
-		}
-		else
-		{
-			theCurrentImage = [NSImage imageNamed:@"light_outline"];
-		}
-	}
-	else
-	{
-		if (isLightFull)
-		{
-			theCurrentImage = [NSImage imageNamed:@"light_full_grey"];
-		}
-		else
-		{
-			theCurrentImage = [NSImage imageNamed:@"light_outline_grey"];
-		}
-	}
+    if (isForeground)
+    {
+        if (isLightFull)
+        {
+            theCurrentImage = [NSImage imageNamed:@"light_full"];
+        }
+        else
+        {
+            theCurrentImage = [NSImage imageNamed:@"light_outline"];
+        }
+    }
+    else
+    {
+        if (isLightFull)
+        {
+            theCurrentImage = [NSImage imageNamed:@"light_full_grey"];
+        }
+        else
+        {
+            theCurrentImage = [NSImage imageNamed:@"light_outline_grey"];
+        }
+    }
 
     [theCurrentImage drawAtPoint: NSMakePoint(0.0, 0.0)
                         fromRect: NSMakeRect(0, 0, 0, 0)
@@ -82,40 +82,40 @@
 
 - (void)show
 {
-	[self setLight:YES];
+    [self setLight:YES];
 }
 
 
 
 - (void)hide
 {
-	[self setLight:NO];
+    [self setLight:NO];
 }
 
 
 - (void)setLight:(BOOL)onOrOff
 {
-	// Controls the save? icon's opacity: full when there is at least one project open
-	// or low when there are NO projects open
+    // Controls the save? icon's opacity: full when there is at least one project open
+    // or low when there are NO projects open
 
-	isLightOn = onOrOff;
-	[self setNeedsDisplay:YES];
+    isLightOn = onOrOff;
+    [self setNeedsDisplay:YES];
 }
 
 
 
 - (void)needSave:(BOOL)yesOrNo
 {
-	[self setFull:!yesOrNo];
+    [self setFull:!yesOrNo];
 }
 
 
 
 - (void)setFull:(BOOL)fullOrOutline
 {
-	// Controls the save? icon's image: full for no changes; outline for changes
+    // Controls the save? icon's image: full for no changes; outline for changes
 
-	isLightFull = fullOrOutline;
+    isLightFull = fullOrOutline;
     [self setNeedsDisplay:YES];
 }
 
@@ -123,16 +123,16 @@
 
 - (void)appWillBecomeActive
 {
-	isForeground = YES;
-	[self setNeedsDisplay:YES];
+    isForeground = YES;
+    [self setNeedsDisplay:YES];
 }
 
 
 
 - (void)appWillResignActive
 {
-	isForeground = NO;
-	[self setNeedsDisplay:YES];
+    isForeground = NO;
+    [self setNeedsDisplay:YES];
 }
 
 

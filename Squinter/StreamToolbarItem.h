@@ -11,8 +11,8 @@
 @interface StreamToolbarItem : NSToolbarItem <NSCopying>
 
 {
-	BOOL isForeground;
-	CGRect storedFrame;
+    BOOL isForeground;
+    CGRect storedFrame;
 }
 
 

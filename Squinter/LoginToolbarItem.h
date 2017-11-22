@@ -10,7 +10,7 @@
 @interface LoginToolbarItem : NSToolbarItem <NSCopying>
 
 {
-	BOOL isForeground;
+    BOOL isForeground;
 }
 
 

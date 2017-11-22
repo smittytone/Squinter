@@ -8,9 +8,9 @@
 @interface LogView : NSTextView
 
 {
-	NSSize originalSize;
-	NSSize previousValueOfDocSizeInPage;
-	BOOL previousValueOfWrappingToFit;
+    NSSize originalSize;
+    NSSize previousValueOfDocSizeInPage;
+    BOOL previousValueOfWrappingToFit;
 }
 
 
