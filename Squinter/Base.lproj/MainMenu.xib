@@ -159,6 +159,7 @@
                 <outlet property="saveDevicegroupFilesAccessoryView" destination="CAG-97-Qf7" id="W1e-BA-HR5"/>
                 <outlet property="saveDevicegroupFilesAccessoryViewCheckbox" destination="X8n-NY-Ubq" id="4tv-05-d4t"/>
                 <outlet property="saveLight" destination="05z-Fa-E8J" id="uMi-Gb-yYa"/>
+                <outlet property="setMinimumMenuItem" destination="MtS-R8-cbC" id="Jyv-LN-RIa"/>
                 <outlet property="showDeviceGroupInfoMenuItem" destination="H91-E2-XrA" id="AmO-FM-HPv"/>
                 <outlet property="showDeviceInfoMenuItem" destination="1z8-jV-qI6" id="PMc-f6-KwO"/>
                 <outlet property="showHideToolbarMenuItem" destination="snW-S8-Cw5" id="KyG-x7-bum"/>

@@ -9241,6 +9241,7 @@
     showModelFilesFinderMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
     restartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     conRestartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	setMinimumMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     listCommitsMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     deleteDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     renameDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;

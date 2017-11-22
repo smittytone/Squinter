@@ -80,6 +80,7 @@
     IBOutlet NSMenuItem *compileMenuItem;
     IBOutlet NSMenuItem *uploadMenuItem;
     IBOutlet NSMenuItem *uploadExtraMenuItem;
+	IBOutlet NSMenuItem *setMinimumMenuItem;
     IBOutlet NSMenuItem *removeFilesMenuItem;
     IBOutlet NSMenuItem *externalOpenMenuItem;
     IBOutlet NSMenu *externalSourceMenu;
