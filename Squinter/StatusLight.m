@@ -11,13 +11,13 @@
 @synthesize theCurrentImage;
 
 
-
 - (instancetype)initWithFrame:(NSRect)frame
 {
     if (self = [super initWithFrame:frame])
     {
         isLightFull = NO;
         isLightOn = NO;
+
         if (theCurrentImage == nil) theCurrentImage = [NSImage imageNamed:@"light_outline"];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -43,34 +43,11 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    float alpha = 0.2;
+	float alpha = isLightOn ? 1.0 : 0.2;
 
-    if (isLightOn == YES) alpha = 1.0;
-
-    theCurrentImage = nil;
-
-    if (isForeground)
-    {
-        if (isLightFull)
-        {
-            theCurrentImage = [NSImage imageNamed:@"light_full"];
-        }
-        else
-        {
-            theCurrentImage = [NSImage imageNamed:@"light_outline"];
-        }
-    }
-    else
-    {
-        if (isLightFull)
-        {
-            theCurrentImage = [NSImage imageNamed:@"light_full_grey"];
-        }
-        else
-        {
-            theCurrentImage = [NSImage imageNamed:@"light_outline_grey"];
-        }
-    }
+    theCurrentImage = isForeground
+	? [NSImage imageNamed:(isLightFull ? @"light_full" : @"light_outline")]
+	: [NSImage imageNamed:(isLightFull ? @"light_full_grey" : @"light_outline_grey")];
 
     [theCurrentImage drawAtPoint: NSMakePoint(0.0, 0.0)
                         fromRect: NSMakeRect(0, 0, 0, 0)
@@ -78,6 +55,13 @@
                         fraction: alpha];
 }
 
+
+
+- (void)needSave:(BOOL)yesOrNo
+{
+	[self setFull:!yesOrNo];
+	[self.window setDocumentEdited:yesOrNo];
+}
 
 
 - (void)show
@@ -100,13 +84,6 @@
 
     isLightOn = onOrOff;
     [self setNeedsDisplay:YES];
-}
-
-
-
-- (void)needSave:(BOOL)yesOrNo
-{
-    [self setFull:!yesOrNo];
 }
 
 
