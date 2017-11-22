@@ -25,12 +25,13 @@
 @property (nonatomic, strong) NSMutableDictionary *data;	// The API representation
 @property (nonatomic, strong) NSArray *history;				// The device group's deployment history
 @property (nonatomic, strong) NSString *mdid;				// The minimum deployment ID
+@property (nonatomic, strong) NSString *cdid;				// The current deployment ID
 @property (nonatomic, readwrite) char squinted;				// Has the Device Group's code (if any) been compiled + other status
 															// Bit		Meaning
 															//  1		Device Code compiled
 															//  2		Agent Code compiled
 															//  3		Each model's code fields need saving (product to project)
-															//  4        Model has just been uploaded successfully
+															//  4       Model has just been uploaded successfully
 
 
 @end
