@@ -25,6 +25,8 @@
 		models = nil;
 		data = nil;
 		history = nil;
+		mdid = nil;
+		cdid = nil;
 		squinted = 0;
 	}
 
@@ -48,6 +50,8 @@
 		squinted = 0;
 		data = nil;
 		history = nil;
+		mdid = nil;
+		cdid = nil;
 	}
 
 	return self;
@@ -78,6 +82,8 @@
 	dgcopy.data = [self.data mutableCopy];
 	dgcopy.history = [self.history mutableCopy];
 	dgcopy.squinted = self.squinted;
+	dgcopy.mdid =self.mdid;
+	dgcopy.cdid =self.cdid;
 
 	return dgcopy;
 }
