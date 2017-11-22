@@ -2882,14 +2882,6 @@
 	[self refreshDevicegroupMenu];
 	[self refreshMainDevicegroupsMenu];
 	[self setToolbar];
-
-	// Update the device group data
-	if (currentDevicegroup.data == nil)
-	{
-		NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
-							   @"devicegroup": currentDevicegroup };
-		[ide getDevicegroup:currentDevicegroup.did :dict];
-	}
 }
 
 
@@ -3339,6 +3331,8 @@
 		return;
 	}
 
+	cwvc.devicegroup = currentDevicegroup;
+	
 	[cwvc prepSheet];
 	[_window beginSheet:commitSheet completionHandler:nil];
 
@@ -4430,7 +4424,6 @@
 			{
 				[self writeStringToLog:[NSString stringWithFormat:@"Project file has moved from %@ to %@ since it was last opened.", oldPath, currentProject.path] :YES];
 				projectMoved = YES;
-				//currentProject.haschanged = YES;
 			}
 
 			// Add the opened project to the array of open projects
@@ -4503,6 +4496,25 @@
 				currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
 				currentProject.devicegroupIndex = 0;
 
+				// Get the device group data
+
+				for (Devicegroup *devicegroup in currentProject.devicegroups)
+				{
+					if (ide.isLoggedIn)
+					{
+						NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
+												@"devicegroup" : devicegroup };
+
+						[ide getDevicegroup:devicegroup.did :dict];
+
+						// Action continues in parallel at updateCodeStageTwo:
+					}
+
+					// Set the devicegroup's device list
+
+					[self setDevicegroupDevices:devicegroup];
+				}
+
 				// Auto-compile all of the project's device groups, if required by the user
 
 				if ([defaults boolForKey:@"com.bps.squinter.autocompile"])
@@ -4512,10 +4524,6 @@
 					for (Devicegroup *dg in currentProject.devicegroups)
 					{
 						if (dg.models.count > 0) [self compile:dg :NO];
-
-						// Duplicate the details of assigned devices in the device group
-
-						[self setDevicegroupDevices:dg];
 					}
 
 					[self selectDevice];
@@ -4534,8 +4542,6 @@
 					for (Devicegroup *dg in currentProject.devicegroups)
 					{
 						// Add in the devices, if any
-
-						[self setDevicegroupDevices:dg];
 
 						if (dg.models.count > 0)
 						{
@@ -7648,7 +7654,12 @@
 			{
 				for (Devicegroup *dg in project.devicegroups)
 				{
-					[ide getDevicegroup:dg.did];
+					NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
+											@"devicegroup" : dg };
+
+					[ide getDevicegroup:dg.did :dict];
+
+					// Action continues in parallel at updateCodeStageTwo:
 				}
 			}
 		}
@@ -7846,30 +7857,45 @@
 	NSDictionary *source = [data objectForKey:@"object"];
 	NSString *action = [source objectForKey:@"action"];
 
-	if (action != nil && [action compare:@"updatedevicegroup"] == NSOrderedSame)
+	if (action != nil)
 	{
-		// We're updating the device group
-		Devicegroup *dg = [source objectForKey:@"devicegroup"];
-		dg.data = [NSMutableDictionary dictionaryWithDictionary:devicegroup];
+		if ([action compare:@"updatedevicegroup"] == NSOrderedSame)
+		{
+			// We're updating the devicegroup with info from the server
+
+			Devicegroup *dg = [source objectForKey:@"devicegroup"];
+			dg.data = [NSMutableDictionary dictionaryWithDictionary:devicegroup];
+
+			NSDictionary *dict = [self getValueFrom:dg.data withKey:@"min_supported_deployment"];
+			dg.mdid = [dict objectForKey:@"id"];
+			dict = [self getValueFrom:dg.data withKey:@"current_deployment"];
+			dg.cdid = [dict objectForKey:@"id"];
+		}
+		else if ([action compare:@"updatecode"] == NSOrderedSame)
+		{
+			// We're updating the devicegroup's code
+
+			NSDictionary *currentDeployment = [self getValueFrom:devicegroup withKey:@"current_deployment"];
+
+			if (currentDeployment != nil)
+			{
+				// Get the deployment
+
+				[ide getDeployment:[self getValueFrom:currentDeployment withKey:@"id"] :source];
+
+				// Pick up the action at productToProjectStageThree:
+			}
+			else
+			{
+				// Device group has no current deployment so just run an upload
+
+				[self uploadCode:nil];
+			}
+		}
 	}
-	else if (devicegroup != nil)
+	else
 	{
-		NSDictionary *currentDeployment = [self getValueFrom:devicegroup withKey:@"current_deployment"];
-
-		if (currentDeployment != nil)
-		{
-			// Get the deployment
-
-			[ide getDeployment:[self getValueFrom:currentDeployment withKey:@"id"] :source];
-
-			// Pick up the action at productToProjectStageThree:
-		}
-		else
-		{
-			// Device group has no current deployment so just run an upload
-
-			[self uploadCode:nil];
-		}
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateCodeStageTwo:)"] :YES];
 	}
 }
 
@@ -8623,8 +8649,8 @@
 				if (mid.length > 0 || cid.length > 0)
 				{
 					NSString *did = [deployment objectForKey:@"id"];
-					if ([did compare:mid] == NSOrderedSame	) cs = [cs stringByAppendingString:@"\n     **This device group’s MINIMUM deployment**"];
-					if ([did compare:cid] == NSOrderedSame	) cs = [cs stringByAppendingString:@"\n     **This device group’s CURRENT deployment**"];
+					if ([did compare:mid] == NSOrderedSame	) cs = [cs stringByAppendingString:@"\n     This is this device group’s minimum supported deployment"];
+					if ([did compare:cid] == NSOrderedSame	) cs = [cs stringByAppendingString:@"\n     This is this device group’s current deployment"];
 				}
 
 				[self performSelectorOnMainThread:@selector(logLogs:)
