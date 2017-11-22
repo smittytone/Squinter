@@ -470,13 +470,6 @@
 // Squint Methods
 
 - (IBAction)squint:(id)sender;
-- (void)compile:(Devicegroup *)devicegroup :(BOOL)justACheck;
-- (NSString *)processSource:(NSString *)codePath :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode;
-- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode ;
-- (void)processRequires:(NSString *)sourceCode;
-- (void)processLibraries:(Model *)model;
-- (NSUInteger)getLineNumber:(NSString *)code :(NSInteger)index;
-- (NSString *)getLibraryVersionNumber:(NSString *)libcode;
 
 // BuildAPIAccess Response Handler Methods
 
