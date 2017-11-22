@@ -17,6 +17,8 @@
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
 {
     // Set up stock date formatters
+	// The first, 'def', is used to format app-issued timestamps in the log
+	// The second, 'logDef', is used to format timestamps from impCentral
 
     def = [[NSDateFormatter alloc] init];
     def.dateFormat = @"yyyy-MM-dd HH:mm:ss ZZZZZ";
