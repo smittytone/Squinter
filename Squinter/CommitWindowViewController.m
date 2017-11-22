@@ -14,7 +14,7 @@
 
 @implementation CommitWindowViewController
 
-@synthesize commits, minimumDeployment;
+@synthesize commits, minimumDeployment, devicegroup;
 
 
 - (void)prepSheet
@@ -91,7 +91,7 @@
 
 	if (cell != nil)
 	{
-		NSDictionary *deployment = [commits objectAtIndex:row];
+		NSDictionary *deployment = [commits objectAtIndex:(commits.count - 1 - row)];
 		NSString *sha = [deployment valueForKeyPath:@"attributes.updated_at"];
 		if (sha == nil) sha = [deployment valueForKeyPath:@"attributes.created_at"];
 		sha = [commitDef stringFromDate:[commitDef dateFromString:sha]];
@@ -101,18 +101,19 @@
 
 		if (commits.count < 100)
 		{
-			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%02li Committed at %@", (long)row, sha];
+			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%02li Committed at %@", (long)(row + 1), sha];
 		}
 		else if (commits.count < 1000)
 		{
-			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%03li Committed at %@", (long)row, sha];
+			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%03li Committed at %@", (long)(row + 1), sha];
 		}
 		else
 		{
-			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%05li Committed at %@", (long)row, sha];
+			cell.minimumCheckbox.title = [NSString stringWithFormat:@"%05li Committed at %@", (long)(row + 1), sha];
 		}
 
-		cell.minimumCheckbox.state = NSOffState;
+		NSString *depid = [deployment objectForKey:@"id"];
+		cell.minimumCheckbox.state = (devicegroup.mdid != nil && [devicegroup.mdid compare:depid] == NSOrderedSame) ? NSOnState : NSOffState;
 		cell.minimumCheckbox.action = @selector(checkMinimum:);
 	}
 

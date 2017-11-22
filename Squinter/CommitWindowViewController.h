@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "CommitTableCellView.h"
+#import "Devicegroup.h"
 
 
 @interface CommitWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
@@ -28,6 +29,7 @@
 
 @property (nonatomic, weak, setter=setCommits:) NSArray *commits;
 @property (nonatomic, strong) NSDictionary *minimumDeployment;
+@property (nonatomic, strong) Devicegroup *devicegroup;
 
 
 @end
