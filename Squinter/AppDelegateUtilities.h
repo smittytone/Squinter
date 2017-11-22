@@ -26,6 +26,7 @@
 // Utility Methods
 
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;
+- (void)updateDevicegroup:(Devicegroup	 *)devicegroup;
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
 - (Project *)getParentProject:(Devicegroup *)devicegroup;
 - (NSDate *)convertTimestring:(NSString *)dateString;

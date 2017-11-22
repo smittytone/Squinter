@@ -343,6 +343,21 @@
 
 
 
+- (void)updateDevicegroup:(Devicegroup *)devicegroup
+{
+	if (devicegroup != nil)
+	{
+		NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
+							   @"devicegroup" : devicegroup };
+
+		[ide getDevicegroup:devicegroup.did :dict];
+
+		// Pick up the action at updateCodeStageTwo:
+	}
+}
+
+
+
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
 {
     NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup",
