@@ -30,6 +30,7 @@
 		3B8B8E131E952C1D009363C8 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E121E952C1D009363C8 /* Model.m */; };
 		3B8B8E161E952E5A009363C8 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E151E952E5A009363C8 /* File.m */; };
 		3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */; };
+		3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BD74E461D423D6A00565B0E /* SourceCodePro-Regular.otf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -130,6 +131,8 @@
 		3B8B8E151E952E5A009363C8 /* File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = File.m; sourceTree = "<group>"; };
 		3B9DF2B91ED2D4EB00B682BA /* LogStreamEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LogStreamEvent.h; path = ../../BuildAPIAccess/LogStreamEvent.h; sourceTree = "<group>"; };
 		3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LogStreamEvent.m; path = ../../BuildAPIAccess/LogStreamEvent.m; sourceTree = "<group>"; };
+		3BB2EF031FC7215100F7B7D1 /* SelectWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectWindowViewController.h; sourceTree = "<group>"; };
+		3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectWindowViewController.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusLight.h; sourceTree = "<group>"; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusLight.m; sourceTree = "<group>"; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -300,6 +303,8 @@
 				3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */,
 				3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */,
 				3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */,
+				3BB2EF031FC7215100F7B7D1 /* SelectWindowViewController.h */,
+				3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */,
 				3B6F3AC71FC31BF000A7F5C1 /* CommitWindowViewController.h */,
 				3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */,
 				3B6F3AC41FC31A7700A7F5C1 /* CommitTableCellView.h */,
@@ -541,6 +546,7 @@
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
+				3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
 				3B6AF0DB197127B10083744C /* Project.m in Sources */,
