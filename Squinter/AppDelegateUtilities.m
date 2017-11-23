@@ -239,6 +239,25 @@
 
 
 
+#pragma mark - Network Activity Progress Indicator Methods
+
+
+- (void)startProgress
+{
+	[connectionIndicator startAnimation:self];
+	connectionIndicator.hidden = NO;
+}
+
+
+
+- (void)stopProgress
+{
+	[connectionIndicator stopAnimation:self];
+	connectionIndicator.hidden = YES;
+}
+
+
+
 #pragma mark - Logging Utility Methods
 
 - (void)parseLog
@@ -246,6 +265,161 @@
     logTextView.editable = YES;
     [logTextView checkTextInDocument:nil];
     logTextView.editable = NO;
+}
+
+
+
+- (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold
+{
+	// Set the log window's basic text settings based on preferences
+
+	NSFontManager *fontManager = [NSFontManager sharedFontManager];
+	NSFont *font;
+
+	font = isBold
+	? [fontManager fontWithFamily:fontName traits:NSBoldFontMask weight:0 size:fontSize]
+	: [NSFont fontWithName:fontName size:fontSize];
+
+	return font;
+}
+
+
+
+- (void)setColours
+{
+	// Populate the 'colors' array with a set of colours for logging different devices
+
+	NSString *start = @"com.bps.squinter.dev";
+
+	if (colors.count > 0) [colors removeAllObjects];
+
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+	for (NSUInteger i = 1 ; i < 6 ; ++i)
+	{
+		NSString *key = [start stringByAppendingFormat:@"%li.red", (long)i];
+		NSNumber *red = [defaults objectForKey:key];
+		key = [start stringByAppendingFormat:@"%li.green", (long)i];
+		NSNumber *green = [defaults objectForKey:key];
+		key = [start stringByAppendingFormat:@"%li.blue", (long)i];
+		NSNumber *blue = [defaults objectForKey:key];
+
+		[colors addObject:[NSColor colorWithSRGBRed:red.floatValue
+											  green:green.floatValue
+											   blue:blue.floatValue
+											  alpha:1.0]];
+	}
+
+	/*
+	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry (138)
+	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine (213)
+	 [colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green) (200)
+	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:1.0 blue:1.0 alpha:1.0]]; // White (255)
+	 [colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:1.0]]; // Black (0)
+	 [colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.5 blue:0.5 alpha:1.0]]; // Mid-grey (127)
+	 [colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1.0]]; // Light-grey (204)
+	 [colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.3 blue:0.3 alpha:1.0]]; // Dark-grey (76)
+	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.9 blue:0.5 alpha:1.0]]; // Banana ()
+	 [colors addObject:[NSColor colorWithSRGBRed:0.6 green:0.2 blue:1.0 alpha:1.0]]; // Grape ()
+	 [colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.6 blue:1.0 alpha:1.0]]; // Aqua ()
+	 [colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.8 blue:1.0 alpha:1.0]]; // Sky ()
+	 [colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.5 blue:1.0 alpha:1.0]]; // Lavender ()
+	 [colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.6 blue:0.6 alpha:1.0]]; // Teal ()
+	 [colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.6 blue:0.0 alpha:1.0]]; // Fern ()
+	 */
+}
+
+
+
+- (void)setLoggingColours
+{
+	// Pick colours from the 'colours' array that are darker/lighter than the log background
+	// as approrpriate
+
+	[logColors removeAllObjects];
+
+	NSInteger back = [self perceivedBrightness:backColour];
+	// NSInteger fore = [self perceivedBrightness:textColour];
+
+	if (back > 200)
+	{
+		// Background is light
+
+		for (NSColor *colour in colors)
+		{
+			NSInteger stock = [self perceivedBrightness:colour];
+
+			if (back - stock > 100)
+			{
+				// Colour is dark enough to use against this background
+				// But is it too close to the text colour ?
+
+				[logColors addObject:colour];
+			}
+		}
+	}
+	else
+	{
+		// Background is dark
+
+		for (NSColor *colour in colors)
+		{
+			NSInteger stock = [self perceivedBrightness:colour];
+
+			if (stock - back > 100) [logColors addObject:colour];
+		}
+	}
+}
+
+
+
+#pragma mark - Preferences Panel Subsidiary Methods
+
+- (void)showPanelForText
+{
+	[textColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForBack
+{
+	[backColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev1
+{
+	[dev1ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev2
+{
+	[dev2ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev3
+{
+	[dev3ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev4
+{
+	[dev4ColorWell setColor:[NSColorPanel sharedColorPanel].color];
+}
+
+
+
+- (void)showPanelForDev5
+{
+	[dev5ColorWell setColor:[NSColorPanel sharedColorPanel].color];
 }
 
 

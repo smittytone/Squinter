@@ -11,7 +11,7 @@
 @implementation AppDelegate
 
 
-#pragma mark - Initialization Methods
+#pragma mark - Application Initialization Methods
 
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
@@ -708,6 +708,24 @@
 
 
 
+#pragma mark - Full Screen Methods
+
+
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+	[_window setStyleMask:NSBorderlessWindowMask];
+}
+
+
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification
+{
+	[_window setStyleMask:(NSTitledWindowMask | NSMiniaturizableWindowMask | NSClosableWindowMask)];
+	[_window setTitle:@"Squinter"];
+}
+
+
+
 #pragma mark - Dock Menu Methods
 
 
@@ -943,24 +961,6 @@
         passwordTextField.cell = [[NSSecureTextFieldCell alloc] initTextCell:text];
         passwordTextField.stringValue = text;
     }
-}
-
-
-
-#pragma mark - Full Screen Methods
-
-
-- (void)windowWillEnterFullScreen:(NSNotification *)notification
-{
-    [_window setStyleMask:NSBorderlessWindowMask];
-}
-
-
-
-- (void)windowWillExitFullScreen:(NSNotification *)notification
-{
-    [_window setStyleMask:(NSTitledWindowMask | NSMiniaturizableWindowMask | NSClosableWindowMask)];
-    [_window setTitle:@"Squinter"];
 }
 
 
@@ -8864,7 +8864,7 @@
 
 
 #pragma mark - UI Update Methods
-
+#pragma mark Projects Menu
 
 - (void)refreshProjectsMenu
 {
@@ -9211,6 +9211,9 @@
 
 
 
+#pragma mark Device Groups Menu
+
+
 - (void)refreshDevicegroupMenu
 {
     // Rebuild the Device Groups menu's submenu of current project device groups
@@ -9320,6 +9323,7 @@
 }
 
 
+
 - (void)refreshMainDevicegroupsMenu
 {
     // This method updates the main Device Groups menu, ie. all but the list of
@@ -9387,7 +9391,8 @@
     restartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     conRestartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
 	setMinimumMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    listCommitsMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
+	setProductionTargetMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"factoryfixture"]) ? YES : NO;
+	listCommitsMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     deleteDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     renameDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
     compileMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
@@ -9396,7 +9401,7 @@
     checkImpLibrariesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
     removeFilesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
 
-    // Enable or Disable the source code submenu based on whether's there's a selected device group
+	// Enable or Disable the source code submenu based on whether's there's a selected device group
     // and whether that deviece group has agent and/or device code or not
 
     compiled = NO;
@@ -9595,6 +9600,376 @@
 
 
 
+- (void)refreshLibraryMenus
+{
+	// This method updates the lists of local and ei libraries
+
+	// Update the external library menu. First clear the current menu
+
+	if (externalLibsMenu.numberOfItems > 0) [externalLibsMenu removeAllItems];
+	if (impLibrariesMenu.numberOfItems > 0) [impLibrariesMenu removeAllItems];
+
+	NSInteger aLibCount = 0;
+	NSInteger dLibCount = 0;
+	NSInteger iaLibCount = 0;
+	NSInteger idLibCount = 0;
+	NSString *m;
+	NSMenuItem *item;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			aLibCount = aLibCount + model.libraries.count;
+			iaLibCount = iaLibCount + model.impLibraries.count;
+		}
+		else
+		{
+			dLibCount = dLibCount + model.libraries.count;
+			idLibCount = idLibCount + model.impLibraries.count;
+		}
+	}
+
+	// Add agent libraries, if any
+
+	if (aLibCount > 0)
+	{
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[externalLibsMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"agent"] == NSOrderedSame)
+			{
+				[self libAdder:model.libraries :NO];
+			}
+		}
+	}
+
+	// Add device libraries, if any
+
+	if (dLibCount > 0)
+	{
+		// Drop in a spacer if we have any files above
+
+		if (aLibCount > 0) [externalLibsMenu addItem:[NSMenuItem separatorItem]];
+
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[externalLibsMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"device"] == NSOrderedSame)
+			{
+				[self libAdder:model.libraries :NO];
+			}
+		}
+	}
+
+	if (dLibCount == 0 && aLibCount == 0)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[externalLibsMenu addItem:item];
+	}
+
+	// Add EI Libraries, if any... agent...
+
+	if (iaLibCount > 0)
+	{
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[impLibrariesMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"agent"] == NSOrderedSame)
+			{
+				[self libAdder:model.impLibraries :YES];
+			}
+		}
+	}
+
+	// ...and device
+
+	if (idLibCount > 0)
+	{
+		// Drop in a spacer if we have any files above
+
+		if (iaLibCount > 0) [impLibrariesMenu addItem:[NSMenuItem separatorItem]];
+
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+		item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[impLibrariesMenu addItem:item];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"device"] == NSOrderedSame)
+			{
+				[self libAdder:model.impLibraries :YES];
+			}
+		}
+	}
+
+	if (idLibCount == 0 && iaLibCount == 0)
+	{
+		NSString *title = @"None";
+
+		if (currentDevicegroup != nil && currentDevicegroup.squinted == 0) title = @"Unknown - Code Uncompiled";
+
+		item = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
+		item.enabled = NO;
+		[impLibrariesMenu addItem:item];
+	}
+}
+
+
+
+- (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib
+{
+	for (File *lib in libs)
+	{
+		[self addLibraryToMenu:lib :isEILib :YES];
+	}
+}
+
+
+
+- (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive
+{
+	// Create a new menu entry for the libraries menus
+
+	NSMenuItem *item;
+
+	if (isEILib)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", lib.version] action:@selector(launchLibsPage) keyEquivalent:@""];
+		[impLibrariesMenu addItem:item];
+	}
+	else
+	{
+		if (isActive)
+		{
+			item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", ((lib.version.length == 0) ? @"unknown" : lib.version)]  action:@selector(externalLibOpen:) keyEquivalent:@""];
+			item.representedObject = lib.filename;
+		}
+		else
+		{
+			item = [[NSMenuItem alloc] initWithTitle:lib.filename action:nil keyEquivalent:@""];
+		}
+
+		item.enabled = isActive;
+		[externalLibsMenu addItem:item];
+	}
+}
+
+
+- (NSImage *)menuImage:(NSMutableDictionary *)device
+{
+	// Sets a device menu's icon according to the device's connection status
+
+	NSImage *returnImage = nil;
+	NSString *nameString = @"";
+
+	NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
+	NSString *dvid = [self getValueFrom:device withKey:@"id"];
+
+	nameString = boolean.boolValue ? @"online" : @"offline";
+	if ([ide isDeviceLogging:dvid]) nameString = [nameString stringByAppendingString:@"_logging"];
+
+	returnImage = [NSImage imageNamed:nameString];
+	return returnImage;
+}
+
+
+- (NSString *)menuString:(NSMutableDictionary *)device
+{
+	// Creates the status readout that will be added to the device's name in menus
+	// eg. "Action (logging)"
+
+	NSString *statusString = @"";
+	NSString *loggingString = @"";
+	NSString *returnString = @"";
+
+	NSString *dvid = [self getValueFrom:device withKey:@"id"];
+	NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
+
+	if (!boolean.boolValue) statusString = @"offline";
+	if ([ide isDeviceLogging:dvid]) loggingString = @"logging";
+
+	// Assemble the menuString, eg.
+	// "(offline)", "(offline, logging)", "(logging)"
+
+	if (loggingString.length > 0 || statusString.length > 0)
+	{
+		// Start with a space and an open bracket
+
+		returnString = @" (";
+
+		// Add in the offline status indicator if there is one
+
+		if (statusString.length > 0) returnString = [returnString stringByAppendingString:statusString];
+
+		// If we are logging too, add that in too, prefixing with a comma and space
+		// if we have already added offline status
+
+		if (loggingString.length > 0)
+		{
+			if (statusString.length > 0) returnString = [returnString stringByAppendingString:@", "];
+			returnString = @" (logging)";
+		}
+
+		// Finish with a close bracket
+
+		returnString = [returnString stringByAppendingString:@")"];
+	}
+
+	return returnString;
+}
+
+
+
+- (void)refreshFilesMenu
+{
+	// Update the external files menu. First clear the current menu
+
+	if (externalFilesMenu.numberOfItems > 0) [externalFilesMenu removeAllItems];
+
+	NSInteger aFileCount = 0;
+	NSInteger dFileCount = 0;
+	NSString *m;
+
+	for (Model *model in currentDevicegroup.models)
+	{
+		if ([model.type compare:@"agent"] == NSOrderedSame)
+		{
+			aFileCount = aFileCount + model.files.count;
+		}
+		else
+		{
+			dFileCount = dFileCount + model.files.count;
+		}
+	}
+
+	// Add agent files, if any
+
+	if (aFileCount > 0)
+	{
+		m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+
+		[self addFileToMenu:m :NO];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"agent"] == NSOrderedSame)
+			{
+				[self fileAdder:model.files];
+			}
+		}
+	}
+
+	// Add device files, if any
+
+	if (dFileCount > 0)
+	{
+		// Drop in a spacer if we have any files above
+
+		if (aFileCount > 0) [externalFilesMenu addItem:[NSMenuItem separatorItem]];
+
+		//m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+
+		[self addFileToMenu:@"Device Code" :NO];
+
+		for (Model *model in currentDevicegroup.models)
+		{
+			if ([model.type compare:@"device"] == NSOrderedSame)
+			{
+				[self fileAdder:model.files];
+			}
+		}
+	}
+
+	if (dFileCount == 0 && aFileCount == 0)
+	{
+		[self addFileToMenu:@"None" :NO];
+	}
+	else
+	{
+		// Check for duplications, ie. if agent and device both use the same lib
+		// TODO someone may have the same library name in separate files, so we need to
+		// check for this too.
+
+		for (NSUInteger i = 0 ; i < externalFilesMenu.numberOfItems ; ++i)
+		{
+			NSMenuItem *fileItem = [externalFilesMenu itemAtIndex:i];
+
+			if (fileItem.enabled == YES)
+			{
+				for (NSUInteger j = 0 ; j < externalFilesMenu.numberOfItems ; ++j)
+				{
+					if (j != i)
+					{
+						NSMenuItem *aFileItem = [externalFilesMenu itemAtIndex:j];
+
+						if (aFileItem.enabled == YES)
+						{
+							if ([fileItem.title compare:aFileItem.title] == NSOrderedSame)
+							{
+								// The names match, so remove the current one
+
+								[externalFilesMenu removeItemAtIndex:j];
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+- (void)fileAdder:(NSMutableArray *)models
+{
+	for (File *file in models)
+	{
+		[self addFileToMenu:file.filename :YES];
+	}
+}
+
+
+
+- (void)addFileToMenu:(NSString *)filename :(BOOL)isActive
+{
+	// Adds a model's imported file to the menu list
+
+	NSMenuItem *item;
+
+	if (isActive)
+	{
+		item = [[NSMenuItem alloc] initWithTitle:filename action:@selector(externalFileOpen:) keyEquivalent:@""];
+	}
+	else
+	{
+		item = [[NSMenuItem alloc] initWithTitle:filename action:nil keyEquivalent:@""];
+
+	}
+
+	item.enabled = isActive;
+	[externalFilesMenu addItem:item];
+}
+
+
+
+#pragma mark Device Menu
+
+
 - (void)refreshDeviceMenu
 {
     if (selectedDevice != nil)
@@ -9761,6 +10136,9 @@
 
 
 
+#pragma mark View Menu
+
+
 - (void)refreshViewMenu
 {
     // The View menu has two items. These are only actionable if there is a selected device group
@@ -9770,6 +10148,29 @@
     logAgentCodeMenuItem.enabled = (currentDevicegroup != nil && currentDevicegroup.squinted & kAgentCodeSquinted) ? YES : NO;
 }
 
+
+
+- (IBAction)showHideToolbar:(id)sender
+{
+	// Flip the menu item in the View menu
+
+	if (squinterToolbar.isVisible)
+	{
+		squinterToolbar.visible = NO;
+		showHideToolbarMenuItem.title = @"Show Toolbar";
+		[defaults setValue:[NSNumber numberWithBool:NO] forKey:@"com.bps.squinter.toolbarstatus"];
+	}
+	else
+	{
+		squinterToolbar.visible = YES;
+		showHideToolbarMenuItem.title = @"Hide Toolbar";
+		[defaults setValue:[NSNumber numberWithBool:YES] forKey:@"com.bps.squinter.toolbarstatus"];
+	}
+}
+
+
+
+#pragma mark Files Menu
 
 
 - (void)refreshRecentFilesMenu
@@ -9812,394 +10213,7 @@
 
 
 
-- (IBAction)showHideToolbar:(id)sender
-{
-    // Flip the menu item in the View menu
-
-    if (squinterToolbar.isVisible)
-    {
-        squinterToolbar.visible = NO;
-        showHideToolbarMenuItem.title = @"Show Toolbar";
-        [defaults setValue:[NSNumber numberWithBool:NO] forKey:@"com.bps.squinter.toolbarstatus"];
-    }
-    else
-    {
-        squinterToolbar.visible = YES;
-        showHideToolbarMenuItem.title = @"Hide Toolbar";
-        [defaults setValue:[NSNumber numberWithBool:YES] forKey:@"com.bps.squinter.toolbarstatus"];
-    }
-}
-
-
-
-#pragma mark Imported Library and File List Methods
-
-
-- (void)refreshLibraryMenus
-{
-    // This method updates the lists of local and ei libraries
-
-    // Update the external library menu. First clear the current menu
-
-    if (externalLibsMenu.numberOfItems > 0) [externalLibsMenu removeAllItems];
-    if (impLibrariesMenu.numberOfItems > 0) [impLibrariesMenu removeAllItems];
-
-    NSInteger aLibCount = 0;
-    NSInteger dLibCount = 0;
-    NSInteger iaLibCount = 0;
-    NSInteger idLibCount = 0;
-    NSString *m;
-    NSMenuItem *item;
-
-    for (Model *model in currentDevicegroup.models)
-    {
-        if ([model.type compare:@"agent"] == NSOrderedSame)
-        {
-            aLibCount = aLibCount + model.libraries.count;
-            iaLibCount = iaLibCount + model.impLibraries.count;
-        }
-        else
-        {
-            dLibCount = dLibCount + model.libraries.count;
-            idLibCount = idLibCount + model.impLibraries.count;
-        }
-    }
-
-    // Add agent libraries, if any
-
-    if (aLibCount > 0)
-    {
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
-        item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
-        item.enabled = NO;
-        [externalLibsMenu addItem:item];
-
-        for (Model *model in currentDevicegroup.models)
-        {
-            if ([model.type compare:@"agent"] == NSOrderedSame)
-            {
-                [self libAdder:model.libraries :NO];
-            }
-        }
-    }
-
-    // Add device libraries, if any
-
-    if (dLibCount > 0)
-    {
-        // Drop in a spacer if we have any files above
-
-        if (aLibCount > 0) [externalLibsMenu addItem:[NSMenuItem separatorItem]];
-
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
-        item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
-        item.enabled = NO;
-        [externalLibsMenu addItem:item];
-
-        for (Model *model in currentDevicegroup.models)
-        {
-            if ([model.type compare:@"device"] == NSOrderedSame)
-            {
-                [self libAdder:model.libraries :NO];
-            }
-        }
-    }
-
-    if (dLibCount == 0 && aLibCount == 0)
-    {
-        item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
-        item.enabled = NO;
-        [externalLibsMenu addItem:item];
-    }
-
-    // Add EI Libraries, if any... agent...
-
-    if (iaLibCount > 0)
-    {
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
-        item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
-        item.enabled = NO;
-        [impLibrariesMenu addItem:item];
-
-        for (Model *model in currentDevicegroup.models)
-        {
-            if ([model.type compare:@"agent"] == NSOrderedSame)
-            {
-                [self libAdder:model.impLibraries :YES];
-            }
-        }
-    }
-
-    // ...and device
-
-    if (idLibCount > 0)
-    {
-        // Drop in a spacer if we have any files above
-
-        if (iaLibCount > 0) [impLibrariesMenu addItem:[NSMenuItem separatorItem]];
-
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
-        item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
-        item.enabled = NO;
-        [impLibrariesMenu addItem:item];
-
-        for (Model *model in currentDevicegroup.models)
-        {
-            if ([model.type compare:@"device"] == NSOrderedSame)
-            {
-                [self libAdder:model.impLibraries :YES];
-            }
-        }
-    }
-
-    if (idLibCount == 0 && iaLibCount == 0)
-    {
-        NSString *title = @"None";
-
-        if (currentDevicegroup != nil && currentDevicegroup.squinted == 0) title = @"Unknown - Code Uncompiled";
-
-        item = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
-        item.enabled = NO;
-        [impLibrariesMenu addItem:item];
-    }
-}
-
-
-
-- (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib
-{
-    for (File *lib in libs)
-    {
-        [self addLibraryToMenu:lib :isEILib :YES];
-    }
-}
-
-
-
-- (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive
-{
-    // Create a new menu entry for the libraries menus
-
-    NSMenuItem *item;
-
-    if (isEILib)
-    {
-        item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", lib.version] action:@selector(launchLibsPage) keyEquivalent:@""];
-        [impLibrariesMenu addItem:item];
-    }
-    else
-    {
-        if (isActive)
-        {
-            item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", ((lib.version.length == 0) ? @"unknown" : lib.version)]  action:@selector(externalLibOpen:) keyEquivalent:@""];
-            item.representedObject = lib.filename;
-        }
-        else
-        {
-            item = [[NSMenuItem alloc] initWithTitle:lib.filename action:nil keyEquivalent:@""];
-        }
-
-        item.enabled = isActive;
-        [externalLibsMenu addItem:item];
-    }
-}
-
-
-- (NSImage *)menuImage:(NSMutableDictionary *)device
-{
-    // Sets a device menu's icon according to the device's connection status
-
-    NSImage *returnImage = nil;
-    NSString *nameString = @"";
-
-    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
-    NSString *dvid = [self getValueFrom:device withKey:@"id"];
-
-    nameString = boolean.boolValue ? @"online" : @"offline";
-    if ([ide isDeviceLogging:dvid]) nameString = [nameString stringByAppendingString:@"_logging"];
-
-    returnImage = [NSImage imageNamed:nameString];
-    return returnImage;
-}
-
-
-- (NSString *)menuString:(NSMutableDictionary *)device
-{
-    // Creates the status readout that will be added to the device's name in menus
-    // eg. "Action (logging)"
-
-    NSString *statusString = @"";
-    NSString *loggingString = @"";
-    NSString *returnString = @"";
-
-    NSString *dvid = [self getValueFrom:device withKey:@"id"];
-    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
-
-    if (!boolean.boolValue) statusString = @"offline";
-    if ([ide isDeviceLogging:dvid]) loggingString = @"logging";
-
-    // Assemble the menuString, eg.
-    // "(offline)", "(offline, logging)", "(logging)"
-
-    if (loggingString.length > 0 || statusString.length > 0)
-    {
-        // Start with a space and an open bracket
-
-        returnString = @" (";
-
-        // Add in the offline status indicator if there is one
-
-        if (statusString.length > 0) returnString = [returnString stringByAppendingString:statusString];
-
-        // If we are logging too, add that in too, prefixing with a comma and space
-        // if we have already added offline status
-
-        if (loggingString.length > 0)
-        {
-            if (statusString.length > 0) returnString = [returnString stringByAppendingString:@", "];
-            returnString = @" (logging)";
-        }
-
-        // Finish with a close bracket
-
-        returnString = [returnString stringByAppendingString:@")"];
-    }
-
-    return returnString;
-}
-
-
-
-- (void)refreshFilesMenu
-{
-    // Update the external files menu. First clear the current menu
-
-    if (externalFilesMenu.numberOfItems > 0) [externalFilesMenu removeAllItems];
-
-    NSInteger aFileCount = 0;
-    NSInteger dFileCount = 0;
-    NSString *m;
-
-    for (Model *model in currentDevicegroup.models)
-    {
-        if ([model.type compare:@"agent"] == NSOrderedSame)
-        {
-            aFileCount = aFileCount + model.files.count;
-        }
-        else
-        {
-            dFileCount = dFileCount + model.files.count;
-        }
-    }
-
-    // Add agent files, if any
-
-    if (aFileCount > 0)
-    {
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
-
-        [self addFileToMenu:m :NO];
-
-        for (Model *model in currentDevicegroup.models)
-        {
-            if ([model.type compare:@"agent"] == NSOrderedSame)
-            {
-                [self fileAdder:model.files];
-            }
-        }
-    }
-
-    // Add device files, if any
-
-    if (dFileCount > 0)
-    {
-        // Drop in a spacer if we have any files above
-
-        if (aFileCount > 0) [externalFilesMenu addItem:[NSMenuItem separatorItem]];
-
-        //m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
-
-        [self addFileToMenu:@"Device Code" :NO];
-
-        for (Model *model in currentDevicegroup.models)
-        {
-            if ([model.type compare:@"device"] == NSOrderedSame)
-            {
-                [self fileAdder:model.files];
-            }
-        }
-    }
-
-    if (dFileCount == 0 && aFileCount == 0)
-    {
-        [self addFileToMenu:@"None" :NO];
-    }
-    else
-    {
-        // Check for duplications, ie. if agent and device both use the same lib
-        // TODO someone may have the same library name in separate files, so we need to
-        // check for this too.
-
-        for (NSUInteger i = 0 ; i < externalFilesMenu.numberOfItems ; ++i)
-        {
-            NSMenuItem *fileItem = [externalFilesMenu itemAtIndex:i];
-
-            if (fileItem.enabled == YES)
-            {
-                for (NSUInteger j = 0 ; j < externalFilesMenu.numberOfItems ; ++j)
-                {
-                    if (j != i)
-                    {
-                        NSMenuItem *aFileItem = [externalFilesMenu itemAtIndex:j];
-
-                        if (aFileItem.enabled == YES)
-                        {
-                            if ([fileItem.title compare:aFileItem.title] == NSOrderedSame)
-                            {
-                                // The names match, so remove the current one
-
-                                [externalFilesMenu removeItemAtIndex:j];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-
-- (void)fileAdder:(NSMutableArray *)models
-{
-    for (File *file in models)
-    {
-        [self addFileToMenu:file.filename :YES];
-    }
-}
-
-
-
-- (void)addFileToMenu:(NSString *)filename :(BOOL)isActive
-{
-    // Adds a model's imported file to the menu list
-
-    NSMenuItem *item;
-
-    if (isActive)
-    {
-        item = [[NSMenuItem alloc] initWithTitle:filename action:@selector(externalFileOpen:) keyEquivalent:@""];
-    }
-    else
-    {
-        item = [[NSMenuItem alloc] initWithTitle:filename action:nil keyEquivalent:@""];
-
-    }
-
-    item.enabled = isActive;
-    [externalFilesMenu addItem:item];
-}
-
+#pragma mark Toolbar Methods
 
 
 - (void)setToolbar
@@ -10239,133 +10253,7 @@
 
 
 
-#pragma mark Logging Area Methods
-
-
-- (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold
-{
-    // Set the log window's basic text settings based on preferences
-
-    NSFontManager *fontManager = [NSFontManager sharedFontManager];
-    NSFont *font;
-
-    font = isBold
-    ? [fontManager fontWithFamily:fontName traits:NSBoldFontMask weight:0 size:fontSize]
-    : [NSFont fontWithName:fontName size:fontSize];
-
-    return font;
-}
-
-
-
-- (void)setColours
-{
-    // Populate the 'colors' array with a set of colours for logging different devices
-
-    NSString *start = @"com.bps.squinter.dev";
-
-    if (colors.count > 0) [colors removeAllObjects];
-
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-    for (NSUInteger i = 1 ; i < 6 ; ++i)
-    {
-        NSString *key = [start stringByAppendingFormat:@"%li.red", (long)i];
-        NSNumber *red = [defaults objectForKey:key];
-        key = [start stringByAppendingFormat:@"%li.green", (long)i];
-        NSNumber *green = [defaults objectForKey:key];
-        key = [start stringByAppendingFormat:@"%li.blue", (long)i];
-        NSNumber *blue = [defaults objectForKey:key];
-
-        [colors addObject:[NSColor colorWithSRGBRed:red.floatValue
-                                              green:green.floatValue
-                                               blue:blue.floatValue
-                                              alpha:1.0]];
-    }
-
-    /*
-    [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry (138)
-    [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine (213)
-    [colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green) (200)
-    [colors addObject:[NSColor colorWithSRGBRed:1.0 green:1.0 blue:1.0 alpha:1.0]]; // White (255)
-    [colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:1.0]]; // Black (0)
-    [colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.5 blue:0.5 alpha:1.0]]; // Mid-grey (127)
-    [colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1.0]]; // Light-grey (204)
-    [colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.3 blue:0.3 alpha:1.0]]; // Dark-grey (76)
-    [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.9 blue:0.5 alpha:1.0]]; // Banana ()
-    [colors addObject:[NSColor colorWithSRGBRed:0.6 green:0.2 blue:1.0 alpha:1.0]]; // Grape ()
-    [colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.6 blue:1.0 alpha:1.0]]; // Aqua ()
-    [colors addObject:[NSColor colorWithSRGBRed:0.5 green:0.8 blue:1.0 alpha:1.0]]; // Sky ()
-    [colors addObject:[NSColor colorWithSRGBRed:0.8 green:0.5 blue:1.0 alpha:1.0]]; // Lavender ()
-    [colors addObject:[NSColor colorWithSRGBRed:0.0 green:0.6 blue:0.6 alpha:1.0]]; // Teal ()
-    [colors addObject:[NSColor colorWithSRGBRed:0.3 green:0.6 blue:0.0 alpha:1.0]]; // Fern ()
-    */
-}
-
-
-
-- (void)setLoggingColours
-{
-    // Pick colours from the 'colours' array that are darker/lighter than the log background
-    // as approrpriate
-
-    [logColors removeAllObjects];
-
-    NSInteger back = [self perceivedBrightness:backColour];
-    // NSInteger fore = [self perceivedBrightness:textColour];
-
-    if (back > 200)
-    {
-        // Background is light
-
-        for (NSColor *colour in colors)
-        {
-            NSInteger stock = [self perceivedBrightness:colour];
-
-            if (back - stock > 100)
-            {
-                // Colour is dark enough to use against this background
-                // But is it too close to the text colour ?
-
-                [logColors addObject:colour];
-            }
-        }
-    }
-    else
-    {
-        // Background is dark
-
-        for (NSColor *colour in colors)
-        {
-            NSInteger stock = [self perceivedBrightness:colour];
-
-            if (stock - back > 100) [logColors addObject:colour];
-        }
-    }
-}
-
-
-
-#pragma mark Progress Methods
-
-
-- (void)startProgress
-{
-    [connectionIndicator startAnimation:self];
-    connectionIndicator.hidden = NO;
-}
-
-
-
-- (void)stopProgress
-{
-    [connectionIndicator stopAnimation:self];
-    connectionIndicator.hidden = YES;
-}
-
-
-
-#pragma mark About Sheet Methods
+#pragma mark - About Sheet Methods
 
 
 - (IBAction)showAboutSheet:(id)sender
@@ -10393,7 +10281,7 @@
 
 
 
-#pragma mark Help Menu Methods
+#pragma mark - Help Menu Methods
 
 
 - (IBAction)showAuthor:(id)sender
@@ -10408,7 +10296,7 @@
 
 
 
-#pragma mark Preferences Sheet Methods
+#pragma mark - Preferences Sheet Methods
 
 
 - (IBAction)showPrefs:(id)sender
@@ -10727,55 +10615,6 @@
 
 
 
-- (void)showPanelForText
-{
-    [textColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForBack
-{
-    [backColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev1
-{
-    [dev1ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev2
-{
-    [dev2ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev3
-{
-    [dev3ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev4
-{
-    [dev4ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev5
-{
-    [dev5ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
 #pragma mark - Check Electric Imp Libraries Methods
 
 
@@ -10853,6 +10692,106 @@
 
 
 
+- (void)compareElectricImpLibs
+{
+	NSString *parsedData;
+
+	if (eiLibListData != nil && eiLibListData.length > 0)
+	{
+		// If we have data, attempt to decode it assuming that it is JSON (if it's not, 'error' will not equal nil
+
+		parsedData = [[NSString alloc] initWithData:eiLibListData encoding:NSASCIIStringEncoding];
+	}
+	else
+	{
+		[self writeErrorToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
+		eiLibListData = nil;
+		return;
+	}
+
+	if (parsedData != nil)
+	{
+		// 'parsedData' should contain the csv data
+
+		BOOL allOKFlag = YES;
+		NSArray *libraryList = [parsedData componentsSeparatedByString:@"\n"];
+
+		for (NSString *library in libraryList)
+		{
+			// Watch out for single carriage-returns in .csv file
+
+			if (library.length > 2)
+			{
+				NSArray *libParts = [library componentsSeparatedByString:@","];
+
+				if (libParts.count == 2)
+				{
+					// Watch out for single-line entries in .csv file
+
+					NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
+					NSString *libVer = [libParts objectAtIndex:1];
+
+					for (Model *model in currentDevicegroup.models)
+					{
+						if (model.impLibraries.count > 0)
+						{
+							for (File *eiLib in model.impLibraries)
+							{
+								NSString *name = [eiLib.filename lowercaseString];
+
+								if ([name compare:libName] == NSOrderedSame)
+								{
+									// Local EI lib record and download lib record match
+									// First check for deprecation
+
+									if ([libVer compare:@"dep"] == NSOrderedSame)
+									{
+										// Library is marked as deprecated
+
+										NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
+										[self writeWarningToLog:mString :YES];
+										allOKFlag = NO;
+									}
+									else if ([eiLib.version compare:libVer] != NSOrderedSame)
+									{
+										// Library versions are not the same, so report the discrepancy
+
+										NSString *mString;
+
+										if ([eiLib.version compare:@"not set"] == NSOrderedSame)
+										{
+											mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - your code doesn't specify a version.", libName, libVer];
+
+										}
+										else
+										{
+											mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLib.version];
+											[self writeWarningToLog:mString :YES];
+										}
+
+										[self writeWarningToLog:mString :YES];
+										allOKFlag = NO;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (allOKFlag)
+		{
+			[self writeStringToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", currentDevicegroup.name] :YES];
+		}
+	}
+}
+
+
+
+#pragma mark NSURLSession Delegate Methods
+
+
 - (void)URLSession:(NSURLSession *)session
           dataTask:(NSURLSessionDataTask *)dataTask
 didReceiveResponse:(NSURLResponse *)response
@@ -10914,100 +10853,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 
 
-- (void)compareElectricImpLibs
-{
-    NSString *parsedData;
 
-    if (eiLibListData != nil && eiLibListData.length > 0)
-    {
-        // If we have data, attempt to decode it assuming that it is JSON (if it's not, 'error' will not equal nil
-
-        parsedData = [[NSString alloc] initWithData:eiLibListData encoding:NSASCIIStringEncoding];
-    }
-    else
-    {
-        [self writeErrorToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
-        eiLibListData = nil;
-        return;
-    }
-
-    if (parsedData != nil)
-    {
-        // 'parsedData' should contain the csv data
-
-        BOOL allOKFlag = YES;
-        NSArray *libraryList = [parsedData componentsSeparatedByString:@"\n"];
-
-        for (NSString *library in libraryList)
-        {
-            // Watch out for single carriage-returns in .csv file
-
-            if (library.length > 2)
-            {
-                NSArray *libParts = [library componentsSeparatedByString:@","];
-
-                if (libParts.count == 2)
-                {
-                    // Watch out for single-line entries in .csv file
-
-                    NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
-                    NSString *libVer = [libParts objectAtIndex:1];
-
-                    for (Model *model in currentDevicegroup.models)
-                    {
-                        if (model.impLibraries.count > 0)
-                        {
-                            for (File *eiLib in model.impLibraries)
-                            {
-                                NSString *name = [eiLib.filename lowercaseString];
-
-                                if ([name compare:libName] == NSOrderedSame)
-                                {
-                                    // Local EI lib record and download lib record match
-                                    // First check for deprecation
-
-                                    if ([libVer compare:@"dep"] == NSOrderedSame)
-                                    {
-                                        // Library is marked as deprecated
-
-                                        NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
-                                        [self writeWarningToLog:mString :YES];
-                                        allOKFlag = NO;
-                                    }
-                                    else if ([eiLib.version compare:libVer] != NSOrderedSame)
-                                    {
-                                        // Library versions are not the same, so report the discrepancy
-
-                                        NSString *mString;
-
-                                        if ([eiLib.version compare:@"not set"] == NSOrderedSame)
-                                        {
-                                            mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - your code doesn't specify a version.", libName, libVer];
-
-                                        }
-                                        else
-                                        {
-                                            mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLib.version];
-                                            [self writeWarningToLog:mString :YES];
-                                        }
-
-                                        [self writeWarningToLog:mString :YES];
-                                        allOKFlag = NO;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (allOKFlag)
-        {
-            [self writeStringToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", currentDevicegroup.name] :YES];
-        }
-    }
-}
 
 
 

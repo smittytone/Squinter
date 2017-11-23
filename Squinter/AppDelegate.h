@@ -82,6 +82,7 @@
     IBOutlet NSMenuItem *uploadMenuItem;
     IBOutlet NSMenuItem *uploadExtraMenuItem;
 	IBOutlet NSMenuItem *setMinimumMenuItem;
+	IBOutlet NSMenuItem *setProductionTargetMenuItem;
     IBOutlet NSMenuItem *removeFilesMenuItem;
     IBOutlet NSMenuItem *externalOpenMenuItem;
     IBOutlet NSMenu *externalSourceMenu;
@@ -572,17 +573,6 @@
 - (void)addFileToMenu:(NSString *)filename :(BOOL)isActive;
 - (void)setToolbar;
 
-// Logging Area Methods
-
-- (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
-- (void)setColours;
-- (void)setLoggingColours;
-
-// Progress Methods
-
-- (void)startProgress;
-- (void)stopProgress;
-
 // About Sheet Methods
 
 - (IBAction)showAboutSheet:(id)sender;
@@ -599,13 +589,6 @@
 - (IBAction)cancelPrefs:(id)sender;
 - (IBAction)setPrefs:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;
-- (void)showPanelForText;
-- (void)showPanelForBack;
-- (void)showPanelForDev1;
-- (void)showPanelForDev2;
-- (void)showPanelForDev3;
-- (void)showPanelForDev4;
-- (void)showPanelForDev5;
 
 // Check Electric Imp Libraries Methods
 

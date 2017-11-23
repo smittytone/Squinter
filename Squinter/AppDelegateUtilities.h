@@ -19,9 +19,27 @@
 - (NSData *)bookmarkForURL:(NSURL *)url;
 - (NSURL *)urlForBookmark:(NSData *)bookmark;
 
+// Progress Indicator Methods
+
+- (void)startProgress;
+- (void)stopProgress;
+
 // Logging Utility Methods
 
 - (void)parseLog;
+- (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
+- (void)setColours;
+- (void)setLoggingColours;
+
+// Preferences Panel Subsidiary Methods
+
+- (void)showPanelForText;
+- (void)showPanelForBack;
+- (void)showPanelForDev1;
+- (void)showPanelForDev2;
+- (void)showPanelForDev3;
+- (void)showPanelForDev4;
+- (void)showPanelForDev5;
 
 // Utility Methods
 
