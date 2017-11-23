@@ -23,6 +23,7 @@
 #import "LoginToolbarItem.h"
 #import "PDKeychainBindings.h"
 #import "CommitWindowViewController.h"
+#import "SelectWindowViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -226,9 +227,10 @@
     IBOutlet NSTextField *newDevicegroupDescTextField;
     IBOutlet NSTextField *newDevicegroupDescCountField;
     IBOutlet NSButton *newDevicegroupCheckbox;
-    IBOutlet NSPopUpButton *newDevicegroupTypeMenu;
-    IBOutlet NSTextField *targetAccessoryLabel;
-    IBOutlet NSPopUpButton *targetAccessoryPopup;
+    IBOutlet NSPopUpButton *newDevicegroupTypePopup;
+
+	IBOutlet NSWindow *selectTargetSheet;
+	IBOutlet SelectWindowViewController *swvc;
 
     // About
 
@@ -342,7 +344,7 @@
 
     NSUInteger syncItemCount, logPaddingLength;
 
-    BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag;
+    BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL loginFlag, renameProjectFlag, saveAsFlag, stale;
 }
 
@@ -406,7 +408,10 @@
 - (IBAction)newDevicegroupSheetCreate:(id)sender;
 - (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype;
 - (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action;
-- (IBAction)chooseType:(id)sender;
+- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(Devicegroup *)theTarget;
+- (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles;
+- (IBAction)cancelSelectTarget:(id)sender;
+- (IBAction)selectTarget:(id)sender;
 
 // Existing Device Group Methods
 
@@ -421,6 +426,7 @@
 - (IBAction)getCommits:(id)sender;
 - (IBAction)updateCode:(id)sender;
 - (IBAction)setMinimumDeployment:(id)sender;
+- (IBAction)chooseProductionTarget:(id)sender;
 
 // Existing Device Methods
 

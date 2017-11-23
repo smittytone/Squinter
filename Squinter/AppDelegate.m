@@ -56,7 +56,8 @@
 
     newDevicegroupName = nil;
 
-    newDevicegroupFlag = NO;
+    resetTargetFlag = NO;
+	newDevicegroupFlag = NO;
     deviceSelectFlag = NO;
     renameProjectFlag = NO;
     saveAsFlag = YES;
@@ -2429,26 +2430,9 @@
         newDevicegroupCheckbox.enabled = YES;
     }
 
-    targetAccessoryLabel.enabled = NO;
-    targetAccessoryLabel.textColor = [NSColor grayColor];
+	[newDevicegroupTypePopup selectItemAtIndex:0];
 
-    [targetAccessoryPopup removeAllItems];
-
-    for (Devicegroup *devicegroup in currentProject.devicegroups)
-    {
-        if ([devicegroup.type compare:@"production_devicegroup"] == NSOrderedSame) [targetAccessoryPopup addItemWithTitle:devicegroup.name];
-    }
-
-    if (targetAccessoryPopup.itemArray.count == 0)
-    {
-        [targetAccessoryPopup addItemWithTitle:@"No production device groups in this project"];
-        NSMenuItem *item = [targetAccessoryPopup.itemArray objectAtIndex:0];
-        item.tag = 99;
-    }
-
-    targetAccessoryPopup.enabled = NO;
-
-    [_window beginSheet:newDevicegroupSheet completionHandler:nil];
+	[_window beginSheet:newDevicegroupSheet completionHandler:nil];
 }
 
 
@@ -2510,6 +2494,7 @@
     NSString *dgname = newDevicegroupNameTextField.stringValue;
     NSString *dgdesc = newDevicegroupDescTextField.stringValue;
     BOOL makeNewFiles = newDevicegroupCheckbox.state;
+	NSInteger newType = newDevicegroupTypePopup.indexOfSelectedItem;
 
     [_window endSheet:newDevicegroupSheet];
 
@@ -2565,76 +2550,205 @@
 
     newdg.name = dgname;
     newdg.description = dgdesc;
-    newdg.type = [self convertDevicegroupType:newDevicegroupTypeMenu.selectedItem.title :YES];
     newdg.type = @"development_devicegroup";
 
-    if (currentProject.pid != nil && currentProject.pid.length > 0)
-    {
-        // The current project is associated with a product so we can create the device group on the server
+	switch (newType)
+	{
+		default:
+		case 0:
+			newdg.type = @"development_devicegroup";
+			break;
+		case 1:
+			newdg.type = @"pre_factoryfixture_devicegroup";
+			break;
+		case 2:
+			newdg.type = @"pre_production_devicegroup";
+			break;
+		case 3:
+			newdg.type = @"factoryfixture_devicegroup";
+			break;
+		case 4:
+			newdg.type = @"production_devicegroup";
+			break;
+	}
 
-        NSDictionary *dict = @{ @"action" : @"newdevicegroup",
-                                @"devicegroup" : newdg,
-                                @"project" : currentProject,
-                                @"files" : [NSNumber numberWithBool:makeNewFiles] };
+	if (newType == 1 || newType == 3)
+	{
+		// On choosing a fixture device group, we need to eastablish a target or creation will fail
 
-        [self writeStringToLog:[NSString stringWithFormat:@"Uploading Device Group \"%@\" to the impCloud.", newdg.name] :YES];
+		NSUInteger count = 0;
 
-        NSDictionary *details;
+		for (Devicegroup *dg in currentProject.devicegroups)
+		{
+			if (newType == 1 && [dg.type compare:@"pre_production_devicegroup"] == NSOrderedSame) ++count;
+			if (newType == 3 && [dg.type compare:@"production_devicegroup"] == NSOrderedSame) ++count;
+		}
 
-        if (![newdg.type containsString:@"factoryfixture"])
-        {
-            details = @{ @"name" : newdg.name,
-                         @"description" : newdg.description,
-                         @"productid" : currentProject.pid,
-                         @"type" : newdg.type };
+		if (count == 0)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = [NSString stringWithFormat:@"You cannot create a factory %@ device group", (newType == 1 ? @"test" : @"")];
+			alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a production %@ device group as its target, and you have no such device group in this project.", (newType == 1 ? @"test" : @"")];
 
-            [ide createDevicegroup:details :dict];
+			[alert beginSheetModalForWindow:_window completionHandler:nil];
 
-            // We will handle the addition of the device group and UI updates later - it will call
-            // the following code separately in 'createDevicegroupStageTwo:'
-        }
-        else
-        {
-            // TODO Need to specify a target production device group
+			return;
+		}
 
-            // POPUP and ask
-        }
-    }
-    else
-    {
-        // The project is local only so far
+		[self showSelectTarget:newdg :makeNewFiles];
+	}
+	else
+	{
+		[self newDevicegroupSheetCreateStageTwo:newdg :makeNewFiles :nil];
+	}
+}
 
-        // If we were adding source files, head back to that flow
 
-        if (newDevicegroupFlag)
-        {
-            [self processAddedFiles:saveUrls];
-            return;
-        }
 
-        // Select the new Device Group
+- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(Devicegroup *)theTarget
+{
+	if (currentProject.pid != nil && currentProject.pid.length > 0)
+	{
+		// The current project is associated with a product so we can create the device group on the server
 
-        if (currentDevicegroup != newdg)
-        {
-            [currentProject.devicegroups addObject:newdg];
-            currentDevicegroup = newdg;
-            currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
-        }
+		NSDictionary *dict = @{ @"action" : @"newdevicegroup",
+								@"devicegroup" : devicegroup,
+								@"project" : currentProject,
+								@"files" : [NSNumber numberWithBool:makeNewFiles] };
 
-        // Update the UI
+		[self writeStringToLog:[NSString stringWithFormat:@"Uploading Device Group \"%@\" to the impCloud.", devicegroup.name] :YES];
 
-        [self refreshDevicegroupMenu];
-        [self refreshMainDevicegroupsMenu];
-        [self setToolbar];
+		NSDictionary *details;
 
-        currentProject.haschanged = YES;
-        [saveLight needSave:YES];
-        [self refreshOpenProjectsMenu];
+		if (![devicegroup.type containsString:@"factoryfixture"])
+		{
+			details = @{ @"name" : devicegroup.name,
+						 @"description" : devicegroup.description,
+						 @"productid" : currentProject.pid,
+						 @"type" : devicegroup.type };
+		}
+		else
+		{
+			details = @{ @"name" : devicegroup.name,
+						 @"description" : devicegroup.description,
+						 @"productid" : currentProject.pid,
+						 @"type" : devicegroup.type,
+						 @"targetid" : theTarget.did };
+		}
 
-        // Create the new device group's files as requested
+		[ide createDevicegroup:details :dict];
 
-        if (makeNewFiles) [self createFilesForDevicegroup:newdg.name :@"agent"];
-    }
+		// We will handle the addition of the device group and UI updates later - it will call
+		// the following code separately in 'createDevicegroupStageTwo:'
+	}
+	else
+	{
+		// The project is local only so far
+
+		// If we were adding source files, head back to that flow
+
+		if (newDevicegroupFlag)
+		{
+			[self processAddedFiles:saveUrls];
+			return;
+		}
+
+		// Select the new Device Group
+
+		if (currentDevicegroup != devicegroup)
+		{
+			[currentProject.devicegroups addObject:devicegroup];
+			currentDevicegroup = devicegroup;
+			currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+		}
+
+		// Update the UI
+
+		[self refreshDevicegroupMenu];
+		[self refreshMainDevicegroupsMenu];
+		[self setToolbar];
+
+		currentProject.haschanged = YES;
+		[saveLight needSave:YES];
+		[self refreshOpenProjectsMenu];
+
+		// Create the new device group's files as requested
+
+		if (makeNewFiles) [self createFilesForDevicegroup:devicegroup.name :@"agent"];
+	}
+}
+
+
+
+- (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles
+{
+	// Show a sheet listing suitable fixture device group targets
+
+	swvc.theNewDevicegroup = devicegroup;
+	swvc.makeNewFiles = andMakeNewFiles;
+	swvc.project = currentProject;
+
+	[_window beginSheet:selectTargetSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)cancelSelectTarget:(id)sender
+{
+	[_window endSheet:selectTargetSheet];
+
+	resetTargetFlag = NO;
+}
+
+
+
+- (IBAction)selectTarget:(id)sender
+{
+	[_window endSheet:selectTargetSheet];
+
+	// If no target was selected, bail
+
+	if (swvc.theTarget == nil) return;
+
+	// If we are not (re)setting a target for an existing device,
+	// continue with the creation of a new devicegroup
+
+	if (!resetTargetFlag)
+	{
+		[self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.makeNewFiles :swvc.theTarget];
+		return;
+	}
+
+	resetTargetFlag = NO;
+	
+	// Check that the selected device group is not the current one
+
+	if (currentDevicegroup.data != nil)
+	{
+		NSDictionary *tgt = [self getValueFrom:currentDevicegroup.data withKey:@"production_target"];
+
+		if (tgt != nil)
+		{
+			NSString *tid = [tgt objectForKey:@"id"];
+
+			if ([tid compare:swvc.theTarget.did] == NSOrderedSame)
+			{
+				[self writeWarningToLog:[NSString stringWithFormat:@"The device group you selected is already \"%@\"'s production target.", currentDevicegroup.name]  :YES];
+				return;
+			}
+		}
+	}
+
+	NSDictionary *dict = @{ @"action" : @"resetprodtarget",
+						   @"devicegroup" : currentDevicegroup,
+						   @"target" : swvc.theTarget };
+
+	NSDictionary *targ = @{ @"type" : swvc.theTarget.type,
+							@"id" : swvc.theTarget.did };
+
+	[ide updateDevicegroup:currentDevicegroup.did :@[@"production_target", @"type"] :@[targ, currentDevicegroup.type] :dict];
+
+	// Pick up the action at ... updateDevicegroupStageTwo:
 }
 
 
@@ -2800,31 +2914,6 @@
     }
 }
 
-
-
-- (IBAction)chooseType:(id)sender
-{
-    NSInteger type = [newDevicegroupTypeMenu indexOfSelectedItem];
-
-    if (type == 1)
-    {
-        // Only activate the accessory items for factory fixture device groups
-
-        targetAccessoryLabel.textColor = [NSColor blackColor];
-        targetAccessoryLabel.enabled = YES;
-
-        // If the target list is empty, don't enable it
-
-        NSMenuItem *item = [targetAccessoryPopup.itemArray objectAtIndex:0];
-        targetAccessoryPopup.enabled = item.tag == 99 ? NO : YES;
-    }
-    else
-    {
-        targetAccessoryLabel.textColor = [NSColor grayColor];
-        targetAccessoryLabel.enabled = NO;
-        targetAccessoryPopup.enabled = NO;
-    }
-}
 
 
 #pragma mark - Existing Device Group Methods
@@ -3328,7 +3417,7 @@
 {
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3391,6 +3480,27 @@
 	[ide setMinimumDeployment:devicegroup.did :newMinimum :dict];
 
     // Pick up the action at
+}
+
+
+
+- (IBAction)chooseProductionTarget:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	if (![currentDevicegroup.type containsString:@"factoryfixture"])
+	{
+		[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a factory fixture group so has no production target.", currentDevicegroup.name] :YES];
+		return;
+	}
+
+	resetTargetFlag = YES;
+
+	[self showSelectTarget:currentDevicegroup :NO];
 }
 
 
@@ -6186,7 +6296,7 @@
                 }
             }
         }
-        else if ([action compare:@"none"] == NSOrderedSame)
+	    else if ([action compare:@"none"] == NSOrderedSame)
         {
             return;
         }
@@ -6251,6 +6361,16 @@
                 updated = YES;
             }
         }
+		else if ([action compare:@"resetprodtarget"] == NSOrderedSame)
+		{
+			// Target changed, so report it
+
+			[self updateDevicegroup:devicegroup];
+
+			Devicegroup *tdg = [source objectForKey:@"target"];
+
+			[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" now has a new target device group: \"%@\".", devicegroup.name, tdg.name] :YES];
+		}
     }
     else
     {
@@ -6262,6 +6382,8 @@
         // Mark the device group's parent project as changed, but only if it has
         // NOTE we check for nil, but this is very unlikely (project closed before server responded)
 
+		[self updateDevicegroup:devicegroup];
+		
         Project *project = [self getParentProject:devicegroup];
 
         if (project != nil)
@@ -7671,10 +7793,7 @@
 
     if (inset > 0)
     {
-        for (NSUInteger i = 0 ; i < inset ; ++i)
-        {
-            spaces = [spaces stringByAppendingString:@" "];
-        }
+        for (NSUInteger i = 0 ; i < inset ; ++i) spaces = [spaces stringByAppendingString:@" "];
     }
 
     [lines addObject:[NSString stringWithFormat:@"%@Device group \"%@\"", spaces, devicegroup.name]];
@@ -7694,6 +7813,25 @@
     }
 
     [lines addObject:[NSString stringWithFormat:@"%@Device group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
+
+	if (devicegroup.data != nil)
+	{
+		NSDictionary *aTarget = [self getValueFrom:devicegroup.data withKey:@"production_target"];
+
+		if (aTarget != nil)
+		{
+			NSString *tid = [aTarget objectForKey:@"id"];
+
+			for (Devicegroup *dg in currentProject.devicegroups)
+			{
+				if ([dg.did compare:tid] == NSOrderedSame)
+				{
+					[lines addObject:[NSString stringWithFormat:@"%@Target Device Group: %@", spaces, dg.name]];
+					break;
+				}
+			}
+		}
+	}
 
     if (devicegroup.models.count > 0)
     {
@@ -9106,13 +9244,12 @@
     else
     {
         [self refreshDevicegroupByType:@"development_devicegroup"];
+		[self refreshDevicegroupByType:@"pre_production_devicegroup"];
+		[self refreshDevicegroupByType:@"pre_factoryfixture_devicegroup"];
         [self refreshDevicegroupByType:@"production_devicegroup"];
         [self refreshDevicegroupByType:@"factoryfixture_devicegroup"];
 
         // Add the 'fixed' menu entries
-
-        item = [NSMenuItem separatorItem];
-        [deviceGroupsMenu addItem:item];
 
         item = [[NSMenuItem alloc] initWithTitle:@"Create New Device Group"
                                           action:@selector(newDevicegroup:)
@@ -9156,7 +9293,7 @@
             if (!first)
             {
                 first = YES;
-                item = [[NSMenuItem alloc] initWithTitle:[self convertDevicegroupType:type :NO]
+                item = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"%@ Device Groups", [self convertDevicegroupType:type :NO]]
                                                   action:@selector(chooseDevicegroup:)
                                            keyEquivalent:@""];
                 item.representedObject = nil;
@@ -9174,6 +9311,12 @@
             [deviceGroupsMenu addItem:item];
         }
     }
+
+	if (first)
+	{
+		item = [NSMenuItem separatorItem];
+		[deviceGroupsMenu addItem:item];
+	}
 }
 
 
