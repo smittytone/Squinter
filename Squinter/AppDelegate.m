@@ -3712,26 +3712,31 @@
     // Assemble the projects list with device groups
 
     NSMenuItem *item;
+	BOOL firstDone = NO;
 
     for (Project *project in projectArray)
     {
         if (project.devicegroups.count > 0)
         {
-            // Add the project name as a section header but disable it - it's a marker
-
-            [assignDeviceMenuModels addItemWithTitle:[NSString stringWithFormat:@"Project \"%@\":", project.name]];
-            item = [assignDeviceMenuModels.itemArray lastObject];
-            item.enabled = NO;
-            item.representedObject = nil;
-
             // Add all the device groups' names
 
             for (Devicegroup *dg in project.devicegroups)
             {
-                [assignDeviceMenuModels addItemWithTitle:dg.name];
-                item = [assignDeviceMenuModels.itemArray lastObject];
-                item.representedObject = dg;
+				if (![dg.type containsString:@"production"])
+				{
+					if (firstDone)
+					{
+						[assignDeviceMenuModels.menu addItem:NSMenuItem.separatorItem];
+						firstDone = NO;
+					}
+
+					[assignDeviceMenuModels addItemWithTitle:[NSString stringWithFormat:@"%@/%@", project.name, dg.name]];
+                		item = [assignDeviceMenuModels.itemArray lastObject];
+					item.representedObject = dg;
+				}
             }
+
+			firstDone = YES;
         }
     }
 
@@ -3801,7 +3806,7 @@
         return;
     }
 
-    // Assign the device to the device group
+	// Assign the device to the device group
 
     NSDictionary *dict = @{ @"action" : @"assign",
                             @"device" : device,

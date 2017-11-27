@@ -2067,18 +2067,18 @@ Gw
         <window title="Assign Device" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="DOx-Dm-xr6" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="283" y="305" width="612" height="155"/>
+            <rect key="contentRect" x="283" y="305" width="612" height="206"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <value key="minSize" type="size" width="612" height="155"/>
+            <value key="minSize" type="size" width="612" height="234"/>
+            <value key="minFullScreenContentSize" type="size" width="612" height="234"/>
             <view key="contentView" id="4Uw-Cu-gD6">
-                <rect key="frame" x="0.0" y="0.0" width="612" height="155"/>
+                <rect key="frame" x="0.0" y="0.0" width="612" height="206"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UC3-wk-scu">
-                        <rect key="frame" x="320" y="86" width="275" height="26"/>
+                    <popUpButton horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UC3-wk-scu">
+                        <rect key="frame" x="320" y="137" width="275" height="26"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="270" id="HqE-dl-z2r"/>
-                            <constraint firstAttribute="height" constant="21" id="dow-39-uuu"/>
+                            <constraint firstAttribute="height" constant="21" id="Puo-sa-DMK"/>
                         </constraints>
                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="W01-fB-Ao4" id="ggQ-tw-qS6">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2093,7 +2093,7 @@ Gw
                         </popUpButtonCell>
                     </popUpButton>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="muK-kE-Tij">
-                        <rect key="frame" x="18" y="118" width="274" height="17"/>
+                        <rect key="frame" x="18" y="169" width="274" height="17"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="270" id="QvG-1r-3b4"/>
                             <constraint firstAttribute="height" constant="17" id="kq1-ng-dx8"/>
@@ -2104,11 +2104,10 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hm3-Cm-D97">
-                        <rect key="frame" x="320" y="118" width="274" height="17"/>
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hm3-Cm-D97">
+                        <rect key="frame" x="320" y="169" width="274" height="17"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="17" id="1f7-DO-yf5"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="270" id="ydp-GD-sWv"/>
+                            <constraint firstAttribute="height" constant="17" id="ggG-7f-hwn"/>
                         </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="...and a Device Group to assign it to..." id="elS-3b-fSx">
                             <font key="font" metaFont="system"/>
@@ -2117,7 +2116,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nh1-B0-bW0">
-                        <rect key="frame" x="18" y="86" width="275" height="26"/>
+                        <rect key="frame" x="18" y="137" width="275" height="26"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="TFl-ax-Noh"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="270" id="x6O-Ou-91G"/>
@@ -2135,18 +2134,23 @@ Gw
                         </popUpButtonCell>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="572" translatesAutoresizingMaskIntoConstraints="NO" id="fLr-xj-lYq">
-                        <rect key="frame" x="18" y="61" width="576" height="20"/>
+                        <rect key="frame" x="18" y="65" width="576" height="48"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="20" id="1ua-jg-Ysp"/>
+                            <constraint firstAttribute="height" constant="48" id="WHr-zi-4gt"/>
                         </constraints>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="If your chosen Device Group is not yet sync’d with the impCloud, you will not be able to assign a device to it." id="sMp-Bb-890">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="sMp-Bb-890">
                             <font key="font" metaFont="smallSystem"/>
+                            <string key="title">If your chosen device group is not yet sync’d with the impCloud, you will not be able to assign a device to it. Additionally, you cannot assign development devices to production or pre-production device groups, so these device group types are not listed.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3JI-q9-cDw">
                         <rect key="frame" x="472" y="13" width="126" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="114" id="BZD-zO-lWw"/>
+                            <constraint firstAttribute="height" constant="21" id="UOn-jt-IgK"/>
+                        </constraints>
                         <buttonCell key="cell" type="push" title="Assign Device" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PXU-lE-smC">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -2158,8 +2162,8 @@ Gw
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5YH-ih-e1l">
                         <rect key="frame" x="389" y="13" width="83" height="32"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="21" id="BKT-Q8-Gjr"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="71" id="aBa-YU-aSu"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="71" id="eVO-Vu-hF4"/>
+                            <constraint firstAttribute="height" constant="21" id="qM6-tS-6AR"/>
                         </constraints>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Wkq-6D-4xv">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2174,29 +2178,29 @@ Gw
                     </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="3JI-q9-cDw" firstAttribute="leading" secondItem="5YH-ih-e1l" secondAttribute="trailing" constant="12" id="0FN-dj-sih"/>
+                    <constraint firstAttribute="trailing" secondItem="fLr-xj-lYq" secondAttribute="trailing" constant="20" id="1aR-MX-2y4"/>
                     <constraint firstItem="nh1-B0-bW0" firstAttribute="leading" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" id="2Xs-u8-OGy"/>
-                    <constraint firstAttribute="trailing" secondItem="hm3-Cm-D97" secondAttribute="trailing" constant="20" id="4rK-kl-8FO"/>
+                    <constraint firstItem="5YH-ih-e1l" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" symbolic="YES" id="3hU-Pp-aV2"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="nh1-B0-bW0" secondAttribute="trailing" constant="20" symbolic="YES" id="5vE-DV-dOY"/>
-                    <constraint firstItem="3JI-q9-cDw" firstAttribute="leading" secondItem="5YH-ih-e1l" secondAttribute="trailing" constant="12" symbolic="YES" id="8e8-0Q-IiK"/>
-                    <constraint firstItem="hm3-Cm-D97" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" symbolic="YES" id="9Jd-36-y7S"/>
-                    <constraint firstAttribute="bottom" secondItem="5YH-ih-e1l" secondAttribute="bottom" constant="20" id="9Sy-4u-DSj"/>
-                    <constraint firstItem="3JI-q9-cDw" firstAttribute="trailing" secondItem="fLr-xj-lYq" secondAttribute="trailing" id="Dli-bU-YC4"/>
-                    <constraint firstItem="3JI-q9-cDw" firstAttribute="baseline" secondItem="5YH-ih-e1l" secondAttribute="baseline" id="O3T-mt-n3m"/>
+                    <constraint firstItem="UC3-wk-scu" firstAttribute="leading" secondItem="nh1-B0-bW0" secondAttribute="trailing" constant="32" id="7s0-kd-44Q"/>
+                    <constraint firstItem="UC3-wk-scu" firstAttribute="top" secondItem="hm3-Cm-D97" secondAttribute="bottom" constant="8" id="94c-bx-O01"/>
+                    <constraint firstAttribute="trailing" secondItem="3JI-q9-cDw" secondAttribute="trailing" constant="20" id="NQz-Le-9uE"/>
+                    <constraint firstItem="fLr-xj-lYq" firstAttribute="top" secondItem="UC3-wk-scu" secondAttribute="bottom" constant="27" id="PXq-lp-eH3"/>
+                    <constraint firstItem="hm3-Cm-D97" firstAttribute="leading" secondItem="muK-kE-Tij" secondAttribute="trailing" constant="32" id="U1D-H5-sPa"/>
+                    <constraint firstAttribute="trailing" secondItem="UC3-wk-scu" secondAttribute="trailing" constant="20" id="Uxn-1t-55X"/>
+                    <constraint firstItem="hm3-Cm-D97" firstAttribute="top" secondItem="4Uw-Cu-gD6" secondAttribute="top" constant="20" id="Wv0-Rj-azF"/>
+                    <constraint firstAttribute="trailing" secondItem="hm3-Cm-D97" secondAttribute="trailing" constant="20" id="XhB-wI-pQf"/>
                     <constraint firstItem="muK-kE-Tij" firstAttribute="leading" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" id="Yst-mS-0s2"/>
-                    <constraint firstAttribute="trailing" secondItem="fLr-xj-lYq" secondAttribute="trailing" constant="20" id="gnA-Y9-Plk"/>
-                    <constraint firstItem="UC3-wk-scu" firstAttribute="top" secondItem="hm3-Cm-D97" secondAttribute="bottom" constant="8" id="hnh-VQ-9rQ"/>
-                    <constraint firstItem="UC3-wk-scu" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" symbolic="YES" id="iA2-fS-sa0"/>
+                    <constraint firstAttribute="bottom" secondItem="3JI-q9-cDw" secondAttribute="bottom" constant="20" id="cIN-Q2-p1C"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="muK-kE-Tij" secondAttribute="trailing" constant="20" symbolic="YES" id="iP5-DC-68m"/>
-                    <constraint firstAttribute="trailing" secondItem="UC3-wk-scu" secondAttribute="trailing" constant="20" id="jAJ-do-Clh"/>
-                    <constraint firstItem="5YH-ih-e1l" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" symbolic="YES" id="k0u-7y-FwQ"/>
-                    <constraint firstItem="hm3-Cm-D97" firstAttribute="top" secondItem="4Uw-Cu-gD6" secondAttribute="top" constant="20" id="lO1-bQ-Sqw"/>
-                    <constraint firstItem="fLr-xj-lYq" firstAttribute="leading" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" id="rqS-1V-ZYo"/>
                     <constraint firstItem="nh1-B0-bW0" firstAttribute="top" secondItem="muK-kE-Tij" secondAttribute="bottom" constant="8" id="wgJ-wz-2rg"/>
                     <constraint firstItem="muK-kE-Tij" firstAttribute="top" secondItem="4Uw-Cu-gD6" secondAttribute="top" constant="20" id="wxn-x2-Rbg"/>
-                    <constraint firstItem="fLr-xj-lYq" firstAttribute="top" secondItem="nh1-B0-bW0" secondAttribute="bottom" constant="8" id="yZD-4B-dZ5"/>
+                    <constraint firstItem="fLr-xj-lYq" firstAttribute="leading" secondItem="4Uw-Cu-gD6" secondAttribute="leading" constant="20" id="yaz-T6-ssb"/>
+                    <constraint firstAttribute="bottom" secondItem="5YH-ih-e1l" secondAttribute="bottom" constant="20" id="ztO-75-Q1x"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="410" y="-299.5"/>
+            <point key="canvasLocation" x="410" y="-274"/>
         </window>
         <window title="Rename" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="hav-Uy-J5n" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
@@ -3576,7 +3580,7 @@ Gw
                         <rect key="frame" x="20" y="61" width="572" height="218"/>
                         <clipView key="contentView" id="NWZ-vh-YNt">
                             <rect key="frame" x="1" y="1" width="570" height="216"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="20" viewBased="YES" floatsGroupRows="NO" id="bLn-Rm-uCb">
                                     <rect key="frame" x="0.0" y="0.0" width="570" height="216"/>
