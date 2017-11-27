@@ -8293,29 +8293,34 @@
 
 - (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp
 {
-    logTextView.editable = YES;
+	// Only display non-zero length strings
 
-    // Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
+	if (string.length > 0)
+	{
+		logTextView.editable = YES;
 
-    [logTextView setSelectedRange:NSMakeRange(logTextView.string.length,0)];
+		// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
-    NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
+		[logTextView setSelectedRange:NSMakeRange(logTextView.string.length,0)];
 
-    if (addTimestamp)
-    {
-        NSString *date = [def stringFromDate:[NSDate date]];
-        date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+		NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
 
-        [logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes] replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		if (addTimestamp)
+		{
+			NSString *date = [def stringFromDate:[NSDate date]];
+			date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
-        [logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
-    }
+			[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes] replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-    if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+			[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		}
 
-    [logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-    logTextView.editable = NO;
+		[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+
+		logTextView.editable = NO;
+	}
 }
 
 
