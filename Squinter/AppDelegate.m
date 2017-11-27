@@ -8066,32 +8066,39 @@
 
     NSMutableArray *lines = [[NSMutableArray alloc] init];
 
-    [lines addObject:[NSString stringWithFormat:@"Device: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
-    [lines addObject:[NSString stringWithFormat:@"Device ID: %@", [selectedDevice objectForKey:@"id"]]];
-    [lines addObject:[NSString stringWithFormat:@"Device Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
+	[lines addObject:@"Device Information"];
+    [lines addObject:[NSString stringWithFormat:@"    Name: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
+    [lines addObject:[NSString stringWithFormat:@"      ID: %@", [selectedDevice objectForKey:@"id"]]];
+    [lines addObject:[NSString stringWithFormat:@"    Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
+	//[lines addObject:[NSString stringWithFormat:@"   impOS: %@", [self getValueFrom:selectedDevice withKey:@"swversion"]]];
+    //[lines addObject:[NSString stringWithFormat:@"Free memory: %@ KB", [self getValueFrom:selectedDevice withKey:@"free_memory"]]];
 
-    // [lines addObject:[NSString stringWithFormat:@"Free memory: %@ KB", [self getValueFrom:selectedDevice withKey:@"free_memory"]]];
+	[lines addObject:[NSString stringWithFormat:@"    Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
 
+	[lines addObject:@"\nNetwork Information"];
     NSString *mac = [self getValueFrom:selectedDevice withKey:@"mac_address"];
     mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
-    [lines addObject:[NSString stringWithFormat:@"MAC Address: %@", mac]];
+    [lines addObject:[NSString stringWithFormat:@"     MAC: %@", mac]];
 
     NSNumber *boolean = [self getValueFrom:selectedDevice withKey:@"device_online"];
     NSString *string = (boolean.boolValue) ? @"online" : @"offline";
 
-    if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"IP Address: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
+    if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"      IP: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
 
-    [lines addObject:[NSString stringWithFormat:@"State: %@", string]];
+    [lines addObject:[NSString stringWithFormat:@"   State: %@", string]];
+
+	[lines addObject:@"\nAgent Information"];
 
     boolean = [self getValueFrom:selectedDevice withKey:@"agent_running"];
     string = (boolean.boolValue) ? @"online" : @"offline";
-    [lines addObject:[NSString stringWithFormat:@"Agent state: %@", string]];
+    [lines addObject:[NSString stringWithFormat:@"   State: %@", string]];
 
     if (boolean.boolValue)
     {
-        [lines addObject:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
+        [lines addObject:[NSString stringWithFormat:@"     URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
     }
 
+	[lines addObject:@"\nDevice Group Information"];
     NSDictionary *dg = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
     NSString *dgid = [self getValueFrom:dg withKey:@"id"];
 
@@ -8123,18 +8130,19 @@
 
         if (adg != nil)
         {
-            [lines addObject:[NSString stringWithFormat:@"Device assigned to device group \"%@\" of project \"%@\".", adg.name, apr.name]];
+			[lines addObject:[NSString stringWithFormat:@"   Group: \"%@\"", adg.name]];
+			[lines addObject:[NSString stringWithFormat:@"      ID: \"%@\"", dgid]];
+			[lines addObject:[NSString stringWithFormat:@" Project: \"%@\"", apr.name]];
         }
         else
         {
-            [lines addObject:[NSString stringWithFormat:@"Device assigned to a device group of ID \"%@\".", dgid]];
+			[lines addObject:[NSString stringWithFormat:@"      ID: \"%@\"", dgid]];
         }
     }
     else
     {
-        [lines addObject:@"Device is not assigned to a device group."];
+		[lines addObject:@"   Group: Device is not assigned to a device group"];
     }
-
 
     // Add the assembled lines to the log view and re-check for URLs
 
