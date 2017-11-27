@@ -24,6 +24,7 @@
 #import "PDKeychainBindings.h"
 #import "CommitWindowViewController.h"
 #import "SelectWindowViewController.h"
+#import "InspectorWindowViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -302,6 +303,10 @@
 
     IBOutlet NSWindow *commitSheet;
 
+	// Inspector
+
+	IBOutlet InspectorWindowViewController *iwvc;
+
     // Connection Variables
 
     BuildAPIAccess *ide;
@@ -514,6 +519,7 @@
 - (void)presentLogEntry:(NSNotification *)note;
 - (void)endLogging:(NSNotification *)note;
 - (IBAction)showProjectInfo:(id)sender;
+- (IBAction)showProjectInspector:(id)sender;
 - (IBAction)showDeviceGroupInfo:(id)sender;
 - (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines;
 - (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines;

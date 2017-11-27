@@ -31,6 +31,7 @@
 		3B8B8E161E952E5A009363C8 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E151E952E5A009363C8 /* File.m */; };
 		3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */; };
 		3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */; };
+		3BB42A001FCCA8120059287C /* InspectorWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB429FF1FCCA8120059287C /* InspectorWindowViewController.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BD74E461D423D6A00565B0E /* SourceCodePro-Regular.otf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -133,6 +134,8 @@
 		3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LogStreamEvent.m; path = ../../BuildAPIAccess/LogStreamEvent.m; sourceTree = "<group>"; };
 		3BB2EF031FC7215100F7B7D1 /* SelectWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectWindowViewController.h; sourceTree = "<group>"; };
 		3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectWindowViewController.m; sourceTree = "<group>"; };
+		3BB429FE1FCCA8120059287C /* InspectorWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorWindowViewController.h; sourceTree = "<group>"; };
+		3BB429FF1FCCA8120059287C /* InspectorWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorWindowViewController.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusLight.h; sourceTree = "<group>"; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusLight.m; sourceTree = "<group>"; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -309,6 +312,8 @@
 				3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */,
 				3B6F3AC41FC31A7700A7F5C1 /* CommitTableCellView.h */,
 				3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */,
+				3BB429FE1FCCA8120059287C /* InspectorWindowViewController.h */,
+				3BB429FF1FCCA8120059287C /* InspectorWindowViewController.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -560,6 +565,7 @@
 				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
 				3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */,
 				3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */,
+				3BB42A001FCCA8120059287C /* InspectorWindowViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

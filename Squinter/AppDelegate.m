@@ -1337,6 +1337,8 @@
     [self refreshDevicegroupMenu];
     [self refreshMainDevicegroupsMenu];
     [self setToolbar];
+
+	iwvc.project = currentProject;
 }
 
 
@@ -4876,6 +4878,10 @@
             // Add the newly opened project to the recent files list
 
             [self addToRecentMenu:currentProject.filename :currentProject.path];
+
+			// Update the Inspector
+
+			iwvc.project = currentProject;
         }
     }
     else
@@ -5850,6 +5856,8 @@
         [self refreshProductsMenu];
         [self refreshProjectsMenu];
         [self setToolbar];
+
+		iwvc.products = productsArray;
     }
 
     if (action != nil && ([action compare:@"uploadproject"] == NSOrderedSame))
@@ -6767,6 +6775,8 @@
         [self refreshDeviceMenu];
         [self refreshDevicegroupMenu];
         [self setToolbar];
+
+		iwvc.devices = devicesArray;
     }
     else
     {
@@ -7796,6 +7806,14 @@
     // Finally, print out the lines in the log
 
     [self printInfoInLog:lines];
+}
+
+
+
+- (IBAction)showProjectInspector:(id)sender
+{
+	if (currentProject != nil) iwvc.project = currentProject;
+	[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
