@@ -224,6 +224,7 @@
 {
     NSError *error = nil;
     BOOL isStale = NO;
+
     NSURL *url = [NSURL URLByResolvingBookmarkData: bookmark
                                            options: NSURLBookmarkResolutionWithoutUI
                                      relativeToURL: nil
@@ -232,8 +233,13 @@
 
     // There was an error, so return 'nil' as a warning
 
-    if (error != nil) return nil;
-    stale = isStale;
+	if (error != nil)
+	{
+		stale = YES;
+		return nil;
+	}
+
+	stale = isStale;
     return url;
 }
 
@@ -464,10 +470,14 @@
     if ([key compare:@"agent_running"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.agent_running"] boolValue]];
     if ([key compare:@"swversion"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.swversion"];
 
-    // if ([key compare:@"free_memory"] == NSOrderedSame) return (NSNumber *)[NSNumber numberWithInteger:[[apiDict valueForKeyPath:@"attributes.free_memory"] integerValue]];
+	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
 
-    if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
-    if ([key compare:@"last_blinkup_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.last_blinkup_at"]];
+	if ([key compare:@"last_enrolled_at"] == NSOrderedSame)
+	{
+		NSString *date = [apiDict valueForKeyPath:@"attributes.last_enrolled_at"];
+		if ((NSNull *)date == [NSNull null]) return nil;
+		return [self convertTimestring:date];
+	}
 
     // Attributes Deployment properties - non-nullable
 
@@ -503,6 +513,24 @@
         if ((NSNull *)tags == [NSNull null]) return nil;
         return tags;
     }
+
+	if ([key compare:@"free_memory"] == NSOrderedSame) {
+		NSNumber *num = [apiDict valueForKeyPath:@"attributes.free_memory"];
+		if ((NSNull *)num == [NSNull null]) return nil;
+		return num;
+	}
+
+	if ([key compare:@"rssi"] == NSOrderedSame) {
+		NSNumber *num = [apiDict valueForKeyPath:@"attributes.rssi"];
+		if ((NSNull *)num == [NSNull null]) return nil;
+		return num;
+	}
+
+	if ([key compare:@"plan_id"] == NSOrderedSame) {
+		NSString *plan = [apiDict valueForKeyPath:@"plan_id"];
+		if ((NSNull *)plan == [NSNull null]) return nil;
+		return plan;
+	}
 
     // Relationships properties
 

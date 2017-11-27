@@ -541,10 +541,16 @@
                selector:@selector(updateCodeStageTwo:)
                    name:@"BuildAPIGotDevicegroup"
                  object:ide];
+
     [nsncdc addObserver:self
                selector:@selector(setMinimumDeploymentStageTwo:)
                    name:@"BuildAPISetMinDeployment"
                  object:ide];
+
+	[nsncdc addObserver:self
+			  selector:@selector(updateDevice:)
+				  name:@"BuildAPIGotDevice"
+				object:ide];
 
     // **************
 
@@ -2049,15 +2055,17 @@
     {
         NSMutableArray *urls = [[NSMutableArray alloc] init];
         NSMutableArray *newRecentFiles = [[NSMutableArray alloc] init];
+		BOOL changed = NO;
 
         for (NSDictionary *recent in recentFiles)
         {
-            stale = NO;
-            NSURL *url = [self urlForBookmark:[recent valueForKey:@"bookmark"]];
+			stale = NO;
+			NSURL *url = [self urlForBookmark:[recent valueForKey:@"bookmark"]];
 
-            if (stale)
+			if (stale)
             {
-                if (url != nil)
+                changed = YES;
+				if (url != nil)
                 {
                     [self writeStringToLog:[NSString stringWithFormat:@"Updating location of Project file \"%@\".", [recent valueForKey:@"name"]] :YES];
 
@@ -2082,13 +2090,9 @@
         }
 
         // newRecentFiles contains all the files we have found; use it to replace recentFiles
+		// We removed one or more files from recentFiles, so re-process this menu
 
-        if (recentFiles.count != newRecentFiles.count)
-        {
-            // We removed one or more files from recentFiles, so re-process this menu
-
-            [self refreshRecentFilesMenu];
-        }
+        if (changed) [self refreshRecentFilesMenu];
 
         recentFiles = newRecentFiles;
 
@@ -3714,26 +3718,31 @@
     // Assemble the projects list with device groups
 
     NSMenuItem *item;
+	BOOL firstDone = NO;
 
     for (Project *project in projectArray)
     {
         if (project.devicegroups.count > 0)
         {
-            // Add the project name as a section header but disable it - it's a marker
-
-            [assignDeviceMenuModels addItemWithTitle:[NSString stringWithFormat:@"Project \"%@\":", project.name]];
-            item = [assignDeviceMenuModels.itemArray lastObject];
-            item.enabled = NO;
-            item.representedObject = nil;
-
             // Add all the device groups' names
 
             for (Devicegroup *dg in project.devicegroups)
             {
-                [assignDeviceMenuModels addItemWithTitle:dg.name];
-                item = [assignDeviceMenuModels.itemArray lastObject];
-                item.representedObject = dg;
+				if (![dg.type containsString:@"production"])
+				{
+					if (firstDone)
+					{
+						[assignDeviceMenuModels.menu addItem:NSMenuItem.separatorItem];
+						firstDone = NO;
+					}
+
+					[assignDeviceMenuModels addItemWithTitle:[NSString stringWithFormat:@"%@/%@", project.name, dg.name]];
+                		item = [assignDeviceMenuModels.itemArray lastObject];
+					item.representedObject = dg;
+				}
             }
+
+			firstDone = YES;
         }
     }
 
@@ -3803,7 +3812,7 @@
         return;
     }
 
-    // Assign the device to the device group
+	// Assign the device to the device group
 
     NSDictionary *dict = @{ @"action" : @"assign",
                             @"device" : device,
@@ -6694,6 +6703,11 @@
 #endif
 
                 [devicesArray addObject:newDevice];
+
+				NSDictionary *dict = @{ @"action" : @"getdevice",
+										@"device" : newDevice };
+				
+				[ide getDevice:[newDevice objectForKey:@"id"] :dict];
             }
 
             // Sort the devices list by device name (inside the 'attributes' dictionary
@@ -6758,6 +6772,31 @@
     {
         [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
     }
+}
+
+
+
+- (void)updateDevice:(NSNotification *)note
+{
+	// We're back after getting a list of devices from the server,
+	// and then, for each one, getting the single-device record,
+	// which contains extra fields that we add to the main 'deviceArray'
+	// record here
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *device = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSMutableDictionary *aDevice = [source objectForKey:@"device"];
+
+	NSMutableDictionary *attributes = [aDevice objectForKey:@"attributes"];
+	NSString *version = [self getValueFrom:device withKey:@"swversion"];
+	if (version != nil) [attributes setObject:version forKey:@"swversion"];
+	NSNumber *free = [self getValueFrom:device withKey:@"free_memory"];
+	if (free != nil) [attributes setObject:free forKey:@"free_memory"];
+	version = [self getValueFrom:device withKey:@"plan_id"];
+	if (version != nil) {
+		[attributes setObject:version forKey:@"plan_id"];
+	}
 }
 
 
@@ -8063,32 +8102,49 @@
 
     NSMutableArray *lines = [[NSMutableArray alloc] init];
 
-    [lines addObject:[NSString stringWithFormat:@"Device: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
-    [lines addObject:[NSString stringWithFormat:@"Device ID: %@", [selectedDevice objectForKey:@"id"]]];
-    [lines addObject:[NSString stringWithFormat:@"Device Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
+	[lines addObject:@"Device Information"];
+    [lines addObject:[NSString stringWithFormat:@"     Name: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
+    [lines addObject:[NSString stringWithFormat:@"       ID: %@", [selectedDevice objectForKey:@"id"]]];
+    [lines addObject:[NSString stringWithFormat:@"     Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
 
-    // [lines addObject:[NSString stringWithFormat:@"Free memory: %@ KB", [self getValueFrom:selectedDevice withKey:@"free_memory"]]];
+	NSString *version = [self getValueFrom:selectedDevice withKey:@"swversion"];
+	NSArray *parts = [version componentsSeparatedByString:@" - "];
+	parts = [[parts objectAtIndex:1] componentsSeparatedByString:@"-"];
+	if (version != nil ) [lines addObject:[NSString stringWithFormat:@"    impOS: %@", [parts objectAtIndex:1]]];
 
+	NSNumber *number = [self getValueFrom:selectedDevice withKey:@"free_memory"];
+	if (number != nil) [lines addObject:[NSString stringWithFormat:@" Free RAM: %@KB", number]];
+
+	[lines addObject:@"\nNetwork Information"];
     NSString *mac = [self getValueFrom:selectedDevice withKey:@"mac_address"];
     mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
-    [lines addObject:[NSString stringWithFormat:@"MAC Address: %@", mac]];
+    [lines addObject:[NSString stringWithFormat:@"      MAC: %@", mac]];
 
     NSNumber *boolean = [self getValueFrom:selectedDevice withKey:@"device_online"];
     NSString *string = (boolean.boolValue) ? @"online" : @"offline";
 
-    if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"IP Address: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
+    if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"       IP: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
 
-    [lines addObject:[NSString stringWithFormat:@"State: %@", string]];
+    [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
+
+	[lines addObject:@"\nAgent Information"];
 
     boolean = [self getValueFrom:selectedDevice withKey:@"agent_running"];
     string = (boolean.boolValue) ? @"online" : @"offline";
-    [lines addObject:[NSString stringWithFormat:@"Agent state: %@", string]];
+    [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
 
     if (boolean.boolValue)
     {
-        [lines addObject:[NSString stringWithFormat:@"Agent URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
+        [lines addObject:[NSString stringWithFormat:@"      URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
     }
 
+	[lines addObject:@"\nBlinkUp Information"];
+	NSString *date = [self getValueFrom:selectedDevice withKey:@"last_enrolled_at"];
+	[lines addObject:[NSString stringWithFormat:@" Enrolled: %@", (date != nil ? date : @"Unknown")]];
+	NSString *plan = [self getValueFrom:selectedDevice withKey:@"plan_id"];
+	if (plan != nil) [lines addObject:[NSString stringWithFormat:@"  Plan ID: %@", plan]];
+
+	[lines addObject:@"\nDevice Group Information"];
     NSDictionary *dg = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
     NSString *dgid = [self getValueFrom:dg withKey:@"id"];
 
@@ -8120,18 +8176,19 @@
 
         if (adg != nil)
         {
-            [lines addObject:[NSString stringWithFormat:@"Device assigned to device group \"%@\" of project \"%@\".", adg.name, apr.name]];
+			[lines addObject:[NSString stringWithFormat:@"    Group: \"%@\"", adg.name]];
+			[lines addObject:[NSString stringWithFormat:@"       ID: \"%@\"", dgid]];
+			[lines addObject:[NSString stringWithFormat:@"  Project: \"%@\"", apr.name]];
         }
         else
         {
-            [lines addObject:[NSString stringWithFormat:@"Device assigned to a device group of ID \"%@\".", dgid]];
+			[lines addObject:[NSString stringWithFormat:@"       ID: \"%@\"", dgid]];
         }
     }
     else
     {
-        [lines addObject:@"Device is not assigned to a device group."];
+		[lines addObject:@"   Group: Device is not assigned to a device group"];
     }
-
 
     // Add the assembled lines to the log view and re-check for URLs
 
@@ -8290,29 +8347,34 @@
 
 - (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp
 {
-    logTextView.editable = YES;
+	// Only display non-zero length strings
 
-    // Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
+	if (string.length > 0)
+	{
+		logTextView.editable = YES;
 
-    [logTextView setSelectedRange:NSMakeRange(logTextView.string.length,0)];
+		// Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
-    NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
+		[logTextView setSelectedRange:NSMakeRange(logTextView.string.length,0)];
 
-    if (addTimestamp)
-    {
-        NSString *date = [def stringFromDate:[NSDate date]];
-        date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+		NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
 
-        [logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes] replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		if (addTimestamp)
+		{
+			NSString *date = [def stringFromDate:[NSDate date]];
+			date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
-        [logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
-    }
+			[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes] replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-    if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+			[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		}
 
-    [logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-    logTextView.editable = NO;
+		[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+
+		logTextView.editable = NO;
+	}
 }
 
 
