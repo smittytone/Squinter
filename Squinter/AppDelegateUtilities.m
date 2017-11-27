@@ -224,6 +224,7 @@
 {
     NSError *error = nil;
     BOOL isStale = NO;
+
     NSURL *url = [NSURL URLByResolvingBookmarkData: bookmark
                                            options: NSURLBookmarkResolutionWithoutUI
                                      relativeToURL: nil
@@ -232,8 +233,13 @@
 
     // There was an error, so return 'nil' as a warning
 
-    if (error != nil) return nil;
-    stale = isStale;
+	if (error != nil)
+	{
+		stale = YES;
+		return nil;
+	}
+
+	stale = isStale;
     return url;
 }
 

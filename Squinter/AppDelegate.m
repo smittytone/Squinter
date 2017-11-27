@@ -2049,15 +2049,17 @@
     {
         NSMutableArray *urls = [[NSMutableArray alloc] init];
         NSMutableArray *newRecentFiles = [[NSMutableArray alloc] init];
+		BOOL changed = NO;
 
         for (NSDictionary *recent in recentFiles)
         {
-            stale = NO;
-            NSURL *url = [self urlForBookmark:[recent valueForKey:@"bookmark"]];
+			stale = NO;
+			NSURL *url = [self urlForBookmark:[recent valueForKey:@"bookmark"]];
 
-            if (stale)
+			if (stale)
             {
-                if (url != nil)
+                changed = YES;
+				if (url != nil)
                 {
                     [self writeStringToLog:[NSString stringWithFormat:@"Updating location of Project file \"%@\".", [recent valueForKey:@"name"]] :YES];
 
@@ -2082,13 +2084,9 @@
         }
 
         // newRecentFiles contains all the files we have found; use it to replace recentFiles
+		// We removed one or more files from recentFiles, so re-process this menu
 
-        if (recentFiles.count != newRecentFiles.count)
-        {
-            // We removed one or more files from recentFiles, so re-process this menu
-
-            [self refreshRecentFilesMenu];
-        }
+        if (changed) [self refreshRecentFilesMenu];
 
         recentFiles = newRecentFiles;
 
