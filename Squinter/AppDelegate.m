@@ -541,10 +541,16 @@
                selector:@selector(updateCodeStageTwo:)
                    name:@"BuildAPIGotDevicegroup"
                  object:ide];
+
     [nsncdc addObserver:self
                selector:@selector(setMinimumDeploymentStageTwo:)
                    name:@"BuildAPISetMinDeployment"
                  object:ide];
+
+	[nsncdc addObserver:self
+			  selector:@selector(updateDevice:)
+				  name:@"BuildAPIGotDevice"
+				object:ide];
 
     // **************
 
@@ -6697,6 +6703,11 @@
 #endif
 
                 [devicesArray addObject:newDevice];
+
+				NSDictionary *dict = @{ @"action" : @"getdevice",
+										@"device" : newDevice };
+				
+				[ide getDevice:[newDevice objectForKey:@"id"] :dict];
             }
 
             // Sort the devices list by device name (inside the 'attributes' dictionary
@@ -6761,6 +6772,31 @@
     {
         [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
     }
+}
+
+
+
+- (void)updateDevice:(NSNotification *)note
+{
+	// We're back after getting a list of devices from the server,
+	// and then, for each one, getting the single-device record,
+	// which contains extra fields that we add to the main 'deviceArray'
+	// record here
+
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *device = [data objectForKey:@"data"];
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSMutableDictionary *aDevice = [source objectForKey:@"device"];
+
+	NSMutableDictionary *attributes = [aDevice objectForKey:@"attributes"];
+	NSString *version = [self getValueFrom:device withKey:@"swversion"];
+	if (version != nil) [attributes setObject:version forKey:@"swversion"];
+	NSNumber *free = [self getValueFrom:device withKey:@"free_memory"];
+	if (free != nil) [attributes setObject:free forKey:@"free_memory"];
+	version = [self getValueFrom:device withKey:@"plan_id"];
+	if (version != nil) {
+		[attributes setObject:version forKey:@"plan_id"];
+	}
 }
 
 
@@ -8067,36 +8103,46 @@
     NSMutableArray *lines = [[NSMutableArray alloc] init];
 
 	[lines addObject:@"Device Information"];
-    [lines addObject:[NSString stringWithFormat:@"    Name: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
-    [lines addObject:[NSString stringWithFormat:@"      ID: %@", [selectedDevice objectForKey:@"id"]]];
-    [lines addObject:[NSString stringWithFormat:@"    Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
-	//[lines addObject:[NSString stringWithFormat:@"   impOS: %@", [self getValueFrom:selectedDevice withKey:@"swversion"]]];
-    //[lines addObject:[NSString stringWithFormat:@"Free memory: %@ KB", [self getValueFrom:selectedDevice withKey:@"free_memory"]]];
+    [lines addObject:[NSString stringWithFormat:@"     Name: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
+    [lines addObject:[NSString stringWithFormat:@"       ID: %@", [selectedDevice objectForKey:@"id"]]];
+    [lines addObject:[NSString stringWithFormat:@"     Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
 
-	[lines addObject:[NSString stringWithFormat:@"    Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
+	NSString *version = [self getValueFrom:selectedDevice withKey:@"swversion"];
+	NSArray *parts = [version componentsSeparatedByString:@" - "];
+	parts = [[parts objectAtIndex:1] componentsSeparatedByString:@"-"];
+	if (version != nil ) [lines addObject:[NSString stringWithFormat:@"    impOS: %@", [parts objectAtIndex:1]]];
+
+	NSNumber *number = [self getValueFrom:selectedDevice withKey:@"free_memory"];
+	if (number != nil) [lines addObject:[NSString stringWithFormat:@" Free RAM: %@KB", number]];
 
 	[lines addObject:@"\nNetwork Information"];
     NSString *mac = [self getValueFrom:selectedDevice withKey:@"mac_address"];
     mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
-    [lines addObject:[NSString stringWithFormat:@"     MAC: %@", mac]];
+    [lines addObject:[NSString stringWithFormat:@"      MAC: %@", mac]];
 
     NSNumber *boolean = [self getValueFrom:selectedDevice withKey:@"device_online"];
     NSString *string = (boolean.boolValue) ? @"online" : @"offline";
 
-    if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"      IP: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
+    if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"       IP: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
 
-    [lines addObject:[NSString stringWithFormat:@"   State: %@", string]];
+    [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
 
 	[lines addObject:@"\nAgent Information"];
 
     boolean = [self getValueFrom:selectedDevice withKey:@"agent_running"];
     string = (boolean.boolValue) ? @"online" : @"offline";
-    [lines addObject:[NSString stringWithFormat:@"   State: %@", string]];
+    [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
 
     if (boolean.boolValue)
     {
-        [lines addObject:[NSString stringWithFormat:@"     URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
+        [lines addObject:[NSString stringWithFormat:@"      URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
     }
+
+	[lines addObject:@"\nBlinkUp Information"];
+	NSString *date = [self getValueFrom:selectedDevice withKey:@"last_enrolled_at"];
+	[lines addObject:[NSString stringWithFormat:@" Enrolled: %@", (date != nil ? date : @"Unknown")]];
+	NSString *plan = [self getValueFrom:selectedDevice withKey:@"plan_id"];
+	if (plan != nil) [lines addObject:[NSString stringWithFormat:@"  Plan ID: %@", plan]];
 
 	[lines addObject:@"\nDevice Group Information"];
     NSDictionary *dg = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
@@ -8130,13 +8176,13 @@
 
         if (adg != nil)
         {
-			[lines addObject:[NSString stringWithFormat:@"   Group: \"%@\"", adg.name]];
-			[lines addObject:[NSString stringWithFormat:@"      ID: \"%@\"", dgid]];
-			[lines addObject:[NSString stringWithFormat:@" Project: \"%@\"", apr.name]];
+			[lines addObject:[NSString stringWithFormat:@"    Group: \"%@\"", adg.name]];
+			[lines addObject:[NSString stringWithFormat:@"       ID: \"%@\"", dgid]];
+			[lines addObject:[NSString stringWithFormat:@"  Project: \"%@\"", apr.name]];
         }
         else
         {
-			[lines addObject:[NSString stringWithFormat:@"      ID: \"%@\"", dgid]];
+			[lines addObject:[NSString stringWithFormat:@"       ID: \"%@\"", dgid]];
         }
     }
     else
