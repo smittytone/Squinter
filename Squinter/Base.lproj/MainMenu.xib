@@ -3911,6 +3911,7 @@ Gw
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" white="1" alpha="0.0" colorSpace="deviceWhite"/>
+                                                        <tableViewGridLines key="gridStyleMask" dashed="YES"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
                                                             <tableColumn identifier="deviceinfoheadcolumn" width="106" minWidth="40" maxWidth="1000" id="ECP-nF-hxL">
@@ -3998,7 +3999,7 @@ Gw
                                                                             </textField>
                                                                             <button wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1V1-h3-lTu">
                                                                                 <rect key="frame" x="193" y="1" width="12" height="12"/>
-                                                                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                                                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="button_link" imagePosition="overlaps" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="v8b-KS-K4N">
                                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                     <font key="font" metaFont="miniSystem"/>
