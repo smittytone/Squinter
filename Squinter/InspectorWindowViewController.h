@@ -9,6 +9,7 @@
 #import "Devicegroup.h"
 #import "Model.h"
 #import "File.h"
+#import "InspectorButtonTableCellView.h"
 
 
 @interface InspectorWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
@@ -20,13 +21,19 @@
 
 	NSMutableArray *projectKeys, *projectValues;
 	NSMutableArray *deviceKeys, *deviceValues;
+
+	NSWorkspace *nswsw;
 }
 
 
+- (IBAction)link:(id)sender;
+- (IBAction)goToURL:(id)sender;
 - (void)setProject:(Project *)aProject;
 - (void)setDevice:(NSMutableDictionary *)aDevice;
 - (void)positionWindow;
 - (void)setTab:(NSUInteger)aTab;
+- (BOOL)isLinkRow:(NSInteger)row;
+- (BOOL)isURLRow:(NSInteger)row;
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;

@@ -40,6 +40,17 @@
 	deviceInfoTable.rowSizeStyle = NSTableViewRowSizeStyleCustom;
 	[self setDevice:nil];
 
+	// Set up the tabs
+
+	//inspectorTabView.controlTint = NSGraphiteControlTint;
+
+	nswsw = NSWorkspace.sharedWorkspace;
+
+	// Stop the HUD panel from floating above all windows
+
+	NSPanel *panel = (NSPanel *)self.view.window;
+	[panel setFloatingPanel:NO];
+
 	// Position the window to the right of screen
 
 	mainWindowFrame = [NSScreen mainScreen].frame;
@@ -64,6 +75,8 @@
 	}
 	else
 	{
+		// No room next to the main window, so put the panel above it
+
 		wframe.origin.x = ms.frame.size.width - 340;
 	}
 
@@ -74,10 +87,61 @@
 
 
 
+- (IBAction)link:(id)sender
+{
+	// Link buttons in the Inspector panel come here when clicked
+
+	NSButton *linkButton = (NSButton *)sender;
+	InspectorButtonTableCellView *cellView = (InspectorButtonTableCellView *)linkButton.superview;
+	NSInteger row = cellView.index;
+	NSString *path = [projectValues objectAtIndex:row];
+
+	if (row < 5)
+	{
+		// This will be the location of the project file, which is already open,
+		// so just reveal it in Finder
+
+		[nswsw selectFile:[NSString stringWithFormat:@"%@/%@", project.path, project.filename] inFileViewerRootedAtPath:project.path];
+		return;
+	}
+
+	for (NSInteger i = row ; i >= 0 ; --i)
+	{
+		// Step back up the content array until we get the object whose location button has
+		// been clicked. It will be a model, a library or a file. This gives us the filename
+		// and we can construct the path to it and use that to open the file
+
+		NSString *key = [projectKeys objectAtIndex:i];
+
+		if ([key containsString:@"Model"] || [key containsString:@"Library"] || [key containsString:@"File"])
+		{
+			path = [path stringByAppendingFormat:@"/%@", [projectValues objectAtIndex:i]];
+			[nswsw openFile:path];
+			break;
+		}
+	}
+}
+
+
+
+- (IBAction)goToURL:(id)sender
+{
+	// Link buttons in the Inspector panel come here when clicked
+
+	NSButton *linkButton = (NSButton *)sender;
+	InspectorButtonTableCellView *cellView = (InspectorButtonTableCellView *)linkButton.superview;
+	NSInteger row = cellView.index;
+	NSString *path = [deviceValues objectAtIndex:row];
+	path = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", path];
+	[nswsw openURL:[NSURL URLWithString:path]];
+}
+
+
+
 - (void)setProject:(Project *)aProject
 {
-	// This is the 'project' property setter, which we use to
-	// trigger regeneration of the table view
+	// This is the 'project' property setter, which we use to populate
+	// the two content arrays and trigger regeneration of the table view
 
 	project = aProject;
 
@@ -101,8 +165,25 @@
 			[projectValues addObject:project.description];
 		}
 
-		[projectKeys addObject:@"ID "];
-		[projectValues addObject:(project.pid != nil ? project.pid : @"Undefined")];
+		if (products == nil || products.count == 0 || project.pid == nil)
+		{
+			[projectKeys addObject:@"ID "];
+			[projectValues addObject:(project.pid != nil ? project.pid : @"Undefined")];
+		}
+		else
+		{
+			for (NSDictionary *product in products)
+			{
+				NSString *apid = [product objectForKey:@"id"];
+
+				if ([apid compare:project.pid] == NSOrderedSame)
+				{
+					[projectKeys addObject:@"Product "];
+					[projectValues addObject:[product valueForKeyPath:@"attributes.name"]];
+				}
+			}
+		}
+
 		[projectKeys addObject:@"Location "];
 		[projectValues addObject:project.path];
 
@@ -163,9 +244,6 @@
 
 							for (File *library in model.libraries)
 							{
-								[projectKeys addObject:@" "];
-								[projectValues addObject:@" "];
-
 								[projectKeys addObject:[NSString stringWithFormat:@"Library %li ", (long)libcount]];
 								[projectValues addObject:library.filename];
 								[projectKeys addObject:@"Location "];
@@ -186,9 +264,6 @@
 
 							for (File *file in model.files)
 							{
-								[projectKeys addObject:@" "];
-								[projectValues addObject:@" "];
-
 								[projectKeys addObject:[NSString stringWithFormat:@"File %li ", (long)filecount]];
 								[projectValues addObject:file.filename];
 								[projectKeys addObject:@"Location "];
@@ -206,6 +281,7 @@
 						++modcount;
 					}
 				}
+
 				++dgcount;
 			}
 		}
@@ -238,8 +314,8 @@
 
 - (void)setDevice:(NSMutableDictionary *)aDevice
 {
-	// This is the 'device' property setter, which we use to
-	// trigger regeneration of the table view
+	// This is the 'device' property setter, which we use to populate
+	// the two content arrays and trigger regeneration of the table view
 
 	device = aDevice;
 
@@ -348,14 +424,36 @@
 		if (dg != nil)
 		{
 			NSString *dgid = [dg objectForKey:@"id"];
+			BOOL got = NO;
+
+			for (Devicegroup *devicegroup in project.devicegroups)
+			{
+				if ([devicegroup.did compare:dgid] == NSOrderedSame)
+				{
+					[deviceKeys addObject:@"Name "];
+					[deviceValues addObject:devicegroup.name];
+					got = YES;
+					break;
+				}
+			}
+
+			if (!got)
+			{
+				[deviceKeys addObject:@"ID "];
+				[deviceValues addObject:dgid];
+			}
+		}
+		else
+		{
 			[deviceKeys addObject:@"ID "];
-			[deviceValues addObject:(dgid != nil ? dgid : @"Unassigned")];
+			[deviceValues addObject:@"Unassigned"];
 		}
 	}
 	else
 	{
 		// There is no project info to display, so set up
 		// some basic projectKeys to show
+
 		[deviceKeys addObject:@"Device Name "];
 		[deviceValues addObject:@" "];
 		[deviceKeys addObject:@"ID "];
@@ -407,10 +505,41 @@
 
 - (void)setTab:(NSUInteger)aTab
 {
+	// This is the 'tabIndex' setter method, which we trap in order
+	// to trigger a switch to the implicitly requested tab
+
 	if (aTab > inspectorTabView.numberOfTabViewItems) return;
 
 	tabIndex = aTab;
 	[inspectorTabView selectTabViewItemAtIndex:tabIndex];
+}
+
+
+
+- (BOOL)isLinkRow:(NSInteger)row
+{
+	// Does the title column of content row being displayed
+	// include the word 'location'? If so the content is a link
+	// so we return YES so that the table data source method knows
+	// which type of NSTableCellView to use
+
+	NSString *key = [projectKeys objectAtIndex:row];
+	if ([key containsString:@"Location"]) return YES;
+	return NO;
+}
+
+
+
+- (BOOL)isURLRow:(NSInteger)row
+{
+	// Does the title column of content row being displayed
+	// include the word 'location'? If so the content is a link
+	// so we return YES so that the table data source method knows
+	// which type of NSTableCellView to use
+
+	NSString *key = [deviceKeys objectAtIndex:row];
+	if ([key containsString:@"Agent URL"]) return YES;
+	return NO;
 }
 
 
@@ -448,21 +577,109 @@
 
 		return cell;
 	}
-	else if ([tableColumn.identifier compare:@"infotextcolumn"] == NSOrderedSame || [tableColumn.identifier compare:@"deviceinfotextcolumn"] == NSOrderedSame)
+	else if ([tableColumn.identifier compare:@"infotextcolumn"] == NSOrderedSame)
 	{
-		NSTableCellView *cell = [tableView makeViewWithIdentifier:(tableView == infoTable ? @"infotextcell" : @"deviceinfotextcell") owner:nil];
-
-		if (cell != nil)
+		if ([self isLinkRow:row])
 		{
-			NSString *string = tableView == infoTable ? [projectValues objectAtIndex:row] : [deviceValues objectAtIndex:row];
-			CGFloat width = string.length > 0 ? [self widthOfString:string] : 10.0;
-			CGFloat height = width > 204 ? ((width / 204) + 1) * 14.0: 14.0;
-			[cell setFrameSize:NSMakeSize(204, height)];
-			//cell.textField.preferredMaxLayoutWidth = 204;
-			cell.textField.stringValue = string;
-		}
+			InspectorButtonTableCellView *lcell = [tableView makeViewWithIdentifier:@"infolinkcell" owner:nil];
 
-		return cell;
+			if (lcell != nil)
+			{
+				NSString *string = [projectValues objectAtIndex:row];
+
+				if (string.length > 1)
+				{
+					// Calculate the height of the cell to accomodate the wrapped text
+					// TODO deal with situations where the string requires only x lines
+					// but the width result yields x+1 lines
+
+					CGFloat width = [self widthOfString:string];
+					CGFloat height = width > 190 ? ((NSInteger)(width / 190) + 1) * 14.0 : 14.0;
+					[lcell setFrameSize:NSMakeSize(204, height)];
+					[lcell.link setAction:@selector(link:)];
+					lcell.link.hidden = NO;
+				}
+				else
+				{
+					// Don't show the link button if the field is empty
+
+					[lcell setFrameSize:NSMakeSize(204, 14)];
+					[lcell.link setAction:@selector(link:)];
+					lcell.link.hidden = YES;
+				}
+
+				lcell.textField.stringValue = string;
+				lcell.index = row;
+				return lcell;
+			}
+		}
+		else
+		{
+			NSTableCellView *cell = [tableView makeViewWithIdentifier:@"infotextcell" owner:nil];
+
+			if (cell != nil)
+			{
+				NSString *string = [projectValues objectAtIndex:row];
+				CGFloat width = string.length > 0 ? [self widthOfString:string] : 10.0;
+				CGFloat height = width > 204 ? ((NSInteger)(width / 204) + 1) * 14.0 : 14.0;
+				[cell setFrameSize:NSMakeSize(204, height)];
+				cell.textField.stringValue = string;
+			}
+
+			return cell;
+		}
+	}
+	else if ([tableColumn.identifier compare:@"deviceinfotextcolumn"] == NSOrderedSame)
+	{
+		if ([self isURLRow:row])
+		{
+			InspectorButtonTableCellView *lcell = [tableView makeViewWithIdentifier:@"devicelinkcell" owner:nil];
+
+			if (lcell != nil)
+			{
+				NSString *string = [deviceValues objectAtIndex:row];
+
+				if (string.length > 1 && [string compare:@"No agent"] != NSOrderedSame)
+				{
+					// Calculate the height of the cell to accomodate the wrapped text
+					// TODO deal with situations where the string requires only x lines
+					// but the width result yields x+1 lines
+
+					CGFloat width = [self widthOfString:string];
+					CGFloat height = width > 190 ? ((NSInteger)(width / 190) + 1) * 14.0 : 14.0;
+					[lcell setFrameSize:NSMakeSize(204, height)];
+					[lcell.link setAction:@selector(goToURL:)];
+					lcell.link.hidden = NO;
+				}
+				else
+				{
+					// Don't show the link button if the field is empty
+
+					[lcell setFrameSize:NSMakeSize(204, 14)];
+					[lcell.link setAction:@selector(goToURL:)];
+					lcell.link.hidden = YES;
+				}
+
+				lcell.textField.stringValue = string;
+				lcell.index = row;
+				return lcell;
+			}
+		}
+		else
+		{
+			NSTableCellView *cell = [tableView makeViewWithIdentifier:@"deviceinfotextcell" owner:nil];
+
+			if (cell != nil)
+			{
+				NSString *string = [deviceValues objectAtIndex:row];
+				CGFloat width = string.length > 0 ? [self widthOfString:string] : 10.0;
+				CGFloat height = width > 204 ? ((NSInteger)(width / 204) + 1) * 14.0 : 14.0;
+				[cell setFrameSize:NSMakeSize(204, height)];
+				cell.textField.stringValue = string;
+			}
+
+			return cell;
+		}
 	}
 
 	return nil;
@@ -475,10 +692,14 @@
 	NSString *value = tableView == infoTable ? [projectValues objectAtIndex:row] : [deviceValues objectAtIndex:row];
 	NSString *key = tableView == infoTable ? [projectKeys objectAtIndex:row] : [deviceKeys objectAtIndex:row];
 
+	// Spacer row
+
 	if (value.length < 2 && key.length < 2) return 10;
 
+	// Data rows
+
 	CGFloat width = value.length > 0 ? [self widthOfString:value] : 10.0;
-	CGFloat height = width > 204 ? ((width / 204) + 1) * 17.0: 17.0;
+	CGFloat height = width > 204 ? ((NSInteger)(width / 204) + 1) * 16.0 : 16.0;
 	return height;
 }
 

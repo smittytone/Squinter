@@ -10,6 +10,7 @@
 		195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9470FB833A59D9C952E82 /* libPods-Squinter.a */; };
 		3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */; };
 		3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B124BFC1F97AA9B00D8E4AD /* Token.m */; };
+		3B2A30241FCDA1E1008150BB /* InspectorButtonTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B2A30231FCDA1E1008150BB /* InspectorButtonTableCellView.m */; };
 		3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */; };
 		3B311E8F1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B311E8E1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m */; };
 		3B36D1C31970A0990029CEC0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B36D1C21970A0990029CEC0 /* Cocoa.framework */; };
@@ -86,6 +87,8 @@
 		3B124BFB1F97AA9B00D8E4AD /* Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Token.h; path = ../../BuildAPIAccess/Token.h; sourceTree = "<group>"; };
 		3B124BFC1F97AA9B00D8E4AD /* Token.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Token.m; path = ../../BuildAPIAccess/Token.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
+		3B2A30221FCDA1E1008150BB /* InspectorButtonTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorButtonTableCellView.h; sourceTree = "<group>"; };
+		3B2A30231FCDA1E1008150BB /* InspectorButtonTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorButtonTableCellView.m; sourceTree = "<group>"; };
 		3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccess.h; path = ../../BuildAPIAccess/BuildAPIAccess.h; sourceTree = "<group>"; };
 		3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BuildAPIAccess.m; path = ../../BuildAPIAccess/BuildAPIAccess.m; sourceTree = "<group>"; };
 		3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccessConstants.h; path = ../../BuildAPIAccess/BuildAPIAccessConstants.h; sourceTree = "<group>"; };
@@ -314,6 +317,8 @@
 				3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */,
 				3BB429FE1FCCA8120059287C /* InspectorWindowViewController.h */,
 				3BB429FF1FCCA8120059287C /* InspectorWindowViewController.m */,
+				3B2A30221FCDA1E1008150BB /* InspectorButtonTableCellView.h */,
+				3B2A30231FCDA1E1008150BB /* InspectorButtonTableCellView.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -566,6 +571,7 @@
 				3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */,
 				3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */,
 				3BB42A001FCCA8120059287C /* InspectorWindowViewController.m in Sources */,
+				3B2A30241FCDA1E1008150BB /* InspectorButtonTableCellView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
