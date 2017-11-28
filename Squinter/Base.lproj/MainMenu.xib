@@ -202,8 +202,8 @@
                 <outlet property="uploadTagsCountField" destination="gEw-pk-2vQ" id="XnR-u3-2iY"/>
                 <outlet property="uploadTagsTextField" destination="feV-VP-PzM" id="Avp-eT-VKH"/>
                 <outlet property="usernameTextField" destination="HnJ-4Z-rjk" id="Rbt-ln-Oh7"/>
-                <outlet property="viewAgentCode" destination="QLz-UA-e6J" id="gNA-XH-CNY"/>
-                <outlet property="viewDeviceCode" destination="AQe-mp-qqI" id="FqQ-n3-eXe"/>
+                <outlet property="viewAgentCode" destination="QLz-UA-e6J" id="zDX-Pg-sWV"/>
+                <outlet property="viewDeviceCode" destination="AQe-mp-qqI" id="uZW-3J-yHm"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
                 <outlet property="workingDirectoryField" destination="EQt-Hf-Xj6" id="Ovq-6v-pzP"/>
             </connections>
@@ -1114,24 +1114,24 @@
                             <action selector="uploadCode:" target="Voe-Tx-rLC" id="eFN-kD-qf7"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="B82AA6A1-729A-4A2C-8D01-110BE737E8A0" label="Commits" paletteLabel="Show Commits" tag="122" image="commits_grey" id="Z6i-XT-ijk" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="B82AA6A1-729A-4A2C-8D01-110BE737E8A0" label="Commits" paletteLabel="Show Commits" tag="122" image="commits" id="Z6i-XT-ijk" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="getCommits:" target="Voe-Tx-rLC" id="H69-7W-EoE"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="A43ECB5B-832C-4F16-9A6F-82D4305D92C4" label="View Files" paletteLabel="View Device Group Files in Editor" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="A43ECB5B-832C-4F16-9A6F-82D4305D92C4" label="Edit Files" paletteLabel="Edit Source Files" tag="107" image="open" autovalidates="NO" id="qP6-Nj-CWs" customClass="SquinterToolbarItem">
                         <size key="minSize" width="32" height="32"/>
                         <size key="maxSize" width="96" height="0.0"/>
                         <connections>
                             <action selector="externalOpenAll:" target="Voe-Tx-rLC" id="6hj-9j-NvH"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="7A460075-36EA-499F-B670-DF84D1396EA9" label="View Device Code" paletteLabel="View Device Code in Editor" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="7A460075-36EA-499F-B670-DF84D1396EA9" label="Edit Device Code" paletteLabel="Edit Device Code" tag="105" image="open" autovalidates="NO" id="AQe-mp-qqI" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="externalOpen:" target="Voe-Tx-rLC" id="97h-h9-GxD"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="D79E91F4-BF93-43BF-8547-E9A6BB9588FB" label="View Agent Code" paletteLabel="View Agent Code in Editor" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="D79E91F4-BF93-43BF-8547-E9A6BB9588FB" label="Edit Agent Code" paletteLabel="Edit Agent Code" tag="106" image="open" autovalidates="NO" id="QLz-UA-e6J" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="externalOpen:" target="Voe-Tx-rLC" id="9Om-l5-zor"/>
                         </connections>
@@ -1167,6 +1167,11 @@
                             <action selector="updateDevicesStatus:" target="Voe-Tx-rLC" id="k08-U2-eo6"/>
                         </connections>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="B385803E-4250-4301-A1E0-CF037E68B235" label="Inspector" paletteLabel="Show/Hide Inspector" tag="122" image="inspect" autovalidates="NO" id="3Qg-aT-d3K">
+                        <connections>
+                            <action selector="showProjectInspector:" target="Voe-Tx-rLC" id="ekR-y4-h4b"/>
+                        </connections>
+                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="C00AF7EE-BBAB-481E-9475-B31E1473F9C9" label="Login" paletteLabel="Account Login" tag="120" image="login" autovalidates="NO" id="RR8-L2-okd" customClass="LoginToolbarItem">
                         <connections>
                             <action selector="loginOrOut:" target="Voe-Tx-rLC" id="nwr-Bz-4wh"/>
@@ -1190,15 +1195,14 @@
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="ucm-fZ-jVY"/>
-                    <toolbarItem reference="5z3-es-brQ"/>
                     <toolbarItem reference="hlu-sY-ttp"/>
                     <toolbarItem reference="lpo-Dq-zYF"/>
-                    <toolbarItem reference="JWE-8V-DcR"/>
                     <toolbarItem reference="IEm-mB-CAJ"/>
                     <toolbarItem reference="Fbm-8z-13S"/>
                     <toolbarItem reference="qP6-Nj-CWs"/>
                     <toolbarItem reference="evO-uk-7On"/>
                     <toolbarItem reference="hlu-sY-ttp"/>
+                    <toolbarItem reference="3Qg-aT-d3K"/>
                     <toolbarItem reference="CjG-A6-aAx"/>
                     <toolbarItem reference="Ghp-MP-vpG"/>
                     <toolbarItem reference="YmD-OV-Lst"/>
@@ -3753,17 +3757,17 @@ Gw
                         <tabViewItems>
                             <tabViewItem label="Project" identifier="1" id="OY0-C1-yKU">
                                 <view key="view" id="Rze-tK-Ldr">
-                                    <rect key="frame" x="10" y="25" width="334" height="495"/>
+                                    <rect key="frame" x="10" y="29" width="334" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" scrollerKnobStyle="dark" translatesAutoresizingMaskIntoConstraints="NO" id="JgW-wW-cYc">
-                                            <rect key="frame" x="-3" y="-3" width="340" height="498"/>
+                                            <rect key="frame" x="-3" y="-3" width="340" height="494"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="nMN-Gd-h8U">
-                                                <rect key="frame" x="0.0" y="0.0" width="340" height="498"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="340" height="494"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="15" viewBased="YES" floatsGroupRows="NO" id="ldN-a5-eG2">
-                                                        <rect key="frame" x="0.0" y="0.0" width="340" height="498"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="340" height="494"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.21566104888916016" green="0.21570384502410889" blue="0.21565541625022888" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4062,10 +4066,11 @@ Gw
         <image name="black_compile" width="32" height="32"/>
         <image name="button_link" width="14" height="14"/>
         <image name="clear" width="32" height="32"/>
-        <image name="commits_grey" width="32" height="32"/>
+        <image name="commits" width="32" height="32"/>
         <image name="copy" width="32" height="32"/>
         <image name="download" width="32" height="32"/>
         <image name="info" width="32" height="32"/>
+        <image name="inspect" width="32" height="32"/>
         <image name="login" width="32" height="32"/>
         <image name="open" width="32" height="32"/>
         <image name="plus" width="32" height="32"/>

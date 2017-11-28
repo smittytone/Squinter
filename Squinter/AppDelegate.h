@@ -162,6 +162,7 @@
     IBOutlet SquinterToolbarItem *uploadCodeExtraItem;
     IBOutlet SquinterToolbarItem *listCommitsItem;
     IBOutlet SquinterToolbarItem *downloadProductItem;
+	IBOutlet SquinterToolbarItem *inspectorItem;
 
     // Sheets, dialogs and windows
 

@@ -218,6 +218,10 @@
     downloadProductItem.offImageName = @"download_grey";
     downloadProductItem.toolTip = @"Download the selected product as a project";
 
+	inspectorItem.onImageName = @"inspect";
+	inspectorItem.offImageName = @"inspect_grey";
+	inspectorItem.toolTip = @"Show the project and device inspector";
+
     projectsPopUp.toolTip = @"Select an open project";
     devicesPopUp.toolTip = @"Select a development device";
     saveLight.toolTip = @"Indicates whether the project has changes to be saved (outline) or not (filled)";
