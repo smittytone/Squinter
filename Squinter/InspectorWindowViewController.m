@@ -594,7 +594,8 @@
 					// but the width result yields x+1 lines
 
 					CGFloat width = [self widthOfString:string];
-					CGFloat height = width > 190 ? ((NSInteger)(width / 190) + 1) * 14.0 : 14.0;
+					CGFloat height = width > 186 ? (NSInteger)((width / 186) * 14.0) : 14.0;
+					if (width < 14.0) width = 14.0;
 					[lcell setFrameSize:NSMakeSize(204, height)];
 					[lcell.link setAction:@selector(link:)];
 					lcell.link.hidden = NO;
@@ -621,7 +622,7 @@
 			{
 				NSString *string = [projectValues objectAtIndex:row];
 				CGFloat width = string.length > 0 ? [self widthOfString:string] : 10.0;
-				CGFloat height = width > 204 ? ((NSInteger)(width / 204) + 1) * 14.0 : 14.0;
+				CGFloat height = (NSInteger)width > 204 ? (NSInteger)((width / 204) * 14.0) : 14.0;
 				[cell setFrameSize:NSMakeSize(204, height)];
 				cell.textField.stringValue = string;
 			}
@@ -646,7 +647,7 @@
 					// but the width result yields x+1 lines
 
 					CGFloat width = [self widthOfString:string];
-					CGFloat height = width > 190 ? ((NSInteger)(width / 190) + 1) * 14.0 : 14.0;
+					CGFloat height = width > 186 ? ((NSInteger)(width / 186) + 1) * 14.0 : 14.0;
 					[lcell setFrameSize:NSMakeSize(204, height)];
 					[lcell.link setAction:@selector(goToURL:)];
 					lcell.link.hidden = NO;
@@ -877,7 +878,7 @@
 
 - (CGFloat)widthOfString:(NSString *)string
 {
-	NSFont *font = [NSFont fontWithName:@"System" size:11];
+	NSFont *font = [NSFont fontWithName:@"System" size:10];
 	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
 	return [[[NSAttributedString alloc] initWithString:string attributes:attributes] size].width;
 }
