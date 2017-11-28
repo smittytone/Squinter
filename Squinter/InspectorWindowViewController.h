@@ -15,13 +15,18 @@
 
 {
 	IBOutlet NSTableView *infoTable;
+	IBOutlet NSTableView *deviceInfoTable;
+	IBOutlet NSTabView *inspectorTabView;
 
-	NSMutableArray *keys, *values;
+	NSMutableArray *projectKeys, *projectValues;
+	NSMutableArray *deviceKeys, *deviceValues;
 }
 
 
 - (void)setProject:(Project *)aProject;
+- (void)setDevice:(NSMutableDictionary *)aDevice;
 - (void)positionWindow;
+- (void)setTab:(NSUInteger)aTab;
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
@@ -30,9 +35,11 @@
 
 
 @property (nonatomic, strong, setter=setProject:) Project *project;
+@property (nonatomic, strong, setter=setDevice:) NSMutableDictionary *device;
 @property (nonatomic, strong) NSMutableArray *products;
 @property (nonatomic, strong) NSMutableArray *devices;
 @property (nonatomic, readwrite) NSRect mainWindowFrame;
+@property (nonatomic, readwrite, setter=setTab:) NSUInteger tabIndex;
 
 
 @end

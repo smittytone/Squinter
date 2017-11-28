@@ -65,5 +65,9 @@
 #define kStreamToolbarItemStateMid          1
 #define kStreamToolbarItemStateOn           2
 
+// Inspector Tabs
+
+#define kInspectorTabProject					0
+#define kInspectorTabDevice					1
 
 #endif

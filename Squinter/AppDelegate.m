@@ -3539,6 +3539,7 @@
             if ([aDevId compare:devId] == NSOrderedSame)
             {
                 selectedDevice = (NSMutableDictionary *)device;
+				iwvc.device = selectedDevice;
                 [self refreshDevicesPopup];
                 [self refreshDeviceMenu];
                 break;
@@ -4060,6 +4061,8 @@
     [self refreshDevicegroupMenu];
     [self refreshDeviceMenu];
     [self setToolbar];
+
+	iwvc.device = selectedDevice;
 }
 
 
@@ -4187,6 +4190,15 @@
     [squinterToolbar validateVisibleItems];
     [self refreshDevicesPopup];
     [self refreshDevicegroupMenu];
+}
+
+
+
+- (IBAction)showDeviceInspector:(id)sender
+{
+	if (selectedDevice != nil) iwvc.device = selectedDevice;
+	iwvc.tabIndex = kInspectorTabDevice;
+	[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -7085,6 +7097,7 @@
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
 
     selectedDevice = nil;
+	iwvc.device = nil;
 
     // Now refresh the devices list
 
@@ -7105,7 +7118,11 @@
 
     // If the selected device is the one we've just delete - likely it is
 
-    if (selectedDevice == device) selectedDevice = nil;
+	if (selectedDevice == device)
+	{
+		selectedDevice = nil;
+		iwvc.device = nil;
+	}
 
     // Now refresh the devices list
 
@@ -7824,6 +7841,7 @@
 - (IBAction)showProjectInspector:(id)sender
 {
 	if (currentProject != nil) iwvc.project = currentProject;
+	iwvc.tabIndex = kInspectorTabProject;
 	[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
@@ -9677,6 +9695,7 @@
                         // Set 'selectedDevice' to point at the right object
 
                         selectedDevice = sdict;
+						iwvc.device = selectedDevice;
                         sitem.state = NSOnState;
                         flag = YES;
                         break;
@@ -10154,10 +10173,11 @@
     }
     else
     {
-        // Selecte the first device on the list
+        // Select the first device on the list
 
         [devicesPopUp selectItemAtIndex:0];
         selectedDevice = [devicesArray objectAtIndex:0];
+		iwvc.device = selectedDevice;
     }
 
     // Update the list of unassigned devices - this only happens here

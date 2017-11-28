@@ -451,6 +451,7 @@
 - (IBAction)deleteDevice:(id)sender;
 - (IBAction)getLogs:(id)sender;
 - (IBAction)streamLogs:(id)sender;
+- (IBAction)showDeviceInspector:(id)sender;
 
 // File Location and Opening Methods
 
