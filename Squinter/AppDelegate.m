@@ -222,7 +222,7 @@
     devicesPopUp.toolTip = @"Select a development device";
     saveLight.toolTip = @"Indicates whether the project has changes to be saved (outline) or not (filled)";
 
-    // Other UI Items
+	// Other UI Items
 
     connectionIndicator.hidden = YES;
 
@@ -361,6 +361,11 @@
     {
         [_window center];
     }
+
+	// Position Inspector
+
+	iwvc.mainWindowFrame = _window.frame;
+	[iwvc positionWindow];
 
     // Set the Log TextView's font
 
@@ -1159,6 +1164,8 @@
     [self refreshDeviceMenu];
     [self setToolbar];
 
+	iwvc.project = currentProject;
+
     // Mark the status light as empty, ie. in need of saving
 
     [saveLight show];
@@ -1464,6 +1471,7 @@
         [fileWatchQueue kill];
         fileWatchQueue = nil;
         currentProject = nil;
+		iwvc.project = nil;
 
         // Fade the status light
 
@@ -1517,6 +1525,8 @@
     [self refreshDevicegroupMenu];
     [self refreshMainDevicegroupsMenu];
     [self setToolbar];
+
+	iwvc.project = currentProject;
 }
 
 
@@ -5725,6 +5735,7 @@
 
     [projectArray addObject:project];
     currentProject = project;
+	iwvc.project = project;
 
     // Update the UI
 

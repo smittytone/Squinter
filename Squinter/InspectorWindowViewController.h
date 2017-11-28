@@ -21,12 +21,18 @@
 
 
 - (void)setProject:(Project *)aProject;
+- (void)positionWindow;
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
+- (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
+- (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
+- (NSInteger)numberOfFoldersInPath:(NSString *)path;
+- (CGFloat)widthOfString:(NSString *)string;
 
 
 @property (nonatomic, strong, setter=setProject:) Project *project;
 @property (nonatomic, strong) NSMutableArray *products;
 @property (nonatomic, strong) NSMutableArray *devices;
+@property (nonatomic, readwrite) NSRect mainWindowFrame;
 
 
 @end
