@@ -14,8 +14,8 @@
 }
 
 
-@property (nonatomic, strong) NSString *onImageName;
-@property (nonatomic, strong) NSString *offImageName;
+@property (nonatomic, strong) NSString *activeImageName;
+@property (nonatomic, strong) NSString *inactiveImageName;
 
 
 - (void)appWillBecomeActive;
