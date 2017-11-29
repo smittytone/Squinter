@@ -642,6 +642,13 @@
 
 
 
+- (void)applicationWillBecomeActive:(NSNotification *)notification
+{
+	if (!_window.isKeyWindow) [_window makeKeyAndOrderFront:self];
+}
+
+
+
 #pragma mark - Application Quit Methods
 
 
