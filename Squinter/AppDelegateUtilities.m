@@ -9,6 +9,55 @@
 @implementation AppDelegate(AppDelegateUtilities)
 
 
+#pragma mark - NSToolbarDelegate Methods
+
+
+- (void)toolbarWillAddItem:(NSNotification *)notification
+{
+	id item = [notification.userInfo objectForKey:@"item"];
+
+	if ([item isKindOfClass:[LoginToolbarItem class]])
+	{
+		LoginToolbarItem *tbi = (LoginToolbarItem *)item;
+		tbi.isLoggedIn = ide.isLoggedIn;
+		[tbi validate];
+		loginAndOutItem = tbi;
+	}
+
+	if ([item isKindOfClass:[StreamToolbarItem class]])
+	{
+		StreamToolbarItem *tbi = (StreamToolbarItem *)item;
+		tbi.state = kStreamToolbarItemStateOff;
+
+		if (selectedDevice != nil)
+		{
+			NSString *did = [selectedDevice objectForKey:@"id"];
+
+			if (ide.isLoggedIn && [ide isDeviceLogging:did]) tbi.state = kStreamToolbarItemStateOn;
+		}
+
+		[tbi validate];
+		streamLogsItem = tbi;
+	}
+}
+
+
+
+- (void)toolbarDidRemoveItem:(NSNotification *)notification
+{
+	id item = [notification.userInfo objectForKey:@"item"];
+
+	if ([item isKindOfClass:[StreamToolbarItem class]])
+	{
+		StreamToolbarItem *tbi = (StreamToolbarItem *)item;
+		tbi.state = kStreamToolbarItemStateOff;
+		[tbi validate];
+		streamLogsItem = tbi;
+	}
+}
+
+
+
 #pragma mark - File Path Methods
 
 
