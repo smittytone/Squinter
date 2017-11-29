@@ -62,6 +62,7 @@
     renameProjectFlag = NO;
     saveAsFlag = YES;
     stale = NO;
+	inspectorFlag = NO;
 
     syncItemCount = 0;
     logPaddingLength = 0;
@@ -831,6 +832,43 @@
                 [nswsw openFile:workingDirectory withApplication:nil andDeactivate:YES];
         }
     }
+}
+
+
+
+#pragma mark - Inspector Methods
+
+
+- (IBAction)showInspector:(id)sender
+{
+	if (!inspectorFlag)
+	{
+		[iwvc.view.window makeKeyAndOrderFront:self];
+	}
+	else
+	{
+		[iwvc.view.window close];
+	}
+
+	inspectorFlag = !inspectorFlag;
+}
+
+
+
+- (IBAction)showProjectInspector:(id)sender
+{
+	if (currentProject != nil) iwvc.project = currentProject;
+	iwvc.tabIndex = kInspectorTabProject;
+	[iwvc.view.window makeKeyAndOrderFront:self];
+}
+
+
+
+- (IBAction)showDeviceInspector:(id)sender
+{
+	if (selectedDevice != nil) iwvc.device = selectedDevice;
+	iwvc.tabIndex = kInspectorTabDevice;
+	[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -4194,15 +4232,6 @@
     [squinterToolbar validateVisibleItems];
     [self refreshDevicesPopup];
     [self refreshDevicegroupMenu];
-}
-
-
-
-- (IBAction)showDeviceInspector:(id)sender
-{
-	if (selectedDevice != nil) iwvc.device = selectedDevice;
-	iwvc.tabIndex = kInspectorTabDevice;
-	[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -7842,12 +7871,6 @@
 
 
 
-- (IBAction)showProjectInspector:(id)sender
-{
-	if (currentProject != nil) iwvc.project = currentProject;
-	iwvc.tabIndex = kInspectorTabProject;
-	[iwvc.view.window makeKeyAndOrderFront:self];
-}
 
 
 

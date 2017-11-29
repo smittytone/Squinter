@@ -352,7 +352,7 @@
     NSUInteger syncItemCount, logPaddingLength;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
-    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale;
+    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, inspectorFlag;
 }
 
 
@@ -362,6 +362,12 @@
 // Dock Menu Methods
 
 - (void)dockMenuAction:(id)sender;
+
+// Inspector Methods
+
+- (IBAction)showInspector:(id)sender;
+- (IBAction)showProjectInspector:(id)sender;
+- (IBAction)showDeviceInspector:(id)sender;
 
 // Login Methods
 
@@ -452,7 +458,6 @@
 - (IBAction)deleteDevice:(id)sender;
 - (IBAction)getLogs:(id)sender;
 - (IBAction)streamLogs:(id)sender;
-- (IBAction)showDeviceInspector:(id)sender;
 
 // File Location and Opening Methods
 
@@ -521,7 +526,6 @@
 - (void)presentLogEntry:(NSNotification *)note;
 - (void)endLogging:(NSNotification *)note;
 - (IBAction)showProjectInfo:(id)sender;
-- (IBAction)showProjectInspector:(id)sender;
 - (IBAction)showDeviceGroupInfo:(id)sender;
 - (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines;
 - (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines;

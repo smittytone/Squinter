@@ -131,8 +131,7 @@
 	NSButton *linkButton = (NSButton *)sender;
 	InspectorButtonTableCellView *cellView = (InspectorButtonTableCellView *)linkButton.superview;
 	NSInteger row = cellView.index;
-	NSString *path = [deviceValues objectAtIndex:row];
-	path = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", path];
+	NSString *path = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", [deviceValues objectAtIndex:row]];
 	[nswsw openURL:[NSURL URLWithString:path]];
 }
 
