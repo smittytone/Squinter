@@ -132,94 +132,90 @@
 
     // Toolbar
 
-    squintItem.onImageName = @"black_compile";
-    squintItem.offImageName = @"black_compile_grey";
+    squintItem.activeImageName = @"black_compile";
+    squintItem.inactiveImageName = @"black_compile_grey";
     squintItem.toolTip = @"Compile libraries and files into agent and device code for uploading";
 
-    newProjectItem.onImageName = @"plus";
-    newProjectItem.offImageName = @"plus_grey";
+    newProjectItem.activeImageName = @"plus";
+    newProjectItem.inactiveImageName = @"plus_grey";
     newProjectItem.toolTip = @"Create a new Squinter project";
 
-    infoItem.onImageName = @"info";
-    infoItem.offImageName = @"info_grey";
+    infoItem.activeImageName = @"info";
+    infoItem.inactiveImageName = @"info_grey";
     infoItem.toolTip = @"Display detailed project information";
 
-    openAllItem.onImageName = @"open";
-    openAllItem.offImageName = @"open_grey";
+    openAllItem.activeImageName = @"open";
+    openAllItem.inactiveImageName = @"open_grey";
     openAllItem.toolTip = @"View the device group's code and library files in your external editor";
 
-    viewDeviceCode.onImageName = @"open";
-    viewDeviceCode.offImageName = @"open_grey";
+    viewDeviceCode.activeImageName = @"open";
+    viewDeviceCode.inactiveImageName = @"open_grey";
     viewDeviceCode.toolTip = @"Display the device group's compiled device code";
 
-    viewAgentCode.onImageName = @"open";
-    viewAgentCode.offImageName = @"open_grey";
+    viewAgentCode.activeImageName = @"open";
+    viewAgentCode.inactiveImageName = @"open_grey";
     viewAgentCode.toolTip = @"Display the device group's compiled agent code";
 
-    uploadCodeItem.onImageName = @"upload2";
-    uploadCodeItem.offImageName = @"upload2_grey";
+    uploadCodeItem.activeImageName = @"upload2";
+    uploadCodeItem.inactiveImageName = @"upload2_grey";
     uploadCodeItem.toolTip = @"Upload the device group's compiled code to the impCloud";
 
-    uploadCodeExtraItem.onImageName = @"uploadplus";
-    uploadCodeExtraItem.offImageName = @"uploadplus_grey";
+    uploadCodeExtraItem.activeImageName = @"uploadplus";
+    uploadCodeExtraItem.inactiveImageName = @"uploadplus_grey";
     uploadCodeExtraItem.toolTip = @"Upload the device group's compiled code and commit information to the impCloud";
 
-    restartDevicesItem.onImageName = @"restart";
-    restartDevicesItem.offImageName = @"restart_grey";
+    restartDevicesItem.activeImageName = @"restart";
+    restartDevicesItem.inactiveImageName = @"restart_grey";
     restartDevicesItem.toolTip = @"Force all devices running the device group's code to reboot";
 
-    clearItem.onImageName = @"clear";
-    clearItem.offImageName = @"clear_grey";
+    clearItem.activeImageName = @"clear";
+    clearItem.inactiveImageName = @"clear_grey";
     clearItem.toolTip = @"Clear the log window";
 
-    copyAgentItem.onImageName = @"copy";
-    copyAgentItem.offImageName = @"copy_grey";
+    copyAgentItem.activeImageName = @"copy";
+    copyAgentItem.inactiveImageName = @"copy_grey";
     copyAgentItem.toolTip = @"Copy the device group's compiled agent code to the clipboard";
 
-    copyDeviceItem.onImageName = @"copy";
-    copyDeviceItem.offImageName = @"copy_grey";
+    copyDeviceItem.activeImageName = @"copy";
+    copyDeviceItem.inactiveImageName = @"copy_grey";
     copyDeviceItem.toolTip = @"Copy the device group's compiled device code to the clipboard";
 
-    printItem.onImageName = @"print";
-    printItem.offImageName = @"print_grey";
+    printItem.activeImageName = @"print";
+    printItem.inactiveImageName = @"print_grey";
     printItem.toolTip = @"Print the contents of the log window";
 
-    refreshModelsItem.onImageName = @"refresh";
-    refreshModelsItem.offImageName = @"refresh_grey";
+    refreshModelsItem.activeImageName = @"refresh";
+    refreshModelsItem.inactiveImageName = @"refresh_grey";
     refreshModelsItem.toolTip = @"Refresh the list of devices from the impCloud";
 
-    newDevicegroupItem.onImageName = @"plus";
-    newDevicegroupItem.offImageName = @"plus_grey";
+    newDevicegroupItem.activeImageName = @"plus";
+    newDevicegroupItem.inactiveImageName = @"plus_grey";
     newDevicegroupItem.toolTip = @"Create a new device group for your selected project";
 
-    devicegroupInfoItem.onImageName = @"info";
-    devicegroupInfoItem.offImageName = @"info_grey";
+    devicegroupInfoItem.activeImageName = @"info";
+    devicegroupInfoItem.inactiveImageName = @"info_grey";
     devicegroupInfoItem.toolTip = @"Display detailed device group information";
 
-    //streamLogsItem.onImageName = @"flag";
-    //streamLogsItem.offImageName = @"streamon";
-    //streamLogsItem.onImageNameGrey = @"flag_grey";
-    //streamLogsItem.offImageNameGrey = @"streamon_grey";
     streamLogsItem.toolTip = @"Enable or disable live log streaming for the current device";
     streamLogsItem.state = kStreamToolbarItemStateOff;
 
-    loginAndOutItem.openImageName = @"logout";
-    loginAndOutItem.lockedImageName = @"login";
-    loginAndOutItem.openImageNameGrey = @"logout_grey";
-    loginAndOutItem.lockedImageNameGrey = @"login_grey";
+    loginAndOutItem.activeLogoutImageName = @"logout";
+    loginAndOutItem.activeLoginImageName = @"login";
+    loginAndOutItem.inactiveLogoutImageName = @"logout_grey";
+    loginAndOutItem.inactiveLoginImageName = @"login_grey";
     loginAndOutItem.toolTip = @"Login or logout of your Electric Imp account";
-    loginAndOutItem.isLocked = YES;
+    loginAndOutItem.isLoggedIn = NO;
 
-    listCommitsItem.onImageName = @"commits";
-    listCommitsItem.offImageName = @"commits_grey";
+    listCommitsItem.activeImageName = @"commits";
+    listCommitsItem.inactiveImageName = @"commits_grey";
     listCommitsItem.toolTip = @"List the commits made to the current device group";
 
-    downloadProductItem.onImageName = @"download";
-    downloadProductItem.offImageName = @"download_grey";
+    downloadProductItem.activeImageName = @"download";
+    downloadProductItem.inactiveImageName = @"download_grey";
     downloadProductItem.toolTip = @"Download the selected product as a project";
 
-	inspectorItem.onImageName = @"inspect";
-	inspectorItem.offImageName = @"inspect_grey";
+	inspectorItem.activeImageName = @"inspect";
+	inspectorItem.inactiveImageName = @"inspect_grey";
 	inspectorItem.toolTip = @"Show the project and device inspector";
 
     projectsPopUp.toolTip = @"Select an open project";
@@ -10375,7 +10371,7 @@
 
     // Enabled or disable the login item
 
-    loginAndOutItem.isLocked = !ide.isLoggedIn;
+    loginAndOutItem.isLoggedIn = ide.isLoggedIn;
 
     // Validate items
 
