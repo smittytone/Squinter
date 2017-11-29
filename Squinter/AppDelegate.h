@@ -352,7 +352,7 @@
     NSUInteger syncItemCount, logPaddingLength;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
-    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, inspectorFlag;
+    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale;
 }
 
 

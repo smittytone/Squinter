@@ -62,7 +62,6 @@
     renameProjectFlag = NO;
     saveAsFlag = YES;
     stale = NO;
-	inspectorFlag = NO;
 
     syncItemCount = 0;
     logPaddingLength = 0;
@@ -841,16 +840,10 @@
 
 - (IBAction)showInspector:(id)sender
 {
-	if (!inspectorFlag)
-	{
-		[iwvc.view.window makeKeyAndOrderFront:self];
-	}
-	else
-	{
-		[iwvc.view.window close];
-	}
+	// Show the Inspector if it's closed
+	// If the Inspector is obscured by the main window, or not key, bring it forward
 
-	inspectorFlag = !inspectorFlag;
+	[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
