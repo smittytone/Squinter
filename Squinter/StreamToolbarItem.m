@@ -15,10 +15,12 @@
 
 - (instancetype)initWithItemIdentifier:(NSString *)itemIdentifier
 {
-    self = [super initWithItemIdentifier:itemIdentifier];
-    if (self)
+    if (self = [super initWithItemIdentifier:itemIdentifier])
     {
-        [[NSNotificationCenter defaultCenter] addObserver:self
+		// Set up notification watchers for key app events: going active and becoming active
+		// so that the button can switch its displayed image accordingly
+
+		[[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(appWillResignActive)
                                                      name:NSApplicationWillResignActiveNotification
                                                    object:nil];
@@ -114,10 +116,10 @@
 {
     StreamToolbarItem *copiedItem = [super copyWithZone:zone];
     copiedItem->onImageName = [self.onImageName copyWithZone:zone];
-    copiedItem->offImageName = [self.onImageName copyWithZone:zone];
     copiedItem->onImageNameGrey = [self.onImageNameGrey copyWithZone:zone];
-    copiedItem->offImageNameGrey = [self.offImageNameGrey copyWithZone:zone];
-    copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
+	copiedItem->offImageName = [self.offImageName copyWithZone:zone];
+	copiedItem->offImageNameGrey = [self.offImageNameGrey copyWithZone:zone];
+    copiedItem->midImageName = [self.midImageName copyWithZone:zone];
     copiedItem->midImageNameGrey = [self.midImageNameGrey copyWithZone:zone];
     return copiedItem;
 }
