@@ -17,9 +17,15 @@
 
 #pragma mark - ViewController Methods
 
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(appWillBecomeActive)
+												 name:NSApplicationWillBecomeActiveNotification
+											   object:nil];
 
 	// Clear the content arrays:
 	// 'projectKeys' are the left column contents
@@ -87,6 +93,16 @@
 
 
 
+- (void)appWillBecomeActive
+{
+	if (self.view.window.isVisible) [self.view.window makeKeyAndOrderFront:self];
+}
+
+
+
+#pragma mark - Button Action Methods
+
+
 - (IBAction)link:(id)sender
 {
 	// Link buttons in the Inspector panel come here when clicked
@@ -135,6 +151,9 @@
 	[nswsw openURL:[NSURL URLWithString:path]];
 }
 
+
+
+#pragma mark - Data Setter Methods
 
 
 - (void)setProject:(Project *)aProject
@@ -502,6 +521,9 @@
 
 
 
+#pragma mark - Misc Methods
+
+
 - (void)setTab:(NSUInteger)aTab
 {
 	// This is the 'tabIndex' setter method, which we trap in order
@@ -544,6 +566,7 @@
 
 
 #pragma mark - NSTableView Delegate and DataSource Methods
+
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
@@ -706,6 +729,7 @@
 
 
 #pragma mark - Path Manipulation Methods
+
 
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
 {

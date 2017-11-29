@@ -26,6 +26,7 @@
 }
 
 
+- (void)appWillBecomeActive;
 - (IBAction)link:(id)sender;
 - (IBAction)goToURL:(id)sender;
 - (void)setProject:(Project *)aProject;
