@@ -79,6 +79,7 @@
                 <outlet property="getLogsMenuItem" destination="xKj-jV-Q6B" id="ihy-I8-Uod"/>
                 <outlet property="impLibrariesMenu" destination="siM-Mq-fJp" id="oBR-za-vPG"/>
                 <outlet property="infoItem" destination="5z3-es-brQ" id="1Fd-Wj-L65"/>
+                <outlet property="inspectorItem" destination="3Qg-aT-d3K" id="4ME-hb-a90"/>
                 <outlet property="iwvc" destination="OT4-c4-eOU" id="MLI-2L-RtW"/>
                 <outlet property="linkProductMenuItem" destination="7Yw-EV-inT" id="IUI-Rs-fLh"/>
                 <outlet property="listCommitsItem" destination="Z6i-XT-ijk" id="per-O5-Bag"/>
@@ -936,6 +937,8 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="1024" height="582"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <value key="minSize" type="size" width="1024" height="582"/>
+            <value key="minFullScreenContentSize" type="size" width="1024" height="582"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="1024" height="582"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -946,7 +949,7 @@
                             <constraint firstAttribute="height" constant="21" id="Ctf-46-VdV"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="277" id="pim-N9-Osd"/>
                         </constraints>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" arrowPosition="arrowAtCenter" selectedItem="Utn-Id-BaM" id="C5P-4M-Tch">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" state="on" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" arrowPosition="arrowAtCenter" selectedItem="Utn-Id-BaM" id="C5P-4M-Tch">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" id="BNh-c3-Nxk">
@@ -993,7 +996,7 @@
                         <rect key="frame" x="-1" y="39" width="1026" height="544"/>
                         <clipView key="contentView" id="DPZ-Ai-vv0">
                             <rect key="frame" x="1" y="1" width="1024" height="542"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7">
                                     <rect key="frame" x="0.0" y="-1" width="1024" height="542"/>
@@ -1022,7 +1025,7 @@
                             <constraint firstAttribute="height" constant="17" id="YuU-vc-EFb"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="iLp-UF-8ZQ"/>
                         </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Device" id="RTE-4P-gRi">
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="Device" id="RTE-4P-gRi">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1041,7 +1044,7 @@
                             <constraint firstAttribute="height" constant="17" id="SQ9-pm-Hyu"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="101" id="bnl-GB-CNS"/>
                         </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Project/Device Group" id="SIn-jF-0uW">
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Project/Device Group" id="SIn-jF-0uW">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1167,7 +1170,7 @@
                             <action selector="updateDevicesStatus:" target="Voe-Tx-rLC" id="k08-U2-eo6"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="B385803E-4250-4301-A1E0-CF037E68B235" label="Inspector" paletteLabel="Show/Hide Inspector" tag="122" image="inspect" autovalidates="NO" id="3Qg-aT-d3K">
+                    <toolbarItem implicitItemIdentifier="B385803E-4250-4301-A1E0-CF037E68B235" label="Inspector" paletteLabel="Show/Hide Inspector" tag="122" image="inspect" autovalidates="NO" id="3Qg-aT-d3K" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="showInspector:" target="Voe-Tx-rLC" id="jkQ-fh-lMc"/>
                         </connections>
@@ -3757,17 +3760,17 @@ Gw
                         <tabViewItems>
                             <tabViewItem label="Project" identifier="1" id="OY0-C1-yKU">
                                 <view key="view" id="Rze-tK-Ldr">
-                                    <rect key="frame" x="10" y="25" width="334" height="495"/>
+                                    <rect key="frame" x="10" y="29" width="334" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" scrollerKnobStyle="dark" translatesAutoresizingMaskIntoConstraints="NO" id="JgW-wW-cYc">
-                                            <rect key="frame" x="-3" y="-3" width="340" height="498"/>
+                                            <rect key="frame" x="-3" y="-3" width="340" height="494"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="nMN-Gd-h8U">
-                                                <rect key="frame" x="0.0" y="0.0" width="340" height="498"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="340" height="494"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="15" viewBased="YES" floatsGroupRows="NO" id="ldN-a5-eG2">
-                                                        <rect key="frame" x="0.0" y="0.0" width="340" height="498"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="340" height="494"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.21566104888916016" green="0.21570384502410889" blue="0.21565541625022888" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3844,7 +3847,7 @@ Gw
                                                                         </connections>
                                                                     </tableCellView>
                                                                     <tableCellView identifier="infolinkcell" wantsLayer="YES" id="OtA-PH-nch" customClass="InspectorButtonTableCellView">
-                                                                        <rect key="frame" x="110" y="20" width="208" height="16"/>
+                                                                        <rect key="frame" x="110" y="19" width="208" height="16"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" preferredMaxLayoutWidth="178" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pHd-zd-RcK">
@@ -3939,7 +3942,7 @@ Gw
                                                                                     <constraint firstAttribute="height" constant="14" id="Yop-b2-qiK"/>
                                                                                 </constraints>
                                                                                 <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Table View Cell" id="Y0c-pk-pUp">
-                                                                                    <font key="font" metaFont="systemBold" size="11"/>
+                                                                                    <font key="font" metaFont="smallSystemBold"/>
                                                                                     <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                 </textFieldCell>
