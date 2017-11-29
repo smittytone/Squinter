@@ -14,11 +14,11 @@
 }
 
 
-@property (nonatomic, strong) NSString *openImageName;
-@property (nonatomic, strong) NSString *lockedImageName;
-@property (nonatomic, strong) NSString *openImageNameGrey;
-@property (nonatomic, strong) NSString *lockedImageNameGrey;
-@property (nonatomic, assign) BOOL isLocked;
+@property (nonatomic, strong) NSString *activeLogoutImageName;
+@property (nonatomic, strong) NSString *activeLoginImageName;
+@property (nonatomic, strong) NSString *inactiveLogoutImageName;
+@property (nonatomic, strong) NSString *inactiveLoginImageName;
+@property (nonatomic, assign) BOOL isLoggedIn;
 
 
 - (void)appWillBecomeActive;

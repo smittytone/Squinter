@@ -8,17 +8,18 @@
 
 
 @implementation LoginToolbarItem
-@synthesize openImageName, lockedImageName, openImageNameGrey, lockedImageNameGrey, isLocked;
+@synthesize activeLoginImageName, activeLogoutImageName, inactiveLoginImageName, inactiveLogoutImageName, isLoggedIn;
 
 
 
 - (instancetype)initWithItemIdentifier:(NSString *)itemIdentifier
 {
-    self = [super initWithItemIdentifier:itemIdentifier];
-
-    if (self)
+    if (self = [super initWithItemIdentifier:itemIdentifier])
     {
-        [[NSNotificationCenter defaultCenter] addObserver:self
+		// Set up notification watchers for key app events: going active and becoming active
+		// so that the button can switch its displayed image accordingly
+
+		[[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(appWillResignActive)
                                                      name:NSApplicationWillResignActiveNotification
                                                    object:nil];
@@ -34,11 +35,11 @@
                                                    object:nil];
 
         isForeground = YES;
-        isLocked = YES;
-        openImageName = @"logout";
-        lockedImageName = @"login";
-        openImageNameGrey = @"logout_grey";
-        lockedImageNameGrey = @"login_grey";
+        isLoggedIn = NO;
+        activeLogoutImageName = @"logout";
+        activeLoginImageName = @"login";
+        inactiveLogoutImageName = @"logout_grey";
+        inactiveLoginImageName = @"login_grey";
     }
 
     return self;
@@ -52,14 +53,14 @@
     {
         // App in foreground, so draw in green
 
-        if (isLocked)
+        if (!isLoggedIn)
         {
-            [self setImage:[NSImage imageNamed:lockedImageName]];
+            [self setImage:[NSImage imageNamed:activeLoginImageName]];
             self.label = @"In";
         }
         else
         {
-            [self setImage:[NSImage imageNamed:openImageName]];
+            [self setImage:[NSImage imageNamed:activeLogoutImageName]];
             self.label = @"Out";
         }
     }
@@ -67,14 +68,14 @@
     {
         // App in background, draw in grey
 
-        if (isLocked)
+        if (!isLoggedIn)
         {
-            [self setImage:[NSImage imageNamed:lockedImageNameGrey]];
+            [self setImage:[NSImage imageNamed:inactiveLoginImageName]];
             self.label = @"In";
         }
         else
         {
-            [self setImage:[NSImage imageNamed:openImageNameGrey]];
+            [self setImage:[NSImage imageNamed:inactiveLogoutImageName]];
             self.label = @"Out";
         }
     }
@@ -110,10 +111,10 @@
 - (id)copyWithZone:(NSZone *)zone
 {
     LoginToolbarItem *copiedItem = [super copyWithZone:zone];
-    copiedItem->openImageName = [self.openImageName copyWithZone:zone];
-    copiedItem->lockedImageName = [self.lockedImageName copyWithZone:zone];
-    copiedItem->openImageNameGrey = [self.openImageNameGrey copyWithZone:zone];
-    copiedItem->lockedImageNameGrey = [self.lockedImageNameGrey copyWithZone:zone];
+    copiedItem->activeLogoutImageName = [self.activeLogoutImageName copyWithZone:zone];
+    copiedItem->activeLoginImageName = [self.activeLoginImageName copyWithZone:zone];
+    copiedItem->inactiveLogoutImageName = [self.inactiveLogoutImageName copyWithZone:zone];
+    copiedItem->inactiveLoginImageName = [self.inactiveLoginImageName copyWithZone:zone];
     return copiedItem;
 }
 
