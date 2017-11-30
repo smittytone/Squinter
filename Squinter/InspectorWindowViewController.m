@@ -57,15 +57,9 @@
 	[self setDevice:nil];
 
 #ifdef DEBUG
-	infoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
-	deviceInfoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
+	//infoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
+	//deviceInfoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
 #endif
-
-	// Set up the tabs
-
-	//inspectorTabView.controlTint = NSGraphiteControlTint;
-
-	[inspectorTabView selectTabViewItemAtIndex:1];
 
 	nswsw = NSWorkspace.sharedWorkspace;
 
@@ -79,6 +73,16 @@
 	mainWindowFrame = [NSScreen mainScreen].frame;
 
 	[self positionWindow];
+
+	// Hide the tables when there's nothing to show
+
+	infoTable.hidden = YES;
+	deviceInfoTable.hidden = YES;
+	field.stringValue = @"No project selected";
+
+	// Set up the tabs
+
+	[inspectorTabView selectTabViewItemAtIndex:1];
 }
 
 
@@ -193,6 +197,9 @@
 
 	if (project != nil)
 	{
+		infoTable.hidden = NO;
+		field.hidden = YES;
+
 		[projectKeys addObject:@"Project Name "];
 		[projectValues addObject:project.name];
 
@@ -221,7 +228,7 @@
 			}
 		}
 
-		[projectKeys addObject:@"Location "];
+		[projectKeys addObject:@"Path "];
 
 		if (project.path != nil)
 		{
@@ -272,12 +279,12 @@
 						[projectKeys addObject:@" "];
 						[projectValues addObject:@" "];
 
-						[projectKeys addObject:[NSString stringWithFormat:@"Model %li ", (long)modcount]];
+						[projectKeys addObject:[NSString stringWithFormat:@"Source File %li ", (long)modcount]];
 						[projectValues addObject:model.filename];
 						[projectKeys addObject:@"Type "];
 						[projectValues addObject:model.type];
-						[projectKeys addObject:@"Location "];
-						[projectValues addObject:[self getAbsolutePath:project.path :model.path]];
+						[projectKeys addObject:@"Path "];
+						[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename]];
 
 						[projectKeys addObject:@"Uploaded "];
 						NSString *date = model.updated;
@@ -305,8 +312,8 @@
 							{
 								[projectKeys addObject:[NSString stringWithFormat:@"Library %li ", (long)libcount]];
 								[projectValues addObject:library.filename];
-								[projectKeys addObject:@"Location "];
-								[projectValues addObject:[self getAbsolutePath:project.path :library.path]];
+								[projectKeys addObject:@"Path "];
+								[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename]];
 
 								++libcount;
 							}
@@ -325,8 +332,8 @@
 							{
 								[projectKeys addObject:[NSString stringWithFormat:@"File %li ", (long)filecount]];
 								[projectValues addObject:file.filename];
-								[projectKeys addObject:@"Location "];
-								[projectValues addObject:[self getAbsolutePath:project.path :file.path]];
+								[projectKeys addObject:@"Path "];
+								[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename]];
 
 								++filecount;
 							}
@@ -349,19 +356,6 @@
 			[projectKeys addObject:@"Device Groups "];
 			[projectValues addObject:@"None"];
 		}
-	}
-	else
-	{
-		// There is no project info to display, so set up
-		// some basic projectKeys to show
-		[projectKeys addObject:@"Project Name "];
-		[projectValues addObject:@" "];
-		[projectKeys addObject:@"Description "];
-		[projectValues addObject:@" "];
-		[projectKeys addObject:@"ID "];
-		[projectValues addObject:@" "];
-		[projectKeys addObject:@"Location "];
-		[projectValues addObject:@" "];
 	}
 
 	[infoTable reloadData];
@@ -389,13 +383,16 @@
 
 	if (device != nil)
 	{
+		deviceInfoTable.hidden = NO;
+		field.hidden = YES;
+
 		[deviceKeys addObject:@"Device Name "];
 		[deviceValues addObject:[device valueForKeyPath:@"attributes.name"]];
 		[deviceKeys addObject:@"ID "];
 		[deviceValues addObject:[device objectForKey:@"id"]];
 
 
-		NSString *type = [device valueForKeyPath:@"attributes.type"];
+		NSString *type = [device valueForKeyPath:@"attributes.imp_type"];
 		if ((NSNull *)type == [NSNull null]) type = nil;
 		if (type != nil )
 		{
@@ -519,52 +516,6 @@
 			[deviceValues addObject:@"Unassigned"];
 		}
 	}
-	else
-	{
-		// There is no project info to display, so set up
-		// some basic projectKeys to show
-
-		[deviceKeys addObject:@"Device Name "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"ID "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Type "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"impOS "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Free RAM "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Network Info "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"MAC "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Status "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"IP "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Agent Info "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Status "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Agent URL "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"BlinkUp Info "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Last Enrolled "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"Device Group "];
-		[deviceValues addObject:@" "];
-		[deviceKeys addObject:@"ID "];
-		[deviceValues addObject:@" "];
-	}
 
 	[deviceInfoTable reloadData];
 
@@ -598,7 +549,7 @@
 
 	NSString *key = [projectKeys objectAtIndex:row];
 	NSString *value = [projectValues objectAtIndex:row];
-	if ([key containsString:@"Location"] && value.length > 1 ) return YES;
+	if ([key containsString:@"Path"] && value.length > 1 ) return YES;
 	return NO;
 }
 
@@ -644,6 +595,8 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
+	
+
 	if ([tableColumn.identifier compare:@"infoheadcolumn"] == NSOrderedSame || [tableColumn.identifier compare:@"deviceinfoheadcolumn"] == NSOrderedSame)
 	{
 		NSTableCellView *cell = [tableView makeViewWithIdentifier:(tableView == infoTable ? @"infoheadcell" : @"deviceinfoheadcell") owner:nil];
@@ -741,6 +694,25 @@
 	}
 
 	return 16;
+}
+
+
+
+#pragma mark - NSTabviewDelegate Methods
+
+- (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+	if (tabViewItem == projectTabViewItem)
+	{
+		field.stringValue = @"No project selected";
+		field.hidden = project != nil ? YES : NO;
+	}
+
+	if (tabViewItem == deviceTabViewItem)
+	{
+		field.stringValue = @"No device selected";
+		field.hidden = device != nil ? YES : NO;
+	}
 }
 
 

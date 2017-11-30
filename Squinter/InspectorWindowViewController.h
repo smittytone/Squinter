@@ -12,12 +12,15 @@
 #import "InspectorButtonTableCellView.h"
 
 
-@interface InspectorWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
+@interface InspectorWindowViewController : NSViewController
+	<NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate>
 
 {
 	IBOutlet NSTableView *infoTable;
 	IBOutlet NSTableView *deviceInfoTable;
 	IBOutlet NSTabView *inspectorTabView;
+	IBOutlet NSTabViewItem *projectTabViewItem;
+	IBOutlet NSTabViewItem *deviceTabViewItem;
 
 	NSMutableArray *projectKeys, *projectValues;
 	NSMutableArray *deviceKeys, *deviceValues;
@@ -25,6 +28,8 @@
 	NSWorkspace *nswsw;
 
 	NSDateFormatter *inLogDef, *outLogDef;
+
+	IBOutlet NSTextField *field;
 }
 
 
