@@ -38,6 +38,16 @@
 	deviceKeys = [[NSMutableArray alloc] init];
 	deviceValues = [[NSMutableArray alloc] init];
 
+	// Set up date handling
+
+	inLogDef = [[NSDateFormatter alloc] init];
+	inLogDef.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZZ";
+	inLogDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+
+	outLogDef = [[NSDateFormatter alloc] init];
+	outLogDef.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS ZZZZZ";
+	outLogDef.timeZone = [NSTimeZone localTimeZone];
+
 	// Set up the main tables
 
 	infoTable.rowSizeStyle = NSTableViewRowSizeStyleCustom;
@@ -252,7 +262,12 @@
 						[projectKeys addObject:@"Location "];
 						[projectValues addObject:[self getAbsolutePath:project.path :model.path]];
 						[projectKeys addObject:@"Uploaded "];
-						[projectValues addObject:model.updated];
+
+						NSString *date = [outLogDef stringFromDate:[inLogDef dateFromString:model.updated]];
+						date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+						date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+						[projectValues addObject:date];
+
 						[projectKeys addObject:@"SHA "];
 						[projectValues addObject:model.sha];
 
@@ -430,7 +445,18 @@
 		NSString *date = [device valueForKeyPath:@"attributes.last_enrolled_at"];
 		if ((NSNull *)date == [NSNull null]) date = nil;
 		[deviceKeys addObject:@"Last Enrolled "];
-		[deviceValues addObject:(date != nil ? date : @"Unknown")];
+
+		if (date != nil)
+		{
+			date = [outLogDef stringFromDate:[inLogDef dateFromString:date]];
+			date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+			date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+			[deviceValues addObject:date];
+		}
+		else
+		{
+			[deviceValues addObject:@"Unknown"];
+		}
 
 		[deviceKeys addObject:@" "];
 		[deviceValues addObject:@" "];

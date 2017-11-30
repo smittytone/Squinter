@@ -23,6 +23,8 @@
 	NSMutableArray *deviceKeys, *deviceValues;
 
 	NSWorkspace *nswsw;
+
+	NSDateFormatter *inLogDef, *outLogDef;
 }
 
 
