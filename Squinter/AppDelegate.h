@@ -264,6 +264,7 @@
     IBOutlet NSPopUpButton *recentFilesCountMenu;
     IBOutlet NSPopUpButton *maxLogCountMenu;
     IBOutlet NSButton *azureCheckbox;
+	IBOutlet NSButton *showInspectorCheckbox;
 
     // Assign Device
 

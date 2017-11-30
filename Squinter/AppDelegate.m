@@ -287,7 +287,8 @@
                          @"com.bps.squinter.dev4.green",
                          @"com.bps.squinter.dev5.red",
                          @"com.bps.squinter.dev5.blue",
-                         @"com.bps.squinter.dev5.green", nil];
+                         @"com.bps.squinter.dev5.green",
+						 @"com.bps.squinter.show.inspector", nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
                             [NSString stringWithString:NSStringFromRect(_window.frame)],
@@ -331,7 +332,8 @@
                             [NSNumber numberWithFloat:0.8],
                             [NSNumber numberWithFloat:1.0],
                             [NSNumber numberWithFloat:0.0],
-                            [NSNumber numberWithFloat:0.6], nil];
+                            [NSNumber numberWithFloat:0.6],
+							[NSNumber numberWithBool:NO],nil];
 
     // Drop the arrays into the Defauts
 
@@ -615,6 +617,9 @@
     // Update UI
 
     [self setToolbar];
+
+	if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:nil];
+
     [_window setTitle:@"Squinter Beta"];
     [_window makeKeyAndOrderFront:nil];
 
@@ -10502,6 +10507,7 @@
     autoUpdateCheckCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) ? NSOnState : NSOffState;
     boldTestCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.showboldtext"]) ? NSOnState : NSOffState;
     loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
+	showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
 
     // Set location menu
 
@@ -10535,79 +10541,17 @@
 {
     workingDirectory = workingDirectoryField.stringValue;
 
-    if (autoLoadListsCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.autoloadlists"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.autoloadlists"];
-    }
+	[defaults setBool:(autoLoadListsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoloadlists"];
+	[defaults setBool:(preserveCheckbox.state == NSOnState) forKey:@"com.bps.squinter.preservews"];
+	[defaults setBool:(autoCompileCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autocompile"];
+	[defaults setBool:(loadDevicesCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoloaddevlists"];
+	[defaults setBool:(autoUpdateCheckCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autocheckupdates"];
+	[defaults setBool:(loadModelsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoload"];
+	[defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
+	[defaults setBool:(azureCheckbox.state == NSOnState) forKey:@"com.bps.squinter.useazure"];
+	[defaults setBool:(showInspectorCheckbox.state == NSOnState) forKey:@"com.bps.squinter.show.inspector"];
 
-    if (preserveCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.preservews"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.preservews"];
-    }
-
-    if (autoCompileCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.autocompile"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.autocompile"];
-    }
-
-    if (loadDevicesCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.autoloaddevlists"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.autoloaddevlists"];
-    }
-
-    if (autoUpdateCheckCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.autocheckupdates"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.autocheckupdates"];
-    }
-
-    if (loadModelsCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.autoload"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.autoload"];
-    }
-
-    if (boldTestCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.showboldtext"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.showboldtext"];
-    }
-
-    if (azureCheckbox.state == NSOnState)
-    {
-        [defaults setBool:YES forKey:@"com.bps.squinter.useazure"];
-    }
-    else
-    {
-        [defaults setBool:NO forKey:@"com.bps.squinter.useazure"];
-    }
-
-    textColour = textColorWell.color;
+	textColour = textColorWell.color;
     backColour = backColorWell.color;
 
     float r = (float)textColour.redComponent;
@@ -10686,7 +10630,6 @@
 
     [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
-
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
 
     // Set recent files count
