@@ -61,6 +61,23 @@
 #pragma mark - File Path Methods
 
 
+- (NSString *)getDisplayPath:(NSString *)path
+{
+	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+
+	if (index == 0) path = [self getAbsolutePath:currentProject.path :path];
+
+	if (index == 2)
+	{
+		path = [self getAbsolutePath:currentProject.path :path];
+		path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[path stringByDeletingLastPathComponent]];
+	}
+
+	return path;
+}
+
+
+
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath
 {
     // This method takes an absolute location ('filePath') and returns a location relative

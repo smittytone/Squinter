@@ -3456,7 +3456,10 @@
 
 - (IBAction)updateCode:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// NOTE This method is not currently connected to a UI element, or called from within this file or
+	// any other AppDelegate file. Keep for now, but may remove
+
+	if (currentDevicegroup == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
@@ -3608,6 +3611,8 @@
     NSDictionary *dict = @{ @"action" : @"getdevices" };
 
     [ide getDevices:dict];
+
+	// Pick up the action at listDevices:
 }
 
 
@@ -5834,19 +5839,6 @@
 
 
 
-#pragma mark - Squint Methods
-
-
-- (IBAction)squint:(id)sender
-{
-    // This method is a hangover from a previous version.
-    // Now it simply calls the version which replaces it.
-
-    [self compile:currentDevicegroup :NO];
-}
-
-
-
 #pragma mark - API Response Handler Methods
 
 - (void)listProducts:(NSNotification *)note
@@ -6763,16 +6755,14 @@
 
                 // Finally, add modified (or not) device to current list of devices
 
-#ifdef DEBUG
-                if (newDevice == nil) NSLog(@"nil");
-#endif
-
-                [devicesArray addObject:newDevice];
+				[devicesArray addObject:newDevice];
 
 				NSDictionary *dict = @{ @"action" : @"getdevice",
 										@"device" : newDevice };
 				
 				[ide getDevice:[newDevice objectForKey:@"id"] :dict];
+
+				// Pick up the action at updateDevice:
             }
 
             // Sort the devices list by device name (inside the 'attributes' dictionary
@@ -6856,14 +6846,15 @@
 	NSMutableDictionary *aDevice = [source objectForKey:@"device"];
 
 	NSMutableDictionary *attributes = [aDevice objectForKey:@"attributes"];
+
 	NSString *version = [self getValueFrom:device withKey:@"swversion"];
 	if (version != nil) [attributes setObject:version forKey:@"swversion"];
+
+	version = [self getValueFrom:device withKey:@"plan_id"];
+	if (version != nil) [attributes setObject:version forKey:@"plan_id"];
+
 	NSNumber *free = [self getValueFrom:device withKey:@"free_memory"];
 	if (free != nil) [attributes setObject:free forKey:@"free_memory"];
-	version = [self getValueFrom:device withKey:@"plan_id"];
-	if (version != nil) {
-		[attributes setObject:version forKey:@"plan_id"];
-	}
 }
 
 
@@ -7428,7 +7419,11 @@
 
 - (void)listLogs:(NSNotification *)note
 {
-    NSDictionary *data = (NSDictionary *)note.object;
+	// We come here in response to a notification from BuildAPIAccess
+	// The notification contains a list of log entries or a list of device history events -
+	// we sort one from the other by looking at the 'action' value
+
+	NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
 
     __block NSDictionary *device = [source objectForKey:@"device"];
@@ -7507,7 +7502,9 @@
 
 - (void)logLogs:(NSString *)logLine
 {
-    [self writeStringToLog:logLine :NO];
+	// Write a line of a list of log entries to the main window's log view
+
+	[self writeStringToLog:logLine :NO];
 }
 
 
@@ -7550,7 +7547,9 @@
 
 - (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo
 {
-    if (success) [self writeStringToLog:@"Log contents sent to print system." :YES];
+	// Show a post-print message
+
+	if (success) [self writeStringToLog:@"Log contents sent to print system." :YES];
 }
 
 
@@ -7563,6 +7562,9 @@
     NSString *dvid = [data objectForKey:@"device"];
     NSDictionary *device;
 
+	// The returned data includes the device's ID,
+	// so use that to find the device in the device array
+
     for (NSDictionary *aDevice in devicesArray)
     {
         NSString *advid = [aDevice objectForKey:@"id"];
@@ -7574,15 +7576,20 @@
         }
     }
 
+	// Inform the user
+
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
 
-    if (device == selectedDevice)
+	// Update the UI: add logging marks to menus, colour to the toolbar item,
+	// and set the menu item's text and state
+
+	if (device == selectedDevice)
     {
         streamLogsItem.state = kStreamToolbarItemStateOn;
         streamLogsMenuItem.title = @"Stop Log Streaming";
     }
 
-    [streamLogsItem validate];
+	[streamLogsItem validate];
     [self refreshDevicesMenus];
     [self refreshDevicesPopup];
 }
@@ -7597,7 +7604,10 @@
     NSString *dvid = [data objectForKey:@"device"];
     NSDictionary *device;
 
-    for (NSDictionary *aDevice in devicesArray)
+	// The returned data includes the device's ID,
+	// so use that to find the device in the device array
+
+	for (NSDictionary *aDevice in devicesArray)
     {
         NSString *advid = [aDevice objectForKey:@"id"];
 
@@ -7608,7 +7618,12 @@
         }
     }
 
+	// Inform the user
+
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
+
+	// Update the UI: remove logging marks, re-colour to the toolbar item,
+	// and set the menu item's text and state
 
     if (device == selectedDevice)
     {
@@ -7625,8 +7640,9 @@
 
 - (void)presentLogEntry:(NSNotification *)note
 {
-    // @"232390b030728cee 2017-05-19T17:28:19.095Z development server.log Connected by WiFi on SSID \"darkmatter\" with IP address 192.168.0.2"
-    // or
+	// Decode a streamed log entry relayed from BuildAPIAccess
+	// Log entry formats:
+	// @"232390b030728cee 2017-05-19T17:28:19.095Z development server.log Connected by WiFi on SSID \"darkmatter\" with IP address 192.168.0.2"
     // @"subscribed 232390b030728cee"
 
     NSDictionary *data = (NSDictionary *)note.object;
@@ -7869,9 +7885,6 @@
 
     [self printInfoInLog:lines];
 }
-
-
-
 
 
 
@@ -8167,9 +8180,13 @@
 }
 
 
+
 - (IBAction)showDeviceInfo:(id)sender
 {
-    if (selectedDevice == nil)
+	// Runs through the device's record in 'deviceArray' and displays
+	// key information in the main window log view
+
+	if (selectedDevice == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
@@ -8275,7 +8292,9 @@
 
 - (IBAction)logDeviceCode:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// Dumps compiled device source code to the main window log view
+
+	if (currentDevicegroup == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
@@ -8310,7 +8329,9 @@
 
 - (IBAction)logAgentCode:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// Dumps compiled agent source code to the main window log view
+
+	if (currentDevicegroup == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
@@ -8345,30 +8366,30 @@
 
 - (IBAction)clearLog:(id)sender
 {
-    [logTextView setString:@""];
+	// Clear the main window log view of all text
+
+	[logTextView setString:@""];
 }
 
 
 
 - (void)printInfoInLog:(NSMutableArray *)lines
 {
-    // Determine the number of characters in the longest line...
+	// This method is used to present a series of lines by prefixing and suffixing
+	// them with a line of dashes that is caclulated to be as long as the longest
+	// line in the list passed into 'lines'
+
+	// Determine the number of characters in the longest line...
 
     NSInteger dashCount = 0;
 
-    for (NSString *string in lines)
-    {
-        if (string.length > dashCount) dashCount = string.length;
-    }
+    for (NSString *string in lines) dashCount = string.length > dashCount ? string.length : dashCount;
 
     // ...then build a string of dashes that long
 
     NSString *dashes = @"";
 
-    for (NSUInteger i = 0 ; i < dashCount ; ++i)
-    {
-        dashes = [dashes stringByAppendingString:@"-"];
-    }
+    for (NSUInteger i = 0 ; i < dashCount ; ++i) dashes = [dashes stringByAppendingString:@"-"];
 
     // Write out the dashes
 
@@ -8376,10 +8397,7 @@
 
     // Write out the lines themselves
 
-    for (NSString *string in lines)
-    {
-        [self writeStringToLog:string :NO];
-    }
+    for (NSString *string in lines) [self writeStringToLog:string :NO];
 
     // Write out the dashes
 
@@ -8390,28 +8408,36 @@
 
 - (void)writeStringToLog:(NSString *)string :(BOOL)addTimestamp
 {
-    [self writeNoteToLog:string :textColour :addTimestamp];
+	// Write 'string' to the main window log view as a normal line (ie. of colour 'textColour')
+
+	[self writeNoteToLog:string :textColour :addTimestamp];
 }
 
 
 
 - (void)writeErrorToLog:(NSString *)string :(BOOL)addTimestamp
 {
-    [self writeNoteToLog:string :[NSColor redColor] :addTimestamp];
+	// Write 'string' to the main window log view as an error (ie. in red)
+
+	[self writeNoteToLog:string :[NSColor redColor] :addTimestamp];
 }
 
 
 
 - (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp
 {
-    [self writeNoteToLog:string :[NSColor orangeColor] :addTimestamp];
+	// Write 'string' to the main window log view as a warning (ie. in amber)
+
+	[self writeNoteToLog:string :[NSColor orangeColor] :addTimestamp];
 }
 
 
 
 - (void)writeNoteToLog:(NSString *)string :(NSColor *)colour :(BOOL)addTimestamp
 {
-    NSArray *values = [NSArray arrayWithObjects:colour, nil];
+	// Build an NSAttributedString from 'string' and coloured 'colour'
+
+	NSArray *values = [NSArray arrayWithObjects:colour, nil];
     NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
@@ -8422,6 +8448,8 @@
 
 - (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp
 {
+	// This method writes the specified NSAttributedString, 'string' to the log adding a timestamp if required
+
 	// Only display non-zero length strings
 
 	if (string.length > 0)
@@ -8432,21 +8460,24 @@
 
 		[logTextView setSelectedRange:NSMakeRange(logTextView.string.length,0)];
 
-		NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
-
 		if (addTimestamp)
 		{
+			NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
 			NSString *date = [def stringFromDate:[NSDate date]];
 			date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
-			[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes] replacementRange:NSMakeRange(logTextView.string.length, 0)];
+			[logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes]
+				   replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-			[logTextView insertText:@" " replacementRange:NSMakeRange(logTextView.string.length, 0)];
+			[logTextView insertText:@" "
+				   replacementRange:NSMakeRange(logTextView.string.length, 0)];
 		}
 
-		if (string != nil) [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		[logTextView insertText:string
+			   replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-		[logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		[logTextView insertText:@"\n"
+			   replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
 		logTextView.editable = NO;
 	}
@@ -8454,38 +8485,29 @@
 
 
 
-- (NSString *)getDisplayPath:(NSString *)path
-{
-    NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
-
-    if (index == 0) path = [self getAbsolutePath:currentProject.path :path];
-
-    if (index == 2)
-    {
-        path = [self getAbsolutePath:currentProject.path :path];
-        path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[path stringByDeletingLastPathComponent]];
-    }
-
-    return path;
-}
-
-
-
 - (void)showCodeErrors:(NSNotification *)note
 {
-    NSDictionary *data = (NSDictionary *)note.object;
+	// This method is triggered by a notification from BuildAPIAccess signalling
+	// that there are errors in uploaded code - which this method displays
+
+	NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *object = [data objectForKey:@"object"];
     Devicegroup *devicegroup = [object objectForKey:@"devicegroup"];
     NSMutableArray *errors = [data objectForKey:@"data"];
 
     if (errors.count > 0)
     {
-        [self writeErrorToLog:@"Server-reported syntax-check code errors listed below." :YES];
+		[self writeErrorToLog:@"The impCloud reported the following syntax errors in your code:" :YES];
         [self writeErrorToLog:@" " :NO];
+
+		// Run through each of the errors
 
         for (NSArray *error in errors)
         {
-            NSDictionary *err = [error objectAtIndex:0];
+			// Extract the reported line and column number
+			// NOTE 'err' is a dictionary defined by BuildAPIAccess
+
+			NSDictionary *err = [error objectAtIndex:0];
             NSUInteger row = [[err objectForKey:@"row"] integerValue];
             NSUInteger col = [[err objectForKey:@"column"] integerValue];
             NSString *filename = [err objectForKey:@"file"];
@@ -8494,12 +8516,11 @@
 
             [self writeErrorToLog:[NSString stringWithFormat:@"Error in %@ code: %@ (line %lu, column %lu)", filename, [err objectForKey:@"text"], (unsigned long)row, (unsigned long)col] :NO];
 
+			// Get the line of code from the relevant model and display it
+
             for (Model *model in devicegroup.models)
             {
-                if ([model.type compare:filename] == NSOrderedSame)
-                {
-                    [self listCode:model.code :row - 5 :row + 5 :row :col];
-                }
+                if ([model.type compare:filename] == NSOrderedSame) [self listCode:model.code :row - 5 :row + 5 :row :col];
             }
         }
     }
@@ -8552,28 +8573,9 @@
 
     // Set the max number of characters in the biggest line number
 
-    if (lineTotal > 99999)
-    {
-        numberLength = 6;
-    }
-    else if (lineTotal > 9999)
-    {
-        numberLength = 5;
-    }
-    else if (lineTotal > 999)
-    {
-        numberLength = 4;
-    }
-    else if (lineTotal > 99)
-    {
-        numberLength = 3;
-    }
-    else if (lineTotal > 9)
-    {
-        numberLength = 2;
-    }
+	numberLength = [NSString stringWithFormat:@"%li", lineTotal].length;
 
-    // Run through the code again, this time to display
+	// Run through the code again, this time to display
 
     [code enumerateLinesUsingBlock:^(NSString *line, BOOL *stop) {
 
@@ -8616,7 +8618,9 @@
 
 - (void)logCode
 {
-    [self writeStringToLog:listString :NO];
+	// Write the string assembled in listCode: to the main window log view
+
+	[self writeStringToLog:listString :NO];
     [self writeStringToLog:@" " :NO];
 }
 
@@ -8624,7 +8628,9 @@
 
 - (void)writeStreamToLog:(NSAttributedString *)string
 {
-    logTextView.editable = YES;
+	// Write a decoded log stream event to the main window log view
+
+	logTextView.editable = YES;
 
     // Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
 
@@ -8632,10 +8638,12 @@
 
     if (string != nil && string.length > 0)
     {
-        [logTextView insertText:string replacementRange:NSMakeRange(logTextView.string.length, 0)];
-    }
+        [logTextView insertText:string
+			   replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-    [logTextView insertText:@"\n" replacementRange:NSMakeRange(logTextView.string.length, 0)];
+		[logTextView insertText:@"\n"
+			   replacementRange:NSMakeRange(logTextView.string.length, 0)];
+    }
 
     logTextView.editable = NO;
 }
@@ -8728,6 +8736,19 @@
 
 
 
+#pragma mark - Squint Methods
+
+
+- (IBAction)squint:(id)sender
+{
+	// This method is a hangover from a previous version.
+	// Now it simply calls the version which replaces it.
+
+	[self compile:currentDevicegroup :NO];
+}
+
+
+
 #pragma mark - External Editor Methods
 
 
@@ -8770,7 +8791,9 @@
 
 - (void)switchToEditor:(Model *)model
 {
-    if (model.hasMoved)
+	// Open the supplied model's source code in the user's preferred text editor
+
+	if (model.hasMoved)
     {
         // We've previously recorded that the model file or its parent project file have moved, so warn the user and bail
 
@@ -8916,7 +8939,10 @@
 
 - (IBAction)externalOpenAll:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// Open all of the source code files associated with the current device group:
+	// agent and device code, and all of their included libraries and files
+
+	if (currentDevicegroup == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
@@ -8940,7 +8966,9 @@
 
 - (IBAction)openAgentURL:(id)sender
 {
-    if (selectedDevice == nil)
+	// Open the selected device's agent URL in the default web browser
+
+	if (selectedDevice == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
@@ -8955,7 +8983,9 @@
 
 - (IBAction)showProjectInFinder:(id)sender
 {
-    if (currentProject == nil)
+	// Switch to finder and present the project file's enclosing folder
+
+	if (currentProject == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
@@ -8968,7 +8998,10 @@
 
 - (IBAction)showModelFilesInFinder:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// Switch to finder and present the current device groups source files' enclosing folder(s)
+	// NOTE They may be in different folders, so we check and open both if necessary
+
+	if (currentDevicegroup == nil)
     {
         [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
@@ -8995,7 +9028,9 @@
 
 - (void)launchLibsPage
 {
-    [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/codelibraries/"]];
+	// Open the Electric Imp libraries page on the Dev Center in the default Web browser
+
+	[nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/codelibraries/"]];
 }
 
 

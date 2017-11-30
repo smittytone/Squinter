@@ -11,6 +11,7 @@
 
 // File Path Methods
 
+- (NSString *)getDisplayPath:(NSString *)path;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
 - (NSInteger)numberOfFoldersInPath:(NSString *)path;

@@ -540,7 +540,6 @@
 - (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeNoteToLog:(NSString *)string :(NSColor *)colour :(BOOL)addTimestamp;
 - (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp;
-- (NSString *)getDisplayPath:(NSString *)path;
 - (void)showCodeErrors:(NSNotification *)note;
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
 - (void)logCode;
