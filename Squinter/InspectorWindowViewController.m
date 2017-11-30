@@ -31,7 +31,7 @@
 	// 'projectKeys' are the left column contents
 	// 'projectValues' are the right column contents
 	// 'deviceKeys' are the left column contents
-	// 'deviceValues' are the right column contents
+	// 'deviceValues' are the middle column contents
 
 	projectKeys = [[NSMutableArray alloc] init];
 	projectValues = [[NSMutableArray alloc] init];
@@ -56,9 +56,16 @@
 	deviceInfoTable.rowSizeStyle = NSTableViewRowSizeStyleCustom;
 	[self setDevice:nil];
 
+#ifdef DEBUG
+	infoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
+	deviceInfoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
+#endif
+
 	// Set up the tabs
 
 	//inspectorTabView.controlTint = NSGraphiteControlTint;
+
+	[inspectorTabView selectTabViewItemAtIndex:1];
 
 	nswsw = NSWorkspace.sharedWorkspace;
 
@@ -198,7 +205,7 @@
 		if (products == nil || products.count == 0 || project.pid == nil)
 		{
 			[projectKeys addObject:@"ID "];
-			[projectValues addObject:(project.pid != nil ? project.pid : @"Undefined")];
+			[projectValues addObject:(project.pid != nil ? project.pid : @"Project not linked to a product")];
 		}
 		else
 		{
@@ -215,9 +222,17 @@
 		}
 
 		[projectKeys addObject:@"Location "];
-		[projectValues addObject:project.path];
 
-		if (project.devicegroups.count > 0)
+		if (project.path != nil)
+		{
+			[projectValues addObject:[NSString stringWithFormat:@"%@/%@", project.path, project.filename]];
+		}
+		else
+		{
+			[projectValues addObject:@"Project has not yet been saved"];
+		}
+
+		if (project.devicegroups != nil && project.devicegroups.count > 0)
 		{
 			NSUInteger dgcount = 1;
 
@@ -263,17 +278,26 @@
 						[projectValues addObject:model.type];
 						[projectKeys addObject:@"Location "];
 						[projectValues addObject:[self getAbsolutePath:project.path :model.path]];
-						[projectKeys addObject:@"Uploaded "];
 
-						NSString *date = [outLogDef stringFromDate:[inLogDef dateFromString:model.updated]];
-						date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
-						date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-						[projectValues addObject:date];
+						[projectKeys addObject:@"Uploaded "];
+						NSString *date = model.updated;
+
+						if (date != nil && date.length > 0)
+						{
+							date = [outLogDef stringFromDate:[inLogDef dateFromString:date]];
+							date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+							date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+							[projectValues addObject:date];
+						}
+						else
+						{
+							[projectValues addObject:@"No code uploaded"];
+						}
 
 						[projectKeys addObject:@"SHA "];
-						[projectValues addObject:model.sha];
+						[projectValues addObject:(model.sha != nil && model.sha.length > 0 ? model.sha : @"No code uploaded")];
 
-						if (model.libraries.count > 0)
+						if (model.libraries != nil && model.libraries.count > 0)
 						{
 							NSUInteger libcount = 1;
 
@@ -293,7 +317,7 @@
 							[projectValues addObject:@"No local libraries imported"];
 						}
 
-						if (model.files.count > 0)
+						if (model.files != nil && model.files.count > 0)
 						{
 							NSUInteger filecount = 1;
 
@@ -573,7 +597,8 @@
 	// which type of NSTableCellView to use
 
 	NSString *key = [projectKeys objectAtIndex:row];
-	if ([key containsString:@"Location"]) return YES;
+	NSString *value = [projectValues objectAtIndex:row];
+	if ([key containsString:@"Location"] && value.length > 1 ) return YES;
 	return NO;
 }
 
@@ -586,8 +611,8 @@
 	// so we return YES so that the table data source method knows
 	// which type of NSTableCellView to use
 
-	NSString *key = [deviceKeys objectAtIndex:row];
-	if ([key containsString:@"Agent URL"]) return YES;
+	NSString *value = [deviceValues objectAtIndex:row];
+	if ([value containsString:@"http"]) return YES;
 	return NO;
 }
 
@@ -627,109 +652,55 @@
 
 		return cell;
 	}
-	else if ([tableColumn.identifier compare:@"infotextcolumn"] == NSOrderedSame)
+	else if ([tableColumn.identifier compare:@"infotextcolumn"] == NSOrderedSame || [tableColumn.identifier compare:@"deviceinfotextcolumn"] == NSOrderedSame)
 	{
-		if ([self isLinkRow:row])
+		NSTableCellView *cell = [tableView makeViewWithIdentifier:(tableView == infoTable ? @"infotextcell" : @"deviceinfotextcell") owner:nil];
+
+		if (cell != nil)
 		{
-			InspectorButtonTableCellView *lcell = [tableView makeViewWithIdentifier:@"infolinkcell" owner:nil];
+			// Resize the cell to match the row height
 
-			if (lcell != nil)
-			{
-				NSString *string = [projectValues objectAtIndex:row];
-
-				if (string.length > 1)
-				{
-					// Calculate the height of the cell to accomodate the wrapped text
-					// TODO deal with situations where the string requires only x lines
-					// but the width result yields x+1 lines
-
-					CGFloat width = [self widthOfString:string];
-					CGFloat height = width > 186 ? (NSInteger)((width / 186) * 14.0) : 14.0;
-					if (width < 14.0) width = 14.0;
-					[lcell setFrameSize:NSMakeSize(204, height)];
-					[lcell.link setAction:@selector(link:)];
-					lcell.link.hidden = NO;
-				}
-				else
-				{
-					// Don't show the link button if the field is empty
-
-					[lcell setFrameSize:NSMakeSize(204, 14)];
-					[lcell.link setAction:@selector(link:)];
-					lcell.link.hidden = YES;
-				}
-
-				lcell.textField.stringValue = string;
-				lcell.index = row;
-				return lcell;
-			}
+			NSString *string = tableView == infoTable ? [projectValues objectAtIndex:row] : [deviceValues objectAtIndex:row];
+			CGFloat width = string.length > 0 ? [self widthOfString:string] : 10.0;
+			CGFloat height = width > 196 ? ((NSInteger)(width / 196) + 1) * 14.0 : 14.0;
+			[cell setFrameSize:NSMakeSize(196, height)];
+			cell.textField.stringValue = string;
 		}
-		else
-		{
-			NSTableCellView *cell = [tableView makeViewWithIdentifier:@"infotextcell" owner:nil];
 
-			if (cell != nil)
-			{
-				NSString *string = [projectValues objectAtIndex:row];
-				CGFloat width = string.length > 0 ? [self widthOfString:string] : 10.0;
-				CGFloat height = (NSInteger)width > 204 ? (NSInteger)((width / 204) * 14.0) : 14.0;
-				[cell setFrameSize:NSMakeSize(204, height)];
-				cell.textField.stringValue = string;
-			}
-
-			return cell;
-		}
+		return cell;
 	}
-	else if ([tableColumn.identifier compare:@"deviceinfotextcolumn"] == NSOrderedSame)
+	else if ([tableColumn.identifier compare:@"deviceinfocheckcolumn"] == NSOrderedSame)
 	{
 		if ([self isURLRow:row])
 		{
-			InspectorButtonTableCellView *lcell = [tableView makeViewWithIdentifier:@"devicelinkcell" owner:nil];
+			InspectorButtonTableCellView *linkcell = [tableView makeViewWithIdentifier:@"deviceinfocheckcell" owner:nil];
 
-			if (lcell != nil)
+			if (linkcell != nil)
 			{
-				NSString *string = [deviceValues objectAtIndex:row];
+				// Set the button action and save the row number in the cell
 
-				if (string.length > 1 && [string compare:@"No agent"] != NSOrderedSame)
-				{
-					// Calculate the height of the cell to accomodate the wrapped text
-					// TODO deal with situations where the string requires only x lines
-					// but the width result yields x+1 lines
-
-					CGFloat width = [self widthOfString:string];
-					CGFloat height = width > 186 ? ((NSInteger)(width / 186) + 1) * 14.0 : 14.0;
-					[lcell setFrameSize:NSMakeSize(204, height)];
-					[lcell.link setAction:@selector(goToURL:)];
-					lcell.link.hidden = NO;
-				}
-				else
-				{
-					// Don't show the link button if the field is empty
-
-					[lcell setFrameSize:NSMakeSize(204, 14)];
-					[lcell.link setAction:@selector(goToURL:)];
-					lcell.link.hidden = YES;
-				}
-
-				lcell.textField.stringValue = string;
-				lcell.index = row;
-				return lcell;
+				[linkcell.link setAction:@selector(goToURL:)];
+				linkcell.index = row;
 			}
+
+			return linkcell;
 		}
-		else
+	}
+	else if ([tableColumn.identifier compare:@"infocheckcolumn"] == NSOrderedSame)
+	{
+		if ([self isLinkRow:row])
 		{
-			NSTableCellView *cell = [tableView makeViewWithIdentifier:@"deviceinfotextcell" owner:nil];
+			InspectorButtonTableCellView *linkcell = [tableView makeViewWithIdentifier:@"infocheckcell" owner:nil];
 
-			if (cell != nil)
+			if (linkcell != nil)
 			{
-				NSString *string = [deviceValues objectAtIndex:row];
-				CGFloat width = string.length > 0 ? [self widthOfString:string] : 10.0;
-				CGFloat height = width > 204 ? ((NSInteger)(width / 204) + 1) * 14.0 : 14.0;
-				[cell setFrameSize:NSMakeSize(204, height)];
-				cell.textField.stringValue = string;
+				// Set the button action and save the row number in the cell
+
+				[linkcell.link setAction:@selector(link:)];
+				linkcell.index = row;
 			}
 
-			return cell;
+			return linkcell;
 		}
 	}
 
@@ -747,11 +718,29 @@
 
 	if (value.length < 2 && key.length < 2) return 10;
 
-	// Data rows
+	// Data rows - this is determined by the 'values' - 'keys' and 'links' will only be 14 high
 
-	CGFloat width = value.length > 0 ? [self widthOfString:value] : 10.0;
-	CGFloat height = width > 204 ? ((NSInteger)(width / 204) + 1) * 16.0 : 16.0;
-	return height;
+	if (value.length > 0)
+	{
+		CGFloat renderHeight = [self altWidthOfString:value];
+		renderHeight = (NSInteger)(renderHeight / 14) * 16.0;
+
+		NSInteger stringWidth = ceil([self widthOfString:value]);
+		NSInteger stringHeight = stringWidth > 196 ? (NSInteger)(stringWidth / 196) * 16 : 16;
+
+		do
+		{
+			stringWidth = stringWidth - 196;
+		}
+		while (stringWidth > 196);
+
+		if (stringWidth < 0) stringWidth = stringWidth * -1;
+		if (renderHeight > stringHeight && stringWidth < 5) return stringHeight;
+
+		return renderHeight;
+	}
+
+	return 16;
 }
 
 
@@ -797,7 +786,6 @@
 			// '/Users/smitty/documents/github/squinter'
 
 			theFilePath = [theFilePath substringFromIndex:r.length];
-			//theFilePath = [theFilePath stringByAppendingFormat:@"/%@", theFileName];
 		}
 		else
 		{
@@ -807,7 +795,6 @@
 			// '/Users/smitty/documents/github/squinter'
 
 			theFilePath = [self getPathDelta:basePath :theFilePath];
-			//theFilePath = [theFilePath stringByAppendingString:theFileName];
 		}
 	}
 	else if (nf < nb) // theFilePath.length < basePath.length
@@ -823,7 +810,6 @@
 
 			theFilePath = [basePath substringFromIndex:r.length];
 			NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
-			//theFilePath = theFileName;
 
 			// Add in '../' for each directory in the base path but not in the file path
 
@@ -840,7 +826,6 @@
 			// '/Users/smitty/downloads'
 
 			theFilePath = [self getPathDelta:basePath :theFilePath];
-			//theFilePath = [theFilePath stringByAppendingString:theFileName];
 		}
 	}
 	else
@@ -864,7 +849,6 @@
 			// '/Users/smitty/downloads/archive/nofiles'
 
 			theFilePath = [self getPathDelta:basePath :theFilePath];
-			//theFilePath = [theFilePath stringByAppendingString:theFileName];
 		}
 	}
 
@@ -933,6 +917,35 @@
 	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
 	return [[[NSAttributedString alloc] initWithString:string attributes:attributes] size].width;
 }
+
+
+- (CGFloat)altWidthOfString:(NSString *)string
+{
+	NSTextField *nstf = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 196, 200)];
+	nstf.cell.wraps = YES;
+	nstf.cell.lineBreakMode = NSLineBreakByWordWrapping;
+	nstf.stringValue = string;
+	NSSize drawnSize = [nstf.cell cellSizeForBounds:nstf.bounds];
+	return drawnSize.height;
+}
+
+/*
+
+ NSRect frame = [textField frame];
+ Now make it very high:
+
+ NSRect constraintBounds = frame;
+ constraintBounds.size.height =  10000.0;
+ [textField setFrame: constraintBounds];
+ and set the string:
+
+ [textField  setStringValue:theString];
+ Ask now for the natural size:
+
+ NSSize naturalSize =
+ [[textField cell] cellSizeForBounds:constraintBounds];
+ */
+
 
 
 @end
