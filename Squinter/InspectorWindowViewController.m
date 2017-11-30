@@ -435,7 +435,7 @@
 		string = [device valueForKeyPath:@"attributes.agent_id"];
 		if ((NSNull *)string == [NSNull null]) string = nil;
 		[deviceKeys addObject:@"Agent URL "];
-		[deviceValues addObject:(string != nil ? string : @"No agent")];
+		[deviceValues addObject:(string != nil ? [@"https://agent.electricimp.com/" stringByAppendingString:string] : @"No agent")];
 
 		[deviceKeys addObject:@" "];
 		[deviceValues addObject:@" "];
