@@ -2780,17 +2780,18 @@ Gw
             <point key="canvasLocation" x="-546.5" y="-122"/>
         </customView>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="N7Z-aG-iXH" customClass="NSPanel">
-            <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
+            <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="139" y="81" width="612" height="260"/>
+            <rect key="contentRect" x="139" y="81" width="612" height="308"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <value key="minSize" type="size" width="612" height="260"/>
+            <value key="minSize" type="size" width="612" height="319"/>
+            <value key="maxSize" type="size" width="612" height="319"/>
             <view key="contentView" id="rcs-tI-D8o">
-                <rect key="frame" x="0.0" y="0.0" width="612" height="260"/>
+                <rect key="frame" x="0.0" y="0.0" width="612" height="308"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="RXm-hy-CPS">
-                        <rect key="frame" x="18" y="214" width="576" height="26"/>
+                        <rect key="frame" x="18" y="262" width="576" height="26"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="26" id="W5x-pV-DG3"/>
                         </constraints>
@@ -2801,7 +2802,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="szd-W6-8Wr">
-                        <rect key="frame" x="18" y="189" width="576" height="17"/>
+                        <rect key="frame" x="18" y="237" width="576" height="17"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="17" id="TXw-be-3yF"/>
                         </constraints>
@@ -2812,7 +2813,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="62m-HD-T17">
-                        <rect key="frame" x="18" y="134" width="576" height="17"/>
+                        <rect key="frame" x="18" y="182" width="576" height="17"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="17" id="thr-t5-oxf"/>
                         </constraints>
@@ -2823,7 +2824,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HnJ-4Z-rjk">
-                        <rect key="frame" x="20" y="159" width="572" height="22"/>
+                        <rect key="frame" x="20" y="207" width="572" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="AwV-Hp-cs9"/>
                         </constraints>
@@ -2834,7 +2835,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <secureTextField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CO8-RY-XbG">
-                        <rect key="frame" x="20" y="104" width="572" height="22"/>
+                        <rect key="frame" x="20" y="152" width="572" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="aVl-pt-Cg4"/>
                         </constraints>
@@ -2847,6 +2848,39 @@ Gw
                             </allowedInputSourceLocales>
                         </secureTextFieldCell>
                     </secureTextField>
+                    <button translatesAutoresizingMaskIntoConstraints="NO" id="Agw-Zz-2Y5">
+                        <rect key="frame" x="18" y="128" width="576" height="18"/>
+                        <buttonCell key="cell" type="check" title="Store these credentials in your keychain" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="SmE-zo-O6T">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
+                    <button translatesAutoresizingMaskIntoConstraints="NO" id="DBW-Sv-Zvb">
+                        <rect key="frame" x="18" y="107" width="576" height="18"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="14" id="wxs-Zl-KOA"/>
+                        </constraints>
+                        <buttonCell key="cell" type="check" title="Show password" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="goY-rh-Fkj">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="setSecureEntry:" target="Voe-Tx-rLC" id="Zfh-Zt-jYI"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gBn-Mc-5N4">
+                        <rect key="frame" x="18" y="61" width="576" height="28"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="572" id="Ckx-st-1GK"/>
+                            <constraint firstAttribute="height" constant="28" id="cwd-zY-fe0"/>
+                        </constraints>
+                        <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" id="9HI-Tv-Qsx">
+                            <font key="font" metaFont="smallSystem"/>
+                            <string key="title">If you do not yet have a free Electric Imp account, please visit the Electric Imp website using the button below to create one before attempting to sign in here.</string>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Z4J-ob-7Z3">
                         <rect key="frame" x="524" y="13" width="74" height="32"/>
                         <constraints>
@@ -2863,13 +2897,6 @@ DQ
                         <connections>
                             <action selector="login:" target="Voe-Tx-rLC" id="bPC-b2-U54"/>
                         </connections>
-                    </button>
-                    <button translatesAutoresizingMaskIntoConstraints="NO" id="Agw-Zz-2Y5">
-                        <rect key="frame" x="18" y="80" width="576" height="18"/>
-                        <buttonCell key="cell" type="check" title="Store these credentials in your keychain" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="SmE-zo-O6T">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UgT-5e-GEs">
                         <rect key="frame" x="442" y="13" width="82" height="32"/>
@@ -2888,32 +2915,37 @@ Gw
                             <action selector="cancelLogin:" target="Voe-Tx-rLC" id="jso-QB-hm9"/>
                         </connections>
                     </button>
-                    <button translatesAutoresizingMaskIntoConstraints="NO" id="DBW-Sv-Zvb">
-                        <rect key="frame" x="18" y="59" width="576" height="18"/>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BtY-iA-Cr1">
+                        <rect key="frame" x="14" y="13" width="134" height="32"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="14" id="wxs-Zl-KOA"/>
+                            <constraint firstAttribute="height" constant="21" id="gLn-rq-8QV"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="uQC-Ld-NnF"/>
                         </constraints>
-                        <buttonCell key="cell" type="check" title="Show password" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="goY-rh-Fkj">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <buttonCell key="cell" type="push" title="Create Account" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PoO-ak-Sz1">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="setSecureEntry:" target="Voe-Tx-rLC" id="Zfh-Zt-jYI"/>
+                            <action selector="signup:" target="Voe-Tx-rLC" id="yGe-nh-kGp"/>
                         </connections>
                     </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="szd-W6-8Wr" secondAttribute="trailing" constant="20" id="1JN-RV-1sL"/>
                     <constraint firstItem="62m-HD-T17" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="2VI-HY-fut"/>
+                    <constraint firstItem="gBn-Mc-5N4" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="3b2-C1-RkJ"/>
                     <constraint firstItem="szd-W6-8Wr" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="3nM-fi-ms7"/>
+                    <constraint firstAttribute="bottom" secondItem="BtY-iA-Cr1" secondAttribute="bottom" constant="20" id="8XP-OO-COq"/>
                     <constraint firstItem="Agw-Zz-2Y5" firstAttribute="leading" secondItem="CO8-RY-XbG" secondAttribute="leading" id="8z9-of-GyU"/>
                     <constraint firstAttribute="trailing" secondItem="DBW-Sv-Zvb" secondAttribute="trailing" constant="20" id="94E-f4-VoD"/>
                     <constraint firstAttribute="trailing" secondItem="CO8-RY-XbG" secondAttribute="trailing" constant="20" id="Cjp-ga-ogg"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BtY-iA-Cr1" secondAttribute="trailing" constant="20" symbolic="YES" id="EUk-Js-djt"/>
                     <constraint firstItem="HnJ-4Z-rjk" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="EzQ-yY-7IP"/>
                     <constraint firstAttribute="bottom" secondItem="UgT-5e-GEs" secondAttribute="bottom" constant="20" id="FRT-8e-lHU"/>
                     <constraint firstItem="szd-W6-8Wr" firstAttribute="top" secondItem="RXm-hy-CPS" secondAttribute="bottom" constant="8" id="Fj8-iG-eH4"/>
                     <constraint firstItem="UgT-5e-GEs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" symbolic="YES" id="Hgl-i1-kc9"/>
                     <constraint firstItem="CO8-RY-XbG" firstAttribute="top" secondItem="62m-HD-T17" secondAttribute="bottom" constant="8" id="IjL-bZ-uWy"/>
+                    <constraint firstItem="gBn-Mc-5N4" firstAttribute="top" secondItem="DBW-Sv-Zvb" secondAttribute="bottom" constant="20" id="Jn8-dO-5qp"/>
                     <constraint firstItem="RXm-hy-CPS" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="M2f-vM-q09"/>
                     <constraint firstItem="DBW-Sv-Zvb" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="Nf8-1d-XMy"/>
                     <constraint firstAttribute="trailing" secondItem="HnJ-4Z-rjk" secondAttribute="trailing" constant="20" id="SgF-Ys-0OV"/>
@@ -2926,12 +2958,13 @@ Gw
                     <constraint firstAttribute="trailing" secondItem="RXm-hy-CPS" secondAttribute="trailing" constant="20" id="hO8-r7-SRS"/>
                     <constraint firstAttribute="trailing" secondItem="Z4J-ob-7Z3" secondAttribute="trailing" constant="20" id="o4F-h0-fci"/>
                     <constraint firstItem="Z4J-ob-7Z3" firstAttribute="leading" secondItem="UgT-5e-GEs" secondAttribute="trailing" constant="12" id="rxZ-xF-YiB"/>
+                    <constraint firstItem="BtY-iA-Cr1" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="spW-MI-OZd"/>
                     <constraint firstItem="CO8-RY-XbG" firstAttribute="leading" secondItem="rcs-tI-D8o" secondAttribute="leading" constant="20" id="xak-cC-mlS"/>
                     <constraint firstItem="RXm-hy-CPS" firstAttribute="top" secondItem="rcs-tI-D8o" secondAttribute="top" constant="20" id="xy5-6k-TTc"/>
                     <constraint firstItem="DBW-Sv-Zvb" firstAttribute="top" secondItem="Agw-Zz-2Y5" secondAttribute="bottom" constant="7" id="y4D-Qy-TtJ"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="-752" y="38"/>
+            <point key="canvasLocation" x="-752" y="62"/>
         </window>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="x6k-bd-7Eg" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
@@ -4132,6 +4165,14 @@ Gw
             </view>
             <point key="canvasLocation" x="911" y="-251"/>
         </window>
+        <button verticalHuggingPriority="750" id="aik-eR-Hyv">
+            <rect key="frame" x="0.0" y="0.0" width="82" height="32"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="T1w-re-jAA">
+                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                <font key="font" metaFont="system"/>
+            </buttonCell>
+        </button>
     </objects>
     <resources>
         <image name="bfi" width="32" height="30.5"/>

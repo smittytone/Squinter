@@ -384,6 +384,7 @@
 - (void)loginAlert:(NSString *)extra;
 - (IBAction)setSecureEntry:(id)sender;
 - (IBAction)switchAccount:(id)sender;
+- (IBAction)signup:(id)sender;
 
 // New Project Methods
 

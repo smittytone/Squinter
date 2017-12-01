@@ -1070,6 +1070,16 @@
 
 
 
+- (IBAction)signup:(id)sender
+{
+	[_window endSheet:loginSheet];
+
+	if (switchAccountFlag) switchAccountFlag = NO;
+
+	[nswsw openURL:[NSURL URLWithString:@"https://impcentral.electricimp.com/"]];
+}
+
+
 #pragma mark - New Project Methods
 
 
