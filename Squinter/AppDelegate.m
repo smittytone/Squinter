@@ -62,6 +62,8 @@
     renameProjectFlag = NO;
     saveAsFlag = YES;
     stale = NO;
+	credsFlag = NO;
+	switchAccountFlag = NO;
 
     syncItemCount = 0;
     logPaddingLength = 0;
@@ -85,6 +87,7 @@
     logAgentCodeMenuItem.menu.autoenablesItems = NO;
     externalOpenMenuItem.menu.autoenablesItems = NO;
     deviceGroupsMenu.autoenablesItems = NO;
+	accountMenu.autoenablesItems = NO;
 
     // Hide the Dictation and Emoji items in the Edit menu
 
@@ -124,6 +127,11 @@
 
     // NOTE refreshDevicegroupMenu: calls refreshDevicesMenus:
     // NOTE refreshDevicesPopup: calls refreshUnassignedDevices:
+
+	// Account Menu
+
+	switchAccountMenuItem.enabled = NO;
+	accountMenuItem.enabled = NO;
 
     // View Menu
 
@@ -641,7 +649,7 @@
         // Recommend logging in by showing the log in window
         // NOTE may remove this and leave users to select it from menu
 
-        [self showLoginWindow];
+        // [self showLoginWindow];
     }
 }
 
@@ -886,7 +894,21 @@
         // We are not logged in, so show the log in sheet, but only if we're
         // not already trying to log in
 
-        if (!loginFlag) [self showLoginWindow];
+		if (!loginFlag)
+		{
+			if (!credsFlag)
+			{
+				// No creds set? Show the sheet to get them...
+
+				[self showLoginWindow];
+			}
+			else
+			{
+				// ...or login in automatically
+
+				[self autoLogin];
+			}
+		}
     }
     else
     {
@@ -920,7 +942,7 @@
 
         saveDetailsCheckbox.state = NSOffState;
 
-        [self writeStringToLog:@"Automatically logging you into the impCloud. This can be disabled in Preferences." :YES];
+        [self writeStringToLog:@"Logging you into the impCloud. Automatic login can be disabled in Preferences." :YES];
         [self login:nil];
     }
 }
@@ -960,6 +982,8 @@
     // Just hide the login sheet
 
     [_window endSheet:loginSheet];
+
+	if (switchAccountFlag) switchAccountFlag = NO;
 }
 
 
@@ -970,6 +994,15 @@
     // so we don't need to remove the sheet from the window
 
     if (sender != nil) [_window endSheet:loginSheet];
+
+	// If we're switching accounts, log out first
+
+	if (switchAccountFlag)
+	{
+		[ide logout];
+		[self setToolbar];
+		credsFlag = NO;
+	}
 
     // Register that we're attempting a login
 
@@ -1015,6 +1048,24 @@
         passwordTextField.cell = [[NSSecureTextFieldCell alloc] initTextCell:text];
         passwordTextField.stringValue = text;
     }
+}
+
+
+
+- (IBAction)switchAccount:(id)sender
+{
+	// We're switching account - resumably temporarily
+	// First , if we're logged in, log out
+
+	switchAccountFlag = YES;
+
+	// Show the login sheet empty and with 'save credentials' switched off
+
+	saveDetailsCheckbox.state = NSOffState;
+	usernameTextField.stringValue = @"";
+	passwordTextField.stringValue = @"";
+
+	[_window beginSheet:loginSheet completionHandler:nil];
 }
 
 
@@ -7222,6 +7273,32 @@
 
 
 
+- (void)setMinimumDeploymentStageTwo:(NSNotification *)note
+{
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSDictionary *source = [data objectForKey:@"object"];
+	NSString *action = [source objectForKey:@"action"];
+
+	if (action != nil)
+	{
+		if ([action compare:@"setmindeploy"] == NSOrderedSame)
+		{
+			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+			[self updateDevicegroup:devicegroup];
+
+			Project *project = [self getParentProject:devicegroup];
+
+			[self writeStringToLog:[NSString stringWithFormat:@"Minimum deployment set for project \"%@\"'s device group \"%@\".", project.name, devicegroup.name] :YES];
+		}
+	}
+	else
+	{
+		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (setMinimumDeploymentStageTwo:)"] :YES];
+	}
+}
+
+
+
 - (void)loggedIn:(NSNotification *)note
 {
     // BuildAPIAccess has signalled login success
@@ -7266,13 +7343,17 @@
 
     // Set the 'Accounts' menu
 
+	accountMenuItem.title = [@"Account: " stringByAppendingString:usernameTextField.stringValue];
     loginMenuItem.title = @"Log out of your account";
+	switchAccountMenuItem.enabled = YES;
 
     [self setToolbar];
 
     // Register we are no longer trying to log in
 
     loginFlag = NO;
+	credsFlag = YES;
+	switchAccountFlag = NO;
 
     // Inform the user he or she is logged in
 
@@ -7280,45 +7361,13 @@
 
     // Check for any post-login actions that need to be performed
 
-    if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"])
-    {
-        // User wants the Device lists loaded on login
+    // User wants the Product lists loaded on login
 
-        [self getProductsFromServer:nil];
-    }
+	if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
 
-    if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"])
-    {
-        // User wants the Product lists loaded on login
+    // User wants the Device lists loaded on login
 
-        [self updateDevicesStatus:nil];
-    }
-}
-
-
-
-- (void)setMinimumDeploymentStageTwo:(NSNotification *)note
-{
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *source = [data objectForKey:@"object"];
-    NSString *action = [source objectForKey:@"action"];
-
-	if (action != nil)
-	{
-		if ([action compare:@"setmindeploy"] == NSOrderedSame)
-		{
-			Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-			[self updateDevicegroup:devicegroup];
-
-			Project *project = [self getParentProject:devicegroup];
-
-			[self writeStringToLog:[NSString stringWithFormat:@"Minimum deployment set for project \"%@\"'s device group \"%@\".", project.name, devicegroup.name] :YES];
-		}
-	}
-	else
-	{
-		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (setMinimumDeploymentStageTwo:)"] :YES];
-	}
+	if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) [self updateDevicesStatus:nil];
 }
 
 

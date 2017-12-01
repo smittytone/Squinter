@@ -20,6 +20,8 @@
                 <outlet property="aboutVersionLabel" destination="CaW-Ui-WAP" id="OWh-sU-5mL"/>
                 <outlet property="accessoryView" destination="MJe-9N-Smk" id="06g-xh-CvS"/>
                 <outlet property="accessoryViewNewProjectCheckbox" destination="dDn-6x-nru" id="CEt-ye-R6g"/>
+                <outlet property="accountMenu" destination="VuM-ep-EMV" id="Pw5-th-o2D"/>
+                <outlet property="accountMenuItem" destination="4r9-GW-BFZ" id="i5O-Ke-A4O"/>
                 <outlet property="assignDeviceMenuDevices" destination="nh1-B0-bW0" id="c27-ei-VG6"/>
                 <outlet property="assignDeviceMenuItem" destination="lyS-8y-eH7" id="V7f-pe-tXw"/>
                 <outlet property="assignDeviceMenuModels" destination="UC3-wk-scu" id="9J3-Pd-YjQ"/>
@@ -809,10 +811,20 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Account" id="VuM-ep-EMV">
                         <items>
+                            <menuItem title="Not Logged In" enabled="NO" id="4r9-GW-BFZ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="J6o-S0-e0p"/>
                             <menuItem title="Log in to Your Account..." id="yZG-eW-Kuh">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="loginOrOut:" target="Voe-Tx-rLC" id="hWf-Xh-xdD"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Log in to a Different Account..." alternate="YES" id="HdT-W5-cit">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                                <connections>
+                                    <action selector="switchAccount:" target="Voe-Tx-rLC" id="Ijd-DI-6NO"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -3786,17 +3798,17 @@ Gw
                         <tabViewItems>
                             <tabViewItem label="Project" identifier="1" id="OY0-C1-yKU">
                                 <view key="view" id="Rze-tK-Ldr">
-                                    <rect key="frame" x="10" y="25" width="334" height="495"/>
+                                    <rect key="frame" x="10" y="29" width="334" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="18" horizontalPageScroll="10" verticalLineScroll="18" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" scrollerKnobStyle="dark" translatesAutoresizingMaskIntoConstraints="NO" id="JgW-wW-cYc">
-                                            <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="334" height="491"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="nMN-Gd-h8U">
-                                                <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="334" height="491"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="16" viewBased="YES" floatsGroupRows="NO" id="ldN-a5-eG2">
-                                                        <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="334" height="491"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.21566104888916016" green="0.21570384502410889" blue="0.21565541625022888" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3954,7 +3966,7 @@ Gw
                                             <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="fEc-01-rsL">
                                                 <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="16" viewBased="YES" floatsGroupRows="NO" id="ZbE-jN-J9f">
                                                         <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>

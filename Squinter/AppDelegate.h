@@ -116,7 +116,10 @@
 
     // Account Menu Outlets
 
+	IBOutlet NSMenu *accountMenu;
     IBOutlet NSMenuItem *loginMenuItem;
+	IBOutlet NSMenuItem *accountMenuItem;
+	IBOutlet NSMenuItem *switchAccountMenuItem;
 
     // View Menu outlets
 
@@ -353,7 +356,7 @@
     NSUInteger syncItemCount, logPaddingLength;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
-    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale;
+    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag;
 }
 
 
@@ -380,6 +383,7 @@
 - (IBAction)login:(id)sender;
 - (void)loginAlert:(NSString *)extra;
 - (IBAction)setSecureEntry:(id)sender;
+- (IBAction)switchAccount:(id)sender;
 
 // New Project Methods
 
