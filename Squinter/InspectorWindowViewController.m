@@ -535,6 +535,7 @@
 	if (aTab > inspectorTabView.numberOfTabViewItems) return;
 
 	tabIndex = aTab;
+	
 	[inspectorTabView selectTabViewItemAtIndex:tabIndex];
 }
 
@@ -543,7 +544,7 @@
 - (BOOL)isLinkRow:(NSInteger)row
 {
 	// Does the title column of content row being displayed
-	// include the word 'location'? If so the content is a link
+	// include the word 'path'? If so the content is a link
 	// so we return YES so that the table data source method knows
 	// which type of NSTableCellView to use
 
@@ -557,13 +558,13 @@
 
 - (BOOL)isURLRow:(NSInteger)row
 {
-	// Does the title column of content row being displayed
-	// include the word 'location'? If so the content is a link
+	// Does the content column of content row being displayed
+	// include the word 'http:'? If so the content is a link
 	// so we return YES so that the table data source method knows
 	// which type of NSTableCellView to use
 
 	NSString *value = [deviceValues objectAtIndex:row];
-	if ([value containsString:@"http"]) return YES;
+	if ([value containsString:@"http:"]) return YES;
 	return NO;
 }
 
@@ -688,7 +689,7 @@
 		while (stringWidth > 196);
 
 		if (stringWidth < 0) stringWidth = stringWidth * -1;
-		if (renderHeight > stringHeight && stringWidth < 5) return stringHeight;
+		if (renderHeight > stringHeight && stringWidth < 6) return stringHeight;
 
 		return renderHeight;
 	}
@@ -734,8 +735,7 @@
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath
 {
 	// This method takes an absolute location ('filePath') and returns a location relative
-	// to another location ('basePath'). Typically, this is the path to the host
-	// project
+	// to another location ('basePath'). Typically, this is the path to the host project
 
 	basePath = [basePath stringByStandardizingPath];
 	filePath = [filePath stringByStandardizingPath];
@@ -748,6 +748,7 @@
 	if (nf > nb) // theFilePath.length > basePath.length
 	{
 		// The file path is longer than the base path
+
 		NSRange r = [theFilePath rangeOfString:basePath];
 
 		if (r.location != NSNotFound)
@@ -891,33 +892,15 @@
 }
 
 
+
 - (CGFloat)altWidthOfString:(NSString *)string
 {
 	NSTextField *nstf = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 196, 200)];
 	nstf.cell.wraps = YES;
 	nstf.cell.lineBreakMode = NSLineBreakByWordWrapping;
 	nstf.stringValue = string;
-	NSSize drawnSize = [nstf.cell cellSizeForBounds:nstf.bounds];
-	return drawnSize.height;
+	return [nstf.cell cellSizeForBounds:nstf.bounds].height;
 }
-
-/*
-
- NSRect frame = [textField frame];
- Now make it very high:
-
- NSRect constraintBounds = frame;
- constraintBounds.size.height =  10000.0;
- [textField setFrame: constraintBounds];
- and set the string:
-
- [textField  setStringValue:theString];
- Ask now for the natural size:
-
- NSSize naturalSize =
- [[textField cell] cellSizeForBounds:constraintBounds];
- */
-
 
 
 @end
