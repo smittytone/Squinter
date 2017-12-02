@@ -1072,11 +1072,7 @@
 
 - (IBAction)signup:(id)sender
 {
-	[_window endSheet:loginSheet];
-
-	if (switchAccountFlag) switchAccountFlag = NO;
-
-	[nswsw openURL:[NSURL URLWithString:@"https://impcentral.electricimp.com/"]];
+	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/index.html#account"]];
 }
 
 
@@ -10782,6 +10778,13 @@
 
     [NSApp runModalForWindow:choosePanel];
     [choosePanel makeKeyWindow];
+}
+
+
+
+- (IBAction)getHelpPrefs:(id)sender
+{
+	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/index.html#configuring"]];
 }
 
 
