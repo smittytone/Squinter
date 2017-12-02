@@ -564,7 +564,7 @@
 	// which type of NSTableCellView to use
 
 	NSString *value = [deviceValues objectAtIndex:row];
-	if ([value containsString:@"http:"]) return YES;
+	if ([value containsString:@"https:"]) return YES;
 	return NO;
 }
 
