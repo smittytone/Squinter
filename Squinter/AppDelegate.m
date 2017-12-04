@@ -296,7 +296,8 @@
                          @"com.bps.squinter.dev5.red",
                          @"com.bps.squinter.dev5.blue",
                          @"com.bps.squinter.dev5.green",
-						 @"com.bps.squinter.show.inspector", nil];
+						 @"com.bps.squinter.show.inspector",
+						 @"com.bps.squinter.inspectorsize", nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
                             [NSString stringWithString:NSStringFromRect(_window.frame)],
@@ -341,7 +342,8 @@
                             [NSNumber numberWithFloat:1.0],
                             [NSNumber numberWithFloat:0.0],
                             [NSNumber numberWithFloat:0.6],
-							[NSNumber numberWithBool:NO],nil];
+							[NSNumber numberWithBool:NO],
+							[NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)], nil];
 
     // Drop the arrays into the Defauts
 
@@ -374,10 +376,19 @@
 
 	// Position Inspector
 
-	iwvc.mainWindowFrame = _window.frame;
-	[iwvc positionWindow];
+	if (![defaults boolForKey:@"com.bps.squinter.preservews"])
+	{
+		NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
+		NSRect nuRect = NSRectFromString(frameString);
+		[iwvc.view.window setFrame:nuRect display:NO];
+	}
+	else
+	{
+		iwvc.mainWindowFrame = _window.frame;
+		[iwvc positionWindow];
+	}
 
-    // Set the Log TextView's font
+	// Set the Log TextView's font
 
     NSInteger index = [[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue];
     NSString *fontName = [self getFontName:index];
@@ -626,10 +637,11 @@
 
     [self setToolbar];
 
-	if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:nil];
 
     [_window setTitle:@"Squinter Beta"];
-    [_window makeKeyAndOrderFront:nil];
+    [_window makeKeyAndOrderFront:self];
+
+	if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:self];
 
     // Check for updates if that is requested
 
@@ -730,6 +742,7 @@
 
     [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
     [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
+	if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
     [defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
     // Stop watching for notifications

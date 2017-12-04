@@ -34,8 +34,8 @@
 
 
 - (void)appWillBecomeActive;
-- (IBAction)link:(id)sender;
-- (IBAction)goToURL:(id)sender;
+- (void)link:(id)sender;
+- (void)goToURL:(id)sender;
 - (void)setProject:(Project *)aProject;
 - (void)setDevice:(NSMutableDictionary *)aDevice;
 - (void)positionWindow;

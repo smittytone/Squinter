@@ -8,6 +8,6 @@
 
 @implementation InspectorButtonTableCellView
 
-@synthesize link, index;
+@synthesize goToButton, index;
 
 @end

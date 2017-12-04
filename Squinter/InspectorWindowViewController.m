@@ -70,9 +70,9 @@
 
 	// Position the window to the right of screen
 
-	mainWindowFrame = [NSScreen mainScreen].frame;
+	//mainWindowFrame = [NSScreen mainScreen].frame;
 
-	[self positionWindow];
+	//[self positionWindow];
 
 	// Hide the tables when there's nothing to show
 
@@ -109,7 +109,7 @@
 
 	wframe.origin.y = mainWindowFrame.origin.y + mainWindowFrame.size.height - wframe.size.height;
 
-	[self.view.window setFrame:wframe display:YES];
+	[self.view.window setFrame:wframe display:NO];
 }
 
 
@@ -142,21 +142,7 @@
 		return;
 	}
 
-	for (NSInteger i = row ; i >= 0 ; --i)
-	{
-		// Step back up the content array until we get the object whose location button has
-		// been clicked. It will be a model, a library or a file. This gives us the filename
-		// and we can construct the path to it and use that to open the file
-
-		NSString *key = [projectKeys objectAtIndex:i];
-
-		if ([key containsString:@"Model"] || [key containsString:@"Library"] || [key containsString:@"File"])
-		{
-			path = [path stringByAppendingFormat:@"/%@", [projectValues objectAtIndex:i]];
-			[nswsw openFile:path];
-			break;
-		}
-	}
+	[nswsw openFile:path];
 }
 
 
@@ -262,7 +248,7 @@
 				}
 
 				[projectKeys addObject:@"Type "];
-				[projectValues addObject:[self convertDevicegroupType:devicegroup.type :YES]];
+				[projectValues addObject:[self convertDevicegroupType:devicegroup.type :NO]];
 
 				if (devicegroup.description != nil && devicegroup.description.length > 0)
 				{
@@ -603,8 +589,12 @@
 	{
 		NSTableCellView *cell = [tableView makeViewWithIdentifier:(tableView == infoTable ? @"infoheadcell" : @"deviceinfoheadcell") owner:nil];
 
-		if (cell != nil) cell.textField.stringValue = tableView == infoTable ? [projectKeys objectAtIndex:row] : [deviceKeys objectAtIndex:row];
+		if (cell != nil)
+		{
+			cell.textField.stringValue = tableView == infoTable ? [projectKeys objectAtIndex:row] : [deviceKeys objectAtIndex:row];
 
+			[cell.textField setRefusesFirstResponder:YES];
+		}
 		return cell;
 	}
 	else if ([tableColumn.identifier compare:@"infotextcolumn"] == NSOrderedSame || [tableColumn.identifier compare:@"deviceinfotextcolumn"] == NSOrderedSame)
@@ -620,8 +610,10 @@
 			CGFloat height = width > 196 ? ((NSInteger)(width / 196) + 1) * 14.0 : 14.0;
 			[cell setFrameSize:NSMakeSize(196, height)];
 			cell.textField.stringValue = string;
-		}
 
+			[cell.textField setRefusesFirstResponder:YES];
+		}
+		
 		return cell;
 	}
 	else if ([tableColumn.identifier compare:@"deviceinfocheckcolumn"] == NSOrderedSame)
@@ -634,7 +626,7 @@
 			{
 				// Set the button action and save the row number in the cell
 
-				[linkcell.link setAction:@selector(goToURL:)];
+				[linkcell.goToButton setAction:@selector(goToURL:)];
 				linkcell.index = row;
 			}
 
@@ -651,7 +643,7 @@
 			{
 				// Set the button action and save the row number in the cell
 
-				[linkcell.link setAction:@selector(link:)];
+				[linkcell.goToButton setAction:@selector(link:)];
 				linkcell.index = row;
 			}
 

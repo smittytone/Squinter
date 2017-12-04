@@ -8,7 +8,7 @@
 
 @interface InspectorButtonTableCellView : NSTableCellView
 
-@property (nonatomic, strong) IBOutlet NSButton *link;
+@property (nonatomic, strong) IBOutlet NSButton *goToButton;
 @property (nonatomic, readwrite) NSInteger index;
 
 @end
