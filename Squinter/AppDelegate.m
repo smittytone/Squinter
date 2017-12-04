@@ -6923,14 +6923,32 @@
 
 - (void)listBlessedDevices:(NSArray *)devices :(Devicegroup *)devicegroup
 {
-	[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" test blessed devices:", devicegroup.name] :NO];
-	[self writeStringToLog:@"Device ID         MAC Address" :NO];
+	// This method presents a tabulated list of the devices in a pre-production device group
 
-	for (NSDictionary *device in devices)
+	if (devices.count == 0)
 	{
-		NSString *line = [self getValueFrom:device withKey:@"id"];
-		line = [line stringByAppendingFormat:@"  %@", [self getValueFrom:device withKey:@"mac_address"]];
+		[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" contains no test blessed devices.", devicegroup.name] :YES];
+		return;
 	}
+
+	[extraOpQueue addOperationWithBlock:^(void){
+
+		NSString *headString = [NSString stringWithFormat:@"Device group \"%@\" test blessed devices:", devicegroup.name];
+		NSString *lineString = [@"" stringByPaddingToLength:headString.length withString:@"-" startingAtIndex:0];
+		[self performSelectorOnMainThread:@selector(logLogs:)
+							   withObject:[NSString stringWithFormat:@"%@\n%@\nDevice ID         MAC Address", lineString, headString]
+							waitUntilDone:NO];
+
+		for (NSDictionary *device in devices)
+		{
+			NSString *line = [self getValueFrom:device withKey:@"id"];
+			line = [line stringByAppendingFormat:@"  %@", [self getValueFrom:device withKey:@"mac_address"]];
+
+			[self performSelectorOnMainThread:@selector(logLogs:)
+								   withObject:line
+								waitUntilDone:NO];
+		}
+	}];
 }
 
 
@@ -7447,12 +7465,15 @@
     {
         [extraOpQueue addOperationWithBlock:^(void){
 
-            [self performSelectorOnMainThread:@selector(logLogs:)
-                                   withObject:@"--------------------------------------------------------------------------"
+			NSString *headString = [NSString stringWithFormat:@"Commits to Device Group \"%@\":", devicegroup.name];
+			NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
+
+			[self performSelectorOnMainThread:@selector(logLogs:)
+                                   withObject:lineString
                                 waitUntilDone:NO];
 
             [self performSelectorOnMainThread:@selector(logLogs:)
-                                   withObject:[NSString stringWithFormat:@"Commits to Device Group \"%@\":", devicegroup.name]
+                                   withObject:headString
                                 waitUntilDone:NO];
 
             NSDictionary *min = [self getValueFrom:devicegroup.data withKey:@"min_supported_deployment"];
@@ -7509,7 +7530,7 @@
             }
 
             [self performSelectorOnMainThread:@selector(logLogs:)
-                                   withObject:@"--------------------------------------------------------------------------"
+                                   withObject:lineString
                                 waitUntilDone:NO];
         }];
     }
