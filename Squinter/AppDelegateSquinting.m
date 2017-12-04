@@ -431,23 +431,31 @@
 				libName = [libName substringToIndex:commentRange.location];
 
 				// We have a library or file name and path. Now we need to parse the path:
-				// is it absolute (/Users/smitty/GitHub/Project/file.class.nut)
-				// relative to home (~/GitHub/Project/file.class.nut)
-				// or relative to the source file (../aProject/file.class.nut)
+				// Is it absolute (/Users/smitty/GitHub/Project/file.class.nut)
+				// Is it relative to home (~/GitHub/Project/file.class.nut)
+				// Is it relative to the source file (../aProject/file.class.nut or /subfolder/file.class.nut)
 
-				// First, look for path indicators in libName, ie. /
+				// First, look for the presenct of path indicators
 
 				commentRange = [libName rangeOfString:@"/" options:NSLiteralSearch];
 
 				if (commentRange.location != NSNotFound)
 				{
 					// Found at least one / so there must be directory info here,
-					// even if it's just ~/lib.class.nut
+					// even if it's just ~/lib.class.nut or /lib.class.nut
 
 					// Get the path component from the source file's library name info
 
 					libPath = [libName stringByDeletingLastPathComponent];
 					libPath = [libPath stringByStandardizingPath];
+
+					// Check that the file is not in a folder below the project, eg.
+					// subfolder/file.class.nut - ie. there is no prefixing /
+
+					if (![libPath hasPrefix:@"/"])
+					{
+						libPath = [projectPath stringByAppendingFormat:@"/%@", libPath];
+					}
 
 					// Check for a relative path, ie. at least one ../
 
@@ -468,19 +476,18 @@
 				else
 				{
 					// Didn't find any / characters so we can assume we just have a file name
-					// eg. 'lib.class.nut'. Assume the file is in the same folder as the source file
-					// (which is passed in, so can be the project path or the source path, despite the name)
+					// eg. 'lib.class.nut' and that it's in the same folder as the source file
 
 					libPath = projectPath;
 				}
 
 #ifdef DEBUG
-				NSLog(@"%@", libName);
-				NSLog(@"%@", libPath);
+				NSLog(@"Name: %@", libName);
+				NSLog(@"Path %@", libPath);
 #endif
 
 				// At this point, 'libName' should be of the form 'lib.class.nut', and
-				// 'libPath' should be the absolute path
+				// 'libPath' should be the ABSOLUTE path
 
 				// Assume library or file will be added to the project
 
