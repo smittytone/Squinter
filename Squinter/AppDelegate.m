@@ -4408,6 +4408,7 @@
 
             currentDevicegroup = [[Devicegroup alloc] init];
             currentDevicegroup.models = [[NSMutableArray alloc] init];
+			if (currentProject.devicegroups == nil) currentProject.devicegroups = [[NSMutableArray alloc] init];
             [currentProject.devicegroups addObject:currentDevicegroup];
             currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
 
@@ -5238,12 +5239,12 @@
     if (currentDevicegroup != nil)
     {
         accessoryViewNewProjectCheckbox.state = NSOffState;
-        accessoryViewNewProjectCheckbox.title = [NSString stringWithFormat:@"Create a new Device Group with the file(s) – or uncheck to add the file(s) to Group \"%@\"", currentDevicegroup.name];
+		accessoryViewNewProjectCheckbox.title = [NSString stringWithFormat:@"Create a new Device Group with the file(s) – or uncheck to add the file(s) to Group \"%@\"", currentDevicegroup.name];
     }
     else
     {
         accessoryViewNewProjectCheckbox.state = NSOnState;
-        accessoryViewNewProjectCheckbox.title = @"Create a new Device Group with the file(s)";
+		accessoryViewNewProjectCheckbox.title = @"Create a new Device Group with the file(s)";
     }
 
     // Add the accessory view to the panel
