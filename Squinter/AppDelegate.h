@@ -96,6 +96,7 @@
     IBOutlet NSMenu *externalFilesMenu;
     IBOutlet NSMenu *impLibrariesMenu;
     IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
+	IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
 
     // Device Menu outlets
 
@@ -446,6 +447,7 @@
 - (IBAction)updateCode:(id)sender;
 - (IBAction)setMinimumDeployment:(id)sender;
 - (IBAction)chooseProductionTarget:(id)sender;
+- (IBAction)showTestBlessedDevices:(id)sender;
 
 // Existing Device Methods
 

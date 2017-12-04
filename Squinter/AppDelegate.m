@@ -3624,6 +3624,31 @@
 
 
 
+- (IBAction)showTestBlessedDevices:(id)sender
+{
+	if (currentDevicegroup == nil)
+	{
+		[self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		return;
+	}
+
+	if (![currentDevicegroup.type containsString:@"pre_production"])
+	{
+		[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a pre-production group so has no test blessed devices.", currentDevicegroup.name] :YES];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"gettestblesseddevices",
+							@"devicegroup" : currentDevicegroup };
+
+	[ide getDevicesWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
+
+	// Pick up the action at listDevices:
+
+}
+
+
+
 #pragma mark - Existing Device Methods
 
 
@@ -6765,6 +6790,12 @@
             return;
         }
 
+		if ([action compare:@"gettestblesseddevices"] == NSOrderedSame)
+		{
+			[self listBlessedDevices:devices :[source objectForKey:@"devicegroup"]];
+			return;
+		}
+
         if ([action compare:@"getdevices"] == NSOrderedSame)
         {
             // Initialise or clear the current list of devices then prep to add the incoming list
@@ -6886,6 +6917,20 @@
     {
         [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
     }
+}
+
+
+
+- (void)listBlessedDevices:(NSArray *)devices :(Devicegroup *)devicegroup
+{
+	[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" test blessed devices:", devicegroup.name] :NO];
+	[self writeStringToLog:@"Device ID         MAC Address" :NO];
+
+	for (NSDictionary *device in devices)
+	{
+		NSString *line = [self getValueFrom:device withKey:@"id"];
+		line = [line stringByAppendingFormat:@"  %@", [self getValueFrom:device withKey:@"mac_address"]];
+	}
 }
 
 
@@ -9591,7 +9636,6 @@
             compiled = NO;
             gotFiles = NO;
         }
-
     }
     else
     {
@@ -9627,6 +9671,7 @@
     uploadExtraMenuItem.enabled = (currentDevicegroup != nil && compiled == YES) ? YES : NO;
     checkImpLibrariesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
     removeFilesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
+	listTestBlessedDevicesMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"pre_production"]) ? YES : NO;
 
 	// Enable or Disable the source code submenu based on whether's there's a selected device group
     // and whether that deviece group has agent and/or device code or not

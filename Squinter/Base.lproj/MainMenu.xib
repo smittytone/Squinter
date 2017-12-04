@@ -86,6 +86,7 @@
                 <outlet property="linkProductMenuItem" destination="7Yw-EV-inT" id="IUI-Rs-fLh"/>
                 <outlet property="listCommitsItem" destination="Z6i-XT-ijk" id="per-O5-Bag"/>
                 <outlet property="listCommitsMenuItem" destination="8zD-er-ik6" id="Tui-r3-0FI"/>
+                <outlet property="listTestBlessedDevicesMenuItem" destination="5Fh-hp-dio" id="lkC-X4-Xdf"/>
                 <outlet property="loadDevicesCheckbox" destination="wVL-mp-vcF" id="f1k-DO-M0c"/>
                 <outlet property="loadModelsCheckbox" destination="rcb-N4-0Pa" id="kfq-5d-MR1"/>
                 <outlet property="locationMenu" destination="vma-F5-cck" id="mmI-uY-ysD"/>
@@ -571,6 +572,13 @@
                                     <action selector="uploadCode:" target="Voe-Tx-rLC" id="13W-vp-iU2"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Remove Source Code Files" id="h2N-c1-TV9">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="removeSource:" target="Voe-Tx-rLC" id="OOc-9V-fri"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="QKc-LE-Kan"/>
                             <menuItem title="Restart Device Group Devices" keyEquivalent="R" id="Fmd-ZM-hME">
                                 <connections>
                                     <action selector="restartDevices:" target="Voe-Tx-rLC" id="JOl-fb-dr7"/>
@@ -582,6 +590,7 @@
                                     <action selector="conditionalRestartDevices:" target="Voe-Tx-rLC" id="hQo-j2-loH"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="OOf-1H-NCF"/>
                             <menuItem title="Set Minimum Deployment" id="MtS-R8-cbC">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -594,10 +603,10 @@
                                     <action selector="chooseProductionTarget:" target="Voe-Tx-rLC" id="jC3-12-RQg"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove Source Code Files" id="h2N-c1-TV9">
+                            <menuItem title="List Test Blessed Devices" id="5Fh-hp-dio">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="removeSource:" target="Voe-Tx-rLC" id="OOc-9V-fri"/>
+                                    <action selector="showTestBlessedDevices:" target="Voe-Tx-rLC" id="Mhu-fs-OXQ"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="tEv-Zs-pLu"/>
