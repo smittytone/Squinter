@@ -433,7 +433,7 @@
 				// We have a library or file name and path. Now we need to parse the path:
 				// Is it absolute (/Users/smitty/GitHub/Project/file.class.nut)
 				// Is it relative to home (~/GitHub/Project/file.class.nut)
-				// Is it relative to the source file (../aProject/file.class.nut or /subfolder/file.class.nut)
+				// Is it relative to the source file (../aProject/file.class.nut or subfolder/file.class.nut)
 
 				// First, look for the presenct of path indicators
 
@@ -442,7 +442,7 @@
 				if (commentRange.location != NSNotFound)
 				{
 					// Found at least one / so there must be directory info here,
-					// even if it's just ~/lib.class.nut or /lib.class.nut
+					// even if it's just ~/lib.nut or libs/lib.nut or /users/smitty/libs/lib.nut
 
 					// Get the path component from the source file's library name info
 
@@ -452,22 +452,42 @@
 					// Check that the file is not in a folder below the project, eg.
 					// subfolder/file.class.nut - ie. there is no prefixing /
 
-					if (![libPath hasPrefix:@"/"])
+					BOOL isAbsolute = [libPath hasPrefix:@"/"];
+					BOOL containsParentMarker = ([libPath rangeOfString:@"../" options:NSLiteralSearch].location != NSNotFound);
+
+					if (!isAbsolute)
 					{
-						libPath = [projectPath stringByAppendingFormat:@"/%@", libPath];
+						// Path not absolute, ie. doesn't start with a /
+
+						if (!containsParentMarker)
+						{
+							// There are no relative path indicators, so this must be a subfolder of the project folder
+
+							libPath = [projectPath stringByAppendingFormat:@"/%@", libPath];
+						}
+						else
+						{
+							// Path contains at least one ../
+
+							libPath = [self getAbsolutePath:projectPath :libPath];
+						}
+					}
+					else
+					{
+						// Don't need to do antything here - path is absolute
 					}
 
-					// Check for a relative path, ie. at least one ../
+					/*
+					commentRange = [libPath rangeOfString:@"../" options:NSLiteralSearch];
 
-					commentRange = [libName rangeOfString:@"../" options:NSLiteralSearch];
-
-					if (commentRange.location != NSNotFound)
+					if (hasDoubledots)
 					{
 						// If we have a relative path, process it with 'getAbsolutePath:',
 						// otherwise assume we have an absolute path and leave it unchanged
 
 						libPath = [self getAbsolutePath:projectPath :libPath];
 					}
+					 */
 
 					// Get the actual library name
 
@@ -482,8 +502,9 @@
 				}
 
 #ifdef DEBUG
-				NSLog(@"Name: %@", libName);
-				NSLog(@"Path %@", libPath);
+				NSLog(@"Absolute Path %@", libPath);
+				NSLog(@"         Name: %@", libName);
+
 #endif
 
 				// At this point, 'libName' should be of the form 'lib.class.nut', and
@@ -1393,11 +1414,6 @@
 
 	for (File *item in model.libraries)
 	{
-
-#ifdef DEBUG
-		NSLog(@"Path: %@ Name: %@", item.path, item.filename);
-#endif
-
 		NSString *path = [item.path stringByAppendingFormat:@"/%@", item.filename];
 		if (![fileWatchQueue isPathBeingWatched:path]) [fileWatchQueue addPath:path];
 	}
@@ -1405,22 +1421,19 @@
 	for (File *item in model.files)
 	{
 
-#ifdef DEBUG
-		NSLog(@"Path: %@ Name: %@", item.path, item.filename);
-#endif
-
 		NSString *path = [item.path stringByAppendingFormat:@"/%@", item.filename];
 		if (![fileWatchQueue isPathBeingWatched:path]) [fileWatchQueue addPath:path];
 	}
 
-	// Finally cnvert paths from absolute paths to relative paths for storage
+	// Finally convert paths from absolute paths to relative paths for storage
 
 	for (File *lib in model.libraries)
 	{
 		lib.path = [self getRelativeFilePath:thisProject.path :lib.path];
 
 #ifdef DEBUG
-		NSLog(@"Path: %@ Name: %@", lib.path, lib.filename);
+		NSLog(@"Relative Path: %@", lib.path);
+		NSLog(@"         Name: %@", lib.filename);
 #endif
 
 	}
@@ -1430,7 +1443,8 @@
 		file.path = [self getRelativeFilePath:thisProject.path :file.path];
 
 #ifdef DEBUG
-		NSLog(@"Path: %@ Name: %@", file.path, file.filename);
+		NSLog(@"Relative Path: %@", file.path);
+		NSLog(@"         Name: %@", file.filename);
 #endif
 
 	}
