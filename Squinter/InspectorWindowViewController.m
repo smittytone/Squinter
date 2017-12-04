@@ -262,7 +262,7 @@
 				}
 
 				[projectKeys addObject:@"Type "];
-				[projectValues addObject:devicegroup.type];
+				[projectValues addObject:[self convertDevicegroupType:devicegroup.type :YES]];
 
 				if (devicegroup.description != nil && devicegroup.description.length > 0)
 				{
@@ -279,10 +279,11 @@
 						[projectKeys addObject:@" "];
 						[projectValues addObject:@" "];
 
-						[projectKeys addObject:[NSString stringWithFormat:@"Source File %li ", (long)modcount]];
+						NSString *typeString = [model.type compare:@"agent"] == NSOrderedSame ? @"Agent" : @"Device";
+						[projectKeys addObject:[NSString stringWithFormat:@"%@ Code File ", typeString]];
 						[projectValues addObject:model.filename];
-						[projectKeys addObject:@"Type "];
-						[projectValues addObject:model.type];
+						//[projectKeys addObject:@"Type "];
+						//[projectValues addObject:model.type];
 						[projectKeys addObject:@"Path "];
 						[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename]];
 
@@ -900,6 +901,25 @@
 	nstf.cell.lineBreakMode = NSLineBreakByWordWrapping;
 	nstf.stringValue = string;
 	return [nstf.cell cellSizeForBounds:nstf.bounds].height;
+}
+
+
+
+- (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
+{
+	NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup",
+						  @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
+	NSArray *dgnames = @[ @"Production", @"Factory Fixture", @"Development", @"Factory Test", @"Production Test"];
+
+	for (NSUInteger i = 0 ; i < dgtypes.count ; ++i)
+	{
+		NSString *dgtype = back ? [dgnames objectAtIndex:i] : [dgtypes objectAtIndex:i];
+
+		if ([dgtype compare:type] == NSOrderedSame) return (back ? [dgtypes objectAtIndex:i] : [dgnames objectAtIndex:i]);
+	}
+
+	if (!back) return @"Unknown";
+	return @"development_devicegroup";
 }
 
 
