@@ -7558,9 +7558,11 @@
     if (theLogs.count > 0)
     {
         [extraOpQueue addOperationWithBlock:^(void){
-            // Calculate the width of the widest status message for spacing the output into columns
 
-            NSUInteger width = 0;
+			// Calculate the width of the widest status message for spacing the output into columns
+
+			NSMutableArray *lines = [[NSMutableArray alloc] init];
+			NSUInteger width = 0;
 
             for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
             {
@@ -7568,10 +7570,10 @@
                 NSString *sString = [aLog objectForKey:@"type"];
                 if (sString.length > width) width = sString.length;
             }
-
-            if ([action compare:@"gethistory"] == NSOrderedSame)
+			
+			if ([action compare:@"gethistory"] == NSOrderedSame)
             {
-                [self performSelectorOnMainThread:@selector(logLogs:) withObject:[NSString stringWithFormat:@"History of device \"%@\":", [self getValueFrom:device withKey:@"name"]] waitUntilDone:NO];
+				[lines addObject:[NSString stringWithFormat:@"History of device \"%@\":", [self getValueFrom:device withKey:@"name"]]];
 
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
                 {
@@ -7584,12 +7586,12 @@
 
                     NSString *lString = [NSString stringWithFormat:@"%@ Device %@ by %@", timestamp, event, doer];
 
-                    [self performSelectorOnMainThread:@selector(logLogs:) withObject:lString waitUntilDone:NO];
+                    [lines addObject:lString];
                 }
             }
             else
             {
-                [self performSelectorOnMainThread:@selector(logLogs:) withObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":", [self getValueFrom:device withKey:@"name"]] waitUntilDone:NO];
+                [lines addObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":",[self getValueFrom:device withKey:@"name"]]];
 
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
                 {
@@ -7602,13 +7604,17 @@
                     NSString *spacer = [@"                                      " substringToIndex:13 - type.length];
                     NSString *lString = [NSString stringWithFormat:@"%@ [%@]%@%@", timestamp, type, spacer, msg];
 
-                    [self performSelectorOnMainThread:@selector(logLogs:) withObject:lString waitUntilDone:NO];
+                    [lines addObject:lString];
                 }
             }
 
+			[self performSelectorOnMainThread:@selector(printInfoInLog:) withObject:lines waitUntilDone:YES];
+
             // Look for URLs etc one all the items have gone in
 
-            [self performSelectorOnMainThread:@selector(parseLog) withObject:nil waitUntilDone:NO];
+            [self performSelectorOnMainThread:@selector(parseLog)
+								   withObject:nil
+								waitUntilDone:NO];
         }];
     }
     else
@@ -8508,9 +8514,7 @@
 
     // ...then build a string of dashes that long
 
-    NSString *dashes = @"";
-
-    for (NSUInteger i = 0 ; i < dashCount ; ++i) dashes = [dashes stringByAppendingString:@"-"];
+    NSString *dashes = [@"" stringByPaddingToLength:dashCount withString:@"-" startingAtIndex:0];
 
     // Write out the dashes
 
