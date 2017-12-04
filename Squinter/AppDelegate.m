@@ -9262,7 +9262,7 @@
                 {
                     anItem.state = NSOnState;
                     [projectsPopUp selectItemWithTitle:selected.title];
-                    projectsPopUp.selectedItem.title = [NSString stringWithFormat:@"%@/%@", currentProject.name, currentDevicegroup.name];
+					projectsPopUp.selectedItem.title = [NSString stringWithFormat:@"%@/%@", currentProject.name, (currentDevicegroup != nil ? currentDevicegroup.name : @"None")];
                 }
                 else
                 {
