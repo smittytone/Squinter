@@ -376,7 +376,7 @@
 
 	// Position Inspector
 
-	if (![defaults boolForKey:@"com.bps.squinter.preservews"])
+	if ([defaults boolForKey:@"com.bps.squinter.preservews"])
 	{
 		NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
 		NSRect nuRect = NSRectFromString(frameString);
