@@ -156,7 +156,7 @@
 	NSInteger row = cellView.index;
 
 	// Open the URL
-	
+
 	[nswsw openURL:[NSURL URLWithString:[deviceValues objectAtIndex:row]]];
 }
 
@@ -522,7 +522,7 @@
 	if (aTab > inspectorTabView.numberOfTabViewItems) return;
 
 	tabIndex = aTab;
-	
+
 	[inspectorTabView selectTabViewItemAtIndex:tabIndex];
 }
 
@@ -583,8 +583,6 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	
-
 	if ([tableColumn.identifier compare:@"infoheadcolumn"] == NSOrderedSame || [tableColumn.identifier compare:@"deviceinfoheadcolumn"] == NSOrderedSame)
 	{
 		NSTableCellView *cell = [tableView makeViewWithIdentifier:(tableView == infoTable ? @"infoheadcell" : @"deviceinfoheadcell") owner:nil];
@@ -592,8 +590,6 @@
 		if (cell != nil)
 		{
 			cell.textField.stringValue = tableView == infoTable ? [projectKeys objectAtIndex:row] : [deviceKeys objectAtIndex:row];
-
-			[cell.textField setRefusesFirstResponder:YES];
 		}
 		return cell;
 	}
@@ -610,10 +606,8 @@
 			CGFloat height = width > 196 ? ((NSInteger)(width / 196) + 1) * 14.0 : 14.0;
 			[cell setFrameSize:NSMakeSize(196, height)];
 			cell.textField.stringValue = string;
-
-			[cell.textField setRefusesFirstResponder:YES];
 		}
-		
+
 		return cell;
 	}
 	else if ([tableColumn.identifier compare:@"deviceinfocheckcolumn"] == NSOrderedSame)
@@ -626,6 +620,7 @@
 			{
 				// Set the button action and save the row number in the cell
 
+                [linkcell.goToButton setTarget:self];
 				[linkcell.goToButton setAction:@selector(goToURL:)];
 				linkcell.index = row;
 			}
@@ -643,6 +638,7 @@
 			{
 				// Set the button action and save the row number in the cell
 
+				[linkcell.goToButton setTarget:self];
 				[linkcell.goToButton setAction:@selector(link:)];
 				linkcell.index = row;
 			}
