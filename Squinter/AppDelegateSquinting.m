@@ -452,16 +452,20 @@
 					// Check that the file is not in a folder below the project, eg.
 					// subfolder/file.class.nut - ie. there is no prefixing /
 
-					BOOL isAbsolute = [libPath hasPrefix:@"/"];
-					BOOL containsParentMarker = ([libPath rangeOfString:@"../" options:NSLiteralSearch].location != NSNotFound);
+					commentRange = [libPath rangeOfString:@"../" options:NSLiteralSearch]; 
+
+                 BOOL isAbsolute = [libPath hasPrefix:@"/"];
+					BOOL containsParentMarker = (commentRange.location != NSNotFound);
+                
 
 					if (!isAbsolute)
 					{
 						// Path not absolute, ie. doesn't start with a /
 
-						if (!containsParentMarker)
+						if (!containsParentMarker || (containsParentMaker && commentRange.location > 0))
 						{
-							// There are no relative path indicators, so this must be a subfolder of the project folder
+							// There are no relative path indicators - or none at the start - so
+                       // this must be a subfolder of the project folder
 
 							libPath = [projectPath stringByAppendingFormat:@"/%@", libPath];
 						}
