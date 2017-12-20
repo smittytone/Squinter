@@ -9591,6 +9591,8 @@
     // This SHOULD be only place we call this but may not be
 
     [self refreshDevicesMenus];
+
+	iwvc.project = currentProject;
 }
 
 
