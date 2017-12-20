@@ -454,7 +454,7 @@
 
 					commentRange = [libPath rangeOfString:@"../" options:NSLiteralSearch]; 
 
-                 BOOL isAbsolute = [libPath hasPrefix:@"/"];
+                 	BOOL isAbsolute = [libPath hasPrefix:@"/"];
 					BOOL containsParentMarker = (commentRange.location != NSNotFound);
                 
 
@@ -462,7 +462,7 @@
 					{
 						// Path not absolute, ie. doesn't start with a /
 
-						if (!containsParentMarker || (containsParentMaker && commentRange.location > 0))
+						if (!containsParentMarker || (containsParentMarker && commentRange.location > 0))
 						{
 							// There are no relative path indicators - or none at the start - so
                        // this must be a subfolder of the project folder
