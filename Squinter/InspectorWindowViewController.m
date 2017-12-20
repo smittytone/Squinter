@@ -57,8 +57,8 @@
 	[self setDevice:nil];
 
 #ifdef DEBUG
-	//infoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
-	//deviceInfoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask  | NSTableViewSolidHorizontalGridLineMask;
+	infoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask | NSTableViewSolidHorizontalGridLineMask;
+	deviceInfoTable.gridStyleMask = NSTableViewSolidVerticalGridLineMask | NSTableViewSolidHorizontalGridLineMask;
 #endif
 
 	nswsw = NSWorkspace.sharedWorkspace;
@@ -425,7 +425,9 @@
 
 		if ([string compare:@"Online"] == NSOrderedSame)
 		{
-			[deviceValues addObject:[device valueForKeyPath:@"attributes.ip_address"]];
+			NSNumber *ip = [device valueForKeyPath:@"attributes.ip_address"];
+			if ((NSNull *)ip == [NSNull null]) ip = nil;
+			[deviceValues addObject:(ip != nil ? ip : @"Unknown")];
 		}
 		else
 		{
