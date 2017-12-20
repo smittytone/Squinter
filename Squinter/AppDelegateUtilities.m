@@ -530,13 +530,19 @@
 
     if ([key compare:@"device_online"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.device_online"];
     if ([key compare:@"mac_address"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.mac_address"];
-    if ([key compare:@"ip_address"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.ip_address"];
     if ([key compare:@"imp_type"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.imp_type"];
     if ([key compare:@"agent_id"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.agent_id"];
     if ([key compare:@"agent_running"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.agent_running"] boolValue]];
     if ([key compare:@"swversion"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.swversion"];
 
 	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
+
+	if ([key compare:@"ip_address"] == NSOrderedSame)
+	{
+		NSString *ip = [apiDict valueForKeyPath:@"attributes.ip_address"];
+		if ((NSNull *)ip == [NSNull null]) return nil;
+		return ip;
+	}
 
 	if ([key compare:@"last_enrolled_at"] == NSOrderedSame)
 	{
