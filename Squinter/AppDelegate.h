@@ -34,7 +34,8 @@
                                    NSToolbarDelegate,
                                    NSURLSessionDataDelegate,
                                    NSURLSessionTaskDelegate,
-                                   NSTextFieldDelegate>
+                                   NSTextFieldDelegate,
+								   NSTouchBarProvider>
 {
     // Main UI element outlets
 
@@ -320,8 +321,14 @@
     // Update Tracking
 
     IBOutlet SUUpdater *sparkler;
-
-    IBOutlet CommitWindowViewController *cwvc;
+	
+	// Commit Window
+	
+	IBOutlet CommitWindowViewController *cwvc;
+	
+	// Touch Bar
+	
+	IBOutlet NSTouchBar *appBar;
 
     Project *currentProject, *creatingProject, *savingProject;
     Devicegroup *currentDevicegroup;
@@ -625,5 +632,7 @@
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
 
+
+@property (nonatomic, strong) NSTouchBar *touchBar;
 
 @end

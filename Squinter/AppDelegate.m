@@ -10,6 +10,9 @@
 
 @implementation AppDelegate
 
+@synthesize touchBar;
+
+
 
 #pragma mark - Application Initialization Methods
 
@@ -21,6 +24,8 @@
 	// The second, 'inLogDef', sets the format for incoming timestamps from impCentral.
 	// The third, 'outLogDef', is used to present timestamps from impCentral;
 	// It is the same as 'def' but adds three decimals to the seconds count
+	
+	touchBar = appBar;
 
     def = [[NSDateFormatter alloc] init];
     def.dateFormat = @"yyyy-MM-dd HH:mm:ss ZZZZZ";
