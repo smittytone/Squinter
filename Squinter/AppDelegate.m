@@ -39,7 +39,6 @@
 	outLogDef.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS ZZZZZ";
 	outLogDef.timeZone = [NSTimeZone localTimeZone];
 
-
     // Initialize app properties
     // NOTE 'currentXXX' indicates a selected Squinter object
     //      'selectedXXX' indicates a selected API object
@@ -1499,7 +1498,7 @@
 
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -1653,7 +1652,7 @@
 {
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -1914,7 +1913,7 @@
 
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -2352,7 +2351,7 @@
 {
     if (selectedProduct == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
         return;
     }
 
@@ -2500,13 +2499,13 @@
 {
     if (selectedProduct == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
         return;
     }
 
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -2539,7 +2538,7 @@
 {
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -3117,7 +3116,7 @@
 {
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3224,7 +3223,7 @@
 {
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3484,7 +3483,7 @@
 {
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3515,7 +3514,7 @@
 {
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3536,7 +3535,7 @@
 
 	if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3727,7 +3726,7 @@
 
     if (selectedDevice == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
@@ -3765,7 +3764,7 @@
 
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3789,7 +3788,7 @@
 
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -3813,7 +3812,7 @@
 
     if (selectedDevice == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
@@ -4249,7 +4248,7 @@
 {
     if (selectedDevice == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
@@ -4277,7 +4276,7 @@
 {
     if (selectedDevice == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
@@ -5240,7 +5239,7 @@
 
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -6121,7 +6120,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (productToProjectStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (productToProjectStageTwo:)"] :YES];
     }
 }
 
@@ -6353,7 +6352,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createProductStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createProductStageTwo:)"] :YES];
     }
 }
 
@@ -6485,7 +6484,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateProductStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateProductStageTwo:)"] :YES];
     }
 }
 
@@ -6541,7 +6540,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateDevicegroupStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateDevicegroupStageTwo:)"] :YES];
     }
 
     if (updated)
@@ -6651,7 +6650,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (deleteDevicegroupStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (deleteDevicegroupStageTwo:)"] :YES];
     }
 }
 
@@ -6704,7 +6703,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateCodeStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateCodeStageTwo:)"] :YES];
     }
 }
 
@@ -6934,7 +6933,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listDevices:)"] :YES];
     }
 }
 
@@ -7084,7 +7083,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
     }
 }
 
@@ -7202,7 +7201,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (restarted:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (restarted:)"] :YES];
     }
 }
 
@@ -7245,7 +7244,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (reassigned:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (reassigned:)"] :YES];
     }
 }
 
@@ -7355,7 +7354,7 @@
     }
     else
     {
-        [self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (uploadCodeStageTwo:)"] :YES];
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (uploadCodeStageTwo:)"] :YES];
     }
 }
 
@@ -7381,7 +7380,7 @@
 	}
 	else
 	{
-		[self writeStringToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (setMinimumDeploymentStageTwo:)"] :YES];
+		[self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (setMinimumDeploymentStageTwo:)"] :YES];
 	}
 }
 
@@ -7902,7 +7901,7 @@
 
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -8038,13 +8037,13 @@
 {
     if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -8334,7 +8333,7 @@
 
 	if (selectedDevice == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
@@ -8442,7 +8441,7 @@
 
 	if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -8479,7 +8478,7 @@
 
 	if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -8902,7 +8901,7 @@
 
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -9088,7 +9087,7 @@
 
 	if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -9114,7 +9113,7 @@
 
 	if (selectedDevice == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
@@ -9131,7 +9130,7 @@
 
 	if (currentProject == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
 
@@ -9147,7 +9146,7 @@
 
 	if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -11259,7 +11258,7 @@ didReceiveResponse:(NSURLResponse *)response
 {
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -11292,7 +11291,7 @@ didReceiveResponse:(NSURLResponse *)response
 {
     if (currentDevicegroup == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
@@ -11325,7 +11324,7 @@ didReceiveResponse:(NSURLResponse *)response
 {
     if (selectedDevice == nil)
     {
-        [self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
