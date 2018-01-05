@@ -22,7 +22,7 @@
 
 	if (devicegroup == nil)
 	{
-		[self writeStringToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+		[self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
 		return;
 	}
 
