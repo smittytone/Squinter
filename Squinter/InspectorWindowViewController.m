@@ -616,7 +616,7 @@
 	{
 		if ([self isURLRow:row])
 		{
-			InspectorButtonTableCellView *linkcell = [tableView makeViewWithIdentifier:@"deviceinfocheckcell" owner:nil];
+			InspectorButtonTableCellView *linkcell = [tableView makeViewWithIdentifier:@"deviceinfocheckcell" owner:self];
 
 			if (linkcell != nil)
 			{
