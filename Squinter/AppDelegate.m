@@ -10720,6 +10720,7 @@
 - (IBAction)setPrefs:(id)sender
 {
     workingDirectory = workingDirectoryField.stringValue;
+	BOOL textChange = NO;
 
 	[defaults setBool:(autoLoadListsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoloadlists"];
 	[defaults setBool:(preserveCheckbox.state == NSOnState) forKey:@"com.bps.squinter.preservews"];
@@ -10731,25 +10732,44 @@
 	[defaults setBool:(azureCheckbox.state == NSOnState) forKey:@"com.bps.squinter.useazure"];
 	[defaults setBool:(showInspectorCheckbox.state == NSOnState) forKey:@"com.bps.squinter.show.inspector"];
 
+	float r = (float)textColour.redComponent;
+	float b = (float)textColour.blueComponent;
+	float g = (float)textColour.greenComponent;
+	
 	textColour = textColorWell.color;
-    backColour = backColorWell.color;
+	
+	float r2 = (float)textColour.redComponent;
+	float b2 = (float)textColour.blueComponent;
+	float g2 = (float)textColour.greenComponent;
+	
+	if (r != r2 || b != b2 || g != g2)
+	{
+		textChange = YES;
+	
+		[defaults setObject:[NSNumber numberWithFloat:r2] forKey:@"com.bps.squinter.text.red"];
+		[defaults setObject:[NSNumber numberWithFloat:g2] forKey:@"com.bps.squinter.text.green"];
+		[defaults setObject:[NSNumber numberWithFloat:b2] forKey:@"com.bps.squinter.text.blue"];
+	}
+	
+	r = (float)backColour.redComponent;
+	b = (float)backColour.blueComponent;
+	g = (float)backColour.greenComponent;
+	
+	backColour = backColorWell.color;
 
-    float r = (float)textColour.redComponent;
-    float b = (float)textColour.blueComponent;
-    float g = (float)textColour.greenComponent;
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.text.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.text.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.text.blue"];
-
-    r = (float)backColour.redComponent;
-    b = (float)backColour.blueComponent;
-    g = (float)backColour.greenComponent;
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.back.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.back.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.back.blue"];
-
+	r2 = (float)backColour.redComponent;
+	b2 = (float)backColour.blueComponent;
+	g2 = (float)backColour.greenComponent;
+	
+	if (r != r2 || b != b2 || g != g2)
+	{
+		textChange = YES;
+	
+		[defaults setObject:[NSNumber numberWithFloat:r2] forKey:@"com.bps.squinter.back.red"];
+		[defaults setObject:[NSNumber numberWithFloat:g2] forKey:@"com.bps.squinter.back.green"];
+		[defaults setObject:[NSNumber numberWithFloat:b2] forKey:@"com.bps.squinter.back.blue"];
+	}
+	
     if (r == 0) r = 0.1;
     if (b == 0) b = 0.1;
     if (g == 0) g = 0.1;
@@ -10801,13 +10821,21 @@
     [self setColours];
 
     NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
-    NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
+	NSNumber *num = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
+	if (fontsMenu.indexOfSelectedItem != num.integerValue) textChange = YES;
+	
+	NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
     if (fontSize == 15) fontSize = 18;
-
-    logTextView.font = [self setLogViewFont:fontName :fontSize :(boldTestCheckbox.state == NSOnState)];
-    [logTextView setTextColor:textColour];
-    [logClipView setBackgroundColor:backColour];
-
+	num = [defaults objectForKey:@"com.bps.squinter.fontSizeIndex"];
+	if (fontSize != num.integerValue) textChange = YES;
+	
+	if (textChange)
+	{
+		logTextView.font = [self setLogViewFont:fontName :fontSize :(boldTestCheckbox.state == NSOnState)];
+		[logTextView setTextColor:textColour];
+		[logClipView setBackgroundColor:backColour];
+	}
+	
     [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
