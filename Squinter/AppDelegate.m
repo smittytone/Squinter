@@ -53,6 +53,7 @@
     downloads = nil;
     ide = nil;
     dockMenu = nil;
+	refreshTimer = nil;
 
     eiLibListData = nil;
     eiLibListTask = nil;
@@ -71,6 +72,7 @@
 
     syncItemCount = 0;
     logPaddingLength = 0;
+	deviceCheckCount = -1;
 
     nswsw = NSWorkspace.sharedWorkspace;
     nsfm = NSFileManager.defaultManager;
@@ -741,6 +743,10 @@
     // Kill any connections to the API
 
     [ide killAllConnections];
+	
+	// Kill any timers
+	
+	if (refreshTimer != nil) [refreshTimer invalidate];
 
     // Record settings that are not set by the Prefs dialog
 
@@ -3704,6 +3710,7 @@
     }
 
     [self writeStringToLog:@"Updating devices’ status information - this may take a moment..." :YES];
+	[connectionIndicator startAnimation:self];
 
     // Get all the devices from development device groups and unassigned devices
 
@@ -3712,6 +3719,55 @@
     [ide getDevices:dict];
 
 	// Pick up the action at listDevices:
+}
+
+
+
+- (IBAction)keepDevicesStatusUpdated:(id)sender
+{
+	if (refreshTimer != nil)
+	{
+		[refreshTimer invalidate];
+		
+		checkDeviceStatusMenuItem.state = NSOffState;
+		refreshTimer = nil;
+		return;
+	}
+	
+	checkDeviceStatusMenuItem.state = NSOnState;
+	
+	if (devicesArray == nil || devicesArray.count == 0) [self updateDevicesStatus:nil];
+	
+	refreshTimer = [NSTimer scheduledTimerWithTimeInterval:300.0
+													target:self
+												  selector:@selector(deviceStatusCheck)
+												  userInfo:nil
+												   repeats:YES];
+}
+
+
+
+- (void)deviceStatusCheck
+{
+	if (deviceCheckCount != -1) return;
+	
+	if (devicesArray != nil && devicesArray.count > 0)
+	{
+		[self writeStringToLog:@"Updating devices’ status information..." :YES];
+		
+		deviceCheckCount = 0;
+		
+		for (NSUInteger i = 0 ; i < devicesArray.count ; ++i)
+		{
+			NSDictionary *device = [devicesArray objectAtIndex:i];
+			NSDictionary *dict = @{ @"action" : @"refreshdevice",
+									@"device" : device };
+			
+			[ide getDevice:[device objectForKey:@"id"] :dict];
+			
+			// Pick up the action at updateDevice:
+		}
+	}
 }
 
 
@@ -6815,20 +6871,20 @@
 		}
 
         if ([action compare:@"getdevices"] == NSOrderedSame)
-        {
-            // Initialise or clear the current list of devices then prep to add the incoming list
-
-            if (devicesArray == nil)
-            {
-                devicesArray = [[NSMutableArray alloc] init];
-            }
-            else
-            {
-                [devicesArray removeAllObjects];
-            }
-
-            action = @"adddevices";
-        }
+		{
+			// Initialise or clear the current list of devices then prep to add the incoming list
+			
+			if (devicesArray == nil)
+			{
+				devicesArray = [[NSMutableArray alloc] init];
+			}
+			else
+			{
+				[devicesArray removeAllObjects];
+			}
+			
+			action = @"adddevices";
+		}
 
         if ([action compare:@"adddevices"] == NSOrderedSame)
         {
@@ -6982,17 +7038,51 @@
 	NSDictionary *device = [data objectForKey:@"data"];
 	NSDictionary *source = [data objectForKey:@"object"];
 	NSMutableDictionary *aDevice = [source objectForKey:@"device"];
-
-	NSMutableDictionary *attributes = [aDevice objectForKey:@"attributes"];
-
-	NSString *version = [self getValueFrom:device withKey:@"swversion"];
-	if (version != nil) [attributes setObject:version forKey:@"swversion"];
-
-	version = [self getValueFrom:device withKey:@"plan_id"];
-	if (version != nil) [attributes setObject:version forKey:@"plan_id"];
-
-	NSNumber *free = [self getValueFrom:device withKey:@"free_memory"];
-	if (free != nil) [attributes setObject:free forKey:@"free_memory"];
+	NSString *action = [source objectForKey:@"action"];
+	
+	if (action != nil)
+	{
+		NSMutableDictionary *attributes = [aDevice objectForKey:@"attributes"];
+		
+		if ([action compare:@"refreshdevice"] == NSOrderedSame)
+		{
+			// Update the existing record's status with the new info
+			
+			NSString *status = [self getValueFrom:device withKey:@"device_online"];
+			[attributes setObject:status forKey:@"device_online"];
+			
+			++deviceCheckCount;
+			
+			// NSLog(@"Device %li of %li", (long)deviceCheckCount, (long)devicesArray.count);
+			
+			if (deviceCheckCount == devicesArray.count)
+			{
+				// All done so update the UI and set the not-checking marker
+				
+				deviceCheckCount = -1;
+				
+				[self refreshDevicesMenus];
+				[self refreshDevicesPopup];
+				
+				[connectionIndicator stopAnimation:self];
+			}
+			
+			return;
+		}
+		
+		NSString *version = [self getValueFrom:device withKey:@"swversion"];
+		if (version != nil) [attributes setObject:version forKey:@"swversion"];
+		
+		version = [self getValueFrom:device withKey:@"plan_id"];
+		if (version != nil) [attributes setObject:version forKey:@"plan_id"];
+		
+		NSNumber *free = [self getValueFrom:device withKey:@"free_memory"];
+		if (free != nil) [attributes setObject:free forKey:@"free_memory"];
+	}
+	else
+	{
+		[self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (updateDevice:)"] :YES];
+	}
 }
 
 

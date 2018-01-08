@@ -113,6 +113,7 @@
     IBOutlet NSMenuItem *streamLogsMenuItem;
     IBOutlet NSMenuItem *renameDeviceMenuItem;
     IBOutlet NSMenuItem *updateDeviceStatusMenuItem;
+	IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
     IBOutlet NSMenuItem *deleteDeviceMenuItem;
     IBOutlet NSMenu *unassignedDevicesMenu;
 
@@ -341,12 +342,10 @@
     NSFileManager *nsfm;
     NSNotificationCenter *nsncdc;
     NSUserDefaults *defaults;
-
     NSDateFormatter *def, *inLogDef, *outLogDef;
-
     NSOperationQueue *extraOpQueue;
-
     NSMenu *dockMenu;
+	NSTimer *refreshTimer;
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
@@ -361,7 +360,7 @@
 
     NSString *workingDirectory, *listString, *newDevicegroupName;
 
-    NSUInteger syncItemCount, logPaddingLength;
+	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag;
@@ -460,6 +459,8 @@
 
 - (void)selectDevice;
 - (IBAction)updateDevicesStatus:(id)sender;
+- (IBAction)keepDevicesStatusUpdated:(id)sender;
+- (void)deviceStatusCheck;
 - (IBAction)restartDevice:(id)sender;
 - (IBAction)restartDevices:(id)sender;
 - (IBAction)unassignDevice:(id)sender;

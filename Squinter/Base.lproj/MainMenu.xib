@@ -40,6 +40,7 @@
                 <outlet property="autoUpdateCheckCheckbox" destination="4RA-rZ-K8Y" id="MIk-Vs-MOl"/>
                 <outlet property="backColorWell" destination="wRn-QZ-S9O" id="LCW-Ow-P7y"/>
                 <outlet property="boldTestCheckbox" destination="pAc-bH-SEg" id="E5m-ew-DDC"/>
+                <outlet property="checkDeviceStatusMenuItem" destination="sqM-Fo-tSi" id="lvM-rd-I9m"/>
                 <outlet property="checkImpLibrariesMenuItem" destination="87g-HH-seU" id="ZRa-Fs-E66"/>
                 <outlet property="clearItem" destination="ZWk-Ol-4mW" id="2Ce-Bb-His"/>
                 <outlet property="closeAllMenuItem" destination="DVo-aG-piG" id="oEU-me-bvR"/>
@@ -799,6 +800,12 @@
                                     <action selector="updateDevicesStatus:" target="Voe-Tx-rLC" id="7PS-zv-3Qj"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Keep Devices’ Status Updated" id="sqM-Fo-tSi">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="keepDevicesStatusUpdated:" target="Voe-Tx-rLC" id="aok-yu-QDZ"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="AxY-fi-ANF"/>
                             <menuItem title="Unassigned Devices" id="a8u-9t-iy9">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -1021,7 +1028,7 @@
                         <rect key="frame" x="-1" y="39" width="1026" height="544"/>
                         <clipView key="contentView" id="DPZ-Ai-vv0">
                             <rect key="frame" x="1" y="1" width="1024" height="542"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7">
                                     <rect key="frame" x="0.0" y="-1" width="1024" height="542"/>
