@@ -18,7 +18,6 @@
 @property (nonatomic, strong) NSString *type;               // The source code type: "agent" or "device"
 @property (nonatomic, strong) NSMutableArray *files;        // The source code's included files as of the last compile
 @property (nonatomic, strong) NSMutableArray *libraries;    // The source code's required libs as of the last compile
-
 @property (nonatomic, strong) NSString *sha;                // The deployment SHA (NOTE shared between agent and device)
 @property (nonatomic, strong) NSString *updated;            // The UTC timestamp returned by the server
 

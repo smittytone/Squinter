@@ -25,6 +25,7 @@
 }
 
 
+
 - (void)setDefaults
 {
     version = kSquinterCurrentVersion;

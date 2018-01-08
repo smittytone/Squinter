@@ -27,11 +27,11 @@
 @property (nonatomic, strong) NSString *path;                       // Project’s ABSOLUTE location on local storage
 @property (nonatomic, strong) NSString *filename;                   // Project’s filename on local storage
                                                                     // NOTE path + / + filename = full path string
-
 // Properties that are NOT saved
 
 @property (nonatomic, assign) NSInteger devicegroupIndex;           // Currently selected devicegroup
-@property (nonatomic, assign) BOOL haschanged;                      // Has the project changed in any way, ie. does it need saving?
+@property (nonatomic, assign) BOOL haschanged;                      // Has the project changed in any way, ie. does it
+																	// need saving?
 @property (nonatomic, assign) NSInteger count;                      // Used for uploading/downloading projects
 
 @end
