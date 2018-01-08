@@ -109,9 +109,6 @@
 		3B36D1D51970A0990029CEC0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3B36D1D81970A0990029CEC0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		3B36D1DA1970A0990029CEC0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../../OneDrive/Programming/Squinter/Images.xcassets; sourceTree = SOURCE_ROOT; };
-		3B36D1E81970A0990029CEC0 /* SquinterTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SquinterTests-Info.plist"; sourceTree = "<group>"; };
-		3B36D1EA1970A0990029CEC0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		3B36D1EC1970A0990029CEC0 /* SquinterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SquinterTests.m; sourceTree = "<group>"; };
 		3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegateSquinting.h; sourceTree = "<group>"; };
 		3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegateSquinting.m; sourceTree = "<group>"; };
 		3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginToolbarItem.h; sourceTree = "<group>"; };
@@ -220,7 +217,6 @@
 				3B36D1C01970A0990029CEC0 /* Products */,
 				AA37379CAA499F6C763B7D77 /* Pods */,
 				9D21E7CE86082310D04E5080 /* Frameworks */,
-				3B36D1E61970A0990029CEC0 /* SquinterTests */,
 			);
 			sourceTree = "<group>";
 			usesTabs = 1;
@@ -276,24 +272,6 @@
 				3B36D1CB1970A0990029CEC0 /* InfoPlist.strings */,
 				3B36D1CE1970A0990029CEC0 /* main.m */,
 				3B36D1D01970A0990029CEC0 /* Squinter-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		3B36D1E61970A0990029CEC0 /* SquinterTests */ = {
-			isa = PBXGroup;
-			children = (
-				3B36D1EC1970A0990029CEC0 /* SquinterTests.m */,
-				3B36D1E71970A0990029CEC0 /* Supporting Files */,
-			);
-			path = SquinterTests;
-			sourceTree = "<group>";
-		};
-		3B36D1E71970A0990029CEC0 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				3B36D1E81970A0990029CEC0 /* SquinterTests-Info.plist */,
-				3B36D1E91970A0990029CEC0 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -600,14 +578,6 @@
 				3B36D1D81970A0990029CEC0 /* Base */,
 			);
 			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-		3B36D1E91970A0990029CEC0 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3B36D1EA1970A0990029CEC0 /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
