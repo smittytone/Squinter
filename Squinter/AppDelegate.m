@@ -564,7 +564,12 @@
                name:@"BuildAPIGotLogs"
              object:ide];
 
-    [nsncdc addObserver:self
+	[nsncdc addObserver:self
+			   selector:@selector(listLogs:)
+				   name:@"BuildAPIGotHistory"
+				 object:ide];
+	
+	[nsncdc addObserver:self
                selector:@selector(listCommits:)
                    name:@"BuildAPIGotDeploymentsList"
                  object:ide];
@@ -3753,7 +3758,7 @@
 	
 	if (devicesArray != nil && devicesArray.count > 0)
 	{
-		[self writeStringToLog:@"Updating devices’ status information..." :YES];
+		[self writeStringToLog:@"Refreshing devices’ status information..." :YES];
 		
 		deviceCheckCount = 0;
 		
@@ -7048,8 +7053,8 @@
 		{
 			// Update the existing record's status with the new info
 			
-			NSString *status = [self getValueFrom:device withKey:@"device_online"];
-			[attributes setObject:status forKey:@"device_online"];
+			NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
+			[attributes setObject:boolean forKey:@"device_online"];
 			
 			++deviceCheckCount;
 			
@@ -7063,6 +7068,7 @@
 				
 				[self refreshDevicesMenus];
 				[self refreshDevicesPopup];
+				if (projectArray.count > 0) [self refreshDevicesMenus];
 				
 				[connectionIndicator stopAnimation:self];
 			}
@@ -9683,6 +9689,7 @@
 
     // Now go and build the assigned devices submenus
     // This SHOULD be only place we call this but may not be
+	// (other than updateDevice:)
 
     [self refreshDevicesMenus];
 
