@@ -1,9 +1,6 @@
-//
-//  CommitWindowViewController.m
-//  Squinter
-//
+
 //  Created by Tony Smith on 11/20/17.
-//  Copyright © 2017 Tony Smith. All rights reserved.
+//  Copyright (c) 2017-18 Tony Smith. All rights reserved.
 //
 
 #import "CommitWindowViewController.h"

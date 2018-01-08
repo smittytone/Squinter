@@ -1477,7 +1477,7 @@ DQ
                             <font key="font" metaFont="system"/>
                             <string key="title">Utility for integrating libraries and files into Squirrel code for the Electric Imp Platform
 
-Developed by Tony Smith © 2014-17</string>
+Developed by Tony Smith © 2014-18</string>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -3867,17 +3867,17 @@ Gw
                         <tabViewItems>
                             <tabViewItem label="Project" identifier="1" id="OY0-C1-yKU">
                                 <view key="view" id="Rze-tK-Ldr">
-                                    <rect key="frame" x="10" y="25" width="334" height="495"/>
+                                    <rect key="frame" x="10" y="29" width="334" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="18" horizontalPageScroll="10" verticalLineScroll="18" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" scrollerKnobStyle="dark" translatesAutoresizingMaskIntoConstraints="NO" id="JgW-wW-cYc">
-                                            <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="334" height="491"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="nMN-Gd-h8U">
-                                                <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="334" height="491"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="16" viewBased="YES" floatsGroupRows="NO" id="ldN-a5-eG2">
-                                                        <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="334" height="491"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.21566104888916016" green="0.21570384502410889" blue="0.21565541625022888" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4028,7 +4028,7 @@ Gw
                                             <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="fEc-01-rsL">
                                                 <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="16" viewBased="YES" floatsGroupRows="NO" id="ZbE-jN-J9f">
                                                         <rect key="frame" x="0.0" y="0.0" width="334" height="495"/>
@@ -4056,7 +4056,7 @@ Gw
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="8LY-y1-aoa">
                                                                                 <rect key="frame" x="0.0" y="1" width="106" height="14"/>
                                                                                 <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Table View Cell" id="Y0c-pk-pUp">
-                                                                                    <font key="font" metaFont="systemBold" size="11"/>
+                                                                                    <font key="font" metaFont="smallSystemBold"/>
                                                                                     <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                 </textFieldCell>
@@ -4191,8 +4191,8 @@ Gw
             <touchBarItems>
                 <touchBarItem id="HTm-Zk-xM6">
                     <viewController key="viewController" id="lug-Bo-A5e">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="deR-9C-BqR">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="deR-9C-BqR">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_new" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tGi-c9-YoW">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4208,8 +4208,8 @@ Gw
                 <touchBarSpacerItem identifier="NSTouchBarItemIdentifierFixedSpaceLarge" id="H03-uU-nJZ"/>
                 <touchBarItem id="rDe-JS-dWb">
                     <viewController key="viewController" id="TMp-Vr-idZ">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9ZA-pi-zbs">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9ZA-pi-zbs">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_open" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="nCN-Xq-S0X">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4223,8 +4223,8 @@ Gw
                 </touchBarItem>
                 <touchBarItem id="DQf-1P-A5m">
                     <viewController key="viewController" id="UKc-yi-2gO">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VKI-S2-VOk">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VKI-S2-VOk">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_compile" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZW7-GL-DVf">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4239,8 +4239,8 @@ Gw
                 </touchBarItem>
                 <touchBarItem id="Yz9-Y9-3SL">
                     <viewController key="viewController" id="b7W-Ge-bMX">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nFc-KZ-i53">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nFc-KZ-i53">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_upload" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OEp-oN-Mzn">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4255,8 +4255,8 @@ Gw
                 </touchBarItem>
                 <touchBarItem id="0ny-HS-2ev">
                     <viewController key="viewController" id="Pwq-d2-etd">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aMW-BY-ilF">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aMW-BY-ilF">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_commits" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="02R-ai-iiC">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4271,8 +4271,8 @@ Gw
                 <touchBarSpacerItem identifier="NSTouchBarItemIdentifierFixedSpaceLarge" id="yhL-eY-1fY"/>
                 <touchBarItem id="idu-wu-Nya">
                     <viewController key="viewController" id="kqW-pw-awt">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EM7-9a-oxr">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EM7-9a-oxr">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_refresh" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fCp-2P-Qbk">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4286,8 +4286,8 @@ Gw
                 </touchBarItem>
                 <touchBarItem id="KyH-5e-cGq">
                     <viewController key="viewController" id="dnr-2T-quJ">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2ky-gI-W5F">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2ky-gI-W5F">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_show" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gwj-M9-QeM">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4301,8 +4301,8 @@ Gw
                 </touchBarItem>
                 <touchBarItem id="tPf-Da-4lD">
                     <viewController key="viewController" id="t9y-eR-NFO">
-                        <button key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ijs-aV-LHN">
-                            <rect key="frame" x="0.0" y="0.0" width="72" height="30"/>
+                        <button key="view" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ijs-aV-LHN">
+                            <rect key="frame" x="0.0" y="0.0" width="84" height="41"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" bezelStyle="rounded" image="tb_clear" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qpO-P4-bd3">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

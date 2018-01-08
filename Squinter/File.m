@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 05/04/2017.
-//  Copyright © 2017 Tony Smith. All rights reserved.
+//  Copyright (c) 2014-18 Tony Smith. All rights reserved.
 //
 
 #import "File.h"
