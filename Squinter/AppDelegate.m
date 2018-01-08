@@ -10923,8 +10923,6 @@
     // Only do this if the project contains EI libraries and 1 hour has
     // passed since the last look-up
 
-    BOOL performCheck = NO;
-
     if (currentDevicegroup.models.count > 0)
     {
         if (eiLibListTime != nil)
@@ -10932,53 +10930,35 @@
             NSDate *now = [NSDate date];
             NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
 
-            if (interval < kEILibCheckInterval)
-            {
-                // Last check was more than 1 hour earlier
-
-                performCheck = YES;
-            }
-            else
+            if (interval >= kEILibCheckInterval && eiLibListData != nil)
             {
                 // Last check was less than 1 hour earlier, so use existing list if it exists
 
-                if (eiLibListData != nil)
-                {
-                    [self compareElectricImpLibs];
-                    return;
-                }
-                else
-                {
-                    performCheck = YES;
-                }
+                [self compareElectricImpLibs];
+				return;
             }
         }
-        else
-        {
-            performCheck = YES;
-        }
 
-        if (performCheck)
-        {
-            // Set/reset the time of the most recent check
+		// Set/reset the time of the most recent check
 
-            eiLibListTime = [NSDate date];
+		eiLibListTime = [NSDate date];
 
-            if (connectionIndicator.hidden == YES)
-            {
-                // Start the connection indicator
+		if (connectionIndicator.hidden == YES)
+		{
+			// Start the connection indicator
 
-                connectionIndicator.hidden = NO;
-                [connectionIndicator startAnimation:self];
-            }
+			connectionIndicator.hidden = NO;
+			[connectionIndicator startAnimation:self];
+		}
 
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
-            [request setHTTPMethod:@"GET"];
-            eiLibListData = [NSMutableData dataWithCapacity:0];
-            NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-            eiLibListTask = [session dataTaskWithRequest:request];
-            [eiLibListTask resume];
-        }
+		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
+		[request setHTTPMethod:@"GET"];
+		eiLibListData = [NSMutableData dataWithCapacity:0];
+		NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration]
+															  delegate: self
+														 delegateQueue: [NSOperationQueue mainQueue]];
+		eiLibListTask = [session dataTaskWithRequest:request];
+		[eiLibListTask resume];
     }
 }
 
@@ -11058,7 +11038,6 @@
 										else
 										{
 											mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is at version %@ - you have version %@.", libName, libVer, eiLib.version];
-											[self writeWarningToLog:mString :YES];
 										}
 
 										[self writeWarningToLog:mString :YES];
