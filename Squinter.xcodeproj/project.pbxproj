@@ -81,9 +81,9 @@
 		29F9470FB833A59D9C952E82 /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B05B2581D05C91F00AA89F4 /* StreamToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StreamToolbarItem.h; sourceTree = "<group>"; };
 		3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StreamToolbarItem.m; sourceTree = "<group>"; };
-		3B06F88B1F8BBE930072A898 /* docpic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = docpic.png; path = Squinter/Images.xcassets/docpic.imageset/docpic.png; sourceTree = SOURCE_ROOT; };
-		3B06F88C1F8BBE930072A898 /* docpic@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@2x.png"; path = "Squinter/Images.xcassets/docpic.imageset/docpic@2x.png"; sourceTree = SOURCE_ROOT; };
-		3B06F88D1F8BBE930072A898 /* docpic@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@3x.png"; path = "Squinter/Images.xcassets/docpic.imageset/docpic@3x.png"; sourceTree = SOURCE_ROOT; };
+		3B06F88B1F8BBE930072A898 /* docpic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = docpic.png; path = ../../../OneDrive/Programming/Squinter/Images.xcassets/docpic.imageset/docpic.png; sourceTree = SOURCE_ROOT; };
+		3B06F88C1F8BBE930072A898 /* docpic@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@2x.png"; path = "../../../OneDrive/Programming/Squinter/Images.xcassets/docpic.imageset/docpic@2x.png"; sourceTree = SOURCE_ROOT; };
+		3B06F88D1F8BBE930072A898 /* docpic@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@3x.png"; path = "../../../OneDrive/Programming/Squinter/Images.xcassets/docpic.imageset/docpic@3x.png"; sourceTree = SOURCE_ROOT; };
 		3B124BFB1F97AA9B00D8E4AD /* Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Token.h; path = ../../BuildAPIAccess/Token.h; sourceTree = "<group>"; };
 		3B124BFC1F97AA9B00D8E4AD /* Token.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Token.m; path = ../../BuildAPIAccess/Token.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
