@@ -3688,9 +3688,12 @@
     {
         NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
 
-        for (NSDictionary *device in devicesArray)
+		// First check by device ID — this is how the data should be stored,
+		// but earlier versions used device name...
+
+		for (NSDictionary *device in devicesArray)
         {
-            NSString *aDevId = [self getValueFrom:device withKey:@"name"];
+            NSString *aDevId = [self getValueFrom:device withKey:@"id"];
 
             if ([aDevId compare:devId] == NSOrderedSame)
             {
@@ -3698,9 +3701,25 @@
 				iwvc.device = selectedDevice;
                 [self refreshDevicesPopup];
                 [self refreshDeviceMenu];
-                break;
+                return;
             }
         }
+
+		// ...so we also check by device name, just in case
+
+		for (NSDictionary *device in devicesArray)
+		{
+			NSString *aDevId = [self getValueFrom:device withKey:@"name"];
+
+			if ([aDevId compare:devId] == NSOrderedSame)
+			{
+				selectedDevice = (NSMutableDictionary *)device;
+				iwvc.device = selectedDevice;
+				[self refreshDevicesPopup];
+				[self refreshDeviceMenu];
+				return;
+			}
+		}
     }
 }
 
@@ -6115,6 +6134,7 @@
                 ndg.description = [self getValueFrom:dg withKey:@"description"];
                 ndg.type = [self getValueFrom:dg withKey:@"type"];
                 ndg.models = [[NSMutableArray alloc] init];
+				ndg.devices = [[NSMutableArray alloc] init];
                 ndg.data = [NSMutableDictionary dictionaryWithDictionary:dg];
                 [npdgs addObject:ndg];
 
@@ -6211,7 +6231,6 @@
             {
                 // The target has no models, so create them using the code below
 
-
                 return;
             }
 
@@ -6289,31 +6308,77 @@
 
     if (project.count == 0)
     {
-        // We have now acquired all the device groups models, so we can save everything
+        // We have now acquired all the device groups models, so we can process everything
+		// First make the new project the current one
 
-        [self productToProjectStageFour:project];
-    }
+		currentProject = project;
+
+		if (project.devicegroups.count > 0)
+		{
+			// The project has at least one device group, so make it the current one
+
+			currentDevicegroup = [project.devicegroups objectAtIndex:0];
+			currentProject.devicegroupIndex = 0;
+
+			if (devicesArray.count > 0)
+			{
+				// If we have a device list, run through it and see which devices, if any,
+				// have been assigned to the current device group
+
+				for (NSDictionary *device in devicesArray)
+				{
+					NSDictionary *relationships = [device objectForKey:@"relationships"];
+					NSDictionary *devgrp = [relationships objectForKey:@"devicegroup"];
+					NSString *deviceid = [devgrp objectForKey:@"id"];
+
+					// Just check for a nil device group ID - to avoid unassigned devices - and
+					// then record the device ID in the device group record if it belongs there
+
+					if (deviceid != nil && [deviceid compare:currentDevicegroup.did] == NSOrderedSame) [currentDevicegroup.devices addObject:deviceid];
+				}
+
+				// See if the current device group has any devices, and select one
+
+				[self selectDevice];
+			}
+		}
+
+		// Update the UI
+
+		[self refreshProjectsMenu];
+		[self refreshOpenProjectsMenu];
+		[self refreshMainDevicegroupsMenu];
+		[self refreshDevicegroupMenu];
+		[self setToolbar];
+
+		// Save the project
+
+		[self productToProjectStageFour:project];
+	}
 }
 
 
 
 - (void)productToProjectStageFour:(Project *)project
 {
-    project.haschanged = YES;
+	// This method is called by productToProjectStageThree: in order to
+	// save the downloaded project
+
+	project.haschanged = YES;
 
     if (savingProject != nil)
     {
-        // TODO
+		// We already have a project being saved...
+		// TODO
 
         return;
     }
 
-    // Go and save the project
+    // Save the project
 
     savingProject = project;
     savingProject.filename = [savingProject.name stringByAppendingString:@".squirrelproj"];
     [self saveProjectAs:nil];
-    [self setToolbar];
 }
 
 
@@ -6990,6 +7055,7 @@
         [self refreshDevicegroupMenu];
         [self setToolbar];
 
+		// Update the Inspector
 		iwvc.devices = devicesArray;
     }
     else
