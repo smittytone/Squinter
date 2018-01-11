@@ -6115,7 +6115,7 @@
                 ndg.description = [self getValueFrom:dg withKey:@"description"];
                 ndg.type = [self getValueFrom:dg withKey:@"type"];
                 ndg.models = [[NSMutableArray alloc] init];
-                ndg.data = [NSMutableDictionary dictionaryWithDictionary:data];
+                ndg.data = [NSMutableDictionary dictionaryWithDictionary:dg];
                 [npdgs addObject:ndg];
 
                 NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];

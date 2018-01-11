@@ -611,6 +611,7 @@
 	if ([key compare:@"min_supported_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.min_supported_deployment"];
 	if ([key compare:@"production_target"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.production_target"];
     if ([key compare:@"min_supported_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.min_supported_deployment"];
+	if ([key compare:@"current_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.current_deployment"];
 
     if ((NSNull *)rd == [NSNull null]) return nil;
     return rd;
