@@ -373,7 +373,9 @@
 		deviceInfoTable.hidden = NO;
 		field.hidden = YES;
 
-		[deviceKeys addObject:@"Device Name "];
+		[deviceKeys addObject:@"Device Info "];
+		[deviceValues addObject:@" "];
+		[deviceKeys addObject:@"Name "];
 		[deviceValues addObject:[device valueForKeyPath:@"attributes.name"]];
 		[deviceKeys addObject:@"ID "];
 		[deviceValues addObject:[device objectForKey:@"id"]];
@@ -634,7 +636,7 @@
 	{
 		if ([self isLinkRow:row])
 		{
-			InspectorButtonTableCellView *linkcell = [tableView makeViewWithIdentifier:@"infocheckcell" owner:nil];
+			InspectorButtonTableCellView *linkcell = [tableView makeViewWithIdentifier:@"infocheckcell" owner:self];
 
 			if (linkcell != nil)
 			{
