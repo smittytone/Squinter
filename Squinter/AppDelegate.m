@@ -4889,8 +4889,6 @@
                         if (dg.models.count > 0) [self compile:dg :NO];
                     }
 
-                    [self selectDevice];
-
                     // Add the project's files to the watch list
 
                     [self watchfiles:currentProject];
@@ -5101,6 +5099,10 @@
             {
                 currentDevicegroup = nil;
             }
+			
+			// Select a device
+			
+			[self selectDevice];
 
             // Update the Menus and the Toolbar
 
