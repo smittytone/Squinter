@@ -7136,7 +7136,14 @@
 				[self refreshDevicesPopup];
 				if (projectArray.count > 0) [self refreshDevicesMenus];
 				
-				[connectionIndicator stopAnimation:self];
+				if (ide.numberOfConnections < 1)
+				{
+					// Only hide the connection indicator if 'ide' has no live connections
+					
+					[connectionIndicator stopAnimation:self];
+					connectionIndicator.hidden = YES;
+				}
+				
 			}
 			
 			return;
