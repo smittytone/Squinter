@@ -647,8 +647,6 @@
     // Update UI
 
     [self setToolbar];
-
-
     [_window setTitle:@"Squinter Beta"];
     [_window makeKeyAndOrderFront:self];
 
@@ -1051,7 +1049,7 @@
 {
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = @"You are not logged in to the impCloud";
-    alert.messageText = [NSString stringWithFormat:@"You must be logged in to %@. Do you wish to log in now?", extra];
+    alert.informativeText = [NSString stringWithFormat:@"You must be logged in to %@. Do you wish to log in now?", extra];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"No"];
 
@@ -1102,6 +1100,7 @@
 {
 	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/index.html#account"]];
 }
+
 
 
 #pragma mark - New Project Methods
@@ -1259,16 +1258,16 @@
 
         [self writeStringToLog:@"Creating Project's Product on the server..." :YES];
 
-        NSDictionary *dict = @{ @"action" : @"newproject",
+        NSDictionary *dict = @{ @"action"  : @"newproject",
                                 @"project" : currentProject };
 
         [ide createProduct:pName :pDesc :dict];
         return;
 
-        // We need to handle the result of this at 'createProductStageTwo:'
+        // Pick up the action at 'createProductStageTwo:'
     }
 
-    // Finally, check whether we're connecting this project to a product (new or selected)
+    // Check whether we're connecting this project to a product (new or selected)
 
     if (associateProduct)
     {
@@ -1283,13 +1282,13 @@
 
     [self addProjectMenuItem:pName :currentProject];
 
-    // Enable project-related UI items
+    // Enable project-related UI items for the new project
 
-    [self refreshOpenProjectsMenu];
+    // [self refreshOpenProjectsMenu];
     [self refreshProjectsMenu];
-    [self refreshDevicegroupMenu];
-    [self refreshMainDevicegroupsMenu];
-    [self refreshDeviceMenu];
+    //[self refreshDevicegroupMenu];
+    //[self refreshMainDevicegroupsMenu];
+    //[self refreshDeviceMenu];
     [self setToolbar];
 
 	iwvc.project = currentProject;
@@ -1312,13 +1311,11 @@
     // This method responds to attempts to select a new project dialog checkbox
     // to make sure contradictory responses are not permitted
 
-    // TO DO - WARN USER
-
     if (sender == newProjectAssociateCheckbox)
     {
         // If user is checking the associate product box, we can't have the new product box checked
 
-        if (newProjectAssociateCheckbox.state == NSOnState) newProjectNewProductCheckbox.state = NSOffState;
+		if (newProjectAssociateCheckbox.state == NSOnState) newProjectNewProductCheckbox.state = NSOffState;
     }
 
     if (sender == newProjectNewProductCheckbox)
@@ -1395,12 +1392,12 @@
 
     if (currentProject == chosenProject) return;
 
-    // Switch in the newly chosen project
+    // Switch in the newly chosen project and select its known selected device group
 
     currentProject = chosenProject;
     currentDevicegroup = (currentProject.devicegroupIndex != -1) ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
 
-    // If we have
+    // If we have a current device group, select its device if it has one
 
     if (currentDevicegroup != nil)
     {
@@ -1472,7 +1469,9 @@
     [self refreshDevicegroupMenu];
     [self refreshMainDevicegroupsMenu];
     [self setToolbar];
-
+	
+	// Set the inspector
+	
 	iwvc.project = currentProject;
 }
 
@@ -1502,12 +1501,9 @@
 
 
 
-
 - (IBAction)closeProject:(id)sender
 {
-    if (projectArray.count == 0) return;
-
-    if (currentProject == nil)
+    if (projectArray.count == 0 || currentProject == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
@@ -1599,7 +1595,6 @@
         [fileWatchQueue kill];
         fileWatchQueue = nil;
         currentProject = nil;
-		iwvc.project = nil;
 
         // Fade the status light
 
@@ -1615,7 +1610,6 @@
         // Set the first project to the current one, and update the UI
 
         currentProject = [projectArray objectAtIndex:0];
-
         currentDevicegroup = nil;
         currentProject.devicegroupIndex = -1;
 
@@ -3729,7 +3723,7 @@
 {
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"update devices' status information"];
+        [self loginAlert:@"Update devices' status information"];
         return;
     }
 
