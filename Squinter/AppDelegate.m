@@ -2346,7 +2346,10 @@
     }
 
     [self writeStringToLog:@"Getting a list of Products from the impCloud..." :YES];
-    [ide getProducts];
+
+	NSDictionary *dict = @{ @"action" : @"getproducts" };
+
+	[ide getProducts:dict];
 
     // Pick up the action in 'listProducts:'
 }
