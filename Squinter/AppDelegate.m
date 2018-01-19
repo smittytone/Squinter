@@ -5773,7 +5773,7 @@
 
     savingProject = nil;
 	doubleSaveFlag = NO;
-	
+
     // Did we come here from a 'close project'? If so, re-run to actually close the project
 
     if (closeProjectFlag) [self closeProject:nil];
@@ -6040,76 +6040,94 @@
     // This method should ONLY be called by BuildAPIAccess instance AFTER loading a list of products
     // At this point we typically need to select or re-select a product
 
-    NSString *sid = nil;
     NSDictionary *dict = (NSDictionary *)note.object;
-    NSDictionary *so = [dict objectForKey:@"object"];
-    NSArray *data = [dict objectForKey:@"data"];
+	NSArray *data = [dict objectForKey:@"data"];
+	NSDictionary *so = [dict objectForKey:@"object"];
     NSString *action = [so objectForKey:@"action"];
+	NSString *sid = nil;
 
-    // 'selectedProduct' may point to an entry in the existing 'productsArray', but this is
-    // about to be zapped, so preserved the ID of the product it points to
+	if (action != nil)
+	{
+		// 'selectedProduct' may point to an entry in the existing 'productsArray', but this is
+		// about to be zapped, so preserved the ID of the product it points to
 
-    if (selectedProduct != nil)
-    {
-        sid = [self getValueFrom:selectedProduct withKey:@"id"];
-        selectedProduct = nil;
-    }
+		if (selectedProduct != nil)
+		{
+			sid = [self getValueFrom:selectedProduct withKey:@"id"];
+			selectedProduct = nil;
+		}
 
-    if (productsArray == nil)
-    {
-        productsArray = [[NSMutableArray alloc] init];
-    }
-    else
-    {
-        [productsArray removeAllObjects];
-    }
+		// Clear out or create the products list. If there are no products returned, we don't
+		// want to continue listing products that may have been deleted elsewhere
 
-    if (data != nil)
-    {
-        NSArray *prs = data;
+		if (productsArray == nil)
+		{
+			productsArray = [[NSMutableArray alloc] init];
+		}
+		else
+		{
+			[productsArray removeAllObjects];
+		}
 
-        if (prs.count > 0)
-        {
-            for (NSDictionary *pr in prs)
-            {
-                // Convert incoming dictionary into a mutable one
+		if (data != nil)
+		{
+			NSArray *products = data;
 
-                NSMutableDictionary *apr = [[NSMutableDictionary alloc] init];
+			if (products.count > 0)
+			{
+				for (NSDictionary *product in products)
+				{
+					// Convert incoming dictionary into a mutable one
 
-                [apr setObject:[pr objectForKey:@"id"] forKey:@"id"];
-                [apr setObject:[pr objectForKey:@"type"] forKey:@"type"];
-                [apr setObject:[pr objectForKey:@"relationships"] forKey:@"relationships"];
-                [apr setObject:[NSMutableDictionary dictionaryWithDictionary:[pr objectForKey:@"attributes"]] forKey:@"attributes"];
-                [productsArray addObject:apr];
+					NSMutableDictionary *aProduct = [[NSMutableDictionary alloc] init];
 
-                // If we need to match against a previous 'selectedProduct' ID, do it now
+					[aProduct setObject:[product objectForKey:@"id"] forKey:@"id"];
+					[aProduct setObject:[product objectForKey:@"type"] forKey:@"type"];
+					[aProduct setObject:[product objectForKey:@"relationships"] forKey:@"relationships"];
+					[aProduct setObject:[NSMutableDictionary dictionaryWithDictionary:[product objectForKey:@"attributes"]] forKey:@"attributes"];
+					[productsArray addObject:aProduct];
 
-                if (sid != nil && [sid compare:[pr objectForKey:@"id"]] == NSOrderedSame) selectedProduct = apr;
-            }
+					// If we need to match against a previous 'selectedProduct' ID, do it now
 
-            // Inform the user
+					if (sid != nil && [sid compare:[product objectForKey:@"id"]] == NSOrderedSame) selectedProduct = aProduct;
+				}
 
-            [self writeStringToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
-        }
-        else
-        {
-            [self writeStringToLog:@"There are no products listed on the server." :YES];
-        }
+				// Inform the user
 
-        [self refreshProductsMenu];
-        [self refreshProjectsMenu];
-        [self setToolbar];
+				[self writeStringToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
+			}
+			else
+			{
+				[self writeStringToLog:@"There are no products listed on the server." :YES];
+			}
 
-		iwvc.products = productsArray;
-    }
+			// Update the UI
 
-    if (action != nil && ([action compare:@"uploadproject"] == NSOrderedSame))
-    {
-        // We are coming here because we want to upload a new project, so go back
-        // and re-check the product information
+			[self refreshProductsMenu];
+			[self refreshProjectsMenu];
+			[self setToolbar];
 
-        [self uploadProject:[so objectForKey:@"project"]];
-    }
+			// Point the Inspector at the products list
+
+			iwvc.products = productsArray;
+		}
+		else
+		{
+			// TODO Indicate an issue???
+		}
+
+		if ([action compare:@"uploadproject"] == NSOrderedSame)
+		{
+			// We are coming here because we want to upload a new project, so go back
+			// and re-check the product information now we have retrieved it
+
+			[self uploadProject:[so objectForKey:@"project"]];
+		}
+	}
+	else
+	{
+		[self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listProducts:)"] :YES];
+	}
 }
 
 
@@ -6855,8 +6873,8 @@
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSArray *devices = [data objectForKey:@"data"];
-    NSDictionary *source = [data objectForKey:@"object"];
-    NSString *action = [source objectForKey:@"action"];
+    NSDictionary *so = [data objectForKey:@"object"];
+    NSString *action = [so objectForKey:@"action"];
 
     if (action != nil)
     {
@@ -6866,7 +6884,7 @@
             // number devices being provided so we can determine whether the product's
             // device groups are themselves able to be deleted
 
-            NSMutableDictionary *deletedProduct = [source objectForKey:@"product"];
+            NSMutableDictionary *deletedProduct = [so objectForKey:@"product"];
             NSDictionary *product = [deletedProduct objectForKey:@"product"];
             NSNumber *number = [deletedProduct objectForKey:@"count"];
             NSInteger count = number.integerValue;
@@ -6884,7 +6902,7 @@
 
                 [deletedProduct setObject:[NSNumber numberWithInteger:kDoneChecking] forKey:@"count"];
 
-                NSDictionary *devicegroup = [source objectForKey:@"devicegroup"];
+                NSDictionary *devicegroup = [so objectForKey:@"devicegroup"];
 
                 [self writeStringToLog:[NSString stringWithFormat:@"Product \"%@\" can't be deleted because device group \"%@\" has devices assigned. Aborting delete attempt.", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"]] :YES];
             }
@@ -6950,7 +6968,7 @@
 
 		if ([action compare:@"gettestblesseddevices"] == NSOrderedSame)
 		{
-			[self listBlessedDevices:devices :[source objectForKey:@"devicegroup"]];
+			[self listBlessedDevices:devices :[so objectForKey:@"devicegroup"]];
 			return;
 		}
 
