@@ -35,7 +35,7 @@
                                    NSURLSessionDataDelegate,
                                    NSURLSessionTaskDelegate,
                                    NSTextFieldDelegate,
-								   NSTouchBarProvider>
+								  NSTouchBarProvider>
 {
     // Main UI element outlets
 
@@ -363,7 +363,7 @@
 	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
-    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag;
+    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag, doubleSaveFlag;
 }
 
 

@@ -69,6 +69,7 @@
     stale = NO;
 	credsFlag = NO;
 	switchAccountFlag = NO;
+	doubleSaveFlag = NO;
 
     syncItemCount = 0;
     logPaddingLength = 0;
@@ -2452,7 +2453,6 @@
     newProject.pid = [self getValueFrom:selectedProduct withKey:@"id"];
     newProject.description = [self getValueFrom:selectedProduct withKey:@"description"];
     newProject.path = workingDirectory;
-    newProject.devicegroups = [[NSMutableArray alloc] init];
 
     NSInteger count = 1;
     BOOL done = YES;
@@ -5750,7 +5750,7 @@
             saveAsFlag = NO;
         }
 
-        [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
+        if (!doubleSaveFlag) [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
     }
     else
     {
@@ -5761,15 +5761,19 @@
 
     Project *sp = nil;
 
-    for (Project *ap in downloads)
-    {
-        if (ap == savingProject) sp = ap;
-    }
+	if (downloads.count > 0)
+	{
+		for (Project *ap in downloads)
+		{
+			if (ap == savingProject) sp = ap;
+		}
+	}
 
     // Done saving so clear 'savingProject'
 
     savingProject = nil;
-
+	doubleSaveFlag = NO;
+	
     // Did we come here from a 'close project'? If so, re-run to actually close the project
 
     if (closeProjectFlag) [self closeProject:nil];
@@ -5935,7 +5939,7 @@
 
     [downloads removeObject:project];
 
-    NSMutableArray *files = [[NSMutableArray alloc] init];
+    NSMutableArray *filesToSave = [[NSMutableArray alloc] init];
 
     if (project.devicegroups.count > 0)
     {
@@ -5950,19 +5954,32 @@
                     model.path = project.path;
                     model.filename = [dg.name stringByAppendingFormat:@".%@.nut", model.type];
 
-                    [files addObject:model];
+                    [filesToSave addObject:model];
                 }
             }
         }
     }
 
-    if (files.count > 0) [self saveFiles:files];
-
-    // Load in the project
+    if (filesToSave.count > 0) [self saveFiles:filesToSave];
 
     [projectArray addObject:project];
-    currentProject = project;
-	iwvc.project = project;
+
+    iwvc.project = project;
+	currentProject = project;
+
+	// Set the current device group to the first on the list of the project's
+	// device groups (or zero if the project has no device groups)
+
+	if (project.devicegroups != nil && project.devicegroups.count > 0)
+	{
+		currentDevicegroup = [project.devicegroups firstObject];
+		project.devicegroupIndex = 0;
+	}
+	else
+	{
+		currentDevicegroup = nil;
+		project.devicegroupIndex = -1;
+	}
 
     // Update the UI
 
@@ -5980,11 +5997,12 @@
 
     currentProject.haschanged = YES;
     savingProject = currentProject;
+	doubleSaveFlag = YES;
 
     [self saveProject:nil];
 }
 
-//<- String editing
+
 
 - (void)saveFiles:(NSMutableArray *)files
 {
@@ -6102,73 +6120,87 @@
     // or to 'deleteProduct:' It should be responding with a list of the product's device groups
 
     NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *so = [data objectForKey:@"object"];
     NSMutableArray *dgs = [data objectForKey:@"data"];
-    NSString *action = [so objectForKey:@"action"];
+	NSDictionary *so = [data objectForKey:@"object"];
+	NSString *action = [so objectForKey:@"action"];
 
     if (action != nil)
     {
         if ([action compare:@"downloadproduct"] == NSOrderedSame)
         {
-            // Perform the flow for downloading a product
+			// Perform the flow for downloading a product: Iterate over the list of device groups
+			// and in each case go and get its current deployment
 
-            Project *np = [so objectForKey:@"project"];
-            NSMutableArray *npdgs = np.devicegroups;
+            Project *newProject = [so objectForKey:@"project"];
 
-            // Record the total number of device groups to the product has, ie. the number of
+			// Record the total number of device groups to the product has, ie. the number of
             // device group deployments we will need to retrieve
 
-            np.count = dgs.count;
+            if (dgs.count > 0)
+			{
+				// The product has at least one device group, so add the device group records to the new project
 
-            // Add the product's device group records to the new project
+				newProject.devicegroups = [[NSMutableArray alloc] init];
+				newProject.count = dgs.count;
 
-            for (NSDictionary *dg in dgs)
-            {
-                Devicegroup *ndg = [[Devicegroup alloc] init];
-                ndg.name = [self getValueFrom:dg withKey:@"name"];
-                ndg.did = [self getValueFrom:dg withKey:@"id"];
-                ndg.description = [self getValueFrom:dg withKey:@"description"];
-                ndg.type = [self getValueFrom:dg withKey:@"type"];
-                ndg.models = [[NSMutableArray alloc] init];
-				ndg.devices = [[NSMutableArray alloc] init];
-                ndg.data = [NSMutableDictionary dictionaryWithDictionary:dg];
-                [npdgs addObject:ndg];
+				for (NSDictionary *dg in dgs)
+				{
+					Devicegroup *newDevicegroup = [[Devicegroup alloc] init];
+					newDevicegroup.name = [self getValueFrom:dg withKey:@"name"];
+					newDevicegroup.did = [self getValueFrom:dg withKey:@"id"];
+					newDevicegroup.description = [self getValueFrom:dg withKey:@"description"];
+					newDevicegroup.type = [self getValueFrom:dg withKey:@"type"];
+					newDevicegroup.models = [[NSMutableArray alloc] init];
+					newDevicegroup.devices = [[NSMutableArray alloc] init];
+					newDevicegroup.data = [NSMutableDictionary dictionaryWithDictionary:dg];
+					[newProject.devicegroups addObject:newDevicegroup];
 
-                NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];
+					NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];
 
-                if (cd != nil)
-                {
-                    NSString *dpid = [cd objectForKey:@"id"];
+					if (cd != nil)
+					{
+						// Get the current deployment's deployment ID
 
-                    if (dpid != nil)
-                    {
-                        // Now retrieve the code using the devicegroup id
+						NSString *dpid = [cd objectForKey:@"id"];
 
-                        NSDictionary *dict = @{ @"action" : action,
-                                                @"devicegroup" : ndg,
-                                                @"project" : np };
+						if (dpid != nil)
+						{
+							// Now retrieve the code using the deployment ID
 
-                        [ide getDeployment:dpid :dict];
+							NSDictionary *dict = @{ @"action" : action,
+												   @"devicegroup" : newDevicegroup,
+												   @"project" : newProject };
 
-                        // At this point we have to wait for multiple async calls to 'productToProjectStageThree:'
-                    }
-                    else
-                    {
-                        // Decrement the tally of downloadable device groups
+							[ide getDeployment:dpid :dict];
 
-                        --np.count;
-                    }
-                }
-                else
-                {
-                    // Decrement the tally of downloadable device groups
+							// At this point we have to wait for multiple async calls to 'productToProjectStageThree:'
+						}
+						else
+						{
+							// Can't proceed so decrement the tally of downloadable device groups and move on
 
-                    --np.count;
-                }
+							--newProject.count;
+						}
+					}
+					else
+					{
+						// Can't proceed so decrement the tally of downloadable device groups and move on
 
-                // NOTE if 'cd' or 'dpid' is nil, the device group has no current deployment
-                // TODO do we get a historical, or create an empty file?
-            }
+						--newProject.count;
+					}
+
+					// NOTE if 'cd' or 'dpid' is nil, the device group has no current deployment
+					// TODO do we get a historical, or create an empty file?
+				}
+			}
+			else
+			{
+				// Product has no device groups, so just save the new project as is
+				// NOTE Methods called by 'productToProjectStageFour:' will handle adding
+				// the project to the project array, updating the UI, etc.
+
+				[self productToProjectStageFour:newProject];
+			}
         }
         else
         {
@@ -6210,12 +6242,11 @@
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *deployment = [data objectForKey:@"data"];
-    NSDictionary *dict = [data objectForKey:@"object"];
-    NSString *action = [dict objectForKey:@"action"];
-    Project *project = [dict objectForKey:@"project"];
-    Devicegroup *newDevicegroup = [dict objectForKey:@"devicegroup"];
+    NSDictionary *so = [data objectForKey:@"object"];
 
-    if (newDevicegroup.models == nil) newDevicegroup.models = [[NSMutableArray alloc] init];
+	NSString *action = [so objectForKey:@"action"];
+    Project *newProject = [so objectForKey:@"project"];
+    Devicegroup *newDevicegroup = [so objectForKey:@"devicegroup"];
 
     if (deployment != nil)
     {
@@ -6225,7 +6256,7 @@
 
             if (newDevicegroup.models.count == 0)
             {
-                // The target has no models, so create them using the code below
+                // BORKED? The target has no models, so create them using the code below
 
                 return;
             }
@@ -6263,9 +6294,12 @@
         }
         else
         {
-            // Create two models - one device, one agent - based on the deployment
+			// We presume the 'action' is 'downloadproduct'
+			// Create two models - one device, one agent - based on the deployment
 
-            Model *model;
+			if (newDevicegroup.models == nil) newDevicegroup.models = [[NSMutableArray alloc] init];
+
+			Model *model;
             NSString *code = [self getValueFrom:deployment withKey:@"device_code"];
 
             if (code != nil)
@@ -6274,7 +6308,7 @@
                 model.type = @"device";
                 model.squinted = YES;
                 model.code = code;
-                model.path = project.path;
+                model.path = newProject.path;
                 model.sha = [self getValueFrom:deployment withKey:@"sha"];
                 model.updated = [self getValueFrom:deployment withKey:@"updated_at"];
                 if (model.updated == nil) model.updated = [self getValueFrom:deployment withKey:@"created_at"];
@@ -6289,7 +6323,7 @@
                 model.type = @"agent";
                 model.squinted = YES;
                 model.code = code;
-                model.path = project.path;
+                model.path = newProject.path;
                 model.sha = [self getValueFrom:deployment withKey:@"sha"];
                 model.updated = [self getValueFrom:deployment withKey:@"updated_at"];
                 if (model.updated == nil) model.updated = [self getValueFrom:deployment withKey:@"created_at"];
@@ -6300,22 +6334,14 @@
 
     // Decrement the tally of downloadable device groups to see if we've got them all yet
 
-    --project.count;
+    --newProject.count;
 
-    if (project.count == 0)
+    if (newProject.count == 0)
     {
         // We have now acquired all the device groups models, so we can process everything
-		// First make the new project the current one
 
-		currentProject = project;
-
-		if (project.devicegroups.count > 0)
+		if (newProject.devicegroups.count > 0)
 		{
-			// The project has at least one device group, so make it the current one
-
-			currentDevicegroup = [project.devicegroups objectAtIndex:0];
-			currentProject.devicegroupIndex = 0;
-
 			if (devicesArray.count > 0)
 			{
 				// If we have a device list, run through it and see which devices, if any,
@@ -6339,17 +6365,9 @@
 			}
 		}
 
-		// Update the UI
-
-		[self refreshProjectsMenu];
-		[self refreshOpenProjectsMenu];
-		[self refreshMainDevicegroupsMenu];
-		[self refreshDevicegroupMenu];
-		[self setToolbar];
-
 		// Save the project
 
-		[self productToProjectStageFour:project];
+		[self productToProjectStageFour:newProject];
 	}
 }
 
