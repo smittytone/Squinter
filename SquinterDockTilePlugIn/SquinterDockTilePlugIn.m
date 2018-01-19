@@ -110,7 +110,7 @@
 		switch(item.tag)
 		{
 			case 1:
-				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/"]];
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html"]];
 				break;
 
 			case 2:

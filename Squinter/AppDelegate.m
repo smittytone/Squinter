@@ -859,7 +859,7 @@
         switch(item.tag)
         {
             case 1:
-                [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/"]];
+                [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html"]];
                 break;
 
             case 2:
@@ -1099,7 +1099,7 @@
 
 - (IBAction)signup:(id)sender
 {
-	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/index.html#account"]];
+	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#account"]];
 }
 
 
@@ -10790,7 +10790,7 @@
 - (IBAction)viewSquinterSite:(id)sender
 {
     [_window endSheet:aboutSheet];
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/"]];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html"]];
 }
 
 
@@ -11104,7 +11104,7 @@
 
 - (IBAction)getHelpPrefs:(id)sender
 {
-	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/version2/index.html#configuring"]];
+	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#configuring"]];
 }
 
 
