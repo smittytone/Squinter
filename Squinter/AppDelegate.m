@@ -8717,6 +8717,11 @@
 {
 	// Clear the main window log view of all text
 
+	NSArray *values = [NSArray arrayWithObjects:textColour, nil];
+	NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+
+	[logTextView setTypingAttributes:attributes];
 	[logTextView setString:@""];
 }
 
