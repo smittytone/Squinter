@@ -525,7 +525,7 @@
 				NSRange aRange = [libName rangeOfString:@"class"];
 				if (aRange.location != NSNotFound) isLibraryFlag = YES;
 
-				aRange = [libName rangeOfString:@"library"];
+				aRange = [libName rangeOfString:@"lib"];
 				if (aRange.location != NSNotFound) isLibraryFlag = YES;
 
 				// Attempt to load in the contents of the referenced file
