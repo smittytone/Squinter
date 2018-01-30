@@ -8717,11 +8717,17 @@
 {
 	// Clear the main window log view of all text
 
+	NSNumber *index = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
+	NSString *fontName = [self getFontName:index.integerValue];
+	index = [defaults objectForKey:@"com.bps.squinter.fontSizeIndex"];
+
 	NSArray *values = [NSArray arrayWithObjects:textColour, nil];
 	NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
 	NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
 
 	[logTextView setTypingAttributes:attributes];
+	logTextView.font = [self setLogViewFont:fontName :index.integerValue :false];
+
 	[logTextView setString:@""];
 }
 
