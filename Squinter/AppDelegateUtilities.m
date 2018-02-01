@@ -316,16 +316,22 @@
 
 - (void)startProgress
 {
-	[connectionIndicator startAnimation:self];
-	connectionIndicator.hidden = NO;
+	NSOperationQueue *main = [NSOperationQueue mainQueue];
+	[main addOperationWithBlock:^{
+		[connectionIndicator startAnimation:self];
+		connectionIndicator.hidden = NO;
+	}];
 }
 
 
 
 - (void)stopProgress
 {
-	[connectionIndicator stopAnimation:self];
-	connectionIndicator.hidden = YES;
+	NSOperationQueue *main = [NSOperationQueue mainQueue];
+	[main addOperationWithBlock:^{
+		[connectionIndicator stopAnimation:self];
+		connectionIndicator.hidden = YES;
+	}];
 }
 
 
