@@ -67,7 +67,7 @@
 
 // Inspector Tabs
 
-#define kInspectorTabProject					0
+#define kInspectorTabProject				0
 #define kInspectorTabDevice					1
 
 #endif
