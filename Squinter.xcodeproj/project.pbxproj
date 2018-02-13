@@ -10,7 +10,6 @@
 		195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9470FB833A59D9C952E82 /* libPods-Squinter.a */; };
 		3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */; };
 		3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B124BFC1F97AA9B00D8E4AD /* Token.m */; };
-		3B2A30241FCDA1E1008150BB /* InspectorButtonTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B2A30231FCDA1E1008150BB /* InspectorButtonTableCellView.m */; };
 		3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */; };
 		3B311E8F1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B311E8E1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m */; };
 		3B36D1C31970A0990029CEC0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B36D1C21970A0990029CEC0 /* Cocoa.framework */; };
@@ -32,7 +31,8 @@
 		3B8B8E161E952E5A009363C8 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E151E952E5A009363C8 /* File.m */; };
 		3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */; };
 		3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */; };
-		3BB42A001FCCA8120059287C /* InspectorWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB429FF1FCCA8120059287C /* InspectorWindowViewController.m */; };
+		3BB5DCBE202B88C600FA6F7D /* InspectorWindow2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */; };
+		3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BD74E461D423D6A00565B0E /* SourceCodePro-Regular.otf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -87,8 +87,6 @@
 		3B124BFB1F97AA9B00D8E4AD /* Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Token.h; path = ../../BuildAPIAccess/Token.h; sourceTree = "<group>"; };
 		3B124BFC1F97AA9B00D8E4AD /* Token.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Token.m; path = ../../BuildAPIAccess/Token.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
-		3B2A30221FCDA1E1008150BB /* InspectorButtonTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorButtonTableCellView.h; sourceTree = "<group>"; };
-		3B2A30231FCDA1E1008150BB /* InspectorButtonTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorButtonTableCellView.m; sourceTree = "<group>"; };
 		3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccess.h; path = ../../BuildAPIAccess/BuildAPIAccess.h; sourceTree = "<group>"; };
 		3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BuildAPIAccess.m; path = ../../BuildAPIAccess/BuildAPIAccess.m; sourceTree = "<group>"; };
 		3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildAPIAccessConstants.h; path = ../../BuildAPIAccess/BuildAPIAccessConstants.h; sourceTree = "<group>"; };
@@ -134,8 +132,10 @@
 		3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LogStreamEvent.m; path = ../../BuildAPIAccess/LogStreamEvent.m; sourceTree = "<group>"; };
 		3BB2EF031FC7215100F7B7D1 /* SelectWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectWindowViewController.h; sourceTree = "<group>"; };
 		3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectWindowViewController.m; sourceTree = "<group>"; };
-		3BB429FE1FCCA8120059287C /* InspectorWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorWindowViewController.h; sourceTree = "<group>"; };
-		3BB429FF1FCCA8120059287C /* InspectorWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorWindowViewController.m; sourceTree = "<group>"; };
+		3BB5DCBC202B88C600FA6F7D /* InspectorWindow2ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorWindow2ViewController.h; sourceTree = "<group>"; };
+		3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorWindow2ViewController.m; sourceTree = "<group>"; };
+		3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorDataCellView.h; sourceTree = "<group>"; };
+		3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorDataCellView.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusLight.h; sourceTree = "<group>"; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusLight.m; sourceTree = "<group>"; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -293,10 +293,10 @@
 				3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */,
 				3B6F3AC41FC31A7700A7F5C1 /* CommitTableCellView.h */,
 				3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */,
-				3BB429FE1FCCA8120059287C /* InspectorWindowViewController.h */,
-				3BB429FF1FCCA8120059287C /* InspectorWindowViewController.m */,
-				3B2A30221FCDA1E1008150BB /* InspectorButtonTableCellView.h */,
-				3B2A30231FCDA1E1008150BB /* InspectorButtonTableCellView.m */,
+				3BB5DCBC202B88C600FA6F7D /* InspectorWindow2ViewController.h */,
+				3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */,
+				3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */,
+				3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -536,11 +536,13 @@
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
 				3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
+				3BB5DCBE202B88C600FA6F7D /* InspectorWindow2ViewController.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
 				3B6AF0DB197127B10083744C /* Project.m in Sources */,
 				3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */,
 				3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */,
 				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
+				3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */,
 				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
 				3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */,
@@ -548,8 +550,6 @@
 				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
 				3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */,
 				3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */,
-				3BB42A001FCCA8120059287C /* InspectorWindowViewController.m in Sources */,
-				3B2A30241FCDA1E1008150BB /* InspectorButtonTableCellView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

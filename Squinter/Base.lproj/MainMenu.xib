@@ -86,7 +86,6 @@
                 <outlet property="impLibrariesMenu" destination="siM-Mq-fJp" id="oBR-za-vPG"/>
                 <outlet property="infoItem" destination="5z3-es-brQ" id="1Fd-Wj-L65"/>
                 <outlet property="inspectorItem" destination="3Qg-aT-d3K" id="4ME-hb-a90"/>
-                <outlet property="iwvc" destination="OT4-c4-eOU" id="MLI-2L-RtW"/>
                 <outlet property="iwvc2" destination="Jc5-83-wpp" id="N09-Xy-LVY"/>
                 <outlet property="linkProductMenuItem" destination="7Yw-EV-inT" id="IUI-Rs-fLh"/>
                 <outlet property="listCommitsItem" destination="Z6i-XT-ijk" id="per-O5-Bag"/>
@@ -3832,17 +3831,6 @@ Gw
                 <outlet property="view" destination="SfP-J6-928" id="5Ax-cP-OG1"/>
             </connections>
         </viewController>
-        <viewController id="OT4-c4-eOU" customClass="InspectorWindowViewController">
-            <connections>
-                <outlet property="deviceInfoTable" destination="ZbE-jN-J9f" id="3LJ-TH-jQM"/>
-                <outlet property="deviceTabViewItem" destination="8Q7-Dh-MOL" id="MOm-hK-3cc"/>
-                <outlet property="field" destination="sGq-3g-EH7" id="3UU-JB-DGD"/>
-                <outlet property="infoTable" destination="ldN-a5-eG2" id="HPy-NG-r5l"/>
-                <outlet property="inspectorTabView" destination="YKl-Ga-oiG" id="WoU-dM-vnY"/>
-                <outlet property="projectTabViewItem" destination="OY0-C1-yKU" id="hQG-CZ-8Ww"/>
-                <outlet property="view" destination="EVf-bn-Bng" id="xPB-Bk-aXb"/>
-            </connections>
-        </viewController>
         <window title="Inspector" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="jDj-4r-UWn" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -3992,10 +3980,6 @@ Gw
                                                                 </prototypeCellViews>
                                                             </tableColumn>
                                                         </tableColumns>
-                                                        <connections>
-                                                            <outlet property="dataSource" destination="OT4-c4-eOU" id="wos-df-8Vi"/>
-                                                            <outlet property="delegate" destination="OT4-c4-eOU" id="owD-aa-dqz"/>
-                                                        </connections>
                                                     </tableView>
                                                 </subviews>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="deviceWhite"/>
@@ -4146,10 +4130,6 @@ Gw
                                                                 </prototypeCellViews>
                                                             </tableColumn>
                                                         </tableColumns>
-                                                        <connections>
-                                                            <outlet property="dataSource" destination="OT4-c4-eOU" id="zqy-rg-2vl"/>
-                                                            <outlet property="delegate" destination="OT4-c4-eOU" id="nDn-y7-WdO"/>
-                                                        </connections>
                                                     </tableView>
                                                 </subviews>
                                                 <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4173,9 +4153,6 @@ Gw
                                 </view>
                             </tabViewItem>
                         </tabViewItems>
-                        <connections>
-                            <outlet property="delegate" destination="OT4-c4-eOU" id="Fbg-Lx-sk0"/>
-                        </connections>
                     </tabView>
                 </subviews>
                 <constraints>
@@ -4414,7 +4391,7 @@ Gw
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xz5-F7-xIl">
-                                                            <rect key="frame" x="115" y="3" width="33" height="14"/>
+                                                            <rect key="frame" x="115" y="3" width="201" height="14"/>
                                                             <textFieldCell key="cell" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Label" id="f5w-kX-IqR">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4436,12 +4413,12 @@ Gw
                                                     <constraints>
                                                         <constraint firstItem="lFh-4C-BKm" firstAttribute="top" secondItem="jEq-GW-sx4" secondAttribute="top" constant="4" id="0Qi-qc-8O5"/>
                                                         <constraint firstAttribute="trailing" secondItem="lFh-4C-BKm" secondAttribute="trailing" constant="3" id="Mr8-Tv-G1k"/>
+                                                        <constraint firstItem="lFh-4C-BKm" firstAttribute="leading" secondItem="Xz5-F7-xIl" secondAttribute="trailing" constant="8" id="N0S-sq-Yc3"/>
                                                         <constraint firstItem="1l7-NR-g9s" firstAttribute="leading" secondItem="jEq-GW-sx4" secondAttribute="leading" constant="3" id="O58-Wa-Rty"/>
-                                                        <constraint firstItem="Xz5-F7-xIl" firstAttribute="top" secondItem="jEq-GW-sx4" secondAttribute="top" constant="3" id="O8Z-I2-1rV"/>
                                                         <constraint firstItem="1l7-NR-g9s" firstAttribute="top" secondItem="jEq-GW-sx4" secondAttribute="top" constant="3" id="QcW-2t-v9F"/>
-                                                        <constraint firstItem="Xz5-F7-xIl" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="1l7-NR-g9s" secondAttribute="trailing" symbolic="YES" id="XSR-Es-aOs"/>
-                                                        <constraint firstAttribute="bottom" secondItem="Xz5-F7-xIl" secondAttribute="bottom" constant="3" id="chX-T8-qfX"/>
-                                                        <constraint firstAttribute="trailing" secondItem="Xz5-F7-xIl" secondAttribute="trailing" constant="191" id="t3V-Pp-EC3"/>
+                                                        <constraint firstAttribute="bottom" secondItem="Xz5-F7-xIl" secondAttribute="bottom" constant="3" id="aIS-3T-NtX"/>
+                                                        <constraint firstItem="Xz5-F7-xIl" firstAttribute="leading" secondItem="1l7-NR-g9s" secondAttribute="trailing" constant="8" id="fXF-1p-8GY"/>
+                                                        <constraint firstItem="Xz5-F7-xIl" firstAttribute="top" secondItem="jEq-GW-sx4" secondAttribute="top" constant="3" id="kJ8-cP-CIH"/>
                                                     </constraints>
                                                     <connections>
                                                         <outlet property="data" destination="Xz5-F7-xIl" id="18b-Pm-YpX"/>

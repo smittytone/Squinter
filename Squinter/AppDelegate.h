@@ -24,7 +24,7 @@
 #import "PDKeychainBindings.h"
 #import "CommitWindowViewController.h"
 #import "SelectWindowViewController.h"
-#import "InspectorWindowViewController.h"
+#import "InspectorWindow2ViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -311,9 +311,9 @@
 
     IBOutlet NSWindow *commitSheet;
 
-	// Inspector
+	// Inspector Panel
 
-	IBOutlet InspectorWindowViewController *iwvc;
+	IBOutlet InspectorWindow2ViewController *iwvc2;
 
     // Connection Variables
 
