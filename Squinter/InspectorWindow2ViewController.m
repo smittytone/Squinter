@@ -45,7 +45,7 @@
 	inLogDef.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
 	
 	outLogDef = [[NSDateFormatter alloc] init];
-	outLogDef.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS ZZZZZ";
+	outLogDef.dateFormat = @"yyyy-MM-dd\nHH:mm:ss.SSS ZZZZZ";
 	outLogDef.timeZone = [NSTimeZone localTimeZone];
 	
 	// Set up the main tables
@@ -59,17 +59,23 @@
 	
 	NSPanel *panel = (NSPanel *)self.view.window;
 	[panel setFloatingPanel:NO];
+}
+
+
+
+- (void)viewWillAppear
+{
+	[super viewWillAppear];
 	
 	// Hide the tables when there's nothing to show
 	
 	deviceOutlineView.hidden = YES;
 	deviceOutlineView.delegate = self;
-	deviceOutlineView.gridStyleMask = NSTableViewSolidVerticalGridLineMask | NSTableViewSolidHorizontalGridLineMask;
+	//deviceOutlineView.gridStyleMask = NSTableViewSolidVerticalGridLineMask | NSTableViewSolidHorizontalGridLineMask;
 	
 	// Set up the tabs
 	
 	panelSelector.selectedSegment = 0;
-	tabIndex = 0;
 	field.stringValue = @"No project selected";
 	field.hidden = NO;
 }
@@ -169,10 +175,7 @@
 	
 	if (project != nil)
 	{
-		deviceOutlineView.hidden = NO;
-		field.hidden = YES;
-		
-		[projectKeys addObject:@"Project Info"];
+		[projectKeys addObject:@"Project Information"];
 		[projectValues addObject:@""];
 		
 		[projectKeys addObject:@"Project Name"];
@@ -214,7 +217,7 @@
 			[projectValues addObject:@"Project has not yet been saved"];
 		}
 		
-		[projectKeys addObject:@"Device Group Info"];
+		[projectKeys addObject:@"Device Group Information"];
 		[projectValues addObject:@""];
 		
 		if (project.devicegroups != nil && project.devicegroups.count > 0)
@@ -261,11 +264,11 @@
 						
 						if ([typeString compare:@"Agent"] == NSOrderedSame)
 						{
-							[projectKeys addObject:@"Agent Code Info"];
+							[projectKeys addObject:@"Agent Code Information"];
 						}
 						else
 						{
-							[projectKeys addObject:@"Device Code Info"];
+							[projectKeys addObject:@"Device Code Information"];
 						}
 						
 						[projectValues addObject:@""];
@@ -347,8 +350,14 @@
 		}
 	}
 	
-	[deviceOutlineView reloadData];
-	[deviceOutlineView setNeedsDisplay];
+	if (panelSelector.selectedSegment == 0)
+	{
+		deviceOutlineView.hidden = NO;
+		field.hidden = YES;
+		
+		[deviceOutlineView reloadData];
+		[deviceOutlineView setNeedsDisplay];
+	}
 }
 
 
@@ -368,10 +377,7 @@
 	
 	if (device != nil)
 	{
-		deviceOutlineView.hidden = NO;
-		field.hidden = YES;
-		
-		[deviceKeys addObject:@"Device Info"];
+		[deviceKeys addObject:@"Device Information"];
 		[deviceValues addObject:@""];
 		[deviceKeys addObject:@"Name "];
 		[deviceValues addObject:[device valueForKeyPath:@"attributes.name"]];
@@ -406,7 +412,7 @@
 		[deviceKeys addObject:@"Free RAM "];
 		[deviceValues addObject:(number != nil ? [NSString stringWithFormat:@"%@KB", number] : @"Unknown")];
 		
-		[deviceKeys addObject:@"Network Info"];
+		[deviceKeys addObject:@"Network Information"];
 		[deviceValues addObject:@""];
 		
 		NSString *mac = [device valueForKeyPath:@"attributes.mac_address"];
@@ -431,7 +437,7 @@
 			[deviceValues addObject:@"Unknown"];
 		}
 		
-		[deviceKeys addObject:@"Agent Info"];
+		[deviceKeys addObject:@"Agent Information"];
 		[deviceValues addObject:@""];
 		
 		boolean = [device valueForKeyPath:@"attributes.agent_running"];
@@ -444,7 +450,7 @@
 		[deviceKeys addObject:@"Agent URL "];
 		[deviceValues addObject:(string != nil ? [@"https://agent.electricimp.com/" stringByAppendingString:string] : @"No agent")];
 		
-		[deviceKeys addObject:@"BlinkUp Info"];
+		[deviceKeys addObject:@"BlinkUp Information"];
 		[deviceValues addObject:@""];
 		
 		NSString *date = [device valueForKeyPath:@"attributes.last_enrolled_at"];
@@ -463,7 +469,7 @@
 			[deviceValues addObject:@"Unknown"];
 		}
 		
-		[deviceKeys addObject:@"Device Group Info"];
+		[deviceKeys addObject:@"Device Group Information"];
 		[deviceValues addObject:@""];
 		
 		NSDictionary *dg = [device valueForKeyPath:@"relationships.devicegroup"];
@@ -497,8 +503,14 @@
 		}
 	}
 	
-	[deviceOutlineView reloadData];
-	[deviceOutlineView setNeedsDisplay];
+	if (panelSelector.selectedSegment == 1)
+	{
+		deviceOutlineView.hidden = NO;
+		field.hidden = YES;
+		
+		[deviceOutlineView reloadData];
+		[deviceOutlineView setNeedsDisplay];
+	}
 }
 
 
