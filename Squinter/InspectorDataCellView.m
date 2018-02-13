@@ -8,7 +8,7 @@
 
 @implementation InspectorDataCellView
 
-@synthesize title, data, goToButton, index;
+@synthesize title, data, goToButton, row;
 
 
 

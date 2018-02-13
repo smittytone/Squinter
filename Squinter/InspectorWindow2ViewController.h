@@ -17,6 +17,7 @@
 {
 	IBOutlet NSOutlineView *deviceOutlineView;
 	IBOutlet NSSegmentedControl *panelSelector;
+	IBOutlet NSTextField *field;
 	
 	NSMutableArray *projectKeys, *projectValues;
 	NSMutableArray *deviceKeys, *deviceValues;
@@ -24,10 +25,6 @@
 	NSWorkspace *nswsw;
 	
 	NSDateFormatter *inLogDef, *outLogDef;
-	
-	NSInteger reloadCounter;
-	
-	IBOutlet NSTextField *field;
 }
 
 
@@ -44,7 +41,6 @@
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
 - (NSInteger)numberOfFoldersInPath:(NSString *)path;
-- (CGFloat)widthOfString:(NSString *)string;
 - (CGFloat)renderedHeightOfString:(NSString *)string;
 - (IBAction)switchTable:(id)sender;
 

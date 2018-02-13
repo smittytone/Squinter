@@ -11,7 +11,7 @@
 @property (nonatomic) IBOutlet NSButton *goToButton;
 @property (nonatomic) IBOutlet NSTextField *title;
 @property (nonatomic) IBOutlet NSTextField *data;
-@property (nonatomic, readwrite) NSInteger index;
+@property (nonatomic, readwrite) NSInteger row;
 
 
 @end

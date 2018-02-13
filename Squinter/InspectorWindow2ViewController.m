@@ -64,7 +64,7 @@
 	
 	deviceOutlineView.hidden = YES;
 	deviceOutlineView.delegate = self;
-	//deviceOutlineView.gridStyleMask = NSTableViewSolidVerticalGridLineMask | NSTableViewSolidHorizontalGridLineMask;
+	deviceOutlineView.gridStyleMask = NSTableViewSolidVerticalGridLineMask | NSTableViewSolidHorizontalGridLineMask;
 	
 	// Set up the tabs
 	
@@ -115,23 +115,22 @@
 
 - (IBAction)link:(id)sender
 {
-	// Link buttons in the Inspector panel come here when clicked
+	// Project path buttons in the Inspector panel come here when clicked
 	
 	NSButton *linkButton = (NSButton *)sender;
 	InspectorDataCellView *cellView = (InspectorDataCellView *)linkButton.superview;
-	NSInteger row = cellView.index;
-	NSString *path = [projectValues objectAtIndex:row];
+	NSString *path = [projectValues objectAtIndex:cellView.row];
 	
-	if (row < 5)
+	if (cellView.row < 5)
 	{
 		// This will be the location of the project file, which is already open,
-		// so just reveal it in Finder
+		// so just reveal it in Finder...
 		
 		[nswsw selectFile:[NSString stringWithFormat:@"%@/%@", project.path, project.filename] inFileViewerRootedAtPath:project.path];
 		return;
 	}
 	
-	// Open the file
+	// ...otherwise open the file
 	
 	[nswsw openFile:path];
 }
@@ -140,15 +139,14 @@
 
 - (IBAction)goToURL:(id)sender
 {
-	// Link buttons in the Inspector panel come here when clicked
+	// Agent URL buttons in the Inspector panel come here when clicked
 	
 	NSButton *linkButton = (NSButton *)sender;
 	InspectorDataCellView *cellView = (InspectorDataCellView *)linkButton.superview;
-	NSInteger row = cellView.index;
 	
 	// Open the URL
 	
-	[nswsw openURL:[NSURL URLWithString:[deviceValues objectAtIndex:row]]];
+	[nswsw openURL:[NSURL URLWithString:[deviceValues objectAtIndex:cellView.row]]];
 }
 
 
@@ -182,13 +180,13 @@
 		
 		if (project.description != nil && project.description.length > 0)
 		{
-			[projectKeys addObject:@"Description "];
+			[projectKeys addObject:@"Description"];
 			[projectValues addObject:project.description];
 		}
 		
 		if (products == nil || products.count == 0 || project.pid == nil)
 		{
-			[projectKeys addObject:@"ID "];
+			[projectKeys addObject:@"ID"];
 			[projectValues addObject:(project.pid != nil ? project.pid : @"Project not linked to a product")];
 		}
 		else
@@ -199,13 +197,13 @@
 				
 				if ([apid compare:project.pid] == NSOrderedSame)
 				{
-					[projectKeys addObject:@"Product "];
+					[projectKeys addObject:@"Product"];
 					[projectValues addObject:[product valueForKeyPath:@"attributes.name"]];
 				}
 			}
 		}
 		
-		[projectKeys addObject:@"Path "];
+		[projectKeys addObject:@"Path"];
 		
 		if (project.path != nil)
 		{
@@ -216,8 +214,6 @@
 			[projectValues addObject:@"Project has not yet been saved"];
 		}
 		
-		[projectKeys addObject:@" "];
-		[projectValues addObject:@" "];
 		[projectKeys addObject:@"Device Group Info"];
 		[projectValues addObject:@""];
 		
@@ -233,9 +229,9 @@
 					[projectValues addObject:@" "];
 				}
 				
-				[projectKeys addObject:[NSString stringWithFormat:@"Device Group %li ", (long)dgcount]];
+				[projectKeys addObject:[NSString stringWithFormat:@"Device Group %li", (long)dgcount]];
 				[projectValues addObject:devicegroup.name];
-				[projectKeys addObject:@"ID "];
+				[projectKeys addObject:@"ID"];
 				
 				if (devicegroup.did != nil && devicegroup.did.length > 0)
 				{
@@ -246,12 +242,12 @@
 					[projectValues addObject:@"Not uploaded"];
 				}
 				
-				[projectKeys addObject:@"Type "];
+				[projectKeys addObject:@"Type"];
 				[projectValues addObject:[self convertDevicegroupType:devicegroup.type :NO]];
 				
 				if (devicegroup.description != nil && devicegroup.description.length > 0)
 				{
-					[projectKeys addObject:@"Description "];
+					[projectKeys addObject:@"Description"];
 					[projectValues addObject:devicegroup.description];
 				}
 				
@@ -261,12 +257,6 @@
 					
 					for (Model *model in devicegroup.models)
 					{
-						if (modcount > 0)
-						{
-							[projectKeys addObject:@" "];
-							[projectValues addObject:@" "];
-						}
-						
 						NSString *typeString = [model.type compare:@"agent"] == NSOrderedSame ? @"Agent" : @"Device";
 						
 						if ([typeString compare:@"Agent"] == NSOrderedSame)
@@ -280,12 +270,12 @@
 						
 						[projectValues addObject:@""];
 						
-						[projectKeys addObject:[NSString stringWithFormat:@"%@ Code File ", typeString]];
+						[projectKeys addObject:[NSString stringWithFormat:@"%@ Code File", typeString]];
 						[projectValues addObject:model.filename];
 						[projectKeys addObject:@"Path "];
 						[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename]];
 						
-						[projectKeys addObject:@"Uploaded "];
+						[projectKeys addObject:@"Uploaded"];
 						NSString *date = model.updated;
 						
 						if (date != nil && date.length > 0)
@@ -300,7 +290,7 @@
 							[projectValues addObject:@"No code uploaded"];
 						}
 						
-						[projectKeys addObject:@"SHA "];
+						[projectKeys addObject:@"SHA"];
 						[projectValues addObject:(model.sha != nil && model.sha.length > 0 ? model.sha : @"No code uploaded")];
 						
 						if (model.libraries != nil && model.libraries.count > 0)
@@ -309,9 +299,9 @@
 							
 							for (File *library in model.libraries)
 							{
-								[projectKeys addObject:[NSString stringWithFormat:@"Library %li ", (long)libcount]];
+								[projectKeys addObject:[NSString stringWithFormat:@"Library %li", (long)libcount]];
 								[projectValues addObject:library.filename];
-								[projectKeys addObject:@"Path "];
+								[projectKeys addObject:@"Path"];
 								[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename]];
 								
 								++libcount;
@@ -319,7 +309,7 @@
 						}
 						else
 						{
-							[projectKeys addObject:@"Libraries "];
+							[projectKeys addObject:@"Libraries"];
 							[projectValues addObject:@"No local libraries imported"];
 						}
 						
@@ -329,7 +319,7 @@
 							
 							for (File *file in model.files)
 							{
-								[projectKeys addObject:[NSString stringWithFormat:@"File %li ", (long)filecount]];
+								[projectKeys addObject:[NSString stringWithFormat:@"File %li", (long)filecount]];
 								[projectValues addObject:file.filename];
 								[projectKeys addObject:@"Path "];
 								[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename]];
@@ -339,7 +329,7 @@
 						}
 						else
 						{
-							[projectKeys addObject:@"Files "];
+							[projectKeys addObject:@"Files"];
 							[projectValues addObject:@"No local files imported"];
 						}
 						
@@ -352,15 +342,11 @@
 		}
 		else
 		{
-			[projectKeys addObject:@"Device Groups "];
+			[projectKeys addObject:@"Device Groups"];
 			[projectValues addObject:@"None"];
 		}
 	}
 	
-	tabIndex = 0;
-	panelSelector.selectedSegment = 0;
-	
-	reloadCounter = 0;
 	[deviceOutlineView reloadData];
 	[deviceOutlineView setNeedsDisplay];
 }
@@ -420,8 +406,6 @@
 		[deviceKeys addObject:@"Free RAM "];
 		[deviceValues addObject:(number != nil ? [NSString stringWithFormat:@"%@KB", number] : @"Unknown")];
 		
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@""];
 		[deviceKeys addObject:@"Network Info"];
 		[deviceValues addObject:@""];
 		
@@ -447,8 +431,6 @@
 			[deviceValues addObject:@"Unknown"];
 		}
 		
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@" "];
 		[deviceKeys addObject:@"Agent Info"];
 		[deviceValues addObject:@""];
 		
@@ -462,8 +444,6 @@
 		[deviceKeys addObject:@"Agent URL "];
 		[deviceValues addObject:(string != nil ? [@"https://agent.electricimp.com/" stringByAppendingString:string] : @"No agent")];
 		
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@" "];
 		[deviceKeys addObject:@"BlinkUp Info"];
 		[deviceValues addObject:@""];
 		
@@ -483,8 +463,6 @@
 			[deviceValues addObject:@"Unknown"];
 		}
 		
-		[deviceKeys addObject:@" "];
-		[deviceValues addObject:@" "];
 		[deviceKeys addObject:@"Device Group Info"];
 		[deviceValues addObject:@""];
 		
@@ -519,10 +497,6 @@
 		}
 	}
 	
-	tabIndex = 1;
-	panelSelector.selectedSegment = 1;
-	
-	reloadCounter = 0;
 	[deviceOutlineView reloadData];
 	[deviceOutlineView setNeedsDisplay];
 }
@@ -537,8 +511,7 @@
 	// This is the 'tabIndex' setter method, which we trap in order
 	// to trigger a switch to the implicitly requested tab
 	
-	if (aTab > panelSelector.segmentCount) return;
-	
+	if (aTab > panelSelector.segmentCount || aTab == panelSelector.selectedSegment) return;
 	panelSelector.selectedSegment = aTab;
 	[self switchTable:nil];
 }
@@ -547,39 +520,49 @@
 
 - (IBAction)switchTable:(id)sender
 {
+	// This method is called when the user clicks on the NSSegmentedControl, or code
+	// calls setTab: (in which case 'sender' is nil
+	
 	NSInteger aTab = panelSelector.selectedSegment;
 	tabIndex = aTab;
 	
-	if (tabIndex == 0)
+	if (aTab == 0)
 	{
-		if (projectKeys.count == 0)
+		// This is the project panel. If it is empty, just show the message
+		
+		if (project == nil || projectKeys.count == 0)
 		{
 			deviceOutlineView.hidden = YES;
 			field.stringValue = @"No project selected";
 			field.hidden = NO;
+			return;
 		}
 		else
 		{
-			field.hidden = YES;
 			deviceOutlineView.hidden = NO;
+			field.hidden = YES;
 		}
 	}
 	else
 	{
-		if (deviceKeys.count == 0)
+		// This is the project panel. If it is empty, just show the message
+		
+		if (device == nil || deviceKeys.count == 0)
 		{
 			deviceOutlineView.hidden = YES;
 			field.stringValue = @"No device selected";
 			field.hidden = NO;
+			return;
 		}
 		else
 		{
-			field.hidden = YES;
 			deviceOutlineView.hidden = NO;
+			field.hidden = YES;
 		}
 	}
 	
-	reloadCounter = 0;
+	// If we have got this far, rebuild and reshow the table
+	
 	[deviceOutlineView reloadData];
 	[deviceOutlineView setNeedsDisplay];
 }
@@ -620,6 +603,8 @@
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
+	// Nothing is expandable
+	
 	return NO;
 }
 
@@ -627,6 +612,8 @@
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
+	// Nothing is selectable
+	
 	return NO;
 }
 
@@ -634,6 +621,9 @@
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
+	// This will always be the number of items in the root item, ie.
+	// the number of items in the appropriate data set
+	
 	return (item == nil ? (tabIndex == 0 ? projectKeys.count : deviceKeys.count) : 0);
 }
 
@@ -641,7 +631,9 @@
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-	//return (tabIndex == 0 ? [projectKeys objectAtIndex:index] : [deviceKeys objectAtIndex:index]);
+	// We use 'item' as a proxy for row number by converting 'index' (which
+	// is the row number) to an NSNumber so it can be referenced via 'item'
+	
 	return [NSNumber numberWithInteger:index];
 }
 
@@ -649,6 +641,8 @@
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(nullable NSTableColumn *)tableColumn byItem:(nullable id)item
 {
+	// This needs to be here or the NSOutlineView viewForColumn: method is never called
+	
 	return (panelSelector.selectedSegment == 1 ? @"DD" : @"PP");
 }
 
@@ -658,11 +652,14 @@
 {
 	id cellView = nil;
 	
-	//NSString *title = (NSString *)item;
-	NSNumber *num = (NSNumber *)item;
-	NSInteger index = num.integerValue;
+	// Retrieve the row number encoded as an NSNumber referenced by 'item'
 	
-	NSInteger count = 0;
+	NSNumber *num = (NSNumber *)item;
+	NSInteger row = num.integerValue;
+	
+	// Use 'valueArray' and 'keyArray' as proxies for the appropriate data set
+	// (project or device)
+	
 	NSMutableArray *valueArray = nil;
 	NSMutableArray *keyArray = nil;
 	
@@ -670,22 +667,19 @@
 	{
 		keyArray = deviceKeys;
 		valueArray = deviceValues;
-		count = deviceKeys.count;
 	}
 	else
 	{
 		keyArray = projectKeys;
 		valueArray = projectValues;
-		count = projectKeys.count;
 	}
 	
-	
-	NSString *key = [keyArray objectAtIndex:index];
-	NSString *value = [valueArray objectAtIndex:index];
+	NSString *key = [keyArray objectAtIndex:row];
+	NSString *value = [valueArray objectAtIndex:row];
 			
 	if (value.length == 0)
 	{
-		// Header
+		// This is a Header row
 		
 		NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
 		cv.textField.stringValue = [key uppercaseString];
@@ -701,12 +695,16 @@
 		
 		if (panelSelector.selectedSegment == 1)
 		{
-			if ([self isURLRow:index])
+			// This is a device
+			
+			if ([self isURLRow:row])
 			{
+				// If data is a URL, make sure there's an active button at the end of the row
+				
 				[cv.goToButton setTarget:self];
 				[cv.goToButton setAction:@selector(goToURL:)];
 				[cv.goToButton setHidden:NO];
-				cv.index = index;
+				cv.row = row;
 			}
 			else
 			{
@@ -715,12 +713,16 @@
 		}
 		else
 		{
-			if ([self isLinkRow:index])
+			// This is a project
+			
+			if ([self isLinkRow:row])
 			{
+				// If data is a file path, make sure there's an active button at the end of the row
+				
 				[cv.goToButton setTarget:self];
 				[cv.goToButton setAction:@selector(link:)];
 				[cv.goToButton setHidden:NO];
-				cv.index = index;
+				cv.row = row;
 			}
 			else
 			{
@@ -728,73 +730,8 @@
 			}
 		}
 		
-		
 		cellView = cv;
 	}
-	
-	/*
-	for (NSUInteger i = reloadCounter ; i < count ; i++)
-	{
-		NSString *key = [keyArray objectAtIndex:i];
-		
-		if ([key compare:title] == NSOrderedSame)
-		{
-			reloadCounter = i;
-			NSString *value = [valueArray objectAtIndex:i];
-			
-			if (value.length == 0)
-			{
-				// Header
-				
-				NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
-				cv.textField.stringValue = [key uppercaseString];
-				cellView = cv;
-			}
-			else
-			{
-				// Data row
-				
-				InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
-				cv.title.stringValue = key;
-				cv.data.stringValue = value;
-				
-				if (panelSelector.selectedSegment == 1)
-				{
-					if ([self isURLRow:i])
-					{
-						[cv.goToButton setTarget:self];
-						[cv.goToButton setAction:@selector(goToURL:)];
-						[cv.goToButton setHidden:NO];
-						cv.index = i;
-					}
-					else
-					{
-						[cv.goToButton setHidden:YES];
-					}
-				}
-				else
-				{
-					if ([self isLinkRow:i])
-					{
-						[cv.goToButton setTarget:self];
-						[cv.goToButton setAction:@selector(link:)];
-						[cv.goToButton setHidden:NO];
-						cv.index = i;
-					}
-					else
-					{
-						[cv.goToButton setHidden:YES];
-					}
-				}
-				
-				
-				cellView = cv;
-			}
-			
-			break;
-		}
-	}
-	*/
 	
 	return cellView;
 }
@@ -803,11 +740,16 @@
 
 - (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
 {
-	//NSString *title = (NSString *)item;
+	// Return the appropriate height of the row, set by the deepest of the row's elements
+	// This should be the main data field
+	
+	// Get the row we're working on
+	
 	NSNumber *num = (NSNumber *)item;
 	NSInteger index = num.integerValue;
 	
-	// Data rows - this is determined by the 'values' - 'keys' and 'links' will only be 14 high
+	// Set 'keyArray' and 'valueArray' as proxies for whichever data set (projects or
+	// devices) that we are working with
 	
 	NSMutableArray *valueArray = nil;
 	NSMutableArray *keyArray = nil;
@@ -823,17 +765,20 @@
 		valueArray = projectValues;
 	}
 	
-	// Spacer row
-	
-	NSString *title = [keyArray objectAtIndex:index];
-	if (title.length == 1) return 10;
-	
+	NSString *key = [keyArray objectAtIndex:index];
 	NSString *value = [valueArray objectAtIndex:index];
-		
-	if (value.length > 2)
+	
+	// Spacer row — ie. 'key' and 'value' equal a single space
+	
+	if (key.length == 1 && value.length == 1) return 10;
+	
+	// Information row - but is it a header ('value' equals zero-length
+	// string) or a data row?
+	
+	if (value.length > 1)
 	{
-		// Get the rendered height of the text - it's drawn into
-		// an area as wide as the data column, ie. 172px
+		// Get the rendered height of the data text - it's drawn into
+		// an area as wide as the data column
 		
 		CGFloat renderHeight = [self renderedHeightOfString:value];
 		
@@ -849,40 +794,9 @@
 		return renderHeight;
 	}
 	
-	/*
-	for (NSUInteger i = reloadCounter ; i < keyArray.count ; i++)
-	{
-		NSString *key = [keyArray objectAtIndex:i];
-		
-		if ([key compare:title] == NSOrderedSame)
-		{
-			reloadCounter = i;
-			if (i == keyArray.count - 1) reloadCounter = 0;
-			NSString *value = [valueArray objectAtIndex:i];
-			
-			if (value.length > 2)
-			{
-				// Get the rendered height of the text - it's drawn into
-				// an area as wide as the data column, ie. 172px
-				
-				CGFloat renderHeight = [self renderedHeightOfString:value];
-				
-				// 20 is the height of one standard line
-				if (renderHeight < 20) renderHeight = 20;
-				
-				// Calculate the maximum, dealing with a fudge factor
-				if (renderHeight > 20 && fmod(renderHeight, 20) > 0)
-				{
-					renderHeight = renderHeight - fmod(renderHeight, 20) + 20;
-				}
-				
-				return renderHeight;
-			}
-		}
-	}
-	*/
+	// Return the height of a header row
 	
-	return 20;
+	return 30;
 }
 
 
@@ -1049,16 +963,6 @@
 {
 	NSArray *parts = [path componentsSeparatedByString:@"/"];
 	return (parts.count - 1);
-}
-
-
-
-- (CGFloat)widthOfString:(NSString *)string
-{
-	NSFont *font = [NSFont systemFontOfSize:11];
-	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
-	NSLog(@"  %f - %@", [[[NSAttributedString alloc] initWithString:string attributes:attributes] size].width, string);
-	return [[[NSAttributedString alloc] initWithString:string attributes:attributes] size].width;
 }
 
 
