@@ -45,14 +45,14 @@
 - (void)setCommits:(NSArray *)input
 {
     commits = input;
-	minIndex = -1;
+	minIndex = input.count;
 
 	for (NSUInteger i = 0 ; i < commits.count ; ++i)
 	{
 		NSDictionary *deployment = [commits objectAtIndex:i];
 		NSString *depid = [deployment objectForKey:@"id"];
 
-		if (devicegroup.mdid != nil && [devicegroup.mdid compare:depid] == NSOrderedSame) minIndex = commits.count - 1 - i;
+		if (devicegroup.mdid != nil && [devicegroup.mdid compare:depid] == NSOrderedSame) minIndex = i;
 	}
 
     [commitIndicator stopAnimation:nil];
@@ -82,7 +82,7 @@
         }
         else
         {
-            minimumDeployment = [commits objectAtIndex:(commits.count - 1 - i)];
+            minimumDeployment = [commits objectAtIndex:i];
         }
     }
 }
@@ -116,8 +116,7 @@
 			cell.minimumCheckbox.title = @"";
 			cell.minimumCheckbox.state = row == minIndex ? NSOnState : NSOffState;
 			cell.minimumCheckbox.action = @selector(checkMinimum:);
-			if (row < minIndex) cell.minimumCheckbox.enabled = NO;
-
+			cell.minimumCheckbox.enabled = row > minIndex ? NO : YES;
 			return cell;
 		}
 	}
@@ -129,19 +128,19 @@
 		{
 			if (commits.count < 100)
 			{
-				cell.textField.stringValue = [NSString stringWithFormat:@"%02li", (long)(row + 1)];
+				cell.textField.stringValue = [NSString stringWithFormat:@"%02li", (long)(commits.count - row)];
 			}
 			else if (commits.count < 1000)
 			{
-				cell.textField.stringValue = [NSString stringWithFormat:@"%03li", (long)(row + 1)];
+				cell.textField.stringValue = [NSString stringWithFormat:@"%03li", (long)(commits.count - row)];
 			}
 			else
 			{
-				cell.textField.stringValue = [NSString stringWithFormat:@"%05li", (long)(row + 1)];
+				cell.textField.stringValue = [NSString stringWithFormat:@"%05li", (long)(commits.count - row)];
 			}
 
 			cell.textField.enabled = NO;
-			cell.textField.textColor = row < minIndex ? NSColor.grayColor : NSColor.blackColor;
+			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.blackColor;
 		}
 
 		return cell;
@@ -152,7 +151,7 @@
 
 		if (cell != nil)
 		{
-			NSDictionary *deployment = [commits objectAtIndex:(commits.count - 1 - row)];
+			NSDictionary *deployment = [commits objectAtIndex:row];
 			NSString *sha = [deployment valueForKeyPath:@"attributes.updated_at"];
 			if (sha == nil) sha = [deployment valueForKeyPath:@"attributes.created_at"];
 			sha = [def stringFromDate:[commitDef dateFromString:sha]];
@@ -162,7 +161,7 @@
 
 			cell.textField.stringValue = [NSString stringWithFormat:@"Committed at %@", sha];
 			cell.textField.enabled = NO;
-			cell.textField.textColor = row < minIndex ? NSColor.grayColor : NSColor.blackColor;
+			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.blackColor;
 		}
 
 		return cell;
