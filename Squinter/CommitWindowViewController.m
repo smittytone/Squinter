@@ -59,7 +59,7 @@
     [commitTable reloadData];
 
     commitIndicator.hidden = YES;
-    commitLabel.stringValue = @"Choose the device group’s minimum deployment (most recent last):";
+    commitLabel.stringValue = @"Choose the device group’s minimum deployment:";
     commitTable.needsDisplay = YES;
 }
 
