@@ -34,6 +34,8 @@
 
 #define kAllLogs                            0
 #define kStreamLogs                         -1
+#define kMaxLogStreamDevices                8
+#define kMaxLogStreams                      8
 
 #define kOfflineTag                         @" (offline)"
 
@@ -67,7 +69,7 @@
 
 // Inspector Tabs
 
-#define kInspectorTabProject				0
-#define kInspectorTabDevice					1
+#define kInspectorTabProject				  0
+#define kInspectorTabDevice                 1
 
 #endif

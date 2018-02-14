@@ -4401,9 +4401,7 @@
 
     if (![ide isDeviceLogging:devid])
     {
-        // if (ide.numberOfLogStreams == 0) [self setLoggingColours];
-
-        if (ide.numberOfLogStreams == 5)
+        if (ide.numberOfLogStreams == kMaxLogStreamDevices)
         {
             NSAlert *alert = [[NSAlert alloc] init];
             alert.messageText = @"You are already logging five devices";
