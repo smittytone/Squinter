@@ -590,7 +590,12 @@
 				  name:@"BuildAPIGotDevice"
 				object:ide];
 
-    // **************
+	[nsncdc addObserver:self
+			   selector:@selector(handleLoginKey:)
+				   name:@"BuildAPILoginKey"
+				 object:ide];
+	
+	// **************
 
     [nsncdc addObserver:self
            selector:@selector(endLogging:)
@@ -994,11 +999,14 @@
     PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
     NSString *un = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
     NSString *pw = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
+	NSString *lk = [pc stringForKey:@"com.bps.Squinter.ak.notional.telly"];
 
     // Set the login window fields with the data
 
     usernameTextField.stringValue = (un == nil) ? @"" : [ide decodeBase64String:un];
     passwordTextField.stringValue = (pw == nil) ? @"" : [ide decodeBase64String:pw];
+	
+	if (lk != nil) loginKey = lk;
 }
 
 
@@ -1035,6 +1043,12 @@
     loginFlag = YES;
 
     // Attempt to login with the current credentials
+	
+	if (loginKey != nil)
+	{
+		[ide loginWithKey:loginKey];
+		return;
+	}
 
     [ide login:usernameTextField.stringValue
               :passwordTextField.stringValue
@@ -1099,6 +1113,32 @@
 - (IBAction)signup:(id)sender
 {
 	[nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#account"]];
+}
+
+
+
+- (void)handleLoginKey:(NSNotification *)note
+{
+	NSDictionary *data = (NSDictionary *)note.object;
+	NSString *key = [data objectForKey:@"id"];
+	
+	// Pull the login credentials from the keychain
+	
+	PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
+	NSString *lk = [pc stringForKey:@"com.bps.Squinter.ak.notional.telly"];
+	
+	if (lk == nil)
+	{
+		[pc setString:key forKey:@"com.bps.Squinter.ak.notional.telly"];
+	}
+	else
+	{
+		// Warn user and ask if they want to replace key
+		
+		[pc setString:key forKey:@"com.bps.Squinter.ak.notional.telly"];
+	}
+	
+	loginKey = key;
 }
 
 

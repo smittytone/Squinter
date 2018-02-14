@@ -358,7 +358,7 @@
 
     NSColor *backColour, *textColour;
 
-    NSString *workingDirectory, *listString, *newDevicegroupName;
+    NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey;
 
 	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount;
 
