@@ -4675,7 +4675,7 @@
             // Clear project settings used in conversion process
 
             aProject.haschanged = YES;
-            aProject.version = @"3.0";
+            aProject.version = kSquinterCurrentVersion;
             aProject.description = @"";
 
             if (aProject.path == nil || aProject.path.length == 0) aProject.path = [filePath stringByDeletingLastPathComponent];
