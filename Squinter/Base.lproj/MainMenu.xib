@@ -3983,9 +3983,9 @@ Gw
                 <rect key="frame" x="0.0" y="0.0" width="340" height="520"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8ps-uE-OUu">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8ps-uE-OUu">
                         <rect key="frame" x="18" y="249" width="304" height="22"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Label" id="jIw-gb-EO8">
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Label" usesSingleLineMode="YES" id="jIw-gb-EO8">
                             <font key="font" metaFont="system" size="18"/>
                             <color key="textColor" red="0.66422420739999999" green="0.66424006219999998" blue="0.66423153879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -4121,8 +4121,8 @@ Gw
                         <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="rounded" trackingMode="selectOne" id="6hk-Ju-hwv">
                             <font key="font" metaFont="smallSystem"/>
                             <segments>
-                                <segment label="Project" width="65"/>
-                                <segment label="Device" width="65" selected="YES" tag="1"/>
+                                <segment label="Project" width="65" selected="YES"/>
+                                <segment label="Device" width="65" tag="1"/>
                             </segments>
                         </segmentedCell>
                         <connections>

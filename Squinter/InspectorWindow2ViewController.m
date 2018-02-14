@@ -48,11 +48,6 @@
 	outLogDef.dateFormat = @"yyyy-MM-dd\nHH:mm:ss.SSS ZZZZZ";
 	outLogDef.timeZone = [NSTimeZone localTimeZone];
 	
-	// Set up the main tables
-	
-	[self setProject:nil];
-	[self setDevice:nil];
-	
 	nswsw = NSWorkspace.sharedWorkspace;
 	
 	// Stop the HUD panel from floating above all windows
@@ -77,7 +72,6 @@
 	
 	panelSelector.selectedSegment = 0;
 	field.stringValue = @"No project selected";
-	field.hidden = NO;
 }
 
 
@@ -164,9 +158,14 @@
 {
 	// This is the 'project' property setter, which we use to populate
 	// the two content arrays and trigger regeneration of the table view
-	
+
+	// Record the current project for comparison at the end of the method
+
+	Project *oProject = project;
 	project = aProject;
-	
+
+	// Clear the data arrays
+
 	[projectKeys removeAllObjects];
 	[projectValues removeAllObjects];
 	
@@ -349,14 +348,23 @@
 			[projectValues addObject:@"None"];
 		}
 	}
-	
+
 	if (panelSelector.selectedSegment == 0)
 	{
-		deviceOutlineView.hidden = NO;
-		field.hidden = YES;
-		
+		// The Project 'tab' is already selected, so update
+		// the NSOutlineView to reflect the new project
+
 		[deviceOutlineView reloadData];
 		[deviceOutlineView setNeedsDisplay];
+
+		if (oProject != nil && aProject != nil && deviceOutlineView.isHidden)
+		{
+			// Only show the NSOutlineView if it is already hidden
+			// AND both the old and new projects are not nil, ie. only if the
+			// change is nil -> project, project -> nil or project -> project
+			deviceOutlineView.hidden = NO;
+			field.hidden = YES;
+		}
 	}
 }
 
@@ -366,9 +374,14 @@
 {
 	// This is the 'device' property setter, which we use to populate
 	// the two content arrays and trigger regeneration of the table view
+
+	// Record the current device for comparison at the end of the method
 	
+	NSMutableDictionary *oDevice = device;
 	device = aDevice;
-	
+
+	// Clear the data arrays
+
 	[deviceKeys removeAllObjects];
 	[deviceValues removeAllObjects];
 	
@@ -505,11 +518,20 @@
 	
 	if (panelSelector.selectedSegment == 1)
 	{
-		deviceOutlineView.hidden = NO;
-		field.hidden = YES;
-		
+		// The Device 'tab' is already selected, so update
+		// the NSOutlineView to reflect the new device
+
 		[deviceOutlineView reloadData];
 		[deviceOutlineView setNeedsDisplay];
+
+		if (oDevice != nil && aDevice != nil && deviceOutlineView.isHidden)
+		{
+			// Only show the NSOutlineView if it is already hidden
+			// AND both the old and new projects are not nil, ie. only if the
+			// change is nil -> device, device -> nil or device -> device
+			deviceOutlineView.hidden = NO;
+			field.hidden = YES;
+		}
 	}
 }
 
@@ -547,10 +569,12 @@
 			deviceOutlineView.hidden = YES;
 			field.stringValue = @"No project selected";
 			field.hidden = NO;
-			return;
 		}
 		else
 		{
+			[deviceOutlineView reloadData];
+			[deviceOutlineView setNeedsDisplay];
+
 			deviceOutlineView.hidden = NO;
 			field.hidden = YES;
 		}
@@ -564,19 +588,16 @@
 			deviceOutlineView.hidden = YES;
 			field.stringValue = @"No device selected";
 			field.hidden = NO;
-			return;
 		}
 		else
 		{
+			[deviceOutlineView reloadData];
+			[deviceOutlineView setNeedsDisplay];
+
 			deviceOutlineView.hidden = NO;
 			field.hidden = YES;
 		}
 	}
-	
-	// If we have got this far, rebuild and reshow the table
-	
-	[deviceOutlineView reloadData];
-	[deviceOutlineView setNeedsDisplay];
 }
 
 
