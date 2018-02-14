@@ -3570,7 +3570,7 @@
 
     [ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
-    // Pick up the action in getCommitsStageTwo:
+    // Pick up the action in listCommits:
 }
 
 
@@ -3614,7 +3614,7 @@
 
     [ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
-    // Pick up the action in getCommitsStageTwo:
+	// Pick up the action in listCommits:
 }
 
 
@@ -7712,7 +7712,7 @@
 
     if (action != nil && [action compare:@"getcommits"] == NSOrderedSame)
     {
-        cwvc.commits = deployments;
+		cwvc.commits = deployments;
         return;
     }
 
