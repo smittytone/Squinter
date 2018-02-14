@@ -7777,11 +7777,13 @@
                 if (mid.length > 0 || cid.length > 0)
                 {
                     NSString *did = [deployment objectForKey:@"id"];
-                    if ([did compare:mid] == NSOrderedSame  ) cs = [cs stringByAppendingString:@"\n     This is this device group’s minimum supported deployment"];
-                    if ([did compare:cid] == NSOrderedSame  ) cs = [cs stringByAppendingString:@"\n     This is this device group’s current deployment"];
+                    if ([did compare:mid] == NSOrderedSame) cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
+                    if ([did compare:cid] == NSOrderedSame) cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
                 }
 
-                [self performSelectorOnMainThread:@selector(logLogs:)
+				cs = [cs stringByAppendingString:@"\n"];
+
+				[self performSelectorOnMainThread:@selector(logLogs:)
                                        withObject:cs
                                     waitUntilDone:NO];
             }
