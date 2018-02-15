@@ -71,7 +71,6 @@
             {
                 // Project is a 3.x project so load it up
 
-                version = projectVersion;
                 name = [aDecoder decodeObjectForKey:@"project_name"];
                 description = [aDecoder decodeObjectForKey:@"project_desc"];
                 pid = [aDecoder decodeObjectForKey:@"project_pid"];
@@ -82,7 +81,7 @@
 
 				// Add 3.1 properties
 
-				if (minor > 0) aid = [aDecoder decodeObjectForKey:@"project_aid"];
+				aid = minor > 0 ? [aDecoder decodeObjectForKey:@"project_aid"] : @"";
 
                 // Set up other, unsaved properties
 

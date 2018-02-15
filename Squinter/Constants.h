@@ -9,7 +9,7 @@
 #ifndef SquinterContants_h
 #define SquinterContants_h
 
-#define kSquinterCurrentVersion             @"3.0"
+#define kSquinterCurrentVersion             @"3.1"
 
 #define kActionNewDGBothFiles               6
 #define kActionNewDGAgentFile               5
