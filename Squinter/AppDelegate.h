@@ -635,6 +635,7 @@
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
 
+- (NSAlert *)showAccountAlert:(NSString *)head :(NSString *)body;
 
 @property (nonatomic, strong) NSTouchBar *touchBar;
 

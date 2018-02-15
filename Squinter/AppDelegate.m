@@ -1779,11 +1779,18 @@
 
     renameProjectFlag = (sender == renameProjectMenuItem) ? YES : NO;
 
+	if (!renameProjectFlag && !ide.isLoggedIn)
+	{
+		// We now disallow editing device group information when Squinter is not logged in — at least until sync is up and running
+
+		[self loginAlert:@"edit device group information"];
+		return;
+	}
+
     NSString *desc = (renameProjectFlag) ? currentProject.description : currentDevicegroup.description;
     NSString *name = (renameProjectFlag) ? currentProject.name : currentDevicegroup.name;
 
     renameProjectLabel.stringValue = (renameProjectFlag) ? @"Enter a new Project name or update the description:" : @"Enter a new Device Group name or update the description:";
-
     renameProjectLinkCheckbox.title = (renameProjectFlag) ? @"Also update the Product linked to this Project" : @"Also update the Device Group in the impCloud";
 
     if (renameProjectFlag)
@@ -2509,7 +2516,8 @@
 
 - (IBAction)getProductsFromServer:(id)sender
 {
-    // Get a list of the host account's products to populate the products sub-menu
+    // Get a list of the host account's products to populate the products sub-menu, but
+	// only if we are logged in
 
     if (!ide.isLoggedIn)
     {
@@ -2530,13 +2538,21 @@
 
 - (IBAction)deleteProduct:(id)sender
 {
-    if (selectedProduct == nil)
+	// Delete the selected product, provided we are logged in
+
+	if (selectedProduct == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProduct] :YES];
         return;
     }
 
-    BOOL flag = NO;
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"delete products"];
+		return;
+	}
+
+	BOOL flag = NO;
 
     // If the product is linked to a project, pre-flight the deletion
     // by checking the product's device groups (if it has any) for assigned devices
@@ -2578,13 +2594,12 @@
         // if it is, its device groups are all believed to be empty - we will check this later
 
         NSAlert *alert = [[NSAlert alloc] init];
-		alert.messageText = [NSString stringWithFormat:@"You are about to delete the Product \"%@\". Are you sure you want to proceed?", [self getValueFrom:selectedProduct withKey:@"name"]];
-		alert.informativeText = @"Selecting ‘Yes’ will permanently delete the Product — but only if its Device Groups have no devices assigned to any of them.";
+		alert.messageText = [NSString stringWithFormat:@"You are about to delete product “%@”. Are you sure you want to proceed?", [self getValueFrom:selectedProduct withKey:@"name"]];
+		alert.informativeText = @"Selecting ‘Yes’ will permanently delete the product, but only if its device groups have no devices assigned to any of them.";
 		[alert addButtonWithTitle:@"No"];
         [alert addButtonWithTitle:@"Yes"];
         [alert setAlertStyle:NSWarningAlertStyle];
         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-
             if (returnCode == 1001)
             {
                 // Proceed with the deletion
@@ -2622,8 +2637,14 @@
         return;
     }
 
-    [self writeStringToLog:[NSString stringWithFormat:@"Retrieving device groups and source code for product \"%@\".", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
-    [self writeStringToLog:@"This may take a moment or two..." :YES];
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"download products"];
+		return;
+	}
+
+	[self writeStringToLog:[NSString stringWithFormat:@"Retrieving device groups and source code for product \"%@\".", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+    [self writeStringToLog:@"Please be patient as this may take some time if the product has many components." :YES];
 
     Project *newProject = [[Project alloc] init];
 
@@ -2693,19 +2714,27 @@
         return;
     }
 
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self projectAccountAlert:currentProject :[NSString stringWithFormat:@"link product “%@” with", [self getValueFrom:selectedProduct withKey:@"name"]]];
+		return;
+	}
+
     NSString *pid = [selectedProduct objectForKey:@"id"];
 
     if (currentProject.pid != nil && [currentProject.pid compare:pid] == NSOrderedSame)
     {
-        [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is already linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is already linked to product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
     }
     else
     {
         currentProject.pid = pid;
         currentProject.haschanged = YES;
-        [self refreshOpenProjectsMenu];
 
-        [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to Product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+		[self refreshOpenProjectsMenu];
+        [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
     }
 
     // Update UI
@@ -2715,7 +2744,7 @@
 
 
 
-#pragma mark - New Device Group Mehods
+#pragma mark - New Device Group Methods
 
 
 - (IBAction)newDevicegroup:(id)sender
@@ -2726,9 +2755,23 @@
         return;
     }
 
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"create device groups"];
+		return;
+	}
+
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self projectAccountAlert:currentProject :@"add a device group to"];
+		return;
+	}
+
     if (sender != nil)
     {
-        newDevicegroupLabel.stringValue = @"What would you like to call the new Device Group?";
+        newDevicegroupLabel.stringValue = @"What would you like to call the new device group?";
         newDevicegroupNameTextField.stringValue = @"";
         newDevicegroupDescTextField.stringValue = @"";
     }
@@ -3314,7 +3357,15 @@
             return;
         }
 
-        if (devicesArray.count > 0)
+		if (![self isCorrectAccount:currentProject])
+		{
+			// We are working on a project that is NOT tied to the current account
+
+			[self devicegroupAccountAlert:currentDevicegroup :@"delete"];
+			return;
+		}
+
+		if (devicesArray.count > 0)
         {
             // We have a list of device so we can check if the the device group is populated or not
 
@@ -3327,23 +3378,14 @@
                 {
                     // The device group has at least one device assigned to it so we can't delete
 
-                    NSAlert *alert = [[NSAlert alloc] init];
-                    alert.messageText = [NSString stringWithFormat:@"Device Group \"%@\" can’t be deleted.", currentDevicegroup.name];
-                    alert.informativeText = [NSString stringWithFormat:@"Device Group \"%@\" has devices assigned to it. A Device Group can’t be deleted until all of its devices have been re-assigned.", currentDevicegroup.name];
-                    [alert addButtonWithTitle:@"OK"];
-                    [alert beginSheetModalForWindow:_window
-                                  completionHandler:^(NSModalResponse response)
-                                 {
-
-                                 }
-                     ];
-
-                    return;
+					[self accountAlert:[NSString stringWithFormat:@"Device group \"%@\" can’t be deleted.", currentDevicegroup.name]
+									  :[NSString stringWithFormat:@"Device group \"%@\" has devices assigned to it. A device group can’t be deleted until all of its devices have been re-assigned.", currentDevicegroup.name]];
+					return;
                 }
             }
         }
 
-        // If we are here, the device group has no devices assigned, or we can't check at this time.
+		// If we are here, the device group has no devices assigned, or we can't check at this time.
         // So just try to delete it anyway - the server will warn if the group can't be deleted
 
         NSAlert *alert = [[NSAlert alloc] init];
@@ -3411,14 +3453,32 @@
         return;
     }
 
-    [self renameProject:sender];
+	if (!ide.isLoggedIn)
+	{
+		// The user is not logged in, but the device group is associated with a device group on the server.
+
+		[self loginAlert:[NSString stringWithFormat:@"edit device group \"%@\"", currentDevicegroup.name]];
+		return;
+	}
+
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"edit"];
+		return;
+	}
+
+	[self renameProject:sender];
 }
 
 
 
 - (IBAction)uploadCode:(id)sender
 {
-    if (!ide.isLoggedIn)
+	// This is a general method for both direct uploads and uploads with extra information
+
+	if (!ide.isLoggedIn)
     {
         [self loginAlert:@"upload code"];
         return;
@@ -3432,15 +3492,23 @@
 
     if (currentDevicegroup.did == nil || currentDevicegroup.did.length == 0)
     {
-        [self writeErrorToLog:@"[ERROR] Cannot upload: the selected Device Group is not associated with a Device Group in the impCloud." :YES];
+        [self writeErrorToLog:@"[ERROR] Cannot upload: the selected device group is not associated with a device group in the impCloud." :YES];
         return;
     }
 
     if (currentDevicegroup.models.count == 0)
     {
-        [self writeErrorToLog:@"[ERROR] The selected Device Group contains no code to upload." :YES];
+        [self writeErrorToLog:@"[ERROR] The selected device group contains no code to upload." :YES];
         return;
     }
+
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"upload code to"];
+		return;
+	}
 
     if ((currentDevicegroup.squinted & 0x08) != 0)
     {
@@ -3469,7 +3537,7 @@
     {
         if (!model.squinted)
         {
-            [self writeErrorToLog:@"[ERROR] The selected Device Group contains uncompiled code. Please compile before uploading." :YES];
+            [self writeErrorToLog:@"[ERROR] The selected device group contains uncompiled code. Please compile before uploading." :YES];
             return;
         }
 
@@ -3665,15 +3733,18 @@
 
 - (IBAction)removeSource:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// This method removes a device group's links to its source code files
+	// As this does not change the device group on the server, it can be done at any time
+
+	if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
     NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = @"Are you sure you wish to remove the source code files from this Device Group?";
-    alert.informativeText = @"This will remove all source code files from the Device Group but not delete them. You can re-add source code files to the Device Group at any time.";
+    alert.messageText = [NSString stringWithFormat:@"Are you sure you wish to remove the source code files from device group “%@”?", currentDevicegroup.name];
+    alert.informativeText = @"This will remove all source code files from the device group but not delete them. You can re-add source code files to the device group at any time.";
     [alert addButtonWithTitle:@"No"];
     [alert addButtonWithTitle:@"Yes"];
     [alert beginSheetModalForWindow:_window
@@ -3682,11 +3753,11 @@
          if (response != NSAlertFirstButtonReturn)
          {
              if (currentDevicegroup.models.count > 0) [currentDevicegroup.models removeAllObjects];
-
              currentProject.haschanged = YES;
              [saveLight needSave:YES];
-             [self refreshOpenProjectsMenu];
-             [self refreshMainDevicegroupsMenu];
+             // [self refreshOpenProjectsMenu];
+			 [self refreshLibraryMenus];
+			 [self refreshMainDevicegroupsMenu];
          }
      }
      ];
@@ -3696,13 +3767,30 @@
 
 - (IBAction)getCommits:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// Download a list of the commits made to the current device group
+	// This requires the user to be logged in
+
+	if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
-    NSDictionary *dict = @{ @"action" : @"listcommits",
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"download the list of commits"];
+		return;
+	}
+
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"list commits to"];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"listcommits",
                             @"devicegroup" : currentDevicegroup };
 
     [ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
@@ -3735,19 +3823,40 @@
 
 - (IBAction)showMinimumDeploymentSheet:(id)sender
 {
-    if (currentDevicegroup == nil)
+	// Pops up a sheet which displays all the commits made to the device group
+	// The current set minimum deployment is checked - all those commits which are
+	// older than the minimum are unavailablel; any newer one can be selected as
+	// the minimum supported deployment
+	// NOTE The table contained within the sheet is handled by a separate
+	// CommitWindowViewController instance, 'cwvc'
+
+	if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
 
-    cwvc.devicegroup = currentDevicegroup;
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"set the minimum supported deployment"];
+		return;
+	}
+
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"set the minimum deployment for"];
+		return;
+	}
+
+	cwvc.devicegroup = currentDevicegroup;
 
     [cwvc prepSheet];
     [_window beginSheet:commitSheet completionHandler:nil];
 
     NSDictionary *dict = @{ @"action" : @"getcommits",
-                           @"devicegroup" : currentDevicegroup };
+                            @"devicegroup" : currentDevicegroup };
 
     [ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
@@ -3799,13 +3908,18 @@
 
 	[ide setMinimumDeployment:devicegroup.did :newMinimum :dict];
 
-    // Pick up the action at
+    // Pick up the action at ?????
 }
 
 
 
 - (IBAction)chooseProductionTarget:(id)sender
 {
+	// This method allows the user with ops access to select a factory device group's target
+	// The sheet presents a list of suitable device groups in a table
+	// NOTE The table contained within the sheet is handled by a separate
+	// SelectWindowViewController instance, 'swvc'
+
 	if (currentDevicegroup == nil)
 	{
 		[self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
@@ -3815,6 +3929,20 @@
 	if (![currentDevicegroup.type containsString:@"factoryfixture"])
 	{
 		[self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a factory fixture group so has no production target.", currentDevicegroup.name] :YES];
+		return;
+	}
+
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"set production device groups as targets"];
+		return;
+	}
+
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"set a production device group as a target for"];
 		return;
 	}
 
@@ -3839,13 +3967,26 @@
 		return;
 	}
 
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"list test blessed devices"];
+		return;
+	}
+
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"show test blessed devices in"];
+		return;
+	}
+
 	NSDictionary *dict = @{ @"action" : @"gettestblesseddevices",
 							@"devicegroup" : currentDevicegroup };
 
 	[ide getDevicesWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
 	// Pick up the action at listDevices:
-
 }
 
 
@@ -3934,7 +4075,9 @@
 	checkDeviceStatusMenuItem.state = NSOnState;
 	
 	if (devicesArray == nil || devicesArray.count == 0) [self updateDevicesStatus:nil];
-	
+
+	// TODO - MAKE THIS A PREFERENCE
+
 	refreshTimer = [NSTimer scheduledTimerWithTimeInterval:300.0
 													target:self
 												  selector:@selector(deviceStatusCheck)
@@ -3985,7 +4128,7 @@
 
     // Is the device unassigned? If so, it can't be restarted
 
-    NSString *did = [self getValueFrom:selectedDevice withKey:@"id"];
+	NSString *did = [selectedDevice valueForKeyPath:@"relationships.devicegroup.id"];
 
     if (did == nil || did.length == 0)
     {
@@ -4021,7 +4164,15 @@
         return;
     }
 
-    NSDictionary *dict = @{ @"action" : @"restartdevices",
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"restart all the devices assigned to"];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"restartdevices",
                             @"devicegroup" : currentDevicegroup };
 
     [ide restartDevices:currentDevicegroup.did :dict];
@@ -4045,7 +4196,15 @@
         return;
     }
 
-    NSDictionary *dict = @{ @"action" : @"conrestartdevices",
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self devicegroupAccountAlert:currentDevicegroup :@"conditionally restart all the devices assigned to"];
+		return;
+	}
+
+	NSDictionary *dict = @{ @"action" : @"conrestartdevices",
                             @"devicegroup" : currentDevicegroup };
 
     [ide conditionalRestartDevices:currentDevicegroup.did :dict];
@@ -4077,7 +4236,7 @@
         return;
     }
 
-    NSDictionary *dict = @{ @"action" : @"unassign",
+	NSDictionary *dict = @{ @"action" : @"unassign",
                             @"device" : selectedDevice };
 
     [ide unassignDevice:selectedDevice :dict];
@@ -4098,7 +4257,7 @@
         return;
     }
 
-    if (devicesArray == nil || devicesArray.count == 0)
+	if (devicesArray == nil || devicesArray.count == 0)
     {
         // We have no device(s) to assign
 
@@ -4110,11 +4269,20 @@
     {
         // We have no projects open - so we can't assign a device to an open device group
 
-        [self writeErrorToLog:@"[ERROR] You have no Projects open. You will need to create or open a Project and add a Device Group to assign a device." :YES];
+        [self writeErrorToLog:@"[ERROR] You have no projects open. You will need to open or create a project and add a device group to assign a device." :YES];
         return;
     }
 
-    [assignDeviceMenuDevices removeAllItems];
+	if (![self isCorrectAccount:currentProject])
+	{
+		// We are working on a project that is NOT tied to the current account
+
+		[self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", currentProject.name]
+						  :[NSString stringWithFormat:@"To assign devices to any of this project’s device groups, you need to log out of your current account and log into the account it is associated with (ID %@)", currentProject.aid]];
+		return;
+	}
+
+	[assignDeviceMenuDevices removeAllItems];
     [assignDeviceMenuModels removeAllItems];
 
     assignDeviceMenuModels.autoenablesItems = NO;
@@ -4221,7 +4389,7 @@
     {
         // The device group is not synced, so we can't proceed with the assignment
 
-        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Device \"%@\" not assigned because the chosen Device Group, \"%@\" is not yet associated with a Device Group in the impCloud.", [self getValueFrom:device withKey:@"name"], dg.name] :YES];
+        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Device \"%@\" not assigned because the chosen device group, \"%@\" is not yet associated with a device group in the impCloud.", [self getValueFrom:device withKey:@"name"], dg.name] :YES];
         return;
     }
 
@@ -4240,15 +4408,21 @@
 
 - (IBAction)renameDevice:(id)sender
 {
-    if (devicesArray == nil || devicesArray.count == 0)
+	if (!ide.isLoggedIn)
+	{
+		[self loginAlert:@"rename a device"];
+		return;
+	}
+
+	if (devicesArray == nil || devicesArray.count == 0)
     {
         // We have no device to rename
 
-        [self writeErrorToLog:@"[ERROR] You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
+        [self writeErrorToLog:@"[ERROR] You have no devices listed. You need to retrieve the list from the impCloud." :YES];
         return;
     }
 
-    // Assemble the devices list
+	// Assemble the devices list
 
     [renameMenu removeAllItems];
 
@@ -8867,8 +9041,7 @@
 	if (plan != nil) [lines addObject:[NSString stringWithFormat:@"  Plan ID: %@", plan]];
 
 	[lines addObject:@"\nDevice Group Information"];
-    NSDictionary *dg = [self getValueFrom:selectedDevice withKey:@"devicegroup"];
-    NSString *dgid = [self getValueFrom:dg withKey:@"id"];
+    NSString *dgid = [selectedDevice valueForKeyPath:@"relationships.devicegroup.id"];
 
     if (dgid != nil)
     {
@@ -8898,13 +9071,13 @@
 
         if (adg != nil)
         {
-			[lines addObject:[NSString stringWithFormat:@"    Group: \"%@\"", adg.name]];
-			[lines addObject:[NSString stringWithFormat:@"       ID: \"%@\"", dgid]];
-			[lines addObject:[NSString stringWithFormat:@"  Project: \"%@\"", apr.name]];
+			[lines addObject:[NSString stringWithFormat:@"  Project: %@", apr.name]];
+			[lines addObject:[NSString stringWithFormat:@"    Group: %@", adg.name]];
+			[lines addObject:[NSString stringWithFormat:@"       ID: %@", dgid]];
         }
         else
         {
-			[lines addObject:[NSString stringWithFormat:@"       ID: \"%@\"", dgid]];
+			[lines addObject:[NSString stringWithFormat:@"       ID: %@", dgid]];
         }
     }
     else
@@ -10149,6 +10322,9 @@
     NSMenuItem *item;
     BOOL compiled = YES;
     BOOL gotFiles = YES;
+
+	// Set the names of the menu items according to whether there is a selected
+	// device group or not
 
     if (currentDevicegroup != nil)
     {
@@ -11570,7 +11746,7 @@
 
 
 
-#pragma mark NSURLSession Delegate Methods
+#pragma mark - NSURLSession Delegate Methods
 
 
 - (void)URLSession:(NSURLSession *)session
@@ -11891,6 +12067,47 @@ didReceiveResponse:(NSURLResponse *)response
         [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this device group's code.", [fpath lastPathComponent]] :YES];
     }
 }
+
+
+
+#pragma mark - Misc Methods
+
+
+- (BOOL)isCorrectAccount:(Project *)project
+{
+	// Returns YES or NO depending on whether the user is signed into the correct account
+
+	return (project.aid.length > 0 && [project.aid compare:ide.currentAccount] != NSOrderedSame) ? NO : YES;
+}
+
+
+
+- (void)projectAccountAlert:(Project *)project :(NSString *)action
+{
+	[self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
+					  :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]];
+}
+
+
+- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action
+{
+	Project *project = [self getParentProject:devicegroup];
+
+	[self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
+					  :[NSString stringWithFormat:@"To %@ this device group, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]];
+}
+
+
+
+- (void)accountAlert:(NSString *)head :(NSString *)body
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	alert.messageText = head;
+	alert.informativeText = body;
+	[alert addButtonWithTitle:@"OK"];
+	[alert beginSheetModalForWindow:_window completionHandler:nil];
+}
+
 
 
 @end
