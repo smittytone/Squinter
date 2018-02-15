@@ -10,17 +10,13 @@
 @implementation Project
 
 
-@synthesize name, description, pid, version, updated, devicegroups;
+@synthesize name, description, pid, aid, version, updated, devicegroups;
 @synthesize path, filename, haschanged, devicegroupIndex, count;
 
 
 - (instancetype)init
 {
-    if (self = [super init])
-    {
-        [self setDefaults];
-    }
-
+    if (self = [super init]) [self setDefaults];
     return self;
 }
 
@@ -32,6 +28,7 @@
     name = @"";
     description = @"";
     pid = @"";
+	aid = @"";
     devicegroups = nil;
     path = @"";
     filename = @"";
@@ -82,6 +79,10 @@
                 path = [aDecoder decodeObjectForKey:@"project_path"];
                 filename = [aDecoder decodeObjectForKey:@"project_filename"];
                 updated = [aDecoder decodeObjectForKey:@"project_updated"];
+
+				// Add 3.1 properties
+
+				if (minor > 0) aid = [aDecoder decodeObjectForKey:@"project_aid"];
 
                 // Set up other, unsaved properties
 
@@ -135,6 +136,7 @@
     [aCoder encodeObject:name forKey:@"project_name"];
     [aCoder encodeObject:description forKey:@"project_desc"];
     [aCoder encodeObject:pid forKey:@"project_pid"];
+	[aCoder encodeObject:aid forKey:@"project_aid"];
     [aCoder encodeObject:devicegroups forKey:@"project_devicegroups"];
     [aCoder encodeObject:updated forKey:@"project_updated"];
     [aCoder encodeObject:filename forKey:@"project_filename"];
@@ -153,6 +155,7 @@
     projectCopy.name = [self.name mutableCopy];
     projectCopy.description = [self.description mutableCopy];
     projectCopy.pid = [self.pid mutableCopy];
+	projectCopy.aid = [self.aid mutableCopy];
     projectCopy.path = [self.path mutableCopy];
     projectCopy.devicegroups = [self.devicegroups mutableCopy];
     projectCopy.filename = [self.filename mutableCopy];
