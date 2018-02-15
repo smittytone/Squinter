@@ -945,12 +945,42 @@
     {
         // We are logged in - or trying to log in - so log the user out
 
-        loginMenuItem.title = @"Log in to your account";
+		[self logout];
 
-        [ide logout];
-        [self setToolbar];
-        [self writeStringToLog:@"You are now logged out of the impCloud." :YES];
+		// Update the UI and report to the user
+
+		loginMenuItem.title = @"Log in to your account";
+		[self writeStringToLog:@"You are now logged out of the impCloud." :YES];
     }
+}
+
+
+
+- (void)logout
+{
+	// Log out of the current account
+
+	[ide logout];
+
+	// Clear all account-related items: Products and Devices
+
+	[productsArray removeAllObjects];
+	[devicesArray removeAllObjects];
+
+	productsArray = nil;
+	selectedProduct = nil;
+
+	selectedDevice = nil;
+	iwvc2.device = nil;
+
+	// Update the UI elements relating to these items
+
+	[self refreshProductsMenu];
+	[self refreshProjectsMenu];
+	[self refreshDevicesMenus];
+	[self refreshDeviceMenu];
+	[self refreshDevicesPopup];
+	[self setToolbar];
 }
 
 
@@ -1033,8 +1063,7 @@
 
 	if (switchAccountFlag)
 	{
-		[ide logout];
-		[self setToolbar];
+		[self logout];
 		credsFlag = NO;
 	}
 
@@ -1076,7 +1105,9 @@
 
 - (IBAction)setSecureEntry:(id)sender
 {
-    if (showPassCheckbox.state == NSOnState)
+	// EXPERIMENTAL — switches the password entry field between secure and non-secure mode
+
+	if (showPassCheckbox.state == NSOnState)
     {
         NSString *text = passwordTextField.stringValue;
         passwordTextField.cell = [[NSTextFieldCell alloc] init];
@@ -1173,7 +1204,11 @@
 
         newProjectNewProductCheckbox.enabled = YES;
         newProjectNewProductCheckbox.state = NSOnState;
-        //if (productsArray == nil || productsArray.count == 0) [self getProductsFromServer:nil];
+
+		// Get the list of products if we don't have it already
+		// This will be later used to check the new project's name
+
+		// if (productsArray == nil || productsArray.count == 0) [self getProductsFromServer:nil];
     }
     else
     {
@@ -1260,38 +1295,72 @@
         }
     }
 
-    if ((makeNewProduct || !associateProduct) && productsArray != nil && productsArray.count > 0)
+    if (makeNewProduct)
     {
-        // User wants to make a new product or doesn't want to associate with an exitsting one
-        // so compare the new product's name against existing product names
+        if (productsArray != nil)
+		{
+			// User wants to make a new product or doesn't want to associate with an exitsting one
+			// so compare the new product's name against existing product names
 
-        for (NSDictionary *product in productsArray)
-        {
-            NSString *aName = [self getValueFrom:product withKey:@"name"];
+			if (productsArray.count > 0)
+			{
+				for (NSDictionary *product in productsArray)
+				{
+					NSString *aName = [self getValueFrom:product withKey:@"name"];
 
-            if ([aName compare:pName] == NSOrderedSame)
-            {
-                [newProjectLabel setStringValue:@"A product with that name already exists. Please choose another project name, or cancel."];
-                [_window beginSheet:newProjectSheet completionHandler:nil];
-                return;
-            }
-        }
+					if ([aName compare:pName] == NSOrderedSame)
+					{
+						[newProjectLabel setStringValue:@"A product with that name already exists. Please choose another project name, or cancel."];
+						[_window beginSheet:newProjectSheet completionHandler:nil];
+						return;
+					}
+				}
+			}
+		}
+		else
+		{
+			// 'productsArray' is nil so we have not downloaded the product list
+			// Warn the user about this and give them a way out
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = @"You haven‘t yet retrieved this account’s products";
+			alert.informativeText = @"If a product with the same name as your project already exists, creating a new product for this project will fail.";
+			[alert addButtonWithTitle:@"Cancel"];
+			[alert addButtonWithTitle:@"Continue"];
+
+			[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+				if (returnCode == 1001) [self newProjectSheetCreateStageTwo:pName :pDesc :YES :NO];
+			}];
+
+			return;
+		}
     }
 
+	// Go on to the next phase
+
+	[self newProjectSheetCreateStageTwo:pName :pDesc :makeNewProduct :associateProduct];
+}
+
+- (void)newProjectSheetCreateStageTwo:(NSString *)projectName :(NSString *)projectDesc :(BOOL)make :(BOOL)associate
+{
     // Make the new project
 
     currentProject = [[Project alloc] init];
-    currentProject.name = pName;
-    currentProject.description = pDesc;
+    currentProject.name = projectName;
+    currentProject.description = projectDesc;
     currentProject.path = workingDirectory;
-    currentProject.filename = [pName stringByAppendingString:@".squirrelproj"];
+    currentProject.filename = [projectName stringByAppendingString:@".squirrelproj"];
     currentProject.haschanged = YES;
     currentProject.devicegroupIndex = -1;
     currentDevicegroup = nil;
 
-    [projectArray addObject:currentProject];
+	// Add the account ID if we are logged in
 
-    if (makeNewProduct)
+	if (ide.isLoggedIn) currentProject.aid = ide.currentAccount;
+
+	[projectArray addObject:currentProject];
+
+    if (make)
     {
         // User wants to create a new product for this project. We will pick up saving
         // this project AFTER the product has been created (to make sure it is created)
@@ -1301,7 +1370,7 @@
         NSDictionary *dict = @{ @"action"  : @"newproject",
                                 @"project" : currentProject };
 
-        [ide createProduct:pName :pDesc :dict];
+        [ide createProduct:projectName :projectDesc :dict];
         return;
 
         // Pick up the action at 'createProductStageTwo:'
@@ -1309,26 +1378,23 @@
 
     // Check whether we're connecting this project to a product (new or selected)
 
-    if (associateProduct)
+    if (associate)
     {
         // User wants to associate the new project with the selected product, so set 'pid'
-        // NOTE user can't select this if there is no 'selectedProduct'
+        // NOTE user can't have made this choice if 'selectedProduct' is nil
 
         currentProject.pid = [self getValueFrom:selectedProduct withKey:@"id"];
     }
 
-    // Add the new project to the project menu. We've already checked for a name clash,
+	// Add the new project to the project menu. We've already checked for a name clash,
     // so we needn't care about the return value
 
-    [self addProjectMenuItem:pName :currentProject];
+    [self addProjectMenuItem:projectName :currentProject];
 
     // Enable project-related UI items for the new project
+	// NOTE 'addProjectMenuItem:' will have update the sub-menus already
 
-    // [self refreshOpenProjectsMenu];
     [self refreshProjectsMenu];
-    //[self refreshDevicegroupMenu];
-    //[self refreshMainDevicegroupsMenu];
-    //[self refreshDeviceMenu];
     [self setToolbar];
 
 	iwvc2.project = currentProject;
@@ -1635,6 +1701,7 @@
         [fileWatchQueue kill];
         fileWatchQueue = nil;
         currentProject = nil;
+		currentDevicegroup = nil;
 
         // Fade the status light
 
@@ -1969,34 +2036,100 @@
 
 - (void)uploadProject:(Project *)project
 {
-    // We can't sync if we're not logged in
+	// Uploading a project is the act of creating a new product out of a pre-existing project,
+	// ie. a new product wasn't created when the project was created
 
-    if (!ide.isLoggedIn)
+	if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"upload this Project"];
+		// We can't sync if we're not logged in
+
+		[self loginAlert:@"upload this Project"];
         return;
     }
 
-    if (project.pid == nil || project.pid.length == 0)
+	BOOL correctAccount = (project.aid == nil || project.aid.length == 0 || [ide.currentAccount compare:project.aid] == NSOrderedSame) ? YES : NO;
+
+	if (project.pid == nil || project.pid.length == 0)
     {
-        // Project has no PID so just create a new product
+		// TODO - Complete account check
 
-        [self writeStringToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
+		if (correctAccount)
+		{
+			// Project has no PID so just create a new product
 
-        // Start by creating the product
+			// TODO - check the name
 
-        NSDictionary *dict = @{ @"action" : @"uploadproject",
-                                @"project" : project };
+			[self writeStringToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
 
-        [ide createProduct:project.name :project.description :dict];
+			// Start by creating the product
 
-        // Pick up in 'createProductStageTwo:'
+			NSDictionary *dict = @{ @"action" : @"uploadproject",
+									@"project" : project };
 
-        return;
+			[ide createProduct:project.name :project.description :dict];
+
+			// Pick up in 'createProductStageTwo:'
+		}
+		else
+		{
+			// The project is associated with an account other than the one we're signed in to
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
+			alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Account %@), or cancel the upload?", project.aid];
+			[alert addButtonWithTitle:@"Cancel"];
+			[alert addButtonWithTitle:@"Continue"];
+			[alert setAlertStyle:NSWarningAlertStyle];
+			[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+				if (returnCode == 1001)
+				{
+					// Proceed with the upload to this account
+
+					project.aid = ide.currentAccount;
+					project.haschanged = YES;
+					if (project == currentProject) [saveLight needSave:YES];
+
+					// Re-call this method now we have changed the Account ID
+
+					[self uploadProject:project];
+				}
+			}];
+		}
+
+		return;
     }
     else
     {
         // Project has a PID, but has it been orphaned?
+
+		if (!correctAccount)
+		{
+			// The project is associated with an account other than the one we're signed in to
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
+			alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Product %@ and Account %@), or cancel the upload?", project.pid, project.aid];
+			[alert addButtonWithTitle:@"Cancel"];
+			[alert addButtonWithTitle:@"Continue"];
+			[alert setAlertStyle:NSWarningAlertStyle];
+			[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+				if (returnCode == 1001)
+				{
+					// Proceed with the upload to this account
+
+					project.aid = ide.currentAccount;
+					project.pid = @"";
+					project.haschanged = YES;
+					if (project == currentProject) [saveLight needSave:YES];
+
+					// Re-call this method now we have changed the Account ID and Product ID
+
+					[self uploadProject:project];
+				}
+			}];
+
+			return;
+		}
 
         if (productsArray == nil)
         {
@@ -2005,7 +2138,7 @@
             [self writeStringToLog:@"Retrieving a list of your Products" :YES];
 
             NSDictionary *dict = @{ @"action" : @"uploadproject",
-                                    @"project" : currentProject };
+                                    @"project" : project };
 
             [ide getProducts:dict];
 
@@ -2019,7 +2152,7 @@
             {
                 NSString *pid = [product objectForKey:@"id"];
 
-                if ([currentProject.pid compare:pid] == NSOrderedSame)
+                if ([project.pid compare:pid] == NSOrderedSame)
                 {
                     [self writeErrorToLog:@"[ERROR] This Project already exists as a Product in the impCloud." :YES];
                     deadpid = NO;
@@ -2405,26 +2538,30 @@
 
     BOOL flag = NO;
 
-    // If the product is linked to a projetc, re-flight the deletion
-    // by checking the product's device groups for assigned devices
+    // If the product is linked to a project, pre-flight the deletion
+    // by checking the product's device groups (if it has any) for assigned devices
 
     if (projectArray.count > 0)
     {
-        for (Project *project in projectArray)
-        {
-            NSString *apid = [self getValueFrom:selectedProduct withKey:@"id"];
+		NSString *apid = [self getValueFrom:selectedProduct withKey:@"id"];
 
+		for (Project *project in projectArray)
+        {
             if ([project.pid compare:apid] == NSOrderedSame)
             {
                 // This product has a matching project
+				// Check if any of the project's device groups know about devices
 
-                if (devicesArray.count > 0)
+                if (devicesArray.count > 0 && project.devicegroups.count > 0)
                 {
                     for (Devicegroup *devicegroup in project.devicegroups)
                     {
                         if (devicegroup.devices.count > 0)
                         {
-                            flag = YES;
+							// The device group thinks it has assigned devices so
+							// flag this up so we don't attempt to delete the product
+
+							flag = YES;
                             break;
                         }
                     }
@@ -2437,14 +2574,14 @@
 
     if (!flag)
     {
-        // The selected product is not associated with an open project -
-        // or if it is, its device groups are all empty
+        // The selected product is not associated with an open project or,
+        // if it is, its device groups are all believed to be empty - we will check this later
 
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle:@"No"];
+		alert.messageText = [NSString stringWithFormat:@"You are about to delete the Product \"%@\". Are you sure you want to proceed?", [self getValueFrom:selectedProduct withKey:@"name"]];
+		alert.informativeText = @"Selecting ‘Yes’ will permanently delete the Product — but only if its Device Groups have no devices assigned to any of them.";
+		[alert addButtonWithTitle:@"No"];
         [alert addButtonWithTitle:@"Yes"];
-        [alert setMessageText:[NSString stringWithFormat:@"You are about to delete the Product \"%@\". Are you sure you want to proceed?", [self getValueFrom:selectedProduct withKey:@"name"]]];
-        [alert setInformativeText:@"Selecting ‘Yes’ will permanently delete the Product — but only if its Device Groups have no devices assigned to any of them."];
         [alert setAlertStyle:NSWarningAlertStyle];
         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
 
@@ -2461,7 +2598,7 @@
                 NSDictionary *dict = @{ @"action" : @"deleteproduct",
                                         @"product" : dp };
 
-                [self writeStringToLog:[NSString stringWithFormat:@"Deleting Product \"%@\" - checking its Device Groups...", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+                [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking for device droups...", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
 
                 [ide getDevicegroupsWithFilter:@"product.id" :[selectedProduct objectForKey:@"id"] :dict];
 
@@ -2471,7 +2608,7 @@
     }
     else
     {
-        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Cannot delete Project \"%@\" as it appears to have Device Groups with assigned devices", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Cannot delete product \"%@\" as it appears to have device groups with assigned devices", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
     }
 }
 
@@ -2481,11 +2618,11 @@
 {
     if (selectedProduct == nil)
     {
-        [self writeErrorToLog:@"[ERROR] You have not selected a Product as the new project's source." :YES];
+        [self writeErrorToLog:@"[ERROR] You have not selected a product as the new project's source." :YES];
         return;
     }
 
-    [self writeStringToLog:[NSString stringWithFormat:@"Retrieving Device Groups and source code for Product \"%@\".", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+    [self writeStringToLog:[NSString stringWithFormat:@"Retrieving device groups and source code for product \"%@\".", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
     [self writeStringToLog:@"This may take a moment or two..." :YES];
 
     Project *newProject = [[Project alloc] init];
@@ -4839,7 +4976,9 @@
 
                     if (ide.isLoggedIn)
                     {
-                        [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
+						// TODO - Ask if the user wants to do this...
+
+						[self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
 
                         // Run the transfer as a standard upload, though we bypass uploadProject: at first
 
@@ -4865,17 +5004,37 @@
                 }
                 else
                 {
-                    for (NSMenuItem *item in productsMenu.itemArray)
-                    {
-                        NSMutableDictionary *product = (NSMutableDictionary *)item.representedObject;
-                        NSString *pid = [self getValueFrom:product withKey:@"id"];
+					if (productsMenu.itemArray.count > 0)
+					{
+						for (NSMenuItem *item in productsMenu.itemArray)
+						{
+							NSMutableDictionary *product = (NSMutableDictionary *)item.representedObject;
 
-                        if (pid != nil && [pid compare:currentProject.pid] == NSOrderedSame)
-                        {
-                            [self chooseProduct:item];
-                            break;
-                        }
-                    }
+							if (product != nil)
+							{
+								NSString *pid = [self getValueFrom:product withKey:@"id"];
+
+								if (pid != nil && [pid compare:currentProject.pid] == NSOrderedSame)
+								{
+									if (currentProject.aid == nil || currentProject.aid.length == 0)
+									{
+										// The current project does not have an associated accoint, but since we have a
+										// match on the ID of a product in the current account, so we can perform the
+										// association now
+
+										currentProject.aid = ide.currentAccount;
+										currentProject.haschanged = YES;
+
+										[saveLight needSave:YES];
+										[self writeStringToLog:[NSString stringWithFormat:@"Associating project \"%@\" with account ID %@", currentProject.name, currentProject.aid] :YES];
+									}
+
+									[self chooseProduct:item];
+									break;
+								}
+							}
+						}
+					}
                 }
             }
 
@@ -5140,7 +5299,7 @@
 
             // Update the Menus and the Toolbar
 
-            [self refreshOpenProjectsMenu];
+			[self refreshOpenProjectsMenu];	// Need this or we crash in refreshDevicegroupMenu: TODO - check why
             [self refreshProjectsMenu];
             [self refreshDevicegroupMenu];
             [self refreshMainDevicegroupsMenu];
@@ -5159,6 +5318,34 @@
 			// Update the Inspector
 
 			iwvc2.project = currentProject;
+
+			if ((currentProject.aid == nil || currentProject.aid.length == 0) && ide.isLoggedIn)
+			{
+				// This project doesn't have an account ID
+
+				NSAlert *alert = [[NSAlert alloc] init];
+				alert.messageText = [NSString stringWithFormat:@"Project “%@” is yet not associated with an Electric Imp Account.", currentProject.name];
+				alert.informativeText = @"Do you wish to associate it with the account you are currently logged in to? If you are not certain that this project relates to this account, you should select ‘No’.";
+				[alert addButtonWithTitle:@"No"];
+				[alert addButtonWithTitle:@"Yes"];
+
+				Project *aProject = currentProject;
+
+				[alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+					if (returnCode == 1001)
+					{
+						aProject.aid = ide.currentAccount;
+						aProject.haschanged = YES;
+						if (aProject == currentProject) [saveLight needSave:YES];
+						[self writeStringToLog:[NSString stringWithFormat:@"Associating project \"%@\" with account ID %@", aProject.name, aProject.aid] :YES];
+					}
+
+					// Continue opening the other filesr
+					[self openSquirrelProjects:urls];
+				}];
+
+				return;
+			}
         }
     }
     else
@@ -5842,7 +6029,7 @@
 
     if (savingProject == currentProject) saveAsFlag = YES;
 
-    // Configure the NSSavePanel.
+    // Configure the NSSavePanel
 
     saveProjectDialog = [NSSavePanel savePanel];
     [saveProjectDialog setNameFieldStringValue:savingProject.filename];
@@ -6174,7 +6361,7 @@
     // or to 'deleteProduct:' It should be responding with a list of the product's device groups
 
     NSDictionary *data = (NSDictionary *)note.object;
-    NSMutableArray *dgs = [data objectForKey:@"data"];
+    NSMutableArray *devicegroups = [data objectForKey:@"data"];
 	NSDictionary *so = [data objectForKey:@"object"];
 	NSString *action = [so objectForKey:@"action"];
 
@@ -6190,26 +6377,26 @@
 			// Record the total number of device groups to the product has, ie. the number of
             // device group deployments we will need to retrieve
 
-            if (dgs.count > 0)
+            if (devicegroups.count > 0)
 			{
 				// The product has at least one device group, so add the device group records to the new project
 
 				newProject.devicegroups = [[NSMutableArray alloc] init];
-				newProject.count = dgs.count;
+				newProject.count = devicegroups.count;
 
-				for (NSDictionary *dg in dgs)
+				for (NSDictionary *devicegroup in devicegroups)
 				{
 					Devicegroup *newDevicegroup = [[Devicegroup alloc] init];
-					newDevicegroup.name = [self getValueFrom:dg withKey:@"name"];
-					newDevicegroup.did = [self getValueFrom:dg withKey:@"id"];
-					newDevicegroup.description = [self getValueFrom:dg withKey:@"description"];
-					newDevicegroup.type = [self getValueFrom:dg withKey:@"type"];
+					newDevicegroup.name = [self getValueFrom:devicegroup withKey:@"name"];
+					newDevicegroup.did = [self getValueFrom:devicegroup withKey:@"id"];
+					newDevicegroup.description = [self getValueFrom:devicegroup withKey:@"description"];
+					newDevicegroup.type = [self getValueFrom:devicegroup withKey:@"type"];
 					newDevicegroup.models = [[NSMutableArray alloc] init];
 					newDevicegroup.devices = [[NSMutableArray alloc] init];
-					newDevicegroup.data = [NSMutableDictionary dictionaryWithDictionary:dg];
+					newDevicegroup.data = [NSMutableDictionary dictionaryWithDictionary:devicegroup];
 					[newProject.devicegroups addObject:newDevicegroup];
 
-					NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];
+					NSDictionary *cd = [self getValueFrom:devicegroup withKey:@"current_deployment"];
 
 					if (cd != nil)
 					{
@@ -6260,25 +6447,37 @@
         {
             // Perform the flow for deleting a product
 
-            NSMutableDictionary *dp = [so objectForKey:@"product"];
-            NSDictionary *pd = [dp objectForKey:@"product"];
-            [dp setObject:[NSNumber numberWithInteger:dgs.count] forKey:@"count"];
-            [dp setObject:dgs forKey:@"devicegroups"];
+            NSMutableDictionary *productDictionary = [so objectForKey:@"product"];
+            NSDictionary *product = [productDictionary objectForKey:@"product"];
+            [productDictionary setObject:[NSNumber numberWithInteger:devicegroups.count] forKey:@"count"];
+            [productDictionary setObject:devicegroups forKey:@"devicegroups"];
 
-            [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking devicegroups for assigned devices...", [self getValueFrom:pd withKey:@"name"]] :YES];
+            if (devicegroups.count > 0)
+			{
+				[self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking device groups for assigned devices...", [self getValueFrom:product withKey:@"name"]] :YES];
 
-            for (NSDictionary *dg in dgs)
-            {
-                NSDictionary *dict = @{ @"action" : action,
-                                        @"devicegroup" : dg,
-                                        @"product" : dp };
+				// Run through all the device groups to acquire a list off their devices
 
-                // Get the list of devices assigned to this device group
+				for (NSDictionary *devicegroup in devicegroups)
+				{
+					NSDictionary *dict = @{ @"action" : action,
+											@"devicegroup" : devicegroup,
+											@"product" : productDictionary };
 
-                [ide getDevicesWithFilter:@"devicegroup.id" :[dg objectForKey:@"id"] :dict];
-            }
+					// Get the list of devices assigned to this device group
 
-            // Pick up the action in 'listDevices:'
+					[ide getDevicesWithFilter:@"devicegroup.id" :[devicegroup objectForKey:@"id"] :dict];
+
+					// Pick up the action in 'listDevices:'
+				}
+			}
+			else
+			{
+				// Product has no devicegroups - ergo no devices, so just go direct to listDevices:
+				// We do this because it contains the jumping off point for the next step in the sequence
+
+				[self listDevices:note];
+			}
         }
     }
     else
@@ -6390,9 +6589,11 @@
 
     --newProject.count;
 
-    if (newProject.count == 0)
+    if (newProject.count <= 0)
     {
         // We have now acquired all the device groups models, so we can process everything
+
+		newProject.aid = ide.isLoggedIn ? ide.currentAccount : @"";
 
 		if (newProject.devicegroups.count > 0)
 		{
@@ -6422,6 +6623,7 @@
 		// Save the project
 
 		[self productToProjectStageFour:newProject];
+		[self setToolbar];
 	}
 }
 
@@ -6472,7 +6674,7 @@
     {
         if ([action compare:@"newproject"] == NSOrderedSame)
         {
-            // This is the action flow for a new project
+            // This is the action flow for a new project, new product
 
             selectedProduct = nil;
 
@@ -6488,7 +6690,6 @@
             // Enable project-related UI items
             // NOTE It's a new project, so no device groups yet - just update the main device group menu
 
-            [self refreshOpenProjectsMenu];
             [self refreshProjectsMenu];
             [self refreshMainDevicegroupsMenu];
             [self refreshDevicegroupMenu];
@@ -6555,26 +6756,45 @@
 - (void)deleteProductStageTwo:(NSMutableDictionary *)dict
 {
     // We come here after checking all of a product's device groups to see if they can be deleted
+	// It's here that we action the deletion of each device group
 
     NSArray *devicegroups = [dict objectForKey:@"devicegroups"];
     NSDictionary *product = [dict objectForKey:@"product"];
 
     [dict setObject:[NSNumber numberWithInteger:devicegroups.count] forKey:@"count"];
 
-    [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - deleting devicegroups...", [self getValueFrom:product withKey:@"name"]] :YES];
-
     // Run through the device groups in the list and delete them
 
-    for (NSDictionary *devicegroup in devicegroups)
-    {
-        NSDictionary *source = @{ @"action" : @"deleteproduct",
-                                  @"devicegroup" : devicegroup,
-                                  @"product" : dict };
+	if (devicegroups.count > 0)
+	{
+		[self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - deleting device groups...", [self getValueFrom:product withKey:@"name"]] :YES];
 
-        [ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
-    }
+		// Run through the device group list and delete each entry
 
-    // Pick up the action in 'deleteDevicegroupStageTwo:'
+		for (NSDictionary *devicegroup in devicegroups)
+		{
+			NSDictionary *source = @{ @"action" : @"deleteproduct",
+									  @"devicegroup" : devicegroup,
+									  @"product" : dict };
+
+			[ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
+		}
+
+		// Pick up the action in 'deleteDevicegroupStageTwo:'
+	}
+	else
+	{
+		// There are no device groups - now for the final product... phew
+
+		[self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\"...", [self getValueFrom:product withKey:@"name"]] :YES];
+
+		NSDictionary *source = @{ @"action" : @"deleteproduct",
+								  @"product" : dict };
+
+		[ide deleteProduct:[product objectForKey:@"id"] :source];
+
+		// Pick this up at 'deleteProductStageThree:'
+	}
 }
 
 
@@ -6585,14 +6805,22 @@
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
-    NSDictionary *product = [source objectForKey:@"product"];
-    NSDictionary *deletedProduct = [product objectForKey:@"product"];
+    NSDictionary *deletedProduct = [source objectForKey:@"product"];
+    NSDictionary *product = [deletedProduct objectForKey:@"product"];
 
-    selectedProduct = nil;
+	// Clear the current product if it's still the one we're deleting
 
-    [self writeStringToLog:[NSString stringWithFormat:@"Deleted product \"%@\".", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
+	if (selectedProduct == product) selectedProduct = nil;
+
+	// Go and get the updated product list
+
+	NSDictionary *dict = @{ @"action" : @"getproducts" };
+	[ide getProducts:dict];
+
+	// And inform the user
+
+	[self writeStringToLog:[NSString stringWithFormat:@"Deleted product \"%@\".", [self getValueFrom:product withKey:@"name"]] :YES];
     [self writeStringToLog:@"Refreshing your list of products..." :YES];
-    [ide getProducts];
 }
 
 
@@ -6817,26 +7045,23 @@
             // Run the delete product flow
 
             NSDictionary *devicegroup = [source objectForKey:@"devicegroup"];
-            NSMutableDictionary *product = [source objectForKey:@"product"];
-            NSNumber *number = [product objectForKey:@"count"];
-            NSArray *devicegroups = [product objectForKey:@"devicegroups"];
-            NSInteger count = number.integerValue;
+            NSMutableDictionary *productDictionary = [source objectForKey:@"product"];
+            NSNumber *number = [productDictionary objectForKey:@"count"];
+            NSArray *devicegroups = [productDictionary objectForKey:@"devicegroups"];
+			NSDictionary *product = [productDictionary objectForKey:@"product"];
+            NSInteger count = number.integerValue - 1;
 
-            --count;
+            [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
 
-            NSDictionary *deletedProduct = [product objectForKey:@"product"];
+            [productDictionary setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
 
-            [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:deletedProduct withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
-
-            [product setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
-
-            if (count == 0)
+            if (count <= 0)
             {
                 // All the device groups are gone, now for the final product... phew
 
-                [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\"...", [self getValueFrom:deletedProduct withKey:@"name"]] :YES];
+                [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\"...", [self getValueFrom:product withKey:@"name"]] :YES];
 
-                [ide deleteProduct:[deletedProduct objectForKey:@"id"] :source];
+                [ide deleteProduct:[product objectForKey:@"id"] :source];
 
                 // Pick this up at 'deleteProductStageThree:'
             }
@@ -6940,15 +7165,17 @@
 
                 NSDictionary *devicegroup = [so objectForKey:@"devicegroup"];
 
-                [self writeStringToLog:[NSString stringWithFormat:@"Product \"%@\" can't be deleted because device group \"%@\" has devices assigned. Aborting delete attempt.", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"]] :YES];
+                [self writeWarningToLog:[NSString stringWithFormat:@"Product \"%@\" can't be deleted because device group \"%@\" has devices assigned. Aborting delete.", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"]] :YES];
             }
             else
             {
-                // This device group has no devices, we can proceed - but have we got them all
+                // This device group has no devices, we can proceed - but have we checked all the device groups?
+				// 'count' decrements as each device group is checked
+				// NOTE 'count' will already be zero if there were no device groups to begin with
 
                 --count;
 
-                if (count == 0)
+                if (count <= 0)
                 {
                     // We've checked all the device groups and we're good to delete them
 
@@ -6956,7 +7183,9 @@
                 }
                 else
                 {
-                    [deletedProduct setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
+					// Decrement the device group count and continue until we get to the last one
+
+					[deletedProduct setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
                 }
             }
 
@@ -7578,9 +7807,11 @@
             {
                 // All done!
 
-                [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
+                NSDictionary *dict = @{ @"action" : @"getproducts" };
+
+				[ide getProducts:dict];
+				[self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
                 [self writeStringToLog:@"Refreshing product list." :YES];
-                [ide getProducts];
             }
         }
         else
@@ -8199,6 +8430,21 @@
         [lines addObject:@"Project is not linked to a product"];
     }
 
+	if (currentProject.aid != nil && currentProject.aid.length > 0)
+	{
+		if (ide.isLoggedIn && [ide.currentAccount compare:currentProject.aid] == NSOrderedSame)
+		{
+			[lines addObject:@"Project is associated with the account you are currently logged in to."];
+		}
+		else
+		{
+			[lines addObject:[NSString stringWithFormat:@"Project is associated with the account ID %@ (not logged in).", currentProject.aid]];
+		}
+	}
+	else
+	{
+		[lines addObject:@"Project is not associated with an account"];
+	}
 
     if (currentProject.path == nil)
     {
@@ -9504,11 +9750,13 @@
     showProjectInfoMenuItem.enabled = (currentProject != nil) ? YES : NO;
     showProjectFinderMenuItem.enabled = (currentProject != nil) ? YES : NO;
     renameProjectMenuItem.enabled = (currentProject != nil) ? YES : NO;
-    downloadProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
+
+	downloadProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
     linkProductMenuItem.enabled = (currentProject != nil && selectedProduct != nil) ? YES : NO;
     deleteProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
     renameProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
-    syncProjectMenuItem.enabled = (currentProject != nil && currentProject.pid.length == 0) ? YES : NO;
+
+	syncProjectMenuItem.enabled = (currentProject != nil && currentProject.pid.length == 0) ? YES : NO;
 
     // Update the File menu's one changeable item
 
@@ -9668,7 +9916,7 @@
 
     if (productsArray == nil)
     {
-        // No products in the list, so warn the user and bail
+        // No product list to display, so add an appropriate action to the menu
 
         item = [[NSMenuItem alloc] initWithTitle:@"Get Products List"
                                           action:@selector(getProductsFromServer:)
@@ -9681,7 +9929,7 @@
 
     if (productsArray.count == 0)
     {
-        // No products in the list, so warn the user and bail
+        // No products in the list, so just add 'None' to the menu
 
         item = [[NSMenuItem alloc] initWithTitle:@"None"
                                           action:nil
@@ -10058,52 +10306,55 @@
 
     // Rebuild the sub-menus
 
-    for (NSMutableDictionary *device in devicesArray)
-    {
-        NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-        NSString *dgid = (NSString *)[dg objectForKey:@"id"];
+	if (devicesArray.count > 0)
+	{
+		for (NSMutableDictionary *device in devicesArray)
+		{
+			NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+			NSString *dgid = (NSString *)[dg objectForKey:@"id"];
 
-        if (dgid != nil)
-        {
-            // If the device's device group ID is not nil, it's assigned
-            // and we should check for its inclusion here
+			if (dgid != nil)
+			{
+				// If the device's device group ID is not nil, it's assigned
+				// and we should check for its inclusion here
 
-            for (NSMenuItem *item in deviceGroupsMenu.itemArray)
-            {
-                Devicegroup *adg = item.representedObject;
+				for (NSMenuItem *item in deviceGroupsMenu.itemArray)
+				{
+					Devicegroup *adg = item.representedObject;
 
-                if (adg != nil)
-                {
-                    if ([adg.did compare:dgid] == NSOrderedSame)
-                    {
-                        NSMenu *submenu = item.submenu;
+					if (adg != nil)
+					{
+						if ([adg.did compare:dgid] == NSOrderedSame)
+						{
+							NSMenu *submenu = item.submenu;
 
-                        if (submenu == nil)
-                        {
-                            // If there's no devices submenu, add one
+							if (submenu == nil)
+							{
+								// If there's no devices submenu, add one
 
-                            submenu = [[NSMenu alloc] initWithTitle:adg.name];
-                            item.submenu = submenu;
-                            submenu.autoenablesItems = YES;
-                        }
+								submenu = [[NSMenu alloc] initWithTitle:adg.name];
+								item.submenu = submenu;
+								submenu.autoenablesItems = YES;
+							}
 
-                        // Add the device's menu entry and enable it
+							// Add the device's menu entry and enable it
 
-                        NSString *dstring = [self getValueFrom:device withKey:@"name"];
-                        NSMenuItem *ditem = [[NSMenuItem alloc] initWithTitle:dstring action:@selector(chooseDevice:) keyEquivalent:@""];
+							NSString *dstring = [self getValueFrom:device withKey:@"name"];
+							NSMenuItem *ditem = [[NSMenuItem alloc] initWithTitle:dstring action:@selector(chooseDevice:) keyEquivalent:@""];
 
-                        [submenu addItem:ditem];
-                        ditem.enabled = YES;
-                        ditem.state = NSOffState;
-                        ditem.representedObject = device;
-                        ditem.image = [self menuImage:device];
+							[submenu addItem:ditem];
+							ditem.enabled = YES;
+							ditem.state = NSOffState;
+							ditem.representedObject = device;
+							ditem.image = [self menuImage:device];
 
-                        break;
-                    }
-                }
-            }
-        }
-    }
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 
     // Sort the device groups menus submenus
 
@@ -10632,11 +10883,14 @@
     }
     else
     {
-        // Select the first device on the list
+        // Select the first device on the list - if there is a list
 
-        [devicesPopUp selectItemAtIndex:0];
-        selectedDevice = [devicesArray objectAtIndex:0];
-		iwvc2.device = selectedDevice;
+        if (devicesArray.count > 0)
+		{
+			[devicesPopUp selectItemAtIndex:0];
+        		selectedDevice = [devicesArray objectAtIndex:0];
+			iwvc2.device = selectedDevice;
+		}
     }
 
     // Update the list of unassigned devices - this only happens here
@@ -10653,30 +10907,35 @@
 
     // NOTE 'refreshDevicesPopup:' handles the 'no devices' warning
 
-    // NOTE #2 This should ALWAYS be called after 'refreshDevicesPopup:'
+    // NOTE #2 This should ALWAYS be called after 'refreshDevicesPopup:' — it is called by 'refreshDevicesPopup:'
 
     [unassignedDevicesMenu removeAllItems];
 
     NSMutableArray *items = nil;
     NSMutableArray *repos = nil;
 
-    for (NSMutableDictionary *device in devicesArray)
-    {
-        NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-        NSString *dgid = [dg objectForKey:@"id"];
-        NSString *dvName = [self getValueFrom:device withKey:@"name"];
+	if (devicesArray.count > 0)
+	{
+		// Only proceed if we have a list of devices for this account
 
-        if (dgid == nil || ((NSNull *)dgid == [NSNull null]))
-        {
-            // If there is no device group ID, so the device must be unassigned
+		for (NSMutableDictionary *device in devicesArray)
+		{
+			NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+			NSString *dgid = [dg objectForKey:@"id"];
+			NSString *dvName = [self getValueFrom:device withKey:@"name"];
 
-            if (items == nil) items = [[NSMutableArray alloc] init];
-            if (repos == nil) repos = [[NSMutableArray alloc] init];
+			if (dgid == nil || ((NSNull *)dgid == [NSNull null]))
+			{
+				// If there is no device group ID, so the device must be unassigned
 
-            [items addObject:dvName];
-            [repos addObject:device];
-        }
-    }
+				if (items == nil) items = [[NSMutableArray alloc] init];
+				if (repos == nil) repos = [[NSMutableArray alloc] init];
+
+				[items addObject:dvName];
+				[repos addObject:device];
+			}
+		}
+	}
 
     if (items.count > 0)
     {

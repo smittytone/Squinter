@@ -383,6 +383,7 @@
 // Login Methods
 
 - (IBAction)loginOrOut:(id)sender;
+- (void)logout;
 - (void)autoLogin;
 - (void)showLoginWindow;
 - (void)setLoginCreds;
@@ -398,6 +399,7 @@
 - (IBAction)newProject:(id)sender;
 - (IBAction)newProjectSheetCancel:(id)sender;
 - (IBAction)newProjectSheetCreate:(id)sender;
+- (void)newProjectSheetCreateStageTwo:(NSString *)projectName :(NSString *)projectDesc :(BOOL)make :(BOOL)associate;
 - (IBAction)newProjectCheckboxStateHandler:(id)sender;
 
 // Existing Project Methods
