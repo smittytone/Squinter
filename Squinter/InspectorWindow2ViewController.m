@@ -188,8 +188,8 @@
 		
 		if (products == nil || products.count == 0 || project.pid == nil)
 		{
-			[projectKeys addObject:@"ID"];
-			[projectValues addObject:(project.pid != nil ? project.pid : @"Project not linked to a product")];
+			[projectKeys addObject:@"Product ID"];
+			[projectValues addObject:(project.pid.length > 0 ? project.pid : @"Project not linked to a product")];
 		}
 		else
 		{
@@ -199,11 +199,14 @@
 				
 				if ([apid compare:project.pid] == NSOrderedSame)
 				{
-					[projectKeys addObject:@"Product"];
+					[projectKeys addObject:@"Product Name"];
 					[projectValues addObject:[product valueForKeyPath:@"attributes.name"]];
 				}
 			}
 		}
+
+		[projectKeys addObject:@"Account ID"];
+		[projectValues addObject:(project.aid.length > 0 ? project.aid : @"Project not associated with an account")];
 		
 		[projectKeys addObject:@"Path"];
 		
