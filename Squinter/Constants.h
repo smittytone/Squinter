@@ -55,6 +55,9 @@
 #define kLoginResultCodeNetFail             1
 #define kLoginResultCodeCredFail            2
 
+#define kImpCloudTypeAWS					0
+#define kImpCloudTypeAzure					1
+
 // Squinted
 
 #define kDeviceCodeSquinted                 0x01

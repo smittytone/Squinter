@@ -180,6 +180,7 @@
     IBOutlet NSSecureTextFieldCell *passwordTextFieldCell;
     IBOutlet NSButton *saveDetailsCheckbox;
     IBOutlet NSButton *showPassCheckbox;
+	IBOutlet NSPopUpButton *impCloudPopup;
 
     // Open
 
@@ -516,7 +517,7 @@
 - (void)productToProjectStageThree:(NSNotification *)note;
 - (void)productToProjectStageFour:(Project *)project;
 - (void)createProductStageTwo:(NSNotification *)note;
-- (void)deleteProductStageTwo:(NSMutableDictionary *)dict;
+- (void)deleteProductStageTwo:(NSMutableDictionary *)productToDelete;
 - (void)deleteProductStageThree:(NSNotification *)note;
 - (void)updateProductStageTwo:(NSNotification *)note;
 - (void)createDevicegroupStageTwo:(NSNotification *)note;
@@ -635,8 +636,13 @@
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
 
-- (NSAlert *)showAccountAlert:(NSString *)head :(NSString *)body;
+- (BOOL)isCorrectAccount:(Project *)project;
+- (void)projectAccountAlert:(Project *)project :(NSString *)action;
+- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action;
+- (void)accountAlert:(NSString *)head :(NSString *)body;
+
 
 @property (nonatomic, strong) NSTouchBar *touchBar;
+
 
 @end
