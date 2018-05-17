@@ -270,8 +270,8 @@
     IBOutlet NSPopUpButton *locationMenu;
     IBOutlet NSPopUpButton *recentFilesCountMenu;
     IBOutlet NSPopUpButton *maxLogCountMenu;
-    IBOutlet NSButton *azureCheckbox;
-	IBOutlet NSButton *showInspectorCheckbox;
+    IBOutlet NSButton *showInspectorCheckbox;
+	IBOutlet NSButton *updateDevicesCheckbox;
 
     // Assign Device
 
@@ -360,7 +360,9 @@
     NSColor *backColour, *textColour;
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey;
-
+	
+	NSTimeInterval updateDevicePeriod;
+	
 	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;

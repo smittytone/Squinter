@@ -74,6 +74,7 @@
     syncItemCount = 0;
     logPaddingLength = 0;
 	deviceCheckCount = -1;
+	updateDevicePeriod = 300.0;
 
     nswsw = NSWorkspace.sharedWorkspace;
     nsfm = NSFileManager.defaultManager;
@@ -304,7 +305,8 @@
                          @"com.bps.squinter.dev5.blue",
                          @"com.bps.squinter.dev5.green",
 						 @"com.bps.squinter.show.inspector",
-						 @"com.bps.squinter.inspectorsize", nil];
+						 @"com.bps.squinter.inspectorsize",
+						 @"com.bps.squinter.updatedevs",nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
                             [NSString stringWithString:NSStringFromRect(_window.frame)],
@@ -350,7 +352,8 @@
                             [NSNumber numberWithFloat:0.0],
                             [NSNumber numberWithFloat:0.6],
 							[NSNumber numberWithBool:NO],
-							[NSString stringWithString:NSStringFromRect(iwvc2.view.window.frame)], nil];
+							[NSString stringWithString:NSStringFromRect(iwvc2.view.window.frame)],
+							[NSNumber numberWithBool:NO], nil];
 
     // Drop the arrays into the Defauts
 
@@ -966,6 +969,8 @@
 
 	[productsArray removeAllObjects];
 	[devicesArray removeAllObjects];
+	
+	[self keepDevicesStatusUpdated:nil];
 
 	productsArray = nil;
 	selectedProduct = nil;
@@ -1048,6 +1053,26 @@
     [_window endSheet:loginSheet];
 
 	if (switchAccountFlag) switchAccountFlag = NO;
+}
+
+
+
+- (IBAction)hitSaveCheckbox:(id)sender
+{
+	NSButton *checkbox = (NSButton *)sender;
+	
+	if (checkbox.state == NSOnState)
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = @"Caution";
+		alert.informativeText = @"If you already have account credentials saved in your keychain, checking this box will overwrite them. Are you sure?";
+		[alert addButtonWithTitle:@"Yes"];
+		[alert addButtonWithTitle:@"No"];
+		
+		[alert beginSheetModalForWindow:loginSheet completionHandler:^(NSModalResponse returnCode) {
+			if (returnCode != 1000) checkbox.state = NSOffState;
+		}];
+	}
 }
 
 
@@ -4139,7 +4164,7 @@
 {
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"Update devices' status information"];
+        [self loginAlert:@"update devices' status information"];
         return;
     }
 
@@ -4168,17 +4193,24 @@
 		return;
 	}
 	
-	checkDeviceStatusMenuItem.state = NSOnState;
-	
-	if (devicesArray == nil || devicesArray.count == 0) [self updateDevicesStatus:nil];
+	if (ide.isLoggedIn)
+	{
+		checkDeviceStatusMenuItem.state = NSOnState;
+		
+		if (devicesArray == nil || devicesArray.count == 0) [self updateDevicesStatus:nil];
 
-	// TODO - MAKE THIS A PREFERENCE
+		// TODO - MAKE THIS A PREFERENCE
 
-	refreshTimer = [NSTimer scheduledTimerWithTimeInterval:300.0
-													target:self
-												  selector:@selector(deviceStatusCheck)
-												  userInfo:nil
-												   repeats:YES];
+		refreshTimer = [NSTimer scheduledTimerWithTimeInterval:updateDevicePeriod
+														target:self
+													  selector:@selector(deviceStatusCheck)
+													  userInfo:nil
+													   repeats:YES];
+	}
+	else
+	{
+		[self loginAlert:@"keep devices' status information updated"];
+	}
 }
 
 
@@ -6486,7 +6518,8 @@
     {
         // 'closeProjectFlag' is YES if this method has been called when the user
         // wants to save a changed project before closing it or quitting the app
-
+		
+		savingProject = currentProject;
         [self saveProject:nil];
         closeProjectFlag = NO;
         return;
@@ -8325,9 +8358,16 @@
 
 	if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
 
-    // User wants the Device lists loaded on login
-
-	if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) [self updateDevicesStatus:nil];
+    // User wants to update devices' status periodically, or the Device lists loaded on login
+	
+	if ([defaults boolForKey:@"com.bps.squinter.updatedevs"])
+	{
+		[self keepDevicesStatusUpdated:nil];
+	}
+	else if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"])
+	{
+		[self updateDevicesStatus:nil];
+	}
 }
 
 
@@ -8702,7 +8742,7 @@
             }
         }
 
-        NSInteger index = [ide indexOfLoggedDevice:dvid];
+        NSUInteger index = [ide indexOfLoggedDevice:dvid];
 
         // Calculate colour table index
 
@@ -8710,7 +8750,7 @@
 
         while (done == NO)
         {
-            if (index > colors.count)
+            if (index > colors.count - 1)
             {
                 index = index - colors.count;
             }
@@ -11237,8 +11277,8 @@
     getHistoryMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
     streamLogsMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
     deleteDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-
-    unassignDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
+	
+	unassignDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
     renameDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
     assignDeviceMenuItem.enabled = (devicesArray.count > 0 && projectArray.count > 0) ? YES : NO;
 }
@@ -11605,6 +11645,7 @@
     boldTestCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.showboldtext"]) ? NSOnState : NSOffState;
     loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
 	showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
+	updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
 
     // Set location menu
 
@@ -11646,7 +11687,6 @@
 	[defaults setBool:(autoUpdateCheckCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autocheckupdates"];
 	[defaults setBool:(loadModelsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoload"];
 	[defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
-	[defaults setBool:(azureCheckbox.state == NSOnState) forKey:@"com.bps.squinter.useazure"];
 	[defaults setBool:(showInspectorCheckbox.state == NSOnState) forKey:@"com.bps.squinter.show.inspector"];
 
 	float r = (float)textColour.redComponent;
@@ -11777,6 +11817,13 @@
         while (recentFiles.count > count) [recentFiles removeLastObject];
         [self refreshRecentFilesMenu];
     }
+	
+	// Start or stop auto-updating the device list
+	if ([defaults boolForKey:@"com.bps.squinter.updatedevs"] != updateDevicesCheckbox.state == NSOnState)
+	{
+		[defaults setBool:(updateDevicesCheckbox.state == NSOnState) forKey:@"com.bps.squinter.updatedevs"];
+		[self keepDevicesStatusUpdated:nil];
+	}
 
     // Close the sheet
 
@@ -11868,7 +11915,7 @@
 			[connectionIndicator startAnimation:self];
 		}
 
-		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://electricimp.com/liblist.csv"]];
+		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
 		[request setHTTPMethod:@"GET"];
 		eiLibListData = [NSMutableData dataWithCapacity:0];
 		NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration]
