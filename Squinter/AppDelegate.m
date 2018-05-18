@@ -1096,13 +1096,17 @@
 
     loginFlag = YES;
 
-    // Attempt to login with the current credentials
+    // Attempt to login with the current cgesredentials
 	
 	if (loginKey != nil)
 	{
 		[ide loginWithKey:loginKey];
 		return;
 	}
+	
+	// NOTE the following will bork autologin if the user changes the popup (eg. to Azure)
+	//      and the account we're autoloading is AWS
+	// TODO fix this
 	
 	NSInteger code = [impCloudPopup indexOfSelectedItem];
 
@@ -5356,35 +5360,43 @@
 									{
 										// Whoops - they don't match
 										
-										[self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", currentProject.name]
-														  :[NSString stringWithFormat:@"To apply changes to this project, you need to log out of your current account and log into the account it is associated with (ID %@)", currentProject.aid]];
+										[self projectAccountAlert:currentProject :@"**apply changes to this project"];
 										
-										// DON'T select the product
+										// DON'T select the product as it will be the wrong one:
+										// Same product ID but wrong account ID
+									}
+									else
+									{
+										// Select the product the project is linked to
+										
+										for (NSMenuItem *item in productsMenu.itemArray)
+										{
+											if (product == (NSMutableDictionary *)item.representedObject)
+											{
+												[self chooseProduct:item];
+												break;
+											}
+										}
 									}
 								}
 								
 								break;
 							}
+						}
+						
+						if (!match)
+						{
+							// The project doesn't match any known product - perhaps it's on the wrong account
 							
-							if (!match)
+							if (currentProject.aid.length > 0)
 							{
-								if (currentProject.aid.length > 0)
+								if (ide.isLoggedIn)
 								{
-									if (ide.isLoggedIn)
+									if ([currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
 									{
-										if ([currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
-										{
-											// Whoops - they don't match
-											
-											[self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", currentProject.name]
-															  :[NSString stringWithFormat:@"To apply changes to this project, you need to log out of your current account and log into the account it is associated with (ID %@)", currentProject.aid]];
-											
-											// DON'T select the product
-										}
-										else
-										{
-											
-										}
+										// Whoops - they don't match
+										
+										[self projectAccountAlert:currentProject :@"*apply changes to this project"];
 									}
 								}
 							}
@@ -5397,7 +5409,9 @@
 						
 						if (ide.isLoggedIn && currentProject.aid.length > 0 && [ide.currentAccount compare:currentProject.aid] == NSOrderedSame)
 						{
+							// If the account IDs don't match, then the product ID won't no matter what
 							
+							[self projectAccountAlert:currentProject :@"***apply changes to this project"];
 						}
 					}
                 }
@@ -5462,23 +5476,26 @@
                 currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
                 currentProject.devicegroupIndex = 0;
 
-                // Get the device group data
+				// Get the device group data - if it's for a group
 
                 for (Devicegroup *devicegroup in currentProject.devicegroups)
                 {
-                    if (ide.isLoggedIn)
-                    {
-                        NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
-                                                @"devicegroup" : devicegroup };
+					if ([self isCorrectAccount:currentProject])
+					{
+						if (ide.isLoggedIn)
+                    	{
+                        	NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
+                                                    @"devicegroup" : devicegroup };
 
-                        [ide getDevicegroup:devicegroup.did :dict];
+                        	[ide getDevicegroup:devicegroup.did :dict];
 
-                        // Action continues in parallel at updateCodeStageTwo:
-                    }
+                        	// Action continues in parallel at updateCodeStageTwo:
+						}
+						
+						// Set the devicegroup's device list
 
-                    // Set the devicegroup's device list
-
-                    [self setDevicegroupDevices:devicegroup];
+                    	[self setDevicegroupDevices:devicegroup];
+					}
                 }
 
                 // Auto-compile all of the project's device groups, if required by the user
@@ -8336,7 +8353,7 @@
 
     // Set the 'Accounts' menu
 
-	accountMenuItem.title = [@"Account: " stringByAppendingString:usernameTextField.stringValue];
+	accountMenuItem.title = [@"Current Account: " stringByAppendingString:usernameTextField.stringValue];
     loginMenuItem.title = @"Log out of your account";
 	switchAccountMenuItem.enabled = YES;
 
