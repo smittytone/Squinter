@@ -11,7 +11,7 @@
 
 
 @synthesize name, description, pid, aid, version, updated, devicegroups;
-@synthesize path, filename, haschanged, devicegroupIndex, count;
+@synthesize path, filename, haschanged, devicegroupIndex, count, cloudCode;
 
 
 - (instancetype)init
@@ -36,6 +36,7 @@
     haschanged = NO;
     devicegroupIndex = -1;
     count = 0;
+    cloudCode = -1;
 
     // Set the update time
 
@@ -79,9 +80,11 @@
                 filename = [aDecoder decodeObjectForKey:@"project_filename"];
                 updated = [aDecoder decodeObjectForKey:@"project_updated"];
 
-				// Add 3.1 properties
+                // Add 3.1 properties
 
-				aid = minor > 0 ? [aDecoder decodeObjectForKey:@"project_aid"] : @"";
+                aid = minor > 0 ? [aDecoder decodeObjectForKey:@"project_aid"] : @"";
+                NSNumber *n = [aDecoder decodeObjectForKey:@"project_cloudcode"];
+                cloudCode = minor > 0 ? n.integerValue : -1;
 
                 // Set up other, unsaved properties
 
@@ -140,7 +143,7 @@
     [aCoder encodeObject:updated forKey:@"project_updated"];
     [aCoder encodeObject:filename forKey:@"project_filename"];
     [aCoder encodeObject:path forKey:@"project_path"];
-
+	[aCoder encodeObject:[NSNumber numberWithInteger:cloudCode] forKey:@"project_cloudcode"];
 }
 
 
@@ -161,6 +164,7 @@
     projectCopy.haschanged = self.haschanged;
     projectCopy.devicegroupIndex = self.devicegroupIndex;
     projectCopy.count = self.count;
+    projectCopy.cloudCode = self.cloudCode;
 
     return projectCopy;
 }
