@@ -620,6 +620,7 @@
 // Preferences Sheet Methods
 
 - (IBAction)showPrefs:(id)sender;
+- (IBAction)selectFontName:(id)sender;
 - (IBAction)cancelPrefs:(id)sender;
 - (IBAction)setPrefs:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;

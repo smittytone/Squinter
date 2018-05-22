@@ -899,6 +899,7 @@
 {
     // Show the Inspector if it's closed
     // If the Inspector is obscured by the main window, or not key, bring it forward
+    
     [iwvc2.view.window makeKeyAndOrderFront:self];
 }
 
@@ -907,6 +908,7 @@
 - (IBAction)showProjectInspector:(id)sender
 {
     if (currentProject != nil) iwvc2.project = currentProject;
+    
     [iwvc2 setTab:kInspectorTabProject];
     [iwvc2.view.window makeKeyAndOrderFront:self];
 }
@@ -916,6 +918,7 @@
 - (IBAction)showDeviceInspector:(id)sender
 {
     if (selectedDevice != nil) iwvc2.device = selectedDevice;
+    
     [iwvc2 setTab:kInspectorTabDevice];
     [iwvc2.view.window makeKeyAndOrderFront:self];
 }
@@ -953,13 +956,16 @@
     else
     {
         // We are logged in - or trying to log in - so log the user out
-
+        
+        NSInteger cloudCode = ide.impCloudCode;
+        
         [self logout];
 
         // Update the UI and report to the user
 
+        NSString *cloudName = [self getCloudName:cloudCode];
         loginMenuItem.title = @"Log in to your account";
-        [self writeStringToLog:@"You are now logged out of the impCloud." :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"You are now logged out of the %@impCloud.", cloudName] :YES];
     }
 }
 
@@ -976,13 +982,15 @@
     [productsArray removeAllObjects];
     [devicesArray removeAllObjects];
 	
-    [self keepDevicesStatusUpdated:nil];
-
     productsArray = nil;
     selectedProduct = nil;
 
     selectedDevice = nil;
     iwvc2.device = nil;
+    
+    // Stop auto-updating account devices' status
+    
+    [self keepDevicesStatusUpdated:nil];
 
     // Update the UI elements relating to these items
 
@@ -998,6 +1006,8 @@
 
 - (void)autoLogin
 {
+    // Set the credentials for reading
+    
     [self setLoginCreds];
 
     if (usernameTextField.stringValue.length == 0 || passwordTextField.stringValue.length == 0)
@@ -1027,7 +1037,10 @@
 
     saveDetailsCheckbox.state = NSOnState;
 
+    // Set the credentials for reading
+    
     [self setLoginCreds];
+    
     [_window beginSheet:loginSheet completionHandler:nil];
 }
 
@@ -1064,9 +1077,12 @@
 
 - (IBAction)hitSaveCheckbox:(id)sender
 {
+    // If the user hits 'save' while going to another account, warn them that
+    // they will overwrite their currently saved credentials
+    
     NSButton *checkbox = (NSButton *)sender;
 	
-    if (checkbox.state == NSOnState)
+    if (checkbox.state == NSOnState && switchAccountFlag)
     {
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = @"Caution";
@@ -1161,7 +1177,7 @@
 
 - (IBAction)switchAccount:(id)sender
 {
-    // We're switching account - resumably temporarily
+    // We're switching account - presumably temporarily
     // First , if we're logged in, log out
 
     switchAccountFlag = YES;
@@ -8354,8 +8370,10 @@
     }
 
     // Set the 'Accounts' menu
-
-    accountMenuItem.title = [@"Current Account: " stringByAppendingString:usernameTextField.stringValue];
+    
+    NSString *cloudName = [self getCloudName:ide.impCloudCode];
+    accountMenuItem.title = [NSString stringWithFormat:@"Current Account: %@", usernameTextField.stringValue];
+    if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@)", [cloudName substringToIndex:cloudName.length - 1]];
     loginMenuItem.title = @"Log out of your account";
     switchAccountMenuItem.enabled = YES;
 
@@ -8367,9 +8385,9 @@
     credsFlag = YES;
     switchAccountFlag = NO;
 
-    // Inform the user he or she is logged in
-
-    [self writeStringToLog:@"You now are logged in to the impCloud." :YES];
+    // Inform the user he or she is logged in - and to which cloud
+    
+    [self writeStringToLog:[NSString stringWithFormat:@"You now are logged in to the %@impCloud.", cloudName] :YES];
 
     // Check for any post-login actions that need to be performed
 
@@ -11692,6 +11710,8 @@
     loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
     showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
     updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
+    
+    boldTestCheckbox.enabled = index < 3 ? YES : NO;
 
     // Set location menu
 
@@ -11714,6 +11734,17 @@
 
 
 
+- (IBAction)selectFontName:(id)sender
+{
+    // Disable the 'show bold' checkbox for fonts not available in bold
+    
+    NSPopUpButton *list = (NSPopUpButton *)sender;
+    NSInteger index = list.indexOfSelectedItem;
+    boldTestCheckbox.enabled = index < 3 ? YES : NO;
+}
+
+
+
 - (IBAction)cancelPrefs:(id)sender
 {
     [_window endSheet:preferencesSheet];
@@ -11732,7 +11763,6 @@
     [defaults setBool:(loadDevicesCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoloaddevlists"];
     [defaults setBool:(autoUpdateCheckCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autocheckupdates"];
     [defaults setBool:(loadModelsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoload"];
-    [defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
     [defaults setBool:(showInspectorCheckbox.state == NSOnState) forKey:@"com.bps.squinter.show.inspector"];
 
     float r = (float)textColour.redComponent;
@@ -11831,10 +11861,15 @@
     if (fontSize == 15) fontSize = 18;
     num = [defaults objectForKey:@"com.bps.squinter.fontSizeIndex"];
     if (fontSize != num.integerValue) textChange = YES;
+    
+    BOOL isBold = [defaults boolForKey:@"com.bps.squinter.showboldtext"];
+    BOOL shouldBeBold = boldTestCheckbox.state == NSOnState ? YES : NO;
+    
+    if (isBold != shouldBeBold) textChange = YES;
 	
     if (textChange)
     {
-        logFont = [self setLogViewFont:fontName :fontSize :(boldTestCheckbox.state == NSOnState)];
+        logFont = [self setLogViewFont:fontName :fontSize :shouldBeBold];
         logTextView.font = logFont;
         [logTextView setTextColor:textColour];
         [logClipView setBackgroundColor:backColour];
@@ -11843,6 +11878,7 @@
     [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
+    [defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
 
     // Set recent files count
 

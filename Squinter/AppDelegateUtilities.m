@@ -881,4 +881,12 @@
 
 
 
+- (NSString *)getCloudName:(NSInteger)cloudCode
+{
+    if (cloudCode == 0) return @"AWS ";
+    if (cloudCode == 1) return @"Azure ";
+    return @"";
+}
+
+
 @end

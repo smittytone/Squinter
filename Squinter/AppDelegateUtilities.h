@@ -56,5 +56,7 @@
 - (void)setWorkingDirectory:(NSArray *)urls;
 - (NSString *)getFontName:(NSInteger)index;
 - (NSInteger)perceivedBrightness:(NSColor *)colour;
+- (NSString *)getCloudName:(NSInteger)cloudCode;
+
 
 @end
