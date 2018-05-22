@@ -359,6 +359,8 @@
 
     NSColor *backColour, *textColour;
 
+    NSFont *logFont;
+
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey;
 	
 	NSTimeInterval updateDevicePeriod;
