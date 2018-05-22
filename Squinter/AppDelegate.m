@@ -89,6 +89,8 @@
     colors = [[NSMutableArray alloc] init];
     logColors = [[NSMutableArray alloc] init];
 
+    logFont = [self setLogViewFont:@"Monaco" :12.0 :NO];
+
     // Initialize the UI
 
     logDeviceCodeMenuItem.menu.autoenablesItems = NO;
@@ -655,6 +657,10 @@
 
     // Update UI
 
+	NSInteger fontIndex = [[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue];
+	NSInteger fontSize = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue];
+    logFont = [self setLogViewFont:[self getFontName:fontIndex] :fontSize :NO];
+
     [self setToolbar];
     [_window setTitle:@"Squinter Beta"];
     [_window makeKeyAndOrderFront:self];
@@ -1084,7 +1090,7 @@
     if (sender != nil) [_window endSheet:loginSheet];
 
     // If we're switching accounts, log out first
-
+	
     if (switchAccountFlag)
     {
         [self logout];
@@ -4211,7 +4217,9 @@
     }
     else
     {
-        [self loginAlert:@"keep devices' status information updated"];
+        // Only issue a warning if we come here via the menu (ie. 'sender' not nil)
+
+        if (sender != nil) [self loginAlert:@"keep devices' status information updated"];
     }
 }
 
@@ -9535,8 +9543,8 @@
 {
     // Build an NSAttributedString from 'string' and coloured 'colour'
 
-    NSArray *values = [NSArray arrayWithObjects:colour, nil];
-    NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
+    NSArray *values = [NSArray arrayWithObjects:colour, logFont, nil];
+    NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
     [self writeStyledStringToLog:attrString :addTimestamp];
@@ -9552,6 +9560,7 @@
 
     if (string.length > 0)
     {
+        /*
         logTextView.editable = YES;
 
         // Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
@@ -9577,7 +9586,33 @@
         [logTextView insertText:@"\n"
                replacementRange:NSMakeRange(logTextView.string.length, 0)];
 
-        logTextView.editable = NO;
+		logTextView.editable = NO;
+		*/
+
+		NSDictionary *attributes = [string attributesAtIndex:0 effectiveRange:nil];
+		NSTextStorage *textStorage = logTextView.textStorage;
+
+        if (addTimestamp)
+		{
+            NSString *date = [def stringFromDate:[NSDate date]];
+            date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+            date = [date stringByAppendingString:@" "];
+
+            [textStorage beginEditing];
+            [textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:date attributes:attributes]];
+        }
+		else
+		{
+			[textStorage beginEditing];
+		}
+
+		[textStorage appendAttributedString:string];
+		[textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:attributes]];
+        [textStorage endEditing];
+
+		// Scroll to the end of the window
+
+        [logTextView scrollToEndOfDocument:nil];
     }
 }
 
@@ -11803,7 +11838,8 @@
 	
     if (textChange)
     {
-        logTextView.font = [self setLogViewFont:fontName :fontSize :(boldTestCheckbox.state == NSOnState)];
+        logFont = [self setLogViewFont:fontName :fontSize :(boldTestCheckbox.state == NSOnState)];
+        logTextView.font = logFont;
         [logTextView setTextColor:textColour];
         [logClipView setBackgroundColor:backColour];
     }
