@@ -355,7 +355,7 @@
 	NSFont *font;
 
 	font = isBold
-	? [fontManager fontWithFamily:fontName traits:NSBoldFontMask weight:0 size:fontSize]
+	? [fontManager fontWithFamily:fontName traits:NSBoldFontMask weight:10 size:fontSize]
 	: [NSFont fontWithName:fontName size:fontSize];
 
 	return font;
