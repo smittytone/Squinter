@@ -1443,15 +1443,12 @@ DQ
             <point key="canvasLocation" x="477" y="-116.5"/>
         </window>
         <customView identifier="AccessoryView" id="MJe-9N-Smk">
-            <rect key="frame" x="0.0" y="0.0" width="631" height="54"/>
+            <rect key="frame" x="0.0" y="0.0" width="645" height="68"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="dDn-6x-nru">
-                    <rect key="frame" x="18" y="18" width="595" height="18"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="14" id="7uZ-lD-QVb"/>
-                    </constraints>
-                    <buttonCell key="cell" type="check" title="Create a new Device Group with the file(s) — or uncheck to add the file(s) to the current group" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="udf-qH-GUJ">
+                    <rect key="frame" x="18" y="18" width="609" height="32"/>
+                    <buttonCell key="cell" type="check" title="Create a new Device Group with the file(s) — or uncheck to add the file(s) to the current group" bezelStyle="regularSquare" imagePosition="left" truncatesLastVisibleLine="YES" state="on" inset="2" id="udf-qH-GUJ">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -1461,11 +1458,12 @@ DQ
                 </button>
             </subviews>
             <constraints>
-                <constraint firstItem="dDn-6x-nru" firstAttribute="top" secondItem="MJe-9N-Smk" secondAttribute="top" constant="20" id="cst-CV-KiF"/>
-                <constraint firstAttribute="trailing" secondItem="dDn-6x-nru" secondAttribute="trailing" constant="20" id="icI-34-GJ0"/>
-                <constraint firstItem="dDn-6x-nru" firstAttribute="leading" secondItem="MJe-9N-Smk" secondAttribute="leading" constant="20" id="r0p-2H-RPo"/>
+                <constraint firstItem="dDn-6x-nru" firstAttribute="top" secondItem="MJe-9N-Smk" secondAttribute="top" constant="20" id="092-wr-w6b"/>
+                <constraint firstAttribute="trailing" secondItem="dDn-6x-nru" secondAttribute="trailing" constant="20" id="0Ce-Ta-cI6"/>
+                <constraint firstAttribute="bottom" secondItem="dDn-6x-nru" secondAttribute="bottom" constant="20" id="6cn-jG-xmy"/>
+                <constraint firstItem="dDn-6x-nru" firstAttribute="leading" secondItem="MJe-9N-Smk" secondAttribute="leading" constant="20" id="NDg-ez-xrq"/>
             </constraints>
-            <point key="canvasLocation" x="-509" y="-245"/>
+            <point key="canvasLocation" x="-502.5" y="-238"/>
         </customView>
         <window title="About..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="lSs-4y-dIl" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
@@ -2437,39 +2435,37 @@ Gw
         </window>
         <userDefaultsController representsSharedInstance="YES" id="KGf-08-aja"/>
         <customView id="7b2-dB-tnl">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="78"/>
+            <rect key="frame" x="0.0" y="0.0" width="645" height="78"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="VeH-Hs-c9G">
-                    <rect key="frame" x="18" y="42" width="519" height="18"/>
+                    <rect key="frame" x="18" y="42" width="609" height="18"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="14" id="ShT-lT-gid"/>
                     </constraints>
-                    <buttonCell key="cell" type="check" title="Auto-save the new Project" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="S8Q-Ir-Mds">
+                    <buttonCell key="cell" type="check" title="Auto-save the new Project" bezelStyle="regularSquare" imagePosition="left" truncatesLastVisibleLine="YES" state="on" inset="2" id="S8Q-Ir-Mds">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="Lu9-w2-Nua">
-                    <rect key="frame" x="18" y="18" width="519" height="18"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="14" id="6MR-cp-Sqt"/>
-                    </constraints>
-                    <buttonCell key="cell" type="check" title="Save to working directory (uncheck to save alongside source files)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="qLQ-1a-3aQ">
+                    <rect key="frame" x="18" y="18" width="609" height="18"/>
+                    <buttonCell key="cell" type="check" title="Save to working directory (uncheck to save alongside source files)" bezelStyle="regularSquare" imagePosition="left" truncatesLastVisibleLine="YES" state="on" inset="2" id="qLQ-1a-3aQ">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                 </button>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="Lu9-w2-Nua" secondAttribute="trailing" constant="20" id="BGk-5o-nSY"/>
+                <constraint firstAttribute="trailing" secondItem="Lu9-w2-Nua" secondAttribute="trailing" constant="20" id="8Ce-Gk-Zau"/>
                 <constraint firstItem="VeH-Hs-c9G" firstAttribute="leading" secondItem="7b2-dB-tnl" secondAttribute="leading" constant="20" id="Hl7-cZ-HGD"/>
-                <constraint firstItem="Lu9-w2-Nua" firstAttribute="leading" secondItem="7b2-dB-tnl" secondAttribute="leading" constant="20" id="U8R-ii-oFq"/>
-                <constraint firstItem="Lu9-w2-Nua" firstAttribute="top" secondItem="VeH-Hs-c9G" secondAttribute="bottom" constant="10" id="fMJ-Fe-QIz"/>
+                <constraint firstItem="Lu9-w2-Nua" firstAttribute="top" secondItem="VeH-Hs-c9G" secondAttribute="bottom" constant="10" id="JVI-CC-NmO"/>
                 <constraint firstAttribute="trailing" secondItem="VeH-Hs-c9G" secondAttribute="trailing" constant="20" id="frp-Jr-bBi"/>
+                <constraint firstItem="Lu9-w2-Nua" firstAttribute="leading" secondItem="7b2-dB-tnl" secondAttribute="leading" constant="20" id="gJ7-2c-HVR"/>
+                <constraint firstAttribute="bottom" secondItem="Lu9-w2-Nua" secondAttribute="bottom" constant="20" id="rXI-sb-Fid"/>
                 <constraint firstItem="VeH-Hs-c9G" firstAttribute="top" secondItem="7b2-dB-tnl" secondAttribute="top" constant="20" id="ykZ-mj-6Tf"/>
             </constraints>
-            <point key="canvasLocation" x="-546.5" y="-117"/>
+            <point key="canvasLocation" x="-502.5" y="-384"/>
         </customView>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="TMW-57-pcx" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
@@ -2818,19 +2814,24 @@ Gw
             <point key="canvasLocation" x="-117" y="244"/>
         </window>
         <customView id="CAG-97-Qf7">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="54"/>
+            <rect key="frame" x="0.0" y="0.0" width="645" height="54"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="X8n-NY-Ubq">
-                    <rect key="frame" x="18" y="18" width="519" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Create device code file with the same naming and to the same location" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="95g-Yz-MMM">
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="X8n-NY-Ubq">
+                    <rect key="frame" x="18" y="18" width="609" height="18"/>
+                    <buttonCell key="cell" type="check" title="Create device code file with the same naming and to the same location" bezelStyle="regularSquare" imagePosition="left" truncatesLastVisibleLine="YES" state="on" inset="2" id="95g-Yz-MMM">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                 </button>
             </subviews>
-            <point key="canvasLocation" x="-546.5" y="-122"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="X8n-NY-Ubq" secondAttribute="trailing" constant="20" id="BNd-rJ-DcY"/>
+                <constraint firstItem="X8n-NY-Ubq" firstAttribute="top" secondItem="CAG-97-Qf7" secondAttribute="top" constant="20" id="Ptm-VF-F4c"/>
+                <constraint firstItem="X8n-NY-Ubq" firstAttribute="leading" secondItem="CAG-97-Qf7" secondAttribute="leading" constant="20" id="hAz-2g-Q3C"/>
+                <constraint firstAttribute="bottom" secondItem="X8n-NY-Ubq" secondAttribute="bottom" constant="20" id="hWa-kf-dsb"/>
+            </constraints>
+            <point key="canvasLocation" x="-502.5" y="-517"/>
         </customView>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="N7Z-aG-iXH" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES"/>
