@@ -4969,11 +4969,7 @@
             alert.informativeText = [NSString stringWithFormat:@"Device Groups can contain only two source code files: one *.agent.nut and one *.device.nut, but you selected %lu files. Please select two source code files.", (long)urls.count];
             [alert addButtonWithTitle:@"OK"];
             [alert beginSheetModalForWindow:_window
-                          completionHandler:^(NSModalResponse response)
-                             {
-                                 return;
-                             }
-             ];
+                          completionHandler:nil];
 
             return;
         }
