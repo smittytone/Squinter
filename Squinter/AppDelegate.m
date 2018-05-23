@@ -75,6 +75,7 @@
     logPaddingLength = 0;
     deviceCheckCount = -1;
     updateDevicePeriod = 300.0;
+    loginMode = 0;
 
     nswsw = NSWorkspace.sharedWorkspace;
     nsfm = NSFileManager.defaultManager;
@@ -963,8 +964,15 @@
 
         // Update the UI and report to the user
 
+        // Set the Account menu
+
+        accountMenuItem.title = @"Not Signed in to any Account";
+        loginMenuItem.title = @"Log in to your Primary Account";
+        switchAccountMenuItem.enabled = YES;
+        switchAccountMenuItem.title = @"Log in to a Different Account...";
+        loginMode = 0;
+
         NSString *cloudName = [self getCloudName:cloudCode];
-        loginMenuItem.title = @"Log in to your account";
         [self writeStringToLog:[NSString stringWithFormat:@"You are now logged out of the %@impCloud.", cloudName] :YES];
     }
 }
@@ -974,6 +982,7 @@
 - (void)logout
 {
     // Log out of the current account
+    // NOTE Account menu clean-up is handled by the calling method, 'logInOrOut:'
 
     [ide logout];
 
@@ -1054,12 +1063,31 @@
     NSString *un = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
     NSString *pw = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
     NSString *lk = [pc stringForKey:@"com.bps.Squinter.ak.notional.telly"];
+    NSString *ic = [pc stringForKey:@"com.bps.Squinter.ak.notional.toolly"];
 
     // Set the login window fields with the data
 
     usernameTextField.stringValue = (un == nil) ? @"" : [ide decodeBase64String:un];
     passwordTextField.stringValue = (pw == nil) ? @"" : [ide decodeBase64String:pw];
     if (lk != nil) loginKey = lk;
+
+    if (ic == nil || [ic compare:@"AWS"] == NSOrderedSame)
+    {
+        ic = @"AWS";
+        [impCloudPopup selectItemAtIndex:0];
+    }
+    else if ([ic compare:@"Azure"] == NSOrderedSame)
+    {
+        [impCloudPopup selectItemAtIndex:1];
+    }
+    else
+    {
+        // Error!
+
+        credsFlag = NO;
+        usernameTextField.stringValue = @"";
+        passwordTextField.stringValue = @"";
+    }
 }
 
 
@@ -1110,6 +1138,7 @@
     if (switchAccountFlag)
     {
         [self logout];
+
         credsFlag = NO;
     }
 
@@ -1178,17 +1207,27 @@
 - (IBAction)switchAccount:(id)sender
 {
     // We're switching account - presumably temporarily
-    // First , if we're logged in, log out
 
-    switchAccountFlag = YES;
+    if (loginMode != 2)
+    {
+        // We a logging into a different account
 
-    // Show the login sheet empty and with 'save credentials' switched off
+        switchAccountFlag = YES;
 
-    saveDetailsCheckbox.state = NSOffState;
-    usernameTextField.stringValue = @"";
-    passwordTextField.stringValue = @"";
+        // Show the login sheet empty and with 'save credentials' switched off
 
-    [_window beginSheet:loginSheet completionHandler:nil];
+        saveDetailsCheckbox.state = NSOffState;
+        usernameTextField.stringValue = @"";
+        passwordTextField.stringValue = @"";
+
+        [_window beginSheet:loginSheet completionHandler:nil];
+    }
+    else
+    {
+        // We a logging into the primary account
+
+        [self autoLogin];
+    }
 }
 
 
@@ -8372,10 +8411,23 @@
     // Set the 'Accounts' menu
     
     NSString *cloudName = [self getCloudName:ide.impCloudCode];
-    accountMenuItem.title = [NSString stringWithFormat:@"Current Account: %@", usernameTextField.stringValue];
-    if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@)", [cloudName substringToIndex:cloudName.length - 1]];
-    loginMenuItem.title = @"Log out of your account";
+    accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
+    if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
+    loginMenuItem.title = @"Log out of this Account";
     switchAccountMenuItem.enabled = YES;
+
+    if (switchAccountFlag)
+    {
+        // We are switching to a secondary account, so we should change the login option
+
+        switchAccountMenuItem.title = @"Log in to Your Primary Account";
+        loginMode = 2;
+    }
+    else
+    {
+        switchAccountMenuItem.title = @"Log in to a Different Account...";
+        loginMode = 1;
+    }
 
     [self setToolbar];
 

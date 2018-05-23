@@ -365,7 +365,7 @@
 	
 	NSTimeInterval updateDevicePeriod;
 	
-	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount;
+	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag, doubleSaveFlag;
