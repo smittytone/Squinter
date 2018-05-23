@@ -11713,7 +11713,6 @@
     loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
     showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
     updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
-    
 
     // Set location menu
 
@@ -12003,7 +12002,8 @@
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
         [request setHTTPMethod:@"GET"];
         eiLibListData = [NSMutableData dataWithCapacity:0];
-        NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration]
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration: config
                                                               delegate: self
                                                          delegateQueue: [NSOperationQueue mainQueue]];
         eiLibListTask = [session dataTaskWithRequest:request];
@@ -12045,7 +12045,7 @@
             {
                 NSArray *libParts = [library componentsSeparatedByString:@","];
 
-                if (libParts.count == 2)
+                if (libParts.count >= 2)
                 {
                     // Watch out for single-line entries in .csv file
 
@@ -12069,7 +12069,29 @@
                                     {
                                         // Library is marked as deprecated
 
-                                        NSString *mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
+                                        NSString *mString;
+
+                                        if (libParts.count > 2)
+                                        {
+                                            // Is there no replacement for the deprecated library?
+
+                                            NSString *rep = [libParts objectAtIndex:2];
+
+                                            if ([rep compare:@"none"] == NSOrderedSame)
+                                            {
+                                                mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. There is no replacement library.", libName];
+                                            }
+                                            else
+                                            {
+                                                mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated. Please replace it with \"%@\".", libName, [libParts objectAtIndex:2]];
+                                            }
+                                        }
+                                        else
+                                        {
+                                            mString = [NSString stringWithFormat:@"[WARNING] Electric Imp reports library \"%@\" is deprecated.", libName];
+                                        }
+
+
                                         [self writeWarningToLog:mString :YES];
                                         allOKFlag = NO;
                                     }
