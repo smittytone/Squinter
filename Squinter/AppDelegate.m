@@ -11694,10 +11694,13 @@
 
     // Set font name and size menus
 
-    [fontsMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue]];
     NSInteger index = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue] - 9;
     if (index == 9) index = 6;
     [sizeMenu selectItemAtIndex:index];
+
+    index = [[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue];
+    [fontsMenu selectItemAtIndex:index];
+    boldTestCheckbox.enabled = index < 3 ? YES : NO;
 
     // Set checkboxes
 
@@ -11711,7 +11714,6 @@
     showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
     updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
     
-    boldTestCheckbox.enabled = index < 3 ? YES : NO;
 
     // Set location menu
 
