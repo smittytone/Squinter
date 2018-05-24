@@ -3196,7 +3196,7 @@
         [ide createDevicegroup:details :dict];
 
         // We will handle the addition of the device group and UI updates later - it will call
-        // the following code separately in 'createDevicegroupStageTwo:'
+        // the following code separately in **createDevicegroupStageTwo:**
     }
     else
     {
@@ -3228,6 +3228,10 @@
         currentProject.haschanged = YES;
         [saveLight needSave:YES];
         [self refreshOpenProjectsMenu];
+
+        // Update the inspector, if required
+
+        if (iwvc2.tabIndex == kInspectorTabProject) iwvc2.project = currentProject;
 
         // Create the new device group's files as requested
 
@@ -3439,8 +3443,11 @@
             // We have just written the agent code file, so now go and write the device file in the same place
 
             newModel.type = @"agent";
-            newFileName = [currentDevicegroup.name stringByAppendingString:@".device.nut"];
             [currentDevicegroup.models addObject:newModel];
+
+            NSRange dot = [newFileName rangeOfString:@"."];
+            if (dot.location != NSNotFound) newFileName = [newFileName substringToIndex:dot.location];
+            newFileName = [newFileName stringByAppendingString:@".device.nut"];
             [self saveDevicegroupfiles:saveDirectory :newFileName :kActionNewDGDeviceFile];
         }
         else if (action == kActionNewDGAgentFile)
@@ -8044,6 +8051,10 @@
                 [self setToolbar];
                 [self refreshDevicegroupMenu];
                 [self refreshMainDevicegroupsMenu];
+
+                // Update the inspector, if required
+
+                if (iwvc2.tabIndex == kInspectorTabProject) iwvc2.project = currentProject;
             }
 
             // Now we can produce the source code file, as the user requested
