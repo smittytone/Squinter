@@ -70,6 +70,7 @@
     credsFlag = NO;
     switchAccountFlag = NO;
     doubleSaveFlag = NO;
+    reconnectAfterSleepFlag = NO;
 
     syncItemCount = 0;
     logPaddingLength = 0;
@@ -607,6 +608,18 @@
            selector:@selector(endLogging:)
                name:@"BuildAPILogStreamEnd"
              object:ide];
+
+    // Set up sleep/wake notification
+
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
+                                                           selector: @selector(receiveSleepNote:)
+                                                               name: NSWorkspaceWillSleepNotification
+                                                             object: nil];
+
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
+                                                           selector: @selector(receiveWakeNote:)
+                                                               name: NSWorkspaceDidWakeNotification
+                                                             object: nil];
 
     // Get macOS version
 
@@ -4262,8 +4275,6 @@
 		
         if (devicesArray == nil || devicesArray.count == 0) [self updateDevicesStatus:nil];
 
-        // TODO - MAKE THIS A PREFERENCE
-
         refreshTimer = [NSTimer scheduledTimerWithTimeInterval:updateDevicePeriod
                                                         target:self
                                                       selector:@selector(deviceStatusCheck)
@@ -4286,7 +4297,7 @@
 	
     if (devicesArray != nil && devicesArray.count > 0)
     {
-        [self writeStringToLog:@"Refreshing devices’ status information..." :YES];
+        // [self writeStringToLog:@"Refreshing devices’ status information..." :YES];
 		
         deviceCheckCount = 0;
 		
@@ -12565,7 +12576,6 @@ didReceiveResponse:(NSURLResponse *)response
     [alert addButtonWithTitle:@"OK"];
     [alert beginSheetModalForWindow:_window completionHandler:nil];
 }
-
 
 
 @end
