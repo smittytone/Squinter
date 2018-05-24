@@ -8342,6 +8342,8 @@
 
 - (void)setMinimumDeploymentStageTwo:(NSNotification *)note
 {
+    // Called in response to a notification from BuildAPIAccess that a minimum deployment has been set
+
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
     NSString *action = [source objectForKey:@"action"];
@@ -8351,9 +8353,11 @@
         if ([action compare:@"setmindeploy"] == NSOrderedSame)
         {
             Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-            [self updateDevicegroup:devicegroup];
-
             Project *project = [self getParentProject:devicegroup];
+            
+            // Re-acquire the device group data from the server so we have up-to-date info locally
+            
+            [self updateDevicegroup:devicegroup];
 
             [self writeStringToLog:[NSString stringWithFormat:@"Minimum deployment set for project \"%@\"'s device group \"%@\".", project.name, devicegroup.name] :YES];
         }

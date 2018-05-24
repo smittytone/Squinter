@@ -14,30 +14,40 @@
 
 - (void)toolbarWillAddItem:(NSNotification *)notification
 {
-	id item = [notification.userInfo objectForKey:@"item"];
+    // This method is called when certain toolbar items are added to the toolbar,
+    // to ensure their state is correctly reflected at that point.
+    // log-streaming and logging, allowing the toolbar item to indicate progress.
+    // Stream items will go dark green while we are adding them to the log stream
+    // (which may require the creation of a new log stream, which takes time) and
+    // then black when streaming is taking place. We make sure we apply the correct
+    // state for the currently selected device and update as the selection changes.
+    // Login items show an indicator when the user is logged in, and hide that
+    // indicator when the user is not logged in
+    
+    id item = [notification.userInfo objectForKey:@"item"];
 
 	if ([item isKindOfClass:[LoginToolbarItem class]])
 	{
-		LoginToolbarItem *tbi = (LoginToolbarItem *)item;
-		tbi.isLoggedIn = ide.isLoggedIn;
-		[tbi validate];
-		loginAndOutItem = tbi;
+		LoginToolbarItem *ltbi = (LoginToolbarItem *)item;
+		ltbi.isLoggedIn = ide.isLoggedIn;
+		[ltbi validate];
+		loginAndOutItem = ltbi;
 	}
 
 	if ([item isKindOfClass:[StreamToolbarItem class]])
 	{
-		StreamToolbarItem *tbi = (StreamToolbarItem *)item;
-		tbi.state = kStreamToolbarItemStateOff;
+		StreamToolbarItem *stbi = (StreamToolbarItem *)item;
+		stbi.state = kStreamToolbarItemStateOff;
 
 		if (selectedDevice != nil)
 		{
 			NSString *did = [selectedDevice objectForKey:@"id"];
 
-			if (ide.isLoggedIn && [ide isDeviceLogging:did]) tbi.state = kStreamToolbarItemStateOn;
+			if (ide.isLoggedIn && [ide isDeviceLogging:did]) stbi.state = kStreamToolbarItemStateOn;
 		}
 
-		[tbi validate];
-		streamLogsItem = tbi;
+		[stbi validate];
+		streamLogsItem = stbi;
 	}
 }
 
@@ -45,14 +55,17 @@
 
 - (void)toolbarDidRemoveItem:(NSNotification *)notification
 {
-	id item = [notification.userInfo objectForKey:@"item"];
+	// This method is called when certain toolbar items are removed from the toolbar,
+    // to ensure their state is correctly reset at that point
+    
+    id item = [notification.userInfo objectForKey:@"item"];
 
 	if ([item isKindOfClass:[StreamToolbarItem class]])
 	{
-		StreamToolbarItem *tbi = (StreamToolbarItem *)item;
-		tbi.state = kStreamToolbarItemStateOff;
-		[tbi validate];
-		streamLogsItem = tbi;
+		StreamToolbarItem *stbi = (StreamToolbarItem *)item;
+		stbi.state = kStreamToolbarItemStateOff;
+		[stbi validate];
+		streamLogsItem = stbi;
 	}
 }
 
@@ -63,7 +76,9 @@
 
 - (NSString *)getDisplayPath:(NSString *)path
 {
-	NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+    // Convert a path string to the format required by the user's preference
+    
+    NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
 
 	if (index == 0) path = [self getAbsolutePath:currentProject.path :path];
 
@@ -95,6 +110,7 @@
     if (nf > nb) // theFilePath.length > basePath.length
     {
         // The file path is longer than the base path
+        
         NSRange r = [theFilePath rangeOfString:basePath];
 
         if (r.location != NSNotFound)
@@ -183,6 +199,9 @@
 
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath
 {
+    // Return as a string (in the form '../../') of the path 'filePath'
+    // relative to 'basePath'
+    
     NSInteger location = -1;
     NSArray *fileParts = [filePath componentsSeparatedByString:@"/"];
     NSArray *baseParts = [basePath componentsSeparatedByString:@"/"];
@@ -229,6 +248,8 @@
 
 - (NSInteger)numberOfFoldersInPath:(NSString *)path
 {
+    // Count the number of directories in a path
+    
     NSArray *parts = [path componentsSeparatedByString:@"/"];
     return (parts.count - 1);
 }
@@ -272,6 +293,11 @@
 
 
 
+#pragma mark - Boookmark Methods
+
+
+// The following two methods convert URLs <-> bookmark records
+
 - (NSData *)bookmarkForURL:(NSURL *)url
 {
     NSError *error = nil;
@@ -314,6 +340,10 @@
 #pragma mark - Network Activity Progress Indicator Methods
 
 
+// The following two methods are called to start and stop the main window's progress
+// indicator by adding an operation to the main Grand Central Dispatch queue.
+// It's done this way because these methods may be triggered from other queues
+
 - (void)startProgress
 {
 	NSOperationQueue *main = [NSOperationQueue mainQueue];
@@ -338,8 +368,12 @@
 
 #pragma mark - Logging Utility Methods
 
+
 - (void)parseLog
 {
+    // Scan the log view text for certain entities,
+    // primarily agent URLs
+    
     logTextView.editable = YES;
     [logTextView checkTextInDocument:nil];
     logTextView.editable = NO;
@@ -453,62 +487,28 @@
 
 #pragma mark - Preferences Panel Subsidiary Methods
 
-- (void)showPanelForText
-{
-	[textColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
 
+// The following seven methods apply the colour chosen in the picker to the relevant colorWell
 
-
-- (void)showPanelForBack
-{
-	[backColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev1
-{
-	[dev1ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev2
-{
-	[dev2ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev3
-{
-	[dev3ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev4
-{
-	[dev4ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
-
-
-
-- (void)showPanelForDev5
-{
-	[dev5ColorWell setColor:[NSColorPanel sharedColorPanel].color];
-}
+- (void)showPanelForText { [textColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForBack { [backColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev1 { [dev1ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev2 { [dev2ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev3 { [dev3ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev4 { [dev4ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev5 { [dev5ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
 
 
 
 #pragma mark - Utility Methods
+
 
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key
 {
     NSDictionary *rd = nil;
 
     // This extracts the required key, wherever it is in the source (API) data
+    // We also check here for null values, converting them to true nil
 
     if ([key compare:@"id"] == NSOrderedSame) return [apiDict objectForKey:@"id"];
     if ([key compare:@"type"] == NSOrderedSame) return [apiDict objectForKey:@"type"];
@@ -627,14 +627,16 @@
 
 - (void)updateDevicegroup:(Devicegroup *)devicegroup
 {
-	if (devicegroup != nil)
+    // Update the information held locally about a device group
+    
+    if (devicegroup != nil)
 	{
 		NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
-							   @"devicegroup" : devicegroup };
+							    @"devicegroup" : devicegroup };
 
 		[ide getDevicegroup:devicegroup.did :dict];
 
-		// Pick up the action at updateCodeStageTwo:
+		// Pick up the action at **updateCodeStageTwo:**
 	}
 }
 
@@ -642,6 +644,9 @@
 
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
 {
+    // Exchange device group names Squinter <-> API
+    // if 'back' is YES, we return the API name, otherwise the Squinter name
+    
     NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup",
                           @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
     NSArray *dgnames = @[ @"Production", @"Factory Fixture", @"Development", @"Factory Test", @"Production Test"];
@@ -661,6 +666,9 @@
 
 - (Project *)getParentProject:(Devicegroup *)devicegroup
 {
+    // Iterate through the open projects and return the project to which
+    // the specified device group belongs
+    
     for (Project *ap in projectArray)
     {
         if (ap.devicegroups.count > 0)
@@ -679,6 +687,8 @@
 
 - (NSDate *)convertTimestring:(NSString *)dateString
 {
+    // Return an NSDate object the represents the date and time specified in the input string
+    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
     NSLog(@"convertTimestring: %@", dateString);
@@ -689,7 +699,9 @@
 
 - (NSString *)formatTimestamp:(NSString *)timestamp
 {
-	timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
+	// The input string, which records a date and time, to meet Squinter's requirements
+    
+    timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
 	timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
 	timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 	return timestamp;
@@ -699,6 +711,8 @@
 
 - (NSString *)getErrorMessage:(NSUInteger)index
 {
+    // Return an error message string for a specific error code
+    
     switch (index)
     {
         case kErrorMessageNoSelectedDevice:
@@ -782,6 +796,11 @@
 
 - (void)setDevicegroupDevices:(Devicegroup *)devicegroup
 {
+    // Ensure the specified device group's 'devices' property references all of the
+    // devices that have been assigned to the specified device group
+    // This is typically performed after loading a project, as we don't store
+    // this information
+    
     if (devicesArray.count > 0)
     {
         for (NSMutableDictionary *device in devicesArray)
@@ -831,6 +850,8 @@
 
 - (NSString *)getFontName:(NSInteger)index
 {
+    // Return the font name from an index in a font list pop-up
+    
     NSString *fontName = @"";
 
     switch (index)
@@ -883,6 +904,8 @@
 
 - (NSString *)getCloudName:(NSInteger)cloudCode
 {
+    // Return the actual name of the impCloud for a given code number
+    
     if (cloudCode == 0) return @"AWS ";
     if (cloudCode == 1) return @"Azure ";
     return @"";
