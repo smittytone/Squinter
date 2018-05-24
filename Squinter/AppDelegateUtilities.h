@@ -42,6 +42,11 @@
 - (void)showPanelForDev4;
 - (void)showPanelForDev5;
 
+// Sleep/wake Methods
+
+- (void)receiveSleepNote:(NSNotification *)note;
+- (void)receiveWakeNote:(NSNotification *)note;
+
 // Utility Methods
 
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;

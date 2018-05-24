@@ -500,6 +500,45 @@
 
 
 
+#pragma mark - Sleep/Wake Methods
+
+
+- (void)receiveSleepNote:(NSNotification *)note
+{
+    [self writeStringToLog:@"Device sleeping..." :YES];
+
+    if (ide.isLoggedIn)
+    {
+        // We're logged in when the device is about to sleep, so kill all connections
+        // but remain logged in — we will reconnect on wake
+
+        [ide killAllConnections];
+
+        reconnectAfterSleepFlag = YES;
+    }
+}
+
+
+
+- (void)receiveWakeNote:(NSNotification *)note
+{
+    [self writeStringToLog:@"Device woken" :YES];
+
+    if (reconnectAfterSleepFlag)
+    {
+        if (!ide.isLoggedIn)
+        {
+            [self loginOrOut:nil];
+        }
+        else
+        {
+            reconnectAfterSleepFlag = NO;
+        }
+    }
+}
+
+
+
 #pragma mark - Utility Methods
 
 
