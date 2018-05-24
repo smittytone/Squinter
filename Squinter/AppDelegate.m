@@ -4529,7 +4529,7 @@
                     }
 
                     [assignDeviceMenuModels addItemWithTitle:[NSString stringWithFormat:@"%@/%@", project.name, dg.name]];
-                        item = [assignDeviceMenuModels.itemArray lastObject];
+                    item = [assignDeviceMenuModels.itemArray lastObject];
                     item.representedObject = dg;
                 }
             }
@@ -4550,7 +4550,7 @@
     {
         // Select the current device group on the list
 
-        [assignDeviceMenuModels selectItemWithTitle:currentDevicegroup.name];
+        [assignDeviceMenuModels selectItemAtIndex:[assignDeviceMenuModels indexOfItemWithRepresentedObject:currentDevicegroup]];
     }
     else
     {
