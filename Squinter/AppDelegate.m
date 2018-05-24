@@ -8808,20 +8808,23 @@
         // {device ID} {timestamp} {log type} {event type} {message}
         // NOTE {message} comprises the remaining parts of the string
 
-        NSUInteger width = 12;
+        NSUInteger width = 11;
         NSArray *values;
         NSString *device;
         NSString *log;
 
         NSString *type = [parts objectAtIndex:3];
+        NSString *stype = [NSString stringWithFormat:@"[%@]", type];
+        stype = [self recodeLogTags:stype];
+
         NSString *timestamp = [parts objectAtIndex:1];
         timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
         timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
         timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
 
-        if (type.length > width) width = type.length;
+        if (stype.length > width) width = stype.length;
 
-        NSString *spacer = [@"                                      " substringToIndex:width - type.length];
+        NSString *spacer = [@"                                      " substringToIndex:width - stype.length];
         NSString *dvid = [parts objectAtIndex:0];
 
         for (NSDictionary *dev in devicesArray)
@@ -8859,21 +8862,22 @@
         if (ide.numberOfLogStreams > 1)
         {
             NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
-            log = [NSString stringWithFormat:@"\"%@\"%@: [%@] %@%@", device, subspacer, type, spacer, message];
-            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], nil];
+            log = [NSString stringWithFormat:@"\"%@\"%@: %@ %@%@", device, subspacer, stype, spacer, message];
+            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
         else
         {
-            log = [NSString stringWithFormat:@"\"%@\": [%@] %@%@", device, type, spacer, message];
-            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], nil];
+            log = [NSString stringWithFormat:@"\"%@\": %@ %@%@", device, stype, spacer, message];
+            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
 
         log = [timestamp stringByAppendingFormat:@" %@", log];
-        NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
+        NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
         NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
         NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
 
-        [self writeStreamToLog:attrString];
+        //[self writeStreamToLog:attrString];
+        [self writeStyledStringToLog:attrString :NO];
     }
 }
 
@@ -9535,6 +9539,7 @@
 {
     // Clear the main window log view of all text
 
+    /*
     NSNumber *index = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
     NSString *fontName = [self getFontName:index.integerValue];
     index = [defaults objectForKey:@"com.bps.squinter.fontSizeIndex"];
@@ -9547,6 +9552,17 @@
     logTextView.font = [self setLogViewFont:fontName :index.integerValue :false];
 
     [logTextView setString:@""];
+    */
+
+    NSTextStorage *textStorage = logTextView.textStorage;
+    NSArray *values = [NSArray arrayWithObjects:textColour, logFont, nil];
+    NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+    NSAttributedString *emptyString = [[NSAttributedString alloc] initWithString:@"" attributes:attributes];
+
+    [textStorage beginEditing];
+    [textStorage setAttributedString:emptyString];
+    [textStorage endEditing];
 }
 
 
@@ -9586,7 +9602,7 @@
 {
     // Write 'string' to the main window log view as a normal line (ie. of colour 'textColour')
 
-    [self writeNoteToLog:string :textColour :addTimestamp];
+    [self writeNoteToLog:[self recodeLogTags:string] :textColour :addTimestamp];
 }
 
 
@@ -9676,8 +9692,8 @@
 			[textStorage beginEditing];
 		}
 
-		[textStorage appendAttributedString:string];
-		[textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:attributes]];
+        [textStorage appendAttributedString:string];
+        [textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:attributes]];
         [textStorage endEditing];
 
 		// Scroll to the end of the window
@@ -9822,9 +9838,10 @@
 - (void)logCode
 {
     // Write the string assembled in listCode: to the main window log view
+    // Use 'writeNoteToLog:' to avoid the message status parsing that 'writeStringToLog:' does
 
-    [self writeStringToLog:listString :NO];
-    [self writeStringToLog:@" " :NO];
+    [self writeNoteToLog:listString :textColour :NO];
+    [self writeNoteToLog:@" " :textColour :NO];
 }
 
 
