@@ -912,4 +912,21 @@
 }
 
 
+
+- (NSString *)recodeLogTags:(NSString *)string
+{
+    // Parse the input string for standard log tags and replace them with Squinter's own
+
+    string = [string stringByReplacingOccurrencesOfString:@"[server.log]" withString:@"[Device]"];
+    string = [string stringByReplacingOccurrencesOfString:@"[server.error]" withString:@"[Device]"];
+    string = [string stringByReplacingOccurrencesOfString:@"[server.sleep]" withString:@"[Device]"];
+    string = [string stringByReplacingOccurrencesOfString:@"[agent.log]" withString:@"[Agent]"];
+    string = [string stringByReplacingOccurrencesOfString:@"[agent.error]" withString:@"[Agent]"];
+    string = [string stringByReplacingOccurrencesOfString:@"[status]" withString:@"[Server]"];
+    string = [string stringByReplacingOccurrencesOfString:@"[lastexitcode]" withString:@"[Exit Code]"];
+
+    return string;
+}
+
+
 @end

@@ -57,6 +57,7 @@
 - (NSString *)getFontName:(NSInteger)index;
 - (NSInteger)perceivedBrightness:(NSColor *)colour;
 - (NSString *)getCloudName:(NSInteger)cloudCode;
+- (NSString *)recodeLogTags:(NSString *)string;
 
 
 @end
