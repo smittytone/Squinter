@@ -388,7 +388,6 @@
 				3BF4640F1CF875A50094EF59 /* CopyFiles */,
 				3BD74E451D423D6200565B0E /* CopyFiles */,
 				D1E3EA12F37DFE2BD4939FF8 /* [CP] Embed Pods Frameworks */,
-				F03F0E5BE74C9BF90D9B8C00 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -499,21 +498,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Squinter/Pods-Squinter-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F03F0E5BE74C9BF90D9B8C00 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Squinter/Pods-Squinter-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
