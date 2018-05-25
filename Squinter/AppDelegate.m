@@ -4898,6 +4898,8 @@
                   @"device" : selectedDevice };
 
         [ide getDeviceLogs:[self getValueFrom:selectedDevice withKey:@"id"] :dict];
+
+        // Pick up the action at **listLogs:**
     }
     else
     {
@@ -4905,6 +4907,8 @@
                   @"device" : selectedDevice };
 
         [ide getDeviceHistory:[self getValueFrom:selectedDevice withKey:@"id"] :dict];
+
+        // Pick up the action at **listLogs:**
     }
 }
 
@@ -8607,20 +8611,12 @@
     {
         [extraOpQueue addOperationWithBlock:^(void){
 
-            // Calculate the width of the widest status message for spacing the output into columns
-
             NSMutableArray *lines = [[NSMutableArray alloc] init];
-            NSUInteger width = 0;
 
-            for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
-            {
-                NSDictionary *aLog = [theLogs objectAtIndex:i];
-                NSString *sString = [aLog objectForKey:@"type"];
-                if (sString.length > width) width = sString.length;
-            }
-			
             if ([action compare:@"gethistory"] == NSOrderedSame)
             {
+                // Iterate through the history entries, rendering them as lines of text
+
                 [lines addObject:[NSString stringWithFormat:@"History of device \"%@\":", [self getValueFrom:device withKey:@"name"]]];
 
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
@@ -8639,7 +8635,21 @@
             }
             else
             {
+                // Iterate through the log entries, rendering them as lines of text
+
                 [lines addObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":",[self getValueFrom:device withKey:@"name"]]];
+
+                // Calculate the width of the widest status message for spacing the output into columns
+
+                NSUInteger width = 0;
+
+                for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
+                {
+                    NSDictionary *aLog = [theLogs objectAtIndex:i];
+                    NSString *type = [aLog objectForKey:@"type"];
+                    type = [self recodeLogTags:[NSString stringWithFormat:@"[%@]", type]];
+                    if (type.length > width) width = type.length;
+                }
 
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
                 {
@@ -8647,10 +8657,11 @@
                     NSString *timestamp = [self formatTimestamp:[entry objectForKey:@"ts"]];
 
                     NSString *type = [entry objectForKey:@"type"];
+                    type = [self recodeLogTags:[NSString stringWithFormat:@"[%@]", type]];
                     NSString *msg = [entry objectForKey:@"msg"];
 
-                    NSString *spacer = [@"                                      " substringToIndex:13 - type.length];
-                    NSString *lString = [NSString stringWithFormat:@"%@ [%@]%@%@", timestamp, type, spacer, msg];
+                    NSString *spacer = [@"                              " substringToIndex:width + 1 - type.length];
+                    NSString *lString = [NSString stringWithFormat:@"%@ %@%@%@", timestamp, type, spacer, msg];
 
                     [lines addObject:lString];
                 }
@@ -9607,15 +9618,15 @@
 
     // Write out the dashes
 
-    [self writeStringToLog:dashes :NO];
+    [self writeNoteToLog:dashes :textColour :NO];
 
     // Write out the lines themselves
 
-    for (NSString *string in lines) [self writeStringToLog:string :NO];
+    for (NSString *string in lines) [self writeNoteToLog:string :textColour :NO];
 
     // Write out the dashes
 
-    [self writeStringToLog:dashes :NO];
+    [self writeNoteToLog:dashes :textColour :NO];
 }
 
 
