@@ -10,7 +10,7 @@
 @implementation Project
 
 
-@synthesize name, description, pid, aid, version, updated, devicegroups;
+@synthesize name, description, pid, aid, cid, version, updated, devicegroups;
 @synthesize path, filename, haschanged, devicegroupIndex, count;
 
 
@@ -29,6 +29,7 @@
     description = @"";
     pid = @"";
 	aid = @"";
+    cid = @"";
     devicegroups = nil;
     path = @"";
     filename = @"";
@@ -82,6 +83,7 @@
                 // Add 3.1 properties
 
                 aid = minor > 0 ? [aDecoder decodeObjectForKey:@"project_aid"] : @"";
+                cid = minor > 1 ? [aDecoder decodeObjectForKey:@"project_cid"] : @"";
 
                 // Set up other, unsaved properties
 
@@ -136,6 +138,7 @@
     [aCoder encodeObject:description forKey:@"project_desc"];
     [aCoder encodeObject:pid forKey:@"project_pid"];
 	[aCoder encodeObject:aid forKey:@"project_aid"];
+    [aCoder encodeObject:cid forKey:@"project_cid"];
     [aCoder encodeObject:devicegroups forKey:@"project_devicegroups"];
     [aCoder encodeObject:updated forKey:@"project_updated"];
     [aCoder encodeObject:filename forKey:@"project_filename"];
@@ -154,6 +157,7 @@
     projectCopy.description = [self.description mutableCopy];
     projectCopy.pid = [self.pid mutableCopy];
 	projectCopy.aid = [self.aid mutableCopy];
+    projectCopy.cid = [self.cid mutableCopy];
     projectCopy.path = [self.path mutableCopy];
     projectCopy.devicegroups = [self.devicegroups mutableCopy];
     projectCopy.filename = [self.filename mutableCopy];

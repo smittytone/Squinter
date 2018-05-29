@@ -21,7 +21,8 @@
 @property (nonatomic, strong) NSString *name;                           // Project's name
 @property (nonatomic, strong) NSString *description;                    // Project description
 @property (nonatomic, strong) NSString *pid;                            // ID of project's parent Product
-@property (nonatomic, strong) NSString *aid;                            // ID of project's parent Account
+@property (nonatomic, strong) NSString *aid;                            // ID of project's user Account
+@property (nonatomic, strong) NSString *cid;                            // ID of project's creator Account
 @property (nonatomic, strong) NSString *version;                        // Project version number
 @property (nonatomic, strong) NSString *updated;                        // The project was created/updated at...
 @property (nonatomic, strong) NSMutableArray *devicegroups;             // The project's device groups
