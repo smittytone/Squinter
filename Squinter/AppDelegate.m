@@ -601,6 +601,11 @@
                selector:@selector(handleLoginKey:)
                    name:@"BuildAPILoginKey"
                  object:ide];
+    
+    [nsncdc addObserver:self
+               selector:@selector(gotAccount:)
+                   name:@"BuildAPIGotAccountID"
+                 object:ide];
 	
     // **************
 
@@ -2678,12 +2683,19 @@
     }
 
     [self writeStringToLog:@"Getting a list of this account's products from the impCloud..." :YES];
-
+    
     NSDictionary *dict = @{ @"action" : @"getproducts" };
+    
+    if (ide.currentAccount != nil && ide.currentAccount.length > 0)
+    {
+        [ide getProducts:dict];
 
-    [ide getProducts:dict];
-
-    // Pick up the action in 'listProducts:'
+        // Pick up the action in 'listProducts:'
+    }
+    else
+    {
+        [ide getMyAccount:dict];
+    }
 }
 
 
@@ -6741,6 +6753,38 @@
 
 #pragma mark - API Response Handler Methods
 
+- (void)gotAccount:(NSNotification *)note
+{
+    // This method should ONLY be called by BuildAPIAccess instance AFTER loading the account info
+
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSDictionary *so = [data objectForKey:@"object"];
+    NSString *action = [so objectForKey:@"action"];
+    
+    if (so != nil)
+    {
+        // Because the BuildAPIAccess instance's own attempt to get the account info will come here, we
+        // (uniquely) need to make sure that we have a passed object ('so') to work with before processing
+        
+        if (action != nil)
+        {
+            if ([action compare:@"getproducts"] == NSOrderedSame)
+            {
+                // Just re-call 'getProductsFromServer:' as the check on the BuildAPIAccess instance's
+                // currentAccount property will pass, and the products list will be requested from the server
+                
+                [self getProductsFromServer:nil];
+            }
+        }
+        else
+        {
+            [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (gotAccount:)"] :YES];
+        }
+    }
+}
+
+
+
 - (void)listProducts:(NSNotification *)note
 {
     // This method should ONLY be called by BuildAPIAccess instance AFTER loading a list of products
@@ -6790,6 +6834,16 @@
                     [aProduct setObject:[product objectForKey:@"relationships"] forKey:@"relationships"];
                     [aProduct setObject:[NSMutableDictionary dictionaryWithDictionary:[product objectForKey:@"attributes"]] forKey:@"attributes"];
                     [productsArray addObject:aProduct];
+                    
+                    NSString *cid = [aProduct valueForKeyPath:@"relationships.creator.id"];
+                    NSString *oid = ide.currentAccount;
+                    
+                    if ([cid compare:oid] != NSOrderedSame)
+                    {
+                        // The Product is being shared with a collaborator
+                        
+                        [aProduct setObject:cid forKey:@"shared"];
+                    }
 
                     // If we need to match against a previous 'selectedProduct' ID, do it now
 
@@ -6903,8 +6957,8 @@
                             // Now retrieve the code using the deployment ID
 
                             NSDictionary *dict = @{ @"action" : action,
-                                                   @"devicegroup" : newDevicegroup,
-                                                   @"project" : newProject };
+                                                    @"devicegroup" : newDevicegroup,
+                                                    @"project" : newProject };
 
                             [ide getDeployment:dpid :dict];
 
@@ -6927,6 +6981,8 @@
                     // NOTE if 'cd' or 'dpid' is nil, the device group has no current deployment
                     // TODO do we get a historical, or create an empty file?
                 }
+                
+                if (newProject.count == 0) [self productToProjectStageFour:newProject];
             }
             else
             {
@@ -8909,7 +8965,6 @@
         NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
         NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
 
-        //[self writeStreamToLog:attrString];
         [self writeStyledStringToLog:attrString :NO];
     }
 }
@@ -10553,18 +10608,94 @@
         [productsMenu addItem:item];
         return;
     }
-
+    
+    NSMutableArray *sharers = nil;
+    BOOL first = NO;
+    
     for (NSMutableDictionary *aProduct in productsArray)
     {
-        // Run through the list of products and add a menu item for each
+        if (!aProduct[@"shared"])
+        {
+            // Run through the list of products and add a menu item for each
+            
+            if (!first)
+            {
+                item = [[NSMenuItem alloc] initWithTitle:@"Your Products"
+                                              action:nil
+                                       keyEquivalent:@""];
+                item.state = NSOffState;
+                item.enabled = NO;
+                [productsMenu addItem:item];
+                first = YES;
+            }
 
-        NSString *name = [self getValueFrom:aProduct withKey:@"name"];
-        item = [[NSMenuItem alloc] initWithTitle:name
-                                          action:@selector(chooseProduct:)
-                                   keyEquivalent:@""];
-        item.representedObject = aProduct;
+            NSString *name = [self getValueFrom:aProduct withKey:@"name"];
+            item = [[NSMenuItem alloc] initWithTitle:name
+                                              action:@selector(chooseProduct:)
+                                       keyEquivalent:@""];
+            item.representedObject = aProduct;
+            item.state = NSOffState;
+            [productsMenu addItem:item];
+        }
+        else
+        {
+            if (sharers == nil) sharers = [[NSMutableArray alloc] init];
+            
+            NSString *nid = [aProduct objectForKey:@"shared"];
+            BOOL got = NO;
+            
+            if (sharers.count > 0)
+            {
+                for (NSUInteger i = 0 ; i < sharers.count ; i++)
+                {
+                    NSString *aid = [sharers objectAtIndex:i];
+                    
+                    if ([aid compare:nid] == NSOrderedSame) got = YES;
+                }
+            }
+            
+            if (!got) [sharers addObject:nid];
+        }
+    }
+    
+    if (sharers != nil)
+    {
+        [productsMenu addItem:[NSMenuItem separatorItem]];
+        
+        item = [[NSMenuItem alloc] initWithTitle:@"Products Shared With You"
+                                              action:nil
+                                       keyEquivalent:@""];
         item.state = NSOffState;
+        item.enabled = NO;
         [productsMenu addItem:item];
+        
+        for (NSUInteger i = 0 ; i < sharers.count ; i++)
+        {
+            NSString *sharer = [sharers objectAtIndex:i];
+            
+            item = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", sharer]
+                                              action:nil
+                                       keyEquivalent:@""];
+            item.state = NSOffState;
+            item.enabled = NO;
+            [productsMenu addItem:item];
+        
+            for (NSMutableDictionary *aProduct in productsArray)
+            {
+                if (aProduct[@"shared"] && [sharer compare:[aProduct objectForKey:@"shared"]] == NSOrderedSame)
+                {
+                    NSString *name = [self getValueFrom:aProduct withKey:@"name"];
+                    item = [[NSMenuItem alloc] initWithTitle:name
+                                                  action:@selector(chooseProduct:)
+                                           keyEquivalent:@""];
+                    item.representedObject = aProduct;
+                    item.state = NSOffState;
+                    [productsMenu addItem:item];
+                }
+            }
+            
+            if (i < sharers.count - 1) [productsMenu addItem:[NSMenuItem separatorItem]];
+        }
     }
 
     // Add the update command
