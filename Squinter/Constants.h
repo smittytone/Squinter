@@ -9,7 +9,7 @@
 #ifndef SquinterContants_h
 #define SquinterContants_h
 
-#define kSquinterCurrentVersion             @"3.1"
+#define kSquinterCurrentVersion             @"3.2"
 
 #define kActionNewDGBothFiles               6
 #define kActionNewDGAgentFile               5
@@ -72,7 +72,7 @@
 
 // Inspector Tabs
 
-#define kInspectorTabProject				  0
+#define kInspectorTabProject				0
 #define kInspectorTabDevice                 1
 
 #endif
