@@ -204,10 +204,31 @@
 				}
 			}
 		}
-
-		[projectKeys addObject:@"Account ID"];
-		[projectValues addObject:(project.aid.length > 0 ? project.aid : @"Project not associated with an account")];
-		
+        
+        if (project.aid != nil && project.aid.length > 0)
+        {
+            if (project.cid != nil && project.cid.length > 0)
+            {
+                [projectKeys addObject:@"Creator ID"];
+                [projectValues addObject:project.cid];
+                
+                if ([project.cid compare:project.aid] != NSOrderedSame)
+                {
+                    [projectKeys addObject:@"Account ID"];
+                    [projectValues addObject:project.aid];
+                }
+            }
+            else
+            {
+                [projectKeys addObject:@"Account ID"];
+                [projectValues addObject:project.aid];
+            }
+        }
+        else
+        {
+            [projectValues addObject:@"Project not associated with an account"];
+        }
+        
 		[projectKeys addObject:@"Path"];
 		
 		if (project.path != nil)
