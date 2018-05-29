@@ -2210,9 +2210,6 @@
                         }
                     }
                 }
-
-				
-				
             }
 
             [self writeStringToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
@@ -2833,7 +2830,11 @@
     newProject.description = [self getValueFrom:selectedProduct withKey:@"description"];
     newProject.path = workingDirectory;
     newProject.aid = ide.currentAccount;
-
+    
+    NSString *cid = [selectedProduct valueForKeyPath:@"relationships.creator.id"];
+    
+    if ([cid compare:newProject.aid] != NSOrderedSame) newProject.cid = cid;
+    
     NSInteger count = 1;
     BOOL done = YES;
 	
@@ -5468,6 +5469,12 @@
                                                 break;
                                             }
                                         }
+                                        
+                                        if (currentProject.cid != nil && currentProject.cid.length == 0)
+                                        {
+                                            currentProject.cid = currentProject.aid;
+                                            currentProject.haschanged = YES;
+                                        }
                                     }
                                 }
 								
@@ -7222,6 +7229,7 @@
         // Link the project to the new product
 		
         project.pid = [data objectForKey:@"id"];
+        project.cid = [data valueForKeyPath:@"relationships.creator.id"];
 		
         if ([action compare:@"newproject"] == NSOrderedSame)
         {
@@ -9059,16 +9067,28 @@
     {
         [lines addObject:@"Project is not linked to a product"];
     }
-
+    
     if (currentProject.aid != nil && currentProject.aid.length > 0)
     {
-        if (ide.isLoggedIn && [ide.currentAccount compare:currentProject.aid] == NSOrderedSame)
+        if (currentProject.cid != nil && currentProject.cid.length > 0)
         {
-            [lines addObject:@"Project is associated with the account you are currently logged in to."];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"Project is associated with the account ID %@ (not logged in).", currentProject.aid]];
+            if ([currentProject.cid compare:currentProject.aid] != NSOrderedSame)
+            {
+                [lines addObject:[NSString stringWithFormat:@"Project was created by account %@", currentProject.cid]];
+                
+                if (ide.isLoggedIn && [ide.currentAccount compare:currentProject.aid] == NSOrderedSame)
+                {
+                    [lines addObject:@"Project is accessible via the account you are currently logged in to."];
+                }
+                else
+                {
+                    [lines addObject:[NSString stringWithFormat:@"Project is not accessible via the account you are currently logged (requires account ID %@).", currentProject.aid]];
+                }
+            }
+            else
+            {
+                [lines addObject:@"Project was created by you"];
+            }
         }
     }
     else
@@ -10618,17 +10638,6 @@
         {
             // Run through the list of products and add a menu item for each
             
-            if (!first)
-            {
-                item = [[NSMenuItem alloc] initWithTitle:@"Your Products"
-                                              action:nil
-                                       keyEquivalent:@""];
-                item.state = NSOffState;
-                item.enabled = NO;
-                [productsMenu addItem:item];
-                first = YES;
-            }
-
             NSString *name = [self getValueFrom:aProduct withKey:@"name"];
             item = [[NSMenuItem alloc] initWithTitle:name
                                               action:@selector(chooseProduct:)
@@ -10665,43 +10674,42 @@
         item = [[NSMenuItem alloc] initWithTitle:@"Products Shared With You"
                                               action:nil
                                        keyEquivalent:@""];
-        item.state = NSOffState;
-        item.enabled = NO;
-        [productsMenu addItem:item];
+        NSMenu *sharedMenu = [[NSMenu alloc] initWithTitle:@"Products Shared With You"];
+        item.submenu = sharedMenu;
         
         for (NSUInteger i = 0 ; i < sharers.count ; i++)
         {
             NSString *sharer = [sharers objectAtIndex:i];
-            
-            item = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", sharer]
+            NSMenuItem *aitem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", sharer]
                                               action:nil
                                        keyEquivalent:@""];
-            item.state = NSOffState;
-            item.enabled = NO;
-            [productsMenu addItem:item];
+            aitem.state = NSOffState;
+            aitem.enabled = NO;
+            [sharedMenu addItem:aitem];
         
             for (NSMutableDictionary *aProduct in productsArray)
             {
                 if (aProduct[@"shared"] && [sharer compare:[aProduct objectForKey:@"shared"]] == NSOrderedSame)
                 {
                     NSString *name = [self getValueFrom:aProduct withKey:@"name"];
-                    item = [[NSMenuItem alloc] initWithTitle:name
+                    aitem = [[NSMenuItem alloc] initWithTitle:name
                                                   action:@selector(chooseProduct:)
                                            keyEquivalent:@""];
-                    item.representedObject = aProduct;
-                    item.state = NSOffState;
-                    [productsMenu addItem:item];
+                    aitem.representedObject = aProduct;
+                    aitem.state = NSOffState;
+                    [sharedMenu addItem:aitem];
                 }
             }
             
-            if (i < sharers.count - 1) [productsMenu addItem:[NSMenuItem separatorItem]];
+            if (i < sharers.count - 1) [sharedMenu addItem:[NSMenuItem separatorItem]];
         }
+
+        [productsMenu addItem:item];
     }
 
     // Add the update command
 
-    item = [NSMenuItem separatorItem];
-    [productsMenu addItem:item];
+    [productsMenu addItem:[NSMenuItem separatorItem]];
 
     item = [[NSMenuItem alloc] initWithTitle:@"Update Products List"
                                       action:@selector(getProductsFromServer:)
