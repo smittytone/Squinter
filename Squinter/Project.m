@@ -83,6 +83,9 @@
                 // Add 3.1 properties
 
                 aid = minor > 0 ? [aDecoder decodeObjectForKey:@"project_aid"] : @"";
+                
+                // Add 3.2 properties
+
                 cid = minor > 1 ? [aDecoder decodeObjectForKey:@"project_cid"] : @"";
 
                 // Set up other, unsaved properties
