@@ -505,6 +505,8 @@
 
 - (void)receiveSleepNote:(NSNotification *)note
 {
+    // Computer is about to sleep, so quickly
+    
     [self writeStringToLog:@"Device sleeping..." :YES];
 
     if (ide.isLoggedIn)
@@ -526,13 +528,11 @@
 
     if (reconnectAfterSleepFlag)
     {
+        reconnectAfterSleepFlag = NO;
+        
         if (!ide.isLoggedIn)
         {
             [self loginOrOut:nil];
-        }
-        else
-        {
-            reconnectAfterSleepFlag = NO;
         }
     }
 }
