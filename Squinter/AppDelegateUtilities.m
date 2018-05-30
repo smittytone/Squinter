@@ -530,10 +530,7 @@
     {
         reconnectAfterSleepFlag = NO;
         
-        if (!ide.isLoggedIn)
-        {
-            [self loginOrOut:nil];
-        }
+        if (!ide.isLoggedIn) [self loginOrOut:nil];
     }
 }
 
@@ -708,13 +705,13 @@
     // Iterate through the open projects and return the project to which
     // the specified device group belongs
     
-    for (Project *ap in projectArray)
+    for (Project *project in projectArray)
     {
-        if (ap.devicegroups.count > 0)
+        if (project.devicegroups.count > 0)
         {
-            for (Devicegroup *adg in ap.devicegroups)
+            for (Devicegroup *aDevicegroup in project.devicegroups)
             {
-                if (adg == devicegroup) return ap;
+                if (aDevicegroup == devicegroup) return project;
             }
         }
     }
