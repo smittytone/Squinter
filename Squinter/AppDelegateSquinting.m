@@ -44,19 +44,11 @@
 
 	// Get the model's parent project
 
-	for (Project *project in projectArray)
-	{
-		NSMutableArray *dgs = project.devicegroups;
+	thisProject = [self getParentProject:devicegroup];
 
-		for (Devicegroup *dg in dgs)
-		{
-			if (dg == devicegroup)
-			{
-				thisProject = project;
-				break;
-			}
-		}
-	}
+    // This should not trigger but we should add a proper warning just in case
+
+    if (thisProject == nil) return;
 
 	// Process each of the device group's models in turn
 
@@ -170,6 +162,7 @@
 	}
 
 	// Update libraries menu with updated list of local, EI libraries and local files
+    // TODO Do we need to do this here?
 
 	[self refreshMainDevicegroupsMenu];
 	[self refreshLibraryMenus];
@@ -757,9 +750,9 @@
 						returnCode = [returnCode stringByAppendingString:codeEnd];
 
 						// Set 'index' to the start of the code that has yet to be checked,
-						// after 'codeStart' and 'libCode'
+						// right after 'codeStart' but before 'libCode' to allow for nest #imports
 
-						index = codeStart.length + libCode.length;
+						//index = codeStart.length + libCode.length;
 					}
 					else
 					{
@@ -769,8 +762,13 @@
 
 						// Set 'index' to the start of the code that has yet to be checked, ie 'codeEnd'
 
-						index = codeStart.length;
+						// index = codeStart.length;
 					}
+     
+                    // Set 'index' to the start of the code that has yet to be checked,
+                    // right after 'codeStart' but before 'libCode' to allow for nest #imports
+                    
+                    index = codeStart.length;
 				}
 				else
 				{
@@ -995,34 +993,34 @@
 	// It looks for Electric Imp links and for local files and libraries
 
 	// Get the model's parent project
+    // NOTE we use this code, not getParentProject:, becuase we don't have device group
 
-	Project *thisProject;
-	//Devicegroup *thisDevicegroup;
+    Project *project = nil;
 
-	for (Project *project in projectArray)
+	for (Project *aProject in projectArray)
 	{
-		if (project.devicegroups.count > 0)
+		if (aProject.devicegroups.count > 0)
 		{
-			for (Devicegroup *dg in project.devicegroups)
+			for (Devicegroup *devicegroup in aProject.devicegroups)
 			{
-				NSMutableArray *ms = dg.models;
-
-				for (Model *m in ms)
-				{
-					if (m == model)
-					{
-						thisProject = project;
-						//thisDevicegroup = dg;
-						break;
-					}
-				}
+				if (devicegroup.models.count > 0)
+                {
+                    for (Model *aModel in devicegroup.models)
+                    {
+                        if (aModel == model)
+                        {
+                            project = aProject;
+                            break;
+                        }
+                    }
+                }
 			}
 		}
 	}
 
-	if (thisProject == nil)
+	if (project == nil)
 	{
-		// WHOOPS
+		// NOTE This should not happen, but just in case...
 
 		NSLog(@"Found orphan model in processLibraries:");
 		return;
@@ -1200,7 +1198,7 @@
 				[self writeStringToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the %@ code.", (long)mLibs.count, model.type] :YES];
 			}
 
-			thisProject.haschanged = YES;
+			project.haschanged = YES;
 			[mLibs removeAllObjects];
 		}
 		else
@@ -1253,7 +1251,7 @@
 		}
 		else
 		{
-			thisProject.haschanged = YES;
+			project.haschanged = YES;
 
 			NSString *as = @"";
 			NSString *rs = @"";
@@ -1320,7 +1318,7 @@
 				[self writeStringToLog:[NSString stringWithFormat:@"%li local file no longer referenced in the %@ code.", (long)mFiles.count, model.type] :YES];
 			}
 
-			thisProject.haschanged = YES;
+			project.haschanged = YES;
 			[mFiles removeAllObjects];
 		}
 		else
@@ -1370,7 +1368,7 @@
 		}
 		else
 		{
-			thisProject.haschanged = YES;
+			project.haschanged = YES;
 
 			NSString *as = @"";
 			NSString *rs = @"";
@@ -1413,8 +1411,8 @@
 	// Finally, clear and register the new libraries for changes
 	// NOTE 'mFiles' and 'mLibs' point to the old lists
 
-	for (File *item in mFiles) { [fileWatchQueue removePath:[self getAbsolutePath:thisProject.path :item.path]]; }
-	for (File *item in mLibs) { [fileWatchQueue removePath:[self getAbsolutePath:thisProject.path :item.path]]; }
+	for (File *item in mFiles) [fileWatchQueue removePath:[self getAbsolutePath:project.path :item.path]];
+	for (File *item in mLibs) [fileWatchQueue removePath:[self getAbsolutePath:project.path :item.path]];
 
 	for (File *item in model.libraries)
 	{
@@ -1433,7 +1431,7 @@
 
 	for (File *lib in model.libraries)
 	{
-		lib.path = [self getRelativeFilePath:thisProject.path :lib.path];
+		lib.path = [self getRelativeFilePath:project.path :lib.path];
 
 #ifdef DEBUG
 		NSLog(@"Relative Path: %@", lib.path);
@@ -1444,7 +1442,7 @@
 
 	for (File *file in model.files)
 	{
-		file.path = [self getRelativeFilePath:thisProject.path :file.path];
+		file.path = [self getRelativeFilePath:project.path :file.path];
 
 #ifdef DEBUG
 		NSLog(@"Relative Path: %@", file.path);
