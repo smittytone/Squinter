@@ -517,7 +517,8 @@
 
 // BuildAPIAccess Response Handler Methods
 
-- (void)gotAccount:(NSNotification *)note;
+- (void)gotMyAccount:(NSNotification *)note;
+- (void)gotAnAccount:(NSNotification *)note;
 - (void)listProducts:(NSNotification *)note;
 - (void)productToProjectStageTwo:(NSNotification *)note;
 - (void)productToProjectStageThree:(NSNotification *)note;

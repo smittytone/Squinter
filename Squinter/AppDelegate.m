@@ -603,8 +603,13 @@
                  object:ide];
     
     [nsncdc addObserver:self
-               selector:@selector(gotAccount:)
-                   name:@"BuildAPIGotAccountID"
+               selector:@selector(gotMyAccount:)
+                   name:@"BuildAPIGotMyAccount"
+                 object:ide];
+    
+    [nsncdc addObserver:self
+               selector:@selector(gotAnAccount:)
+                   name:@"BuildAPIGotAnAccount"
                  object:ide];
 	
     // **************
@@ -6760,7 +6765,7 @@
 
 #pragma mark - API Response Handler Methods
 
-- (void)gotAccount:(NSNotification *)note
+- (void)gotMyAccount:(NSNotification *)note
 {
     // This method should ONLY be called by BuildAPIAccess instance AFTER loading the account info
 
@@ -6787,6 +6792,37 @@
         {
             [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (gotAccount:)"] :YES];
         }
+    }
+}
+
+
+
+- (void)gotAnAccount:(NSNotification *)note
+{
+    // This method should ONLY be called by BuildAPIAccess instance AFTER loading the account info
+
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSDictionary *account = [data objectForKey:@"account"];
+    NSDictionary *so = [data objectForKey:@"object"];
+    NSMutableDictionary *product = [so objectForKey:@"product"];
+    NSString *action = [so objectForKey:@"action"];
+    
+    if (action != nil)
+    {
+        if ([action compare:@"getaccountid"] == NSOrderedSame)
+        {
+            NSString *productName = [account valueForKeyPath:@"attributes.name"];
+            
+            if ([product objectForKey:@"shared"])
+            {
+                [product setValue:productName forKeyPath:@"shared.name"];
+                [self refreshProductsMenu];
+            }
+        }
+    }
+    else
+    {
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (gotAccount:)"] :YES];
     }
 }
 
@@ -6849,7 +6885,19 @@
                     {
                         // The Product is being shared with a collaborator
                         
-                        [aProduct setObject:cid forKey:@"shared"];
+                        NSMutableDictionary *shared = [[NSMutableDictionary alloc] init];
+                        [shared setObject:@"" forKey:@"name"];
+                        [shared setObject:cid forKey:@"id"];
+                        [aProduct setObject:shared forKey:@"shared"];
+                        
+                        // Get the account name
+                        
+                        NSDictionary *dict = @{ @"product" : aProduct,
+                                                @"action" : @"getaccountid" };
+                        
+                        [ide getAccount:cid :dict];
+                        
+                        // Pick up the asynchronous action at **gotAnAccount:**
                     }
 
                     // If we need to match against a previous 'selectedProduct' ID, do it now
@@ -10630,13 +10678,15 @@
     }
     
     NSMutableArray *sharers = nil;
-    BOOL first = NO;
     
     for (NSMutableDictionary *aProduct in productsArray)
     {
+        // Run through the list of products to see if any contain a 'shared' object
+        
         if (!aProduct[@"shared"])
         {
-            // Run through the list of products and add a menu item for each
+            // The product doesn't have a 'shared' object, so it belongs to the account holder -
+            // just add it to the menu
             
             NSString *name = [self getValueFrom:aProduct withKey:@"name"];
             item = [[NSMenuItem alloc] initWithTitle:name
@@ -10648,27 +10698,37 @@
         }
         else
         {
+            // The product does have a 'shared' object, so it belongs to another account
+            
             if (sharers == nil) sharers = [[NSMutableArray alloc] init];
             
-            NSString *nid = [aProduct objectForKey:@"shared"];
+            NSMutableDictionary *sharer = [aProduct objectForKey:@"shared"];
             BOOL got = NO;
             
             if (sharers.count > 0)
             {
+                // If we already know about at least one shared account (each one is referenced
+                // in 'sharers'), we get its ID and compare it to the creator ID of the current product
+                
                 for (NSUInteger i = 0 ; i < sharers.count ; i++)
                 {
-                    NSString *aid = [sharers objectAtIndex:i];
-                    
-                    if ([aid compare:nid] == NSOrderedSame) got = YES;
+                    NSMutableDictionary *product = [sharers objectAtIndex:i];
+                    NSString *aid = [product objectForKey:@"id"];
+                    NSString *mid = [sharer objectForKey:@"id"];
+                    if ([aid compare:mid] == NSOrderedSame) got = YES;
                 }
             }
             
-            if (!got) [sharers addObject:nid];
+            // If we've not seen this product's creator before, add it to 'sharers'
+            
+            if (!got) [sharers addObject:sharer];
         }
     }
     
     if (sharers != nil)
     {
+        // Some of the user's products are shared, so set up a sub-menu for these
+        
         [productsMenu addItem:[NSMenuItem separatorItem]];
         
         item = [[NSMenuItem alloc] initWithTitle:@"Products Shared With You"
@@ -10677,37 +10737,61 @@
         NSMenu *sharedMenu = [[NSMenu alloc] initWithTitle:@"Products Shared With You"];
         item.submenu = sharedMenu;
         
+        // Now add the shared products to the sub-menu
+        
         for (NSUInteger i = 0 ; i < sharers.count ; i++)
         {
-            NSString *sharer = [sharers objectAtIndex:i];
-            NSMenuItem *aitem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", sharer]
+            NSMutableDictionary *sharer = [sharers objectAtIndex:i];
+            
+            // If we have a stored name for the creator account, use it; otherwise use
+            // the account ID (which may asynchronously be replaced - see 'gotAnAccount:'
+            
+            NSString *name = [sharer objectForKey:@"name"];
+            if (name.length == 0) name = [sharer objectForKey:@"id"];
+            
+            // Add the account name (or ID) to the sub-menu...
+            NSMenuItem *aitem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", name]
                                               action:nil
                                        keyEquivalent:@""];
             aitem.state = NSOffState;
             aitem.enabled = NO;
             [sharedMenu addItem:aitem];
+            
+            // ...now add all of its products
         
             for (NSMutableDictionary *aProduct in productsArray)
             {
-                if (aProduct[@"shared"] && [sharer compare:[aProduct objectForKey:@"shared"]] == NSOrderedSame)
+                NSString *sid = [sharer objectForKey:@"id"];
+                
+                if (aProduct[@"shared"])
                 {
-                    NSString *name = [self getValueFrom:aProduct withKey:@"name"];
-                    aitem = [[NSMenuItem alloc] initWithTitle:name
-                                                  action:@selector(chooseProduct:)
-                                           keyEquivalent:@""];
-                    aitem.representedObject = aProduct;
-                    aitem.state = NSOffState;
-                    [sharedMenu addItem:aitem];
+                    NSString *aid = [aProduct valueForKeyPath:@"shared.id"];
+                    
+                    if ([sid compare:aid] == NSOrderedSame)
+                    {
+                        NSString *name = [self getValueFrom:aProduct withKey:@"name"];
+                        aitem = [[NSMenuItem alloc] initWithTitle:name
+                                                      action:@selector(chooseProduct:)
+                                               keyEquivalent:@""];
+                        aitem.representedObject = aProduct;
+                        aitem.state = NSOffState;
+                        [sharedMenu addItem:aitem];
+                    }
                 }
             }
             
+            // Only add a separator between creators if we haven't just added the last
+            // creator on the list
+            
             if (i < sharers.count - 1) [sharedMenu addItem:[NSMenuItem separatorItem]];
         }
-
+        
+        // Add the 'shared with you' menu item with its sub-menu of shared products
+        
         [productsMenu addItem:item];
     }
 
-    // Add the update command
+    // Add the 'update list' command
 
     [productsMenu addItem:[NSMenuItem separatorItem]];
 
