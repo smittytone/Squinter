@@ -1187,7 +1187,7 @@
               :code
               :NO];
 
-    // Pick up the action in 'loggedIn:' or 'displayError:', depending on success or failure
+    // Pick up the action in **loggedIn:** or **displayError:**, depending on success or failure
 }
 
 
@@ -5386,7 +5386,7 @@
 
                     if (ide.isLoggedIn)
                     {
-                        // TODO - Ask if the user wants to do this...
+                        // TODO - Ask if the user wants to do this as it may already belong to a product
 
                         [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
 
@@ -5448,18 +5448,10 @@
 										
                                         [saveLight needSave:YES];
                                         [self writeStringToLog:[NSString stringWithFormat:@"Associating project \"%@\" with account ID %@", currentProject.name, currentProject.aid] :YES];
-										
-                                        // Select the product the project is linked to
-										
-                                        for (NSMenuItem *item in productsMenu.itemArray)
-                                        {
-                                            if (product == (NSMutableDictionary *)item.representedObject)
-                                            {
-                                                [self chooseProduct:item];
-                                                break;
-                                            }
-                                        }
                                     }
+
+                                    // NOTE If we're not logged in there's not much else we can do
+                                    //      to associate the project with an account
                                 }
                                 else
                                 {
@@ -5471,34 +5463,34 @@
 										
                                         [self projectAccountAlert:currentProject :@"**apply changes to this project"];
 										
-                                        // DON'T select the product as it will be the wrong one:
+                                        // DON'T go on to select the product or set the creator ID as it will be wrong
                                         // Same product ID but wrong account ID
-                                    }
-                                    else
-                                    {
-                                        // We're not logged in or the account IDs match
 
-                                        // Select the product the project is linked to
-										
-                                        for (NSMenuItem *item in productsMenu.itemArray)
-                                        {
-                                            if (product == (NSMutableDictionary *)item.representedObject)
-                                            {
-                                                [self chooseProduct:item];
-                                                break;
-                                            }
-                                        }
-                                        
-                                        if (currentProject.cid != nil && currentProject.cid.length == 0)
-                                        {
-                                            // We don't have a creator ID stored for the project, so set it to the account ID
-
-                                            currentProject.cid = currentProject.aid;
-                                            currentProject.haschanged = YES;
-                                        }
+                                        break;
                                     }
                                 }
 								
+                                if (currentProject.cid != nil && currentProject.cid.length == 0)
+                                {
+                                    // We don't have a creator ID stored for the project, so set it to the account ID
+                                    // (we can do this because we know what the linked product is)
+
+                                    currentProject.cid = [product valueForKeyPath:@"relationships.creator.id"];
+                                    currentProject.haschanged = YES;
+                                    [self writeStringToLog:[NSString stringWithFormat:@"Setting project \"%@\" creator ID to %@", currentProject.name, currentProject.cid] :YES];
+                                }
+
+                                // Select the product the project is linked to
+
+                                for (NSMenuItem *item in productsMenu.itemArray)
+                                {
+                                    if (product == (NSMutableDictionary *)item.representedObject)
+                                    {
+                                        [self chooseProduct:item];
+                                        break;
+                                    }
+                                }
+
                                 break;
                             }
                         }
@@ -5509,31 +5501,33 @@
 
                         if (!match)
                         {
-                            // The project doesn't match any known product - perhaps it's on the wrong account
+                            // The project doesn't match any known product. Perhaps it's on the wrong account, so check
 							
-                            if (currentProject.aid.length > 0)
+                            if (currentProject.aid != nil && currentProject.aid.length > 0 && ide.isLoggedIn)
                             {
-                                if (ide.isLoggedIn)
+                                if ([currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
                                 {
-                                    if ([currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
-                                    {
-                                        // Whoops - they don't match so warn the use that they can't work with this project
-										
-                                        [self projectAccountAlert:currentProject :@"*apply changes to this project"];
-                                    }
+                                    // Whoops - they don't match so warn the use that they can't work with this project
+
+                                    [self projectAccountAlert:currentProject :@"*apply changes to this project"];
                                 }
 
-                                // If we're not logged in, we can't compare accounts, but then the user can't upload,
-                                // so we need not do anything more here.
+                                // NOTE If account IDs match, we could suggest the user logs in at this point...
                             }
+
+                            // NOTE If we're not logged in, or the project account ID is nil or empty, we can't compare account IDs,
+                            //      so there's not much else we can do at this point
                         }
                     }
                     else
                     {
-                        // We don't know if the project's PID refers to the current account or not
-                        // because we have no loaded product list for comparison
+                        // We have no loaded list of products, so we can't see if the project's PID refers to a product
+                        // in the current account, but we can check, if we're logged in, that the project account ID and the
+                        // current account ID match — if not, we need to warn the user
 						
-                        if (ide.isLoggedIn && currentProject.aid.length > 0 && [ide.currentAccount compare:currentProject.aid] != NSOrderedSame)
+                        if (ide.isLoggedIn && currentProject.aid != nil &&
+                            currentProject.aid.length > 0 &&
+                            [ide.currentAccount compare:currentProject.aid] != NSOrderedSame)
                         {
                             // If the account IDs don't match, then the product ID won't no matter what
 							
@@ -8504,7 +8498,12 @@
 {
     // BuildAPIAccess has signalled login success
 
-    // Save credentials if they have changed required
+    // First, get the user's account ID
+
+    [ide getMyAccount];
+
+    // Action continues asynchronously at **gotMyAccount:**
+    // Meatime, save credentials if they have changed required
 
     BOOL flag = NO;
 
