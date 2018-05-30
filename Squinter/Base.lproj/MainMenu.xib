@@ -228,7 +228,7 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Squinter" systemMenu="apple" id="uQy-DD-JDr">
                         <items>
-                            <menuItem title="About Squinter 2.0 Beta" id="5kV-Vb-QxS">
+                            <menuItem title="About Squinter 2.0" id="5kV-Vb-QxS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="showAboutSheet:" target="Voe-Tx-rLC" id="viE-bf-Tsl"/>
@@ -1692,11 +1692,11 @@ Gw
                         <tabViewItems>
                             <tabViewItem label="General" identifier="1" id="evn-9T-0q2">
                                 <view key="view" id="dVn-Xe-jNr">
-                                    <rect key="frame" x="10" y="33" width="566" height="331"/>
+                                    <rect key="frame" x="10" y="33" width="129" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zDH-Ht-72Y">
-                                            <rect key="frame" x="15" y="300" width="536" height="17"/>
+                                            <rect key="frame" x="15" y="-31" width="536" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Primary Projects Directory" id="2tw-rg-OiT">
                                                 <font key="font" metaFont="systemBold"/>
@@ -1705,7 +1705,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EQt-Hf-Xj6">
-                                            <rect key="frame" x="17" y="270" width="437" height="22"/>
+                                            <rect key="frame" x="17" y="-61" width="437" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="yWu-nH-OrX">
                                                 <font key="font" metaFont="system"/>
@@ -1714,7 +1714,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DkE-vS-yQU">
-                                            <rect key="frame" x="184" y="125" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-206" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Preserve window size and location on quit" bezelStyle="regularSquare" imagePosition="left" inset="2" id="0y8-yG-B2s">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1722,7 +1722,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ebC-Zl-yYK">
-                                            <rect key="frame" x="184" y="233" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-98" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Compile Projects when they are opened" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Oao-Lj-YmV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1730,7 +1730,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rcb-N4-0Pa">
-                                            <rect key="frame" x="184" y="199" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-132" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Log in to the impCloud on launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Uac-2V-lgt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1738,7 +1738,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4RA-rZ-K8Y">
-                                            <rect key="frame" x="184" y="105" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-226" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Automatically check for updates on launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="YNZ-qN-hCg">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1746,7 +1746,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QNH-MF-i5o">
-                                            <rect key="frame" x="15" y="234" width="165" height="17"/>
+                                            <rect key="frame" x="15" y="-97" width="165" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Projects:" id="tEd-wl-ozf">
                                                 <font key="font" metaFont="system"/>
@@ -1755,7 +1755,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nnl-zi-h5P">
-                                            <rect key="frame" x="104" y="125" width="76" height="17"/>
+                                            <rect key="frame" x="104" y="-206" width="76" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Application:" id="iyn-6O-3Cr">
                                                 <font key="font" metaFont="system"/>
@@ -1764,7 +1764,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hjS-TN-DBd">
-                                            <rect key="frame" x="184" y="159" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-172" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Auto-load Product list on log-in" bezelStyle="regularSquare" imagePosition="left" inset="2" id="U1a-3i-4Fc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1772,7 +1772,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wVL-mp-vcF">
-                                            <rect key="frame" x="184" y="179" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-152" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Auto-load Devices lists on log-in" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Evd-yN-RwP">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1780,7 +1780,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yY2-Ib-Odi">
-                                            <rect key="frame" x="15" y="199" width="165" height="17"/>
+                                            <rect key="frame" x="15" y="-132" width="165" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Login" id="MbW-MR-iAt">
                                                 <font key="font" metaFont="system"/>
@@ -1789,7 +1789,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nCa-C0-93c">
-                                            <rect key="frame" x="456" y="263" width="99" height="32"/>
+                                            <rect key="frame" x="456" y="-68" width="99" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Change..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" id="Uhg-U7-DrG">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1800,7 +1800,7 @@ Gw
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dds-o4-UR0">
-                                            <rect key="frame" x="184" y="85" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-246" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Show Inspector at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="aTm-eQ-hOR">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1808,7 +1808,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="257-jR-osq">
-                                            <rect key="frame" x="348" y="14" width="86" height="26"/>
+                                            <rect key="frame" x="348" y="-317" width="86" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="5" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="ZDa-ZJ-zlO" id="qle-RE-B2t">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1826,7 +1826,7 @@ Gw
                                             </popUpButtonCell>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="05Y-TQ-Ihn">
-                                            <rect key="frame" x="133" y="19" width="211" height="17"/>
+                                            <rect key="frame" x="133" y="-312" width="211" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Number of Recent Project Files:" id="0kE-l3-h7u">
                                                 <font key="font" metaFont="system"/>
@@ -1835,7 +1835,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b4t-2e-gXc">
-                                            <rect key="frame" x="526" y="14" width="25" height="25"/>
+                                            <rect key="frame" x="526" y="-317" width="25" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="k8W-dd-oMD">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1846,7 +1846,7 @@ Gw
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DjJ-Bw-YRL">
-                                            <rect key="frame" x="184" y="65" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="-266" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Update Devices’ status periodically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="tOF-sy-pYr">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
