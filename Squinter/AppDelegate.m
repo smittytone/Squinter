@@ -5338,6 +5338,8 @@
             gotFlag = YES;
         }
 
+#pragma mark Opened a new project
+
         if (!gotFlag)
         {
             // Set the newly opened project to be the current one
@@ -5371,7 +5373,10 @@
 
             if (currentProject.pid.length > 0)
             {
-                // Project is associated with a product, or is being updated
+
+#pragma mark Opened project is tied to a product
+
+                // Project is associated with a product, or is being updated - ie. pid = "old"
 				
                 if ([currentProject.pid compare:@"old"] == NSOrderedSame)
                 {
@@ -5409,8 +5414,13 @@
                 }
                 else
                 {
+
+#pragma mark Opened project is up to date
+
                     if (productsArray != nil && productsArray.count > 0)
                     {
+                        // We have a list of products so we should check the project against them
+
                         BOOL match = NO;
 						
                         for (NSMutableDictionary *product in productsArray)
@@ -5427,10 +5437,12 @@
                                 {
                                     // The current project does not have an associated accoint, but since we have a
                                     // match on the ID of a product in the current account, so we can perform the
-                                    // association now
+                                    // association anyway
 									
                                     if (ide.isLoggedIn)
                                     {
+                                        // We can only associate the project with the account if we're logged in
+
                                         currentProject.aid = ide.currentAccount;
                                         currentProject.haschanged = YES;
 										
@@ -5451,11 +5463,11 @@
                                 }
                                 else
                                 {
-                                    // The opened project has an account ID - is it the same as the current one
+                                    // The opened project has an account ID - is it the same as the current account's ID?
 									
                                     if (ide.isLoggedIn && [currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
                                     {
-                                        // Whoops - they don't match
+                                        // Whoops - they don't match so warn the use that they can't work with this project
 										
                                         [self projectAccountAlert:currentProject :@"**apply changes to this project"];
 										
@@ -5464,6 +5476,8 @@
                                     }
                                     else
                                     {
+                                        // We're not logged in or the account IDs match
+
                                         // Select the product the project is linked to
 										
                                         for (NSMenuItem *item in productsMenu.itemArray)
@@ -5477,6 +5491,8 @@
                                         
                                         if (currentProject.cid != nil && currentProject.cid.length == 0)
                                         {
+                                            // We don't have a creator ID stored for the project, so set it to the account ID
+
                                             currentProject.cid = currentProject.aid;
                                             currentProject.haschanged = YES;
                                         }
@@ -5486,7 +5502,11 @@
                                 break;
                             }
                         }
-						
+
+#pragma mark Opened project's product is not listed
+
+                        // At this point 'match' will be YES if the project matches a product in the loaded list, or NO if there is no match
+
                         if (!match)
                         {
                             // The project doesn't match any known product - perhaps it's on the wrong account
@@ -5497,11 +5517,14 @@
                                 {
                                     if ([currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
                                     {
-                                        // Whoops - they don't match
+                                        // Whoops - they don't match so warn the use that they can't work with this project
 										
                                         [self projectAccountAlert:currentProject :@"*apply changes to this project"];
                                     }
                                 }
+
+                                // If we're not logged in, we can't compare accounts, but then the user can't upload,
+                                // so we need not do anything more here.
                             }
                         }
                     }
@@ -5510,7 +5533,7 @@
                         // We don't know if the project's PID refers to the current account or not
                         // because we have no loaded product list for comparison
 						
-                        if (ide.isLoggedIn && currentProject.aid.length > 0 && [ide.currentAccount compare:currentProject.aid] == NSOrderedSame)
+                        if (ide.isLoggedIn && currentProject.aid.length > 0 && [ide.currentAccount compare:currentProject.aid] != NSOrderedSame)
                         {
                             // If the account IDs don't match, then the product ID won't no matter what
 							
@@ -5521,52 +5544,60 @@
             }
             else
             {
+
+#pragma mark Opened project is not tied to a product
+
                 // The opened project is not assigned to a product
-                // If also has no account affiliation we can ignore it
+                // If it also has no account affiliation we can ignore it
 				
                 if (currentProject.aid != nil && currentProject.aid.length > 0)
                 {
-                    // The opened project does have an AID
+                    // The opened project has an accout ID we can attempt to match against the logged in account
 					
                     if (ide.isLoggedIn && [currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
                     {
-                        // TO DO
+                        // Whoops - they don't match so warn the use that they can't work with this project
+
+                        [self projectAccountAlert:currentProject :@"*apply changes to this project"];
                     }
                 }
-				
-                /*
-                 if ((currentProject.aid == nil || currentProject.aid.length == 0) && ide.isLoggedIn)
-                 {
-                 // This project doesn't have an account ID
-				 
-                 NSAlert *alert = [[NSAlert alloc] init];
-                 alert.messageText = [NSString stringWithFormat:@"Project “%@” is yet not associated with an Electric Imp Account.", currentProject.name];
-                 alert.informativeText = @"Do you wish to associate it with the account you are currently logged in to? If you are not certain that this project relates to this account, you should select ‘No’.";
-                 [alert addButtonWithTitle:@"No"];
-                 [alert addButtonWithTitle:@"Yes"];
-				 
-                 Project *aProject = currentProject;
-				 
-                 [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-                 if (returnCode == 1001)
-                 {
-                 aProject.aid = ide.currentAccount;
-                 aProject.haschanged = YES;
-                 if (aProject == currentProject) [saveLight needSave:YES];
-                 [self writeStringToLog:[NSString stringWithFormat:@"Associating project \"%@\" with account ID %@", aProject.name, aProject.aid] :YES];
-                 }
-				 
-                 // Continue opening the other filesr
-                 [self openSquirrelProjects:urls];
-                 }];
-				 
-                 return;
-                 }
-                */
+				else
+                {
+                    if (ide.isLoggedIn)
+                    {
+                        // This project doesn't have an account ID, so warn the user
+
+                        NSAlert *alert = [[NSAlert alloc] init];
+                        alert.messageText = [NSString stringWithFormat:@"Project “%@” is yet not associated with an Electric Imp Account.", currentProject.name];
+                        alert.informativeText = @"Do you wish to associate it with the account you are currently logged in to? If you are not certain that this project relates to this account, you should select ‘No’.";
+                        [alert addButtonWithTitle:@"No"];
+                        [alert addButtonWithTitle:@"Yes"];
+
+                        Project *aProject = currentProject;
+
+                        [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+                            if (returnCode == 1001)
+                            {
+                                aProject.aid = ide.currentAccount;
+                                aProject.haschanged = YES;
+                                if (aProject == currentProject) [saveLight needSave:YES];
+                                [self writeStringToLog:[NSString stringWithFormat:@"Associating project \"%@\" with account ID %@", aProject.name, aProject.aid] :YES];
+                            }
+
+                            // Continue opening the other filesr
+
+                            [self openSquirrelProjects:urls];
+                        }];
+
+                        return;
+                    }
+                }
             }
 
+#pragma mark Update the UI with the opened project
+
             // Update the Project menu’s 'openProjectsMenu' sub-menu by adding the project's name
-            // (or 'newName' if we are using a temporary name because of a match)
+            // (or 'newName' if we are using a temporary name because of a match with a project on the list)
 
             [self addProjectMenuItem:(newName != nil ? newName : currentProject.name) :currentProject];
 
@@ -5579,22 +5610,21 @@
                 currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
                 currentProject.devicegroupIndex = 0;
 
-                // Get the device group data - if it's for a group
+                // Get the device group data, provided we're logged in to the correct account
 
-                for (Devicegroup *devicegroup in currentProject.devicegroups)
+                if (ide.isLoggedIn && [self isCorrectAccount:currentProject])
                 {
-                    if ([self isCorrectAccount:currentProject])
+                    for (Devicegroup *devicegroup in currentProject.devicegroups)
                     {
-                        if (ide.isLoggedIn)
-                        {
-                            NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
-                                                    @"devicegroup" : devicegroup };
+                        // Update the device group data in case it has changed since the user last logged in
 
-                            [ide getDevicegroup:devicegroup.did :dict];
+                        NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
+                                                @"devicegroup" : devicegroup };
 
-                            // Action continues in parallel at updateCodeStageTwo:
-                        }
-						
+                        [ide getDevicegroup:devicegroup.did :dict];
+
+                        // Action continues asynchronously at **updateCodeStageTwo:**
+
                         // Set the devicegroup's device list
 
                         [self setDevicegroupDevices:devicegroup];
@@ -5612,7 +5642,8 @@
                         if (dg.models.count > 0) [self compile:dg :NO];
                     }
 
-                    // Add the project's files to the watch list
+                    // Add the mail project files to the watch list
+                    // NOTE compile: adds (via methods) library and other files to the watch queue
 
                     [self watchfiles:currentProject];
                 }
@@ -5620,22 +5651,22 @@
                 {
                     // We're not autocompiling the the project, so we just add the known files and libraries to the file-watch queue
 
-                    NSString *modelAbsPath, *modelRelPath, *fileRelPath, *fileAbsPath;
+                    NSString *modelAbsPath, *modelRelPath;
                     BOOL result;
 
-                    for (Devicegroup *dg in currentProject.devicegroups)
+                    for (Devicegroup *devicegroup in currentProject.devicegroups)
                     {
-                        // Add in the devices, if any
-
-                        if (dg.models.count > 0)
+                        if (devicegroup.models.count > 0)
                         {
-                            for (Model *md in dg.models)
+                            // Run through the device group's models, if it has any
+
+                            for (Model *model in devicegroup.models)
                             {
                                 // Get the model's expected location (this is relative to 'oldPath')
 
-                                modelRelPath = [NSString stringWithFormat:@"%@/%@", md.path, md.filename];
+                                modelRelPath = [NSString stringWithFormat:@"%@/%@", model.path, model.filename];
 
-                                NSRange range = [md.path rangeOfString:@"../"];
+                                NSRange range = [model.path rangeOfString:@"../"];
 
                                 // Is the model file above or below the project file in the hiererchy (expected)
 
@@ -5655,7 +5686,7 @@
                                 }
 
 #ifdef DEBUG
-    NSLog(@"M: %@", modelAbsPath);
+    NSLog(@"Model Abs: %@", modelAbsPath);
 #endif
                                 // Check that the file is where we think it is
 
@@ -5666,11 +5697,11 @@
                                 {
                                     // We can't locate the model file at the expected location, whether the project has moved or not
 
-                                    [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find source file \"%@\" at expected location %@.", md.filename, [self getPrintPath:currentProject.path :md.path]] :YES];
+                                    [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find source file \"%@\" at expected location %@.", model.filename, [self getPrintPath:currentProject.path :model.path]] :YES];
 
-                                    [self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
+                                    [self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", devicegroup.name] :YES];
 
-                                    md.hasMoved = YES;
+                                    model.hasMoved = YES;
                                 }
                                 else
                                 {
@@ -5682,9 +5713,9 @@
                                         {
                                             // Model file is still above the project - ie. we found it at oldPath - so recalculate relative path
 
-                                            md.path = [self getRelativeFilePath:currentProject.path :modelAbsPath];
+                                            model.path = [self getRelativeFilePath:currentProject.path :modelAbsPath];
 
-                                            [self writeStringToLog:[NSString stringWithFormat:@"Updating saved source file \"%@\" path to %@ - source or project file has moved.", md.filename, [self getPrintPath:currentProject.path :md.path]] :YES];
+                                            [self writeStringToLog:[NSString stringWithFormat:@"Updating saved source file \"%@\" path to %@ - source or project file has moved.", model.filename, [self getPrintPath:currentProject.path :model.path]] :YES];
 
                                             currentProject.haschanged = YES;
                                         }
@@ -5694,122 +5725,19 @@
                                     // NOTE These are just the known locations - they may not reflect what is actually
                                     // in the file, which is which is why we compile on load as the default
 
-                                    if (md.libraries.count > 0)
+                                    if (model.libraries.count > 0)
                                     {
-                                        for (File *fl in md.libraries)
+                                        for (File *file in model.libraries)
                                         {
-                                            // Get the path of the file, which is relative to 'oldPath'
-
-                                            fileRelPath = [NSString stringWithFormat:@"%@/%@", fl.path, fl.filename];
-
-                                            NSRange range = [fl.path rangeOfString:@"../"];
-
-                                            if (range.location != NSNotFound)
-                                            {
-                                                // File is above the project file in the hierarchy
-
-                                                fileAbsPath = [self getAbsolutePath:oldPath :fileRelPath];
-                                            }
-                                            else
-                                            {
-                                                // File is below the project file in the hierarchy
-
-                                                fileAbsPath = [self getAbsolutePath:currentProject.path :fileRelPath];
-                                            }
-
-#ifdef DEBUG
-    NSLog(@"R: %@-%@", fl.path, fl.filename);
-    NSLog(@"A: %@", fileAbsPath);
-#endif
-
-                                            result = [self checkFile:fileAbsPath];
-                                            fileAbsPath = [fileAbsPath stringByDeletingLastPathComponent];
-
-                                            if (!result)
-                                            {
-                                                [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find library \"%@\" at expected location %@ - source or project file has moved.", fl.filename, [self getPrintPath:currentProject.path :fl.path]] :YES];
-
-                                                [self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
-
-                                                fl.hasMoved = YES;
-                                            }
-                                            else
-                                            {
-                                                if (projectMoved)
-                                                {
-                                                    if (range.location != NSNotFound)
-                                                    {
-                                                        // File is still above the project - ie. we found it at oldPath - so recalculate relative path
-
-                                                        fl.path = [self getRelativeFilePath:currentProject.path :fileAbsPath];
-
-                                                        [self writeStringToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
-
-                                                        currentProject.haschanged = YES;
-
-#ifdef DEBUG
-    NSLog(@"N: %@", fl.path);
-#endif
-
-                                                    }
-                                                }
-                                            }
+                                            [self checkFiles:file :oldPath :@"library" :devicegroup :projectMoved];
                                         }
                                     }
 
-                                    if (md.files.count > 0)
+                                    if (model.files.count > 0)
                                     {
-                                        for (File *fl in md.files)
+                                        for (File *file in model.files)
                                         {
-                                            fileRelPath = [NSString stringWithFormat:@"%@/%@", fl.path, fl.filename];
-
-                                            NSRange range = [fl.path rangeOfString:@"../"];
-
-                                            if (range.location != NSNotFound)
-                                            {
-                                                fileAbsPath = [self getAbsolutePath:oldPath :fileRelPath];
-                                            }
-                                            else
-                                            {
-                                                fileAbsPath = [self getAbsolutePath:currentProject.path :fileRelPath];
-                                            }
-
-#ifdef DEBUG
-    NSLog(@"R: %@-%@", fl.path, fl.filename);
-    NSLog(@"A: %@", fileAbsPath);
-#endif
-
-                                            result = [self checkFile:fileAbsPath];
-                                            fileAbsPath = [fileAbsPath stringByDeletingLastPathComponent];
-
-                                            if (!result)
-                                            {
-                                                [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find file \"%@\" at expected location %@ - file or project has moved.", fl.filename, [self getPrintPath:currentProject.path :fl.path]] :YES];
-
-                                                [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" cannot be compiled until this is resolved.", dg.name] :YES];
-
-                                                fl.hasMoved = YES;
-                                            }
-                                            else
-                                            {
-                                                if (projectMoved)
-                                                {
-                                                    if (range.location != NSNotFound)
-                                                    {
-                                                        // File is still above the project - ie. we found it at oldPath - so recalculate relative path
-
-                                                        fl.path = [self getRelativeFilePath:currentProject.path :fileAbsPath];
-
-                                                        [self writeStringToLog:[NSString stringWithFormat:@"Updating stored library \"%@/%@\" - source or project file has moved.", [self getPrintPath:currentProject.path :fl.path], fl.filename] :YES];
-
-                                                        currentProject.haschanged = YES;
-
-#ifdef DEBUG
-    NSLog(@"N: %@", fl.path);
-#endif
-                                                    }
-                                                }
-                                            }
+                                            [self checkFiles:file :oldPath :@"file" :devicegroup :projectMoved];
                                         }
                                     }
                                 }
@@ -5821,6 +5749,7 @@
             else
             {
                 currentDevicegroup = nil;
+                currentProject.devicegroupIndex = -1;
             }
 			
             // Select a device
@@ -5860,6 +5789,69 @@
     // Call the method again in case there are any URLs left to deal with
 
     [self openSquirrelProjects:urls];
+}
+
+
+
+- (void)checkFiles:(File *)file :(NSString *)oldPath :(NSString *)type :(Devicegroup *)devicegroup :(BOOL)projectMoved
+{
+    // Get the path of the file, which is relative to 'oldPath'
+
+    NSString *fileAbsPath = nil;
+    NSString *fileRelPath = [NSString stringWithFormat:@"%@/%@", file.path, file.filename];
+
+    NSRange range = [file.path rangeOfString:@"../"];
+
+    if (range.location != NSNotFound)
+    {
+        // File is above the project file in the hierarchy
+
+        fileAbsPath = [self getAbsolutePath:oldPath :fileRelPath];
+    }
+    else
+    {
+        // File is below the project file in the hierarchy
+
+        fileAbsPath = [self getAbsolutePath:currentProject.path :fileRelPath];
+    }
+
+#ifdef DEBUG
+    NSLog(@"%@ Rel: %@-%@", type, file.path, file.filename);
+    NSLog(@"%@ Abs: %@", type, fileAbsPath);
+#endif
+
+    BOOL result = [self checkFile:fileAbsPath];
+    fileAbsPath = [fileAbsPath stringByDeletingLastPathComponent];
+
+    if (!result)
+    {
+        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find %@ \"%@\" at expected location %@ - source or project file has moved.", type, file.filename, [self getPrintPath:currentProject.path :file.path]] :YES];
+
+        [self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", devicegroup.name] :YES];
+
+        file.hasMoved = YES;
+    }
+    else
+    {
+        if (projectMoved)
+        {
+            if (range.location != NSNotFound)
+            {
+                // File is still above the project - ie. we found it at oldPath - so recalculate relative path
+
+                file.path = [self getRelativeFilePath:currentProject.path :fileAbsPath];
+
+                [self writeStringToLog:[NSString stringWithFormat:@"Updating stored %@ \"%@/%@\" - source or project file has moved.", type, [self getPrintPath:currentProject.path :file.path], file.filename] :YES];
+
+                currentProject.haschanged = YES;
+
+#ifdef DEBUG
+    NSLog(@"N: %@", file.path);
+#endif
+
+            }
+        }
+    }
 }
 
 
@@ -11811,7 +11803,7 @@
 - (void)refreshViewMenu
 {
     // The View menu has two items. These are only actionable if there is a selected device group
-    // and that device group's code has has been compiled
+    // and that device group's code has been compiled
 
     logDeviceCodeMenuItem.enabled = (currentDevicegroup != nil && currentDevicegroup.squinted & kDeviceCodeSquinted) ? YES : NO;
     logAgentCodeMenuItem.enabled = (currentDevicegroup != nil && currentDevicegroup.squinted & kAgentCodeSquinted) ? YES : NO;
