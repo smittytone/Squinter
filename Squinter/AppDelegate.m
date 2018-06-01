@@ -1142,7 +1142,7 @@
         [alert addButtonWithTitle:@"No"];
 
         [alert beginSheetModalForWindow:loginSheet completionHandler:^(NSModalResponse returnCode) {
-            if (returnCode != 1000) checkbox.state = NSOffState;
+            if (returnCode != NSAlertFirstButtonReturn) checkbox.state = NSOffState;
         }];
     }
 }
@@ -1201,7 +1201,7 @@
     [alert addButtonWithTitle:@"No"];
 
     [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-        if (returnCode == 1000) [self autoLogin];
+        if (returnCode == NSAlertFirstButtonReturn) [self autoLogin];
     }];
 }
 
@@ -1446,7 +1446,7 @@
             [alert addButtonWithTitle:@"Cancel"];
             [alert addButtonWithTitle:@"Continue"];
             [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-                if (returnCode == 1001) [self newProjectSheetCreateStageTwo:pName :pDesc :YES :NO];
+                if (returnCode == NSAlertSecondButtonReturn) [self newProjectSheetCreateStageTwo:pName :pDesc :YES :NO];
             }];
 
             return;
@@ -2239,7 +2239,7 @@
             [alert addButtonWithTitle:@"Continue"];
             [alert setAlertStyle:NSWarningAlertStyle];
             [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-                if (returnCode == 1001)
+                if (returnCode == NSAlertSecondButtonReturn)
                 {
                     // Proceed with the upload to this account
 
@@ -2271,7 +2271,7 @@
             [alert addButtonWithTitle:@"Continue"];
             [alert setAlertStyle:NSWarningAlertStyle];
             [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-                if (returnCode == 1001)
+                if (returnCode == NSAlertSecondButtonReturn)
                 {
                     // Proceed with the upload to this account
 
@@ -2773,7 +2773,7 @@
         [alert addButtonWithTitle:@"Yes"];
         [alert setAlertStyle:NSWarningAlertStyle];
         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-            if (returnCode == 1001)
+            if (returnCode == NSAlertSecondButtonReturn)
             {
                 // Proceed with the deletion: create a dictionary holding the product itself
                 // and a count variable which we'll use to tick of devicegroups as they are
@@ -3026,7 +3026,7 @@
         [ays setMessageText:@"If you cancel, you will not add the selected file(s). Are you sure you want to proceed?"];
         [ays setAlertStyle:NSWarningAlertStyle];
         [ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-            if (returnCode == 1001)
+            if (returnCode == NSAlertSecondButtonReturn)
             {
                 // Proceed with the cancellation - currentDevicegroup indicates the new device group
 
@@ -3743,7 +3743,7 @@
         [alert addButtonWithTitle:@"Cancel"];
         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
             // If user hits Upload, re-run the method
-            if (returnCode == 1000)
+            if (returnCode == NSAlertFirstButtonReturn)
             {
                 currentDevicegroup.squinted = currentDevicegroup.squinted - 0x08;
                 [self uploadCode:nil];
@@ -5390,16 +5390,26 @@
                     {
                         // TODO - Ask if the user wants to do this as it may already belong to a product
 
-                        [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
+                        NSAlert *alert = [[NSAlert alloc] init];
+                        alert.messageText = @"This project has been updated from an earlier version.";
+                        alert.informativeText = [NSString stringWithFormat:@"You can upload project \"%@\" as a new product, or you may prefer to associate it with an existing product or upload it later. If you see processing errors in the log, you should not upload this project.", currentProject.name];
+                        [alert addButtonWithTitle:@"Upload Now"];
+                        [alert addButtonWithTitle:@"Later"];
+                        [alert setAlertStyle:NSWarningAlertStyle];
+                        [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+                            if (returnCode == NSAlertFirstButtonReturn) {
+                                [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
 
-                        // Run the transfer as a standard upload, though we bypass uploadProject: at first
+                                // Run the transfer as a standard upload, though we bypass uploadProject: at first
 
-                        NSDictionary *dict = @{ @"action" : @"uploadproject",
-                                                @"project" : currentProject };
+                                NSDictionary *dict = @{ @"action" : @"uploadproject",
+                                                        @"project" : currentProject };
 
-                        [ide createProduct:currentProject.name :currentProject.description :dict];
+                                [ide createProduct:currentProject.name :currentProject.description :dict];
 
-                        // Asynchronous pick up in 'createProductStageTwo:' but we continue here
+                                // Asynchronous pick up in 'createProductStageTwo:' but we continue here
+                            }
+                        }];
                     }
                     else
                     {
@@ -5572,7 +5582,7 @@
                         Project *aProject = currentProject;
 
                         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-                            if (returnCode == 1001)
+                            if (returnCode == NSAlertSecondButtonReturn)
                             {
                                 aProject.aid = ide.currentAccount;
                                 aProject.haschanged = YES;
