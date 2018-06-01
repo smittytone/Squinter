@@ -54,6 +54,7 @@
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
 - (Project *)getParentProject:(Devicegroup *)devicegroup;
 - (NSDate *)convertTimestring:(NSString *)dateString;
+- (NSString *)convertDate:(NSDate *)date;
 - (NSString *)formatTimestamp:(NSString *)timestamp;
 - (NSString *)getErrorMessage:(NSUInteger)index;
 - (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces;

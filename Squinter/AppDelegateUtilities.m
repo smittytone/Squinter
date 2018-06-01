@@ -733,6 +733,14 @@
 
 
 
+- (NSString *)convertDate:(NSDate *)date
+{
+    NSString *dateString = [def stringFromDate:date];
+    return dateString;
+}
+
+
+
 - (NSString *)formatTimestamp:(NSString *)timestamp
 {
 	// The input string, which records a date and time, to meet Squinter's requirements
