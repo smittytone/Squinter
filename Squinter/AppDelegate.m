@@ -4177,6 +4177,8 @@
 
 - (IBAction)showTestBlessedDevices:(id)sender
 {
+    // Get and list a pre_production device group's devices
+
     if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
@@ -4208,7 +4210,7 @@
 
     [ide getDevicesWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
-    // Pick up the action at listDevices:
+    // Pick up the action at **listDevices:**
 }
 
 
@@ -8005,23 +8007,40 @@
         return;
     }
 
+    __block NSString *titleString = [NSString stringWithFormat:@"Device group \"%@\" test blessed devices:", devicegroup.name];
+    __block NSString *lineString = @"+-----------------------------------------------------------------------+";
+    __block NSString *headString = @"| Device ID         |  MAC Address        |  Enrolled                   |";
+    __block NSString *midString =  @"+-------------------+---------------------+-----------------------------+";
+
     [extraOpQueue addOperationWithBlock:^(void){
 
-        NSString *headString = [NSString stringWithFormat:@"Device group \"%@\" test blessed devices:", devicegroup.name];
-        NSString *lineString = [@"" stringByPaddingToLength:headString.length withString:@"-" startingAtIndex:0];
         [self performSelectorOnMainThread:@selector(logLogs:)
-                               withObject:[NSString stringWithFormat:@"%@\n%@\nDevice ID         MAC Address", lineString, headString]
+                               withObject:[NSString stringWithFormat:@"\n%@\n%@\n%@\n%@", titleString, lineString, headString, midString]
                             waitUntilDone:NO];
 
         for (NSDictionary *device in devices)
         {
-            NSString *line = [self getValueFrom:device withKey:@"id"];
-            line = [line stringByAppendingFormat:@"  %@", [self getValueFrom:device withKey:@"mac_address"]];
+            NSString *enrolled = @"Unknown                   ";
+            NSDate *enrolDate = [self getValueFrom:device withKey:@"last_enrolled_at"];
+
+            if (enrolDate != nil)
+            {
+                enrolled = [self convertDate:enrolDate];
+                enrolled = [enrolled stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+                enrolled = [enrolled stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+            }
+
+            NSString *line = [NSString stringWithFormat:@"| %@  |  %@  |  %@ |", [self getValueFrom:device withKey:@"id"],
+                              [self getValueFrom:device withKey:@"mac_address"], enrolled];
 
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:line
                                 waitUntilDone:NO];
         }
+
+        [self performSelectorOnMainThread:@selector(logLogs:)
+                               withObject:lineString
+                            waitUntilDone:NO];
     }];
 }
 
@@ -9828,6 +9847,7 @@
         if (addTimestamp)
 		{
             NSString *date = [def stringFromDate:[NSDate date]];
+            date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
             date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
             date = [date stringByAppendingString:@" "];
 
