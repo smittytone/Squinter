@@ -1043,11 +1043,11 @@
 		{
 			if (iLibs.count == 1)
 			{
-				[self writeStringToLog:[NSString stringWithFormat:@"1 Electric Imp library no longer included in this %@ code.", model.type] :YES];
+				[self writeWarningToLog:[NSString stringWithFormat:@"1 Electric Imp library no longer included in this %@ code.", model.type] :YES];
 			}
 			else
 			{
-				[self writeStringToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included in this %@ code.", (long)iLibs.count, model.type] :YES];
+				[self writeWarningToLog:[NSString stringWithFormat:@"%li Electric Imp libraries no longer included in this %@ code.", (long)iLibs.count, model.type] :YES];
 			}
 
 			[iLibs removeAllObjects];
@@ -1097,7 +1097,7 @@
 					{
 						// Names match but the versions don't
 
-						[self writeStringToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", aLib.filename, match, aLib.path] :YES];
+						[self writeWarningToLog:[NSString stringWithFormat:@"Electric Imp library \"%@\" has been changed from version \"%@\" to \"%@\".", aLib.filename, match, aLib.path] :YES];
 					}
 				}
 			}
@@ -1160,7 +1160,7 @@
 				as = rs;
 			}
 
-			if (as.length > 0) [self writeStringToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+			if (as.length > 0) [self writeWarningToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
 		}
 
 		// Now replace the recorded EI library list with the new one from 'foundEILibs'
@@ -1192,11 +1192,11 @@
 		{
 			if (mLibs.count == 1)
 			{
-				[self writeStringToLog:[NSString stringWithFormat:@"1 local library no longer referenced in the %@ code.", model.type] :YES];
+				[self writeWarningToLog:[NSString stringWithFormat:@"1 local library no longer referenced in the %@ code.", model.type] :YES];
 			}
 			else
 			{
-				[self writeStringToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the %@ code.", (long)mLibs.count, model.type] :YES];
+				[self writeWarningToLog:[NSString stringWithFormat:@"%li local libraries no longer referenced in the %@ code.", (long)mLibs.count, model.type] :YES];
 			}
 
 			project.haschanged = YES;
@@ -1219,15 +1219,27 @@
 		{
 			for (File *aLib in foundLibs)
 			{
-				BOOL match = NO;
+				NSString *match = nil;
 
 				for (File *lib in mLibs)
 				{
-					if ([aLib.filename compare:lib.filename] == NSOrderedSame) match = YES;
+					if ([aLib.filename compare:lib.filename] == NSOrderedSame) match = lib.version;
 				}
 
-				if (!match) ++added;
-			}
+                if (match == nil)
+                {
+                    ++added;
+                }
+                else
+                {
+                    if ([match compare:aLib.version] != NSOrderedSame)
+                    {
+                        // Names match but the versions don't
+
+                        [self writeWarningToLog:[NSString stringWithFormat:@"Library \"%@\" has been changed from version %@ to %@.", aLib.filename, match, aLib.version] :YES];
+                    }
+                }
+            }
 
 			for (File *lib in mLibs)
 			{
@@ -1284,7 +1296,7 @@
 				as = rs;
 			}
 
-			if (as.length > 0) [self writeStringToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+			if (as.length > 0) [self writeWarningToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
 		}
 
 		// Now replace the recorded EI library list with the new one from 'foundEILibs'
@@ -1312,11 +1324,11 @@
 		{
 			if (mFiles.count == 1)
 			{
-				[self writeStringToLog:[NSString stringWithFormat:@"1 local file no longer referenced in the %@ code.", model.type] :YES];
+				[self writeWarningToLog:[NSString stringWithFormat:@"1 local file no longer referenced in the %@ code.", model.type] :YES];
 			}
 			else
 			{
-				[self writeStringToLog:[NSString stringWithFormat:@"%li local file no longer referenced in the %@ code.", (long)mFiles.count, model.type] :YES];
+				[self writeWarningToLog:[NSString stringWithFormat:@"%li local file no longer referenced in the %@ code.", (long)mFiles.count, model.type] :YES];
 			}
 
 			project.haschanged = YES;
@@ -1336,14 +1348,26 @@
 		{
 			for (File *aFile in foundFiles)
 			{
-				BOOL match = NO;
+				NSString *match = nil;
 
 				for (File *file in mFiles)
 				{
-					if ([aFile.filename compare:file.filename] == NSOrderedSame) match = YES;
+					if ([aFile.filename compare:file.filename] == NSOrderedSame) match = file.version;
 				}
 
-				if (!match) ++added;
+                if (match == nil)
+                {
+                    ++added;
+                }
+                else
+                {
+                    if ([match compare:aFile.version] != NSOrderedSame)
+                    {
+                        // Names match but the versions don't
+
+                        [self writeWarningToLog:[NSString stringWithFormat:@"File \"%@\" has been changed from version %@ to %@.", aFile.filename, match, aFile.version] :YES];
+                    }
+                }
 			}
 
 			for (File *file in mFiles)
@@ -1401,7 +1425,7 @@
 				as = rs;
 			}
 
-			if (as.length > 0) [self writeStringToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
+			if (as.length > 0) [self writeWarningToLog:[as stringByAppendingFormat:@" the %@ code.", model.type] :YES];
 		}
 
 		// Now replace the recorded EI library list with the new one from 'foundEILibs'
