@@ -1236,7 +1236,10 @@
                     {
                         // Names match but the versions don't
 
-                        [self writeWarningToLog:[NSString stringWithFormat:@"Library \"%@\" has been changed from version %@ to %@.", aLib.filename, match, aLib.version] :YES];
+                        NSString *fromVersion = match.length > 0 ? [@"version " stringByAppendingString:match] : @"no version number";
+                        NSString *toVersion = aLib.version.length > 0 ? [@"version " stringByAppendingString:aLib.version] : @"no version number";
+
+                        [self writeWarningToLog:[NSString stringWithFormat:@"Library \"%@\" has been changed from %@ to %@.", aLib.filename, fromVersion, toVersion] :YES];
                     }
                 }
             }
@@ -1365,7 +1368,10 @@
                     {
                         // Names match but the versions don't
 
-                        [self writeWarningToLog:[NSString stringWithFormat:@"File \"%@\" has been changed from version %@ to %@.", aFile.filename, match, aFile.version] :YES];
+                        NSString *fromVersion = match.length > 0 ? [@"version " stringByAppendingString:match] : @"no version number";
+                        NSString *toVersion = aFile.version.length > 0 ? [@"version " stringByAppendingString:aFile.version] : @"no version number";
+
+                        [self writeWarningToLog:[NSString stringWithFormat:@"File \"%@\" has been changed from %@ to %@.", aFile.filename, fromVersion, toVersion] :YES];
                     }
                 }
 			}
