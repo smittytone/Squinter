@@ -727,6 +727,7 @@
 							newFile.type = @"file";
 							newFile.filename = libName;
 							newFile.path = libPath;
+                            newFile.version = libVer;
 
 							[foundFiles addObject:newFile];
 							[self writeStringToLog:[NSString stringWithFormat:@"Local file \"%@\" found in source.", libName] :YES];
@@ -1469,7 +1470,7 @@
 	if (libcode == nil) return returnString;
 
 	NSError *err;
-	NSString *pattern = @"static *VERSION *= *\"[0-9]*.[0-9]*.[0-9]*\"";
+    NSString *pattern = @"(#|static|const) *VERSION *= *\"[0-9]*.[0-9]*.[0-9]*\"";
 	NSRegularExpressionOptions regexOptions =  NSRegularExpressionCaseInsensitive;
 	NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:regexOptions error:&err];
 	if (err) return returnString;
