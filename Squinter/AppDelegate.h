@@ -578,6 +578,8 @@
 - (void)switchToEditor:(Model *)model;
 - (IBAction)externalLibOpen:(id)sender;
 - (IBAction)externalFileOpen:(id)sender;
+- (void)externalOpenItem:(id)sender :(BOOL)isLibrary;
+- (void)externalOpenItems:(BOOL)areLibraries;
 - (IBAction)externalOpenAll:(id)sender;
 - (IBAction)openAgentURL:(id)sender;
 - (IBAction)showProjectInFinder:(id)sender;
@@ -608,7 +610,8 @@
 - (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive;
 - (void)refreshFilesMenu;
 - (void)fileAdder:(NSMutableArray *)models;
-- (void)addFileToMenu:(NSString *)filename :(BOOL)isActive;
+- (void)addFileToMenu:(File *)file :(BOOL)isActive;
+- (void)addItemToFileMenu:(NSString *)text :(BOOL)isActive;
 - (void)setToolbar;
 
 // About Sheet Methods

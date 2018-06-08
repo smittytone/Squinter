@@ -10211,60 +10211,11 @@
 
     if (sender == externalOpenLibsItem)
     {
-        for (Model *model in currentDevicegroup.models)
-        {
-            if (model.libraries.count > 0)
-            {
-                for (File *lib in model.libraries)
-                {
-                    if (lib.hasMoved)
-                    {
-                        [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Library \"%@\" can't be found it is known location.", model.filename] :YES];
-                    }
-                    else
-                    {
-                        NSString *path = [self getAbsolutePath:currentProject.path :lib.path];
-                        path = [path stringByAppendingFormat:@"/%@", lib.filename];
-                        [nswsw openFile:path];
-
-                        // Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
-
-                        [NSThread sleepForTimeInterval:0.2];
-                    }
-                }
-            }
-        }
+        [self externalOpenItems:YES];
     }
     else
     {
-        NSMenuItem *item = (NSMenuItem *)sender;
-        NSString *name = item.representedObject;
-
-        for (Model *model in currentDevicegroup.models)
-        {
-            if (model.libraries.count > 0)
-            {
-                for (File *lib in model.libraries)
-                {
-                    if ([lib.filename compare:name] == NSOrderedSame)
-                    {
-                        if (lib.hasMoved)
-                        {
-                            [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Library \"%@\" can't be found it is known location.", model.filename] :YES];
-                            return;
-                        }
-                        else
-                        {
-                            NSString *path = [self getAbsolutePath:currentProject.path :lib.path];
-                            path = [path stringByAppendingFormat:@"/%@", lib.filename];
-                            [nswsw openFile:path];
-                        }
-
-                        break;
-                    }
-                }
-            }
-        }
+        [self externalOpenItem:sender :YES];
     }
 }
 
@@ -10276,56 +10227,63 @@
 
     if (sender == externalOpenFileItem)
     {
-        for (Model *model in currentDevicegroup.models)
-        {
-            if (model.files.count > 0)
-            {
-                for (File *file in model.files)
-                {
-                    if (file.hasMoved)
-                    {
-                        [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" can't be found it is known location.", model.filename] :YES];
-                    }
-                    else
-                    {
-                        NSString *path = [self getAbsolutePath:currentProject.path :file.path];
-                        path = [path stringByAppendingFormat:@"/%@", file.filename];
-                        [nswsw openFile:path];
-
-                        // Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
-
-                        [NSThread sleepForTimeInterval:0.2];
-                    }
-                }
-            }
-        }
+        [self externalOpenItems:NO];
     }
     else
     {
-        NSMenuItem *item = (NSMenuItem *)sender;
+        [self externalOpenItem:sender :NO];
+    }
+}
 
-        for (Model *model in currentDevicegroup.models)
+
+
+- (void)externalOpenItem:(id)sender :(BOOL)isLibrary
+{
+    // Opens a file or library from the relevant 'Device Groups' menu submenu
+
+    NSMenuItem *item = (NSMenuItem *)sender;
+    File *file = item.representedObject;
+
+    if (file.hasMoved)
+    {
+        [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] %@ \"%@\" can't be found it is known location.", (isLibrary ? @"Library" : @"File"), file.filename] :YES];
+
+    }
+    else
+    {
+        NSString *path = [self getAbsolutePath:currentProject.path :file.path];
+        path = [path stringByAppendingFormat:@"/%@", file.filename];
+        [nswsw openFile:path];
+    }
+}
+
+
+
+- (void)externalOpenItems:(BOOL)areLibraries
+{
+    // Opens all the files or libraries from the relevant 'Device Groups' menu submenu
+
+    for (Model *model in currentDevicegroup.models)
+    {
+        if (model.files.count > 0)
         {
-            if (model.files.count > 0)
+            NSMutableArray *list = areLibraries ? model.libraries : model.files;
+
+            for (File *file in list)
             {
-                for (File *file in model.files)
+                if (file.hasMoved)
                 {
-                    if ([file.filename compare:item.title] == NSOrderedSame)
-                    {
-                        if (file.hasMoved)
-                        {
-                            [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] File \"%@\" can't be found it is known location.", model.filename] :YES];
+                    [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] %@ \"%@\" can't be found it is known location.", (areLibraries ? @"Library" : @"File"), model.filename] :YES];
+                }
+                else
+                {
+                    NSString *path = [self getAbsolutePath:currentProject.path :file.path];
+                    path = [path stringByAppendingFormat:@"/%@", file.filename];
+                    [nswsw openFile:path];
 
-                        }
-                        else
-                        {
-                            NSString *path = [self getAbsolutePath:currentProject.path :file.path];
-                            path = [path stringByAppendingFormat:@"/%@", file.filename];
-                            [nswsw openFile:path];
-                        }
+                    // Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
 
-                        break;
-                    }
+                    [NSThread sleepForTimeInterval:0.2];
                 }
             }
         }
@@ -11315,7 +11273,7 @@
 
     if (aLibCount > 0)
     {
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Compiled Agent Code";
         item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
         item.enabled = NO;
         [externalLibsMenu addItem:item];
@@ -11337,7 +11295,7 @@
 
         if (aLibCount > 0) [externalLibsMenu addItem:[NSMenuItem separatorItem]];
 
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Compiled Device Code";
         item = [[NSMenuItem alloc] initWithTitle:m action:nil keyEquivalent:@""];
         item.enabled = NO;
         [externalLibsMenu addItem:item];
@@ -11431,14 +11389,17 @@
     if (isEILib)
     {
         item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", lib.version] action:@selector(launchLibsPage) keyEquivalent:@""];
+        item.representedObject = lib;
         [impLibrariesMenu addItem:item];
     }
     else
     {
         if (isActive)
         {
-            item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", ((lib.version.length == 0) ? @"unknown" : lib.version)]  action:@selector(externalLibOpen:) keyEquivalent:@""];
-            item.representedObject = lib.filename;
+            item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", ((lib.version.length == 0) ? @"unknown" : lib.version)]
+                                              action:@selector(externalLibOpen:)
+                                       keyEquivalent:@""];
+            item.representedObject = lib;
         }
         else
         {
@@ -11542,9 +11503,9 @@
 
     if (aFileCount > 0)
     {
-        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Agent Code";
+        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Agent Code" : @"Compiled Agent Code";
 
-        [self addFileToMenu:m :NO];
+        [self addItemToFileMenu:m :NO];
 
         for (Model *model in currentDevicegroup.models)
         {
@@ -11563,9 +11524,9 @@
 
         if (aFileCount > 0) [externalFilesMenu addItem:[NSMenuItem separatorItem]];
 
-        //m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Device Code";
+        m = (currentDevicegroup.squinted == 0) ? @"Uncompiled Device Code" : @"Compiled Device Code";
 
-        [self addFileToMenu:@"Device Code" :NO];
+        [self addItemToFileMenu:m :NO];
 
         for (Model *model in currentDevicegroup.models)
         {
@@ -11578,7 +11539,7 @@
 
     if (dFileCount == 0 && aFileCount == 0)
     {
-        [self addFileToMenu:@"None" :NO];
+        [self addItemToFileMenu:@"None" :NO];
     }
     else
     {
@@ -11620,13 +11581,13 @@
 {
     for (File *file in models)
     {
-        [self addFileToMenu:file.filename :YES];
+        [self addFileToMenu:file :YES];
     }
 }
 
 
 
-- (void)addFileToMenu:(NSString *)filename :(BOOL)isActive
+- (void)addFileToMenu:(File *)file :(BOOL)isActive
 {
     // Adds a model's imported file to the menu list
 
@@ -11634,11 +11595,38 @@
 
     if (isActive)
     {
-        item = [[NSMenuItem alloc] initWithTitle:filename action:@selector(externalFileOpen:) keyEquivalent:@""];
+        NSString *version = @"";
+        if (file.version.length > 0) version = [NSString stringWithFormat:@" (%@)", file.version];
+        item = [[NSMenuItem alloc] initWithTitle:[file.filename stringByAppendingFormat:@"%@", version]
+                                          action:@selector(externalFileOpen:)
+                                   keyEquivalent:@""];
+        item.representedObject = file;
     }
     else
     {
-        item = [[NSMenuItem alloc] initWithTitle:filename action:nil keyEquivalent:@""];
+        item = [[NSMenuItem alloc] initWithTitle:file.filename action:nil keyEquivalent:@""];
+        item.representedObject = file;
+    }
+
+    item.enabled = isActive;
+    [externalFilesMenu addItem:item];
+}
+
+
+
+- (void)addItemToFileMenu:(NSString *)text :(BOOL)isActive
+{
+    // Adds a model's imported file to the menu list
+
+    NSMenuItem *item;
+
+    if (isActive)
+    {
+        item = [[NSMenuItem alloc] initWithTitle:text action:@selector(externalFileOpen:) keyEquivalent:@""];
+    }
+    else
+    {
+        item = [[NSMenuItem alloc] initWithTitle:text action:nil keyEquivalent:@""];
 
     }
 
