@@ -686,7 +686,7 @@
     logFont = [self setLogViewFont:[self getFontName:fontIndex] :fontSize :NO];
 
     [self setToolbar];
-    [_window setTitle:@"Squinter Beta"];
+    //[_window setTitle:@"Squinter Beta"];
     [_window makeKeyAndOrderFront:self];
 
     if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc2.view.window makeKeyAndOrderFront:self];
