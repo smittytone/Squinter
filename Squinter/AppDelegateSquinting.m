@@ -1500,7 +1500,7 @@
 	if (libcode == nil) return returnString;
 
 	NSError *err;
-    NSString *pattern = @"(#|static|const) *VERSION *= *\"[0-9]*.[0-9]*.[0-9]*\"";
+    NSString *pattern = @"(#|static|const) *VERSION *=? *\"[0-9]*.[0-9]*.[0-9]*\"";
 	NSRegularExpressionOptions regexOptions =  NSRegularExpressionCaseInsensitive;
 	NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:regexOptions error:&err];
 	if (err) return returnString;
