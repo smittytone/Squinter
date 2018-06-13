@@ -1564,8 +1564,8 @@
 
 - (IBAction)pickProject:(id)sender
 {
-    // Selecting a project from the 'openProjectsMenu' calls 'chooseProject:' directly because we know
-    // which project was selected. This is called by any click on 'projectsPopup'
+    // This is called by any click on 'projectsPopup'
+    // Selecting a project from the 'openProjectsMenu' calls 'chooseProject:' indirectly via the menu item's target
 
     [self chooseProject:projectsPopUp];
 }
@@ -1648,7 +1648,7 @@
         }
     }
 
-    // Update the save? indicator
+    // Update the save? indicator if the newly selected project needs it
 
     [saveLight needSave:currentProject.haschanged];
 
@@ -1658,26 +1658,53 @@
     {
         if (productsArray.count > 0)
         {
+            BOOL done = NO;
+
             for (NSMenuItem *item in productsMenu.itemArray)
             {
-                // TODO CHECK Do we need to cast item.representedObject
-
-                NSDictionary *product = (NSDictionary *)item.representedObject;
-                NSString *pid = [self getValueFrom:product withKey:@"id"];
-                NSString *anid = currentProject.pid;
-                item.state = NSOffState;
-
-                if ([pid compare:anid] == NSOrderedSame)
+                if (item.representedObject != nil)
                 {
-                    // Call 'chooseProduct:' solely to set the UI
+                    NSDictionary *product = (NSDictionary *)item.representedObject;
+                    NSString *pid = [self getValueFrom:product withKey:@"id"];
 
-                    [self chooseProduct:item];
+                    if (pid != nil && [pid compare:currentProject.pid] == NSOrderedSame)
+                    {
+                        [self chooseProduct:item];
+
+                        break;
+                    }
                 }
+
+                // Look for a submenu - only the 'Products Shared With You' item should have one,
+                // which lists the shared products separately
+
+                if (item.submenu != nil)
+                {
+                    for (NSMenuItem *sitem in item.submenu.itemArray)
+                    {
+                        if (sitem.representedObject != nil)
+                        {
+                            NSDictionary *product = (NSDictionary *)sitem.representedObject;
+                            NSString *pid = [self getValueFrom:product withKey:@"id"];
+
+                            if (pid != nil && [pid compare:currentProject.pid] == NSOrderedSame)
+                            {
+                                [self chooseProduct:sitem];
+
+                                done = YES;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (done) break;
             }
         }
     }
 
     // Update the Menus and the Toolbar (left until now in case models etc are selected)
+    // NOTE previous calls to chooseProduct: will cause the products sub-menu to be updated
 
     [self refreshProjectsMenu];
     [self refreshOpenProjectsMenu];
@@ -2659,16 +2686,20 @@
     // NOTE all products menu items reference their source this way
 
     NSMenuItem *item = (NSMenuItem *)sender;
-    if (item.representedObject != nil) selectedProduct = item.representedObject;
-	
-    // Update the UI:
-    //   The product list sub-menu
-    //   The main Projects menu
-    //   The toobar
-	
-    [self refreshProductsMenu];
-    [self refreshProjectsMenu];
-    [self setToolbar];
+
+    if (item.representedObject != nil && item.representedObject != selectedProduct)
+    {
+        selectedProduct = item.representedObject;
+
+        // Update the UI:
+        //   The product list sub-menu's selection
+        //   The main Projects menu
+        //   The toobar
+
+        [self setProductsMenuTick];
+        [self refreshProjectsMenu];
+        [self setToolbar];
+    }
 }
 
 
@@ -5494,13 +5525,41 @@
 
                                 // Select the product the project is linked to
 
+                                BOOL done = NO;
+
                                 for (NSMenuItem *item in productsMenu.itemArray)
                                 {
-                                    if (product == (NSMutableDictionary *)item.representedObject)
+                                    if (item.representedObject != nil)
                                     {
-                                        [self chooseProduct:item];
-                                        break;
+                                        if (product == (NSMutableDictionary *)item.representedObject)
+                                        {
+                                            [self chooseProduct:item];
+
+                                            break;
+                                        }
                                     }
+
+                                    // Look for a submenu - only the 'Products Shared With You' item should have one,
+                                    // which lists the shared products separately
+
+                                    if (item.submenu != nil)
+                                    {
+                                        for (NSMenuItem *sitem in item.submenu.itemArray)
+                                        {
+                                            if (sitem.representedObject != nil)
+                                            {
+                                                if (product == (NSMutableDictionary *)sitem.representedObject)
+                                                {
+                                                    [self chooseProduct:sitem];
+
+                                                    done = YES;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (done) break;
                                 }
 
                                 break;
@@ -10782,18 +10841,31 @@
     item.representedObject = nil;
     [productsMenu addItem:item];
 
+    [self setProductsMenuTick];
+}
+
+
+
+- (void)setProductsMenuTick
+{
     // Re-select the existing item or select the first on the list
     // NOTE we do this by comparing IDs because the selected product's
     // reference will have changed if the list was updated
+
+    NSMenuItem *item;
 
     if (selectedProduct != nil)
     {
         for (item in productsMenu.itemArray)
         {
-            if (item.representedObject == selectedProduct)
+            item.state = item.representedObject == selectedProduct ? NSOnState : NSOffState;
+
+            if (item.submenu != nil)
             {
-                item.state = NSOnState;
-                break;
+                for (NSMenuItem *sitem in item.submenu.itemArray)
+                {
+                    sitem.state = sitem.representedObject == selectedProduct ? NSOnState : NSOffState;
+                }
             }
         }
     }
@@ -10821,6 +10893,21 @@
                             done = YES;
                             break;
                         }
+
+                        if (item.submenu != nil)
+                        {
+                            for (NSMenuItem *sitem in item.submenu.itemArray)
+                            {
+                                if (sitem.representedObject == product)
+                                {
+                                    sitem.state = NSOnState;
+                                    done = YES;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (done) break;
                     }
                 }
 

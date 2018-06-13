@@ -592,6 +592,7 @@
 - (void)refreshOpenProjectsMenu;
 - (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
 - (void)refreshProductsMenu;
+- (void)setProductsMenuTick;
 - (void)refreshDevicegroupMenu;
 - (void)refreshDevicegroupByType:(NSString *)type;
 - (void)refreshMainDevicegroupsMenu;
