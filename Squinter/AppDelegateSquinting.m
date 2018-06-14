@@ -161,6 +161,10 @@
 		devicegroup.squinted = squinted;
 	}
 
+    // Auto-check EI Libs
+
+    [self checkElectricImpLibs];
+
 	// Update libraries menu with updated list of local, EI libraries and local files
     // TODO Do we need to do this here?
 
