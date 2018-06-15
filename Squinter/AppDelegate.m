@@ -4251,43 +4251,67 @@
 
 - (void)selectDevice
 {
-    // Select the first device in the current device group
+    // Select the first device in the current device group, if we have a list of devices
+    // and we actualy have a current device group. Called to select a device after a
+    // project has been opened, selected or downloaded from a product
+    //
+    // Called from: openSquirrelProject:
+    //              productToProjectStage2:
+    //              chooseProject:
 
     if (currentDevicegroup.devices.count > 0 && devicesArray.count > 0)
     {
-        NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
+        // The current device group should have a list of devices - get the ID of the first one
 
-        // First check by device ID — this is how the data should be stored,
-        // but earlier versions used device name...
-
-        for (NSDictionary *device in devicesArray)
+        if (currentDevicegroup.devices.count > 0)
         {
-            NSString *aDevId = [self getValueFrom:device withKey:@"id"];
+            NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
 
-            if ([aDevId compare:devId] == NSOrderedSame)
+            // First check by device ID — this is how the data should be stored,
+            // but earlier versions used device name...
+
+            for (NSDictionary *device in devicesArray)
             {
-                selectedDevice = (NSMutableDictionary *)device;
-                iwvc.device = selectedDevice;
-                [self refreshDevicesPopup];
-                [self refreshDeviceMenu];
-                return;
+                NSString *aDevId = [self getValueFrom:device withKey:@"id"];
+
+                if ([aDevId compare:devId] == NSOrderedSame)
+                {
+                    selectedDevice = (NSMutableDictionary *)device;
+                    iwvc.device = selectedDevice;
+
+                    [self setDevicesPopupTick];
+                    [self setUnassignedDevicesMenuTick];
+                    [self setDevicesMenusTicks];
+                    [self refreshDeviceMenu];
+
+                    return;
+                }
+            }
+
+            // ...so we also check by device name, just in case
+
+            for (NSDictionary *device in devicesArray)
+            {
+                NSString *aDevId = [self getValueFrom:device withKey:@"name"];
+
+                if ([aDevId compare:devId] == NSOrderedSame)
+                {
+                    selectedDevice = (NSMutableDictionary *)device;
+                    iwvc.device = selectedDevice;
+
+                    [self setDevicesPopupTick];
+                    [self setUnassignedDevicesMenuTick];
+                    [self setDevicesMenusTicks];
+                    [self refreshDeviceMenu];
+
+                    return;
+                }
             }
         }
-
-        // ...so we also check by device name, just in case
-
-        for (NSDictionary *device in devicesArray)
+        else
         {
-            NSString *aDevId = [self getValueFrom:device withKey:@"name"];
-
-            if ([aDevId compare:devId] == NSOrderedSame)
-            {
-                selectedDevice = (NSMutableDictionary *)device;
-                iwvc.device = selectedDevice;
-                [self refreshDevicesPopup];
-                [self refreshDeviceMenu];
-                return;
-            }
+            // TODO Should we load up the devics — or has this been done?
+            //      If already attempted, it might have failed
         }
     }
 }
@@ -4804,68 +4828,69 @@
 - (IBAction)chooseDevice:(id)sender
 {
     // The user has selected a device from one of three places:
-    // - Device PopUp
-    // - Unassigned Devices submenu
-    // - Device Groups submenu
+    //   The Device PopUp
+    //   The 'Device' menu's 'Unassigned Devices' submenu
+    //   The 'Device Groups' menu's 'Project's Device Groups' submenu
 
     NSMenuItem *item;
     BOOL isUnassigned = NO;
-    BOOL isAssigned = NO;
     BOOL isPopup = NO;
 
     if (sender == devicesPopUp)
     {
-        // Device selected from the popup rather than the menu
+        // Device has been selected from the popup rather than the menu
 
+        isPopup = YES;
         item = devicesPopUp.selectedItem;
+
+        // Ignore the selection if it's 'None'
 
         if ([item.title compare:@"None"] == NSOrderedSame)
         {
             item.enabled = NO;
             return;
         }
-
-        selectedDevice = item.representedObject;
-        isPopup = YES;
     }
     else
     {
+        // We may be here from eiter the 'Unassigned Devices' or the 'Project's Device Groups' submenu
+
         item = (NSMenuItem *)sender;
-
-        // We may be here from the Unassigned Device menu or from a Device Groups submenu
-
-        if (item.menu == unassignedDevicesMenu)
-        {
-            isUnassigned = YES;
-        }
-        else
-        {
-            isAssigned = YES;
-        }
-
-        selectedDevice = item.representedObject;
+        isUnassigned = item.menu == unassignedDevicesMenu ? YES : NO;
     }
 
-    // Run through the Device Groups submenus and switch all the entries off
-    // EXCEPT the entry matching 'selectedDevice' IF we came here from this menu
+    // Set the currently selected device to the object the menu item is bound to
 
-    for (NSMenuItem *dgitem in deviceGroupsMenu.itemArray)
+    selectedDevice = item.representedObject;
+
+    if (!isPopup && !isUnassigned)
     {
-        if (dgitem.submenu != nil)
-        {
-            for (NSMenuItem *sitem in dgitem.submenu.itemArray)
-            {
-                sitem.state = NSOffState;
+        // Run through the Device Groups submenus to see if the selected device is not assigned to the
+        // currently selected device group (because we'll now need to select that group)
+        // NOTE But only if we DIDN'T select from the popup or an unassgined device, ie. these controls
+        //      do not force a devicegroup switch
 
-                if (isAssigned || isPopup)
+        for (NSMenuItem *menuitem in deviceGroupsMenu.itemArray)
+        {
+            if (menuitem.submenu != nil)
+            {
+                // The referenced device group has a submenu, ie. it has some assigned devices
+
+                for (NSMenuItem *subMenuItem in menuitem.submenu.itemArray)
                 {
-                    if (sitem.representedObject == selectedDevice)
+                    subMenuItem.state = NSOffState;
+
+                    if (subMenuItem.representedObject == selectedDevice)
                     {
-                        sitem.state = NSOnState;
-                        if (dgitem.representedObject != currentDevicegroup)
+                        if (menuitem.representedObject != currentDevicegroup)
                         {
+                            // We are selecting a new device group by selecting an assigned device
+                            // NOTE This doesn't force a project change because we are only selecting from
+                            //      among one project's device groups and devices
+
                             deviceSelectFlag = YES;
-                            [self chooseDevicegroup:dgitem];
+
+                            [self chooseDevicegroup:menuitem];
                         }
                     }
                 }
@@ -4873,26 +4898,13 @@
         }
     }
 
-    // Run through the Unassigned Devices menu and switch all the entries off
-    // EXCEPT the one matching 'selectedDevice' IF we came here from this menu
+    // Update the UI: First, the device menus tick marks:
 
-    for (NSMenuItem *unitem in unassignedDevicesMenu.itemArray)
-    {
-        unitem.state = NSOffState;
+    if (!isPopup) [self setDevicesPopupTick];
+    if (!isUnassigned) [self setUnassignedDevicesMenuTick];
+    if (isPopup || isUnassigned) [self setDevicesMenusTicks];
 
-        if (isUnassigned || isPopup)
-        {
-            if (unitem.representedObject == selectedDevice)
-            {
-                unitem.state = NSOnState;
-            }
-        }
-    }
-
-    NSInteger index = [devicesArray indexOfObject:selectedDevice];
-    [devicesPopUp selectItemWithTag:index];
-
-    // Update the UI
+    // Update the menus and toolbar
 
     [self refreshDevicegroupMenu];
     [self refreshDeviceMenu];
@@ -4967,41 +4979,58 @@
 
 - (IBAction)streamLogs:(id)sender
 {
+    // Called by the UI in response to user control, to begin streaming logs from the current device
+
+    // Is there a currently selected device? If not, bail
+
     if (selectedDevice == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
+    // We have a selected device
+
     NSString *devid = [self getValueFrom:selectedDevice withKey:@"id"];
     NSString *devname = [self getValueFrom:selectedDevice withKey:@"name"];
 
+    // Is the selected device already being streamed?
+
     if (![ide isDeviceLogging:devid])
     {
+        // No, the device is not in the log stream, so add it
+
         if (ide.numberOfLogStreams == kMaxLogStreamDevices)
         {
+            // We have reached the maximum number of logs per stream, so warn the user
+            // TODO Support multiple streams as one
+
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = @"You are already logging five devices";
-            alert.informativeText = @"The impCentral API only supports logging for up to five devices simultaneously. To stream logs from another device, you will need to stop logging from one of the current streaming devices.";
+            alert.messageText = [NSString stringWithFormat:@"You are already logging %@ devices", kMaxLogStreamDevicesText];
+            alert.informativeText = [NSString stringWithFormat:@"The impCentral API only supports logging for up to %@ devices simultaneously. To stream logs from another device, you will need to stop logging from one of the current streaming devices.", kMaxLogStreamDevicesText];
             [alert addButtonWithTitle:@"OK"];
             [alert beginSheetModalForWindow:_window
-                          completionHandler:^(NSModalResponse response)
-             {
-                 return;
-             }
-             ];
+                          completionHandler:nil];
 
             return;
         }
 
+        // Set the Toolbar Item's state
+
         streamLogsItem.state = 1;
 
+        // Start logging
+
         [ide startLogging:devid :@{ @"device" : selectedDevice }];
+
+        // Set the spacing for the log output so that log messages align after the device name
 
         if (devname.length > logPaddingLength) logPaddingLength = devname.length;
     }
     else
     {
+        // Yes, the device is in the log stream, so remove it
+
         [ide stopLogging:devid];
 
         // Reset the log padding to the longest logging device name
@@ -5019,6 +5048,8 @@
                 if (devname.length > logPaddingLength) logPaddingLength = devname.length;
             }
         }
+
+        // Set the Toolbar Item's state
 
         streamLogsItem.state = 1;
     }
@@ -5817,7 +5848,8 @@
                 currentProject.devicegroupIndex = -1;
             }
 			
-            // Select a device
+            // Select the first device assigned to this project's first device group
+            // NOTE This will update the UI ticks
 			
             [self selectDevice];
 
@@ -5828,6 +5860,7 @@
             [self refreshDevicegroupMenu];
             [self refreshMainDevicegroupsMenu];
             [self refreshDeviceMenu];
+
             [self setToolbar];
 
             // Set the status light - light is YES to be not greyed out; full is YES (solid) or NO (empty)
@@ -8049,6 +8082,8 @@
         [self writeStringToLog:@"List of devices loaded: see 'Current Device' and 'Devices' > 'Unassigned Devices'." :YES];
 
         // Update the UI
+        // NOTE Because we have just updated the device list, we need to refresh it with refreshDevicesPopup and refreshDeviceMenu
+        //      rather than just change the popup's selection
 
         [self refreshDevicesPopup];
         [self refreshDeviceMenu];
@@ -11183,7 +11218,7 @@
 
 - (void)refreshDevicesMenus
 {
-    // Rebuild the various sub-menus of devices assigned to the
+    // Rebuild the various sub-menus listing devices assigned to
     // listed device groups, ie. those belonging to the current project
 
     if (currentProject == nil || currentProject.devicegroups.count == 0)
@@ -11198,7 +11233,9 @@
 
     if (deviceGroupsMenu.numberOfItems > 2)
     {
-        // Remove existing device sub-menus
+        // Remove existing the devices sub-submenus
+        // NOTE The 'deviceGroupsMenu' submenu has at least two non-device group items:
+        //      'Create New Device Group' and a separator item
 
         for (menuItem in deviceGroupsMenu.itemArray)
         {
@@ -11210,14 +11247,16 @@
         }
     }
 
-    // Rebuild the sub-menus
+    // Rebuild the devices sub-sub menus
 
     if (devicesArray.count > 0)
     {
+        // Set through all the known devices and add them to the appropriate sub-submenu
+
         for (NSMutableDictionary *device in devicesArray)
         {
             NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = (NSString *)[dg objectForKey:@"id"];
+            NSString *dgid = [self getValueFrom:dg withKey:@"id"]; // (NSString *)[dg objectForKey:@"id"];
 
             if (dgid != nil)
             {
@@ -11236,7 +11275,7 @@
 
                             if (submenu == nil)
                             {
-                                // If there's no devices submenu, add one
+                                // There's no devices submenu, so add one
 
                                 submenu = [[NSMenu alloc] initWithTitle:adg.name];
                                 item.submenu = submenu;
@@ -11255,6 +11294,9 @@
                             ditem.image = [self menuImage:device];
 
                             break;
+
+                            // TODO We don't check for multiple devices with the same name but different (of course)
+                            //      device IDs — we should sort that out here or (better) when we load the device list
                         }
                     }
                 }
@@ -11277,44 +11319,47 @@
             for (NSMenuItem *ditem in items)
             {
                 [item.submenu addItem:ditem];
-                if (ditem.isHidden) ditem.hidden = NO;
+                if (ditem.isHidden) ditem.hidden = NO; // What's this for?
             }
         }
     }
 
     // Re-select the selected device, if there is one
-    // NOTE the selected device may not be represented here becuase
-    // it's assigned to another device group or is assigned
-    // NOTE A new device group will have no devices, so this won't
-    // select any part of the menu
+
+    [self setDevicesMenusTicks];
+}
+
+
+
+- (void)setDevicesMenusTicks
+{
+    // Run through all of the 'Project's Device Groups' submenu items to find those with
+    // devices sub-submenus. Of those that do, if a listed device matches the currently
+    // selected device, tick it; otherwise untick it (just in case)
 
     if (selectedDevice != nil)
     {
         BOOL flag = NO;
-        NSString *devid = [selectedDevice objectForKey:@"id"];
 
         // For 'deviceGroupsMenu' we have to iterate through any submenus
         // and compare the IDs of the represented device and the selectedDevice
         // as the objects may be identical by value but not by reference
 
-        for (NSMenuItem *item in deviceGroupsMenu.itemArray)
+        for (NSMenuItem *menuItem in deviceGroupsMenu.itemArray)
         {
-            if (item.submenu != nil)
+            if (menuItem.submenu != nil)
             {
-                for (NSMenuItem *sitem in item.submenu.itemArray)
+                for (NSMenuItem *subMenuItem in menuItem.submenu.itemArray)
                 {
-                    NSMutableDictionary *sdict = (NSMutableDictionary *)sitem.representedObject;
-                    NSString *sid = [sdict objectForKey:@"id"];
-
-                    if ([devid compare:sid] == NSOrderedSame)
+                    if (subMenuItem.representedObject == selectedDevice)
                     {
-                        // Set 'selectedDevice' to point at the right object
-
-                        selectedDevice = sdict;
-                        iwvc.device = selectedDevice;
-                        sitem.state = NSOnState;
+                        subMenuItem.state = NSOnState;
                         flag = YES;
                         break;
+                    }
+                    else
+                    {
+                        subMenuItem.state = NSOffState;
                     }
                 }
             }
@@ -11499,67 +11544,19 @@
 }
 
 
+
 - (NSImage *)menuImage:(NSMutableDictionary *)device
 {
-    // Sets a device menu's icon according to the device's connection status
+    // Sets a device's menu and/or popup icon according to the device's connection status
 
-    NSImage *returnImage = nil;
-    NSString *nameString = @"";
-
+    NSString *imageNameString = @"";
     NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
     NSString *dvid = [self getValueFrom:device withKey:@"id"];
 
-    nameString = boolean.boolValue ? @"online" : @"offline";
-    if ([ide isDeviceLogging:dvid]) nameString = [nameString stringByAppendingString:@"_logging"];
+    imageNameString = boolean.boolValue ? @"online" : @"offline";
+    if ([ide isDeviceLogging:dvid]) imageNameString = [imageNameString stringByAppendingString:@"_logging"];
 
-    returnImage = [NSImage imageNamed:nameString];
-    return returnImage;
-}
-
-
-- (NSString *)menuString:(NSMutableDictionary *)device
-{
-    // Creates the status readout that will be added to the device's name in menus
-    // eg. "Action (logging)"
-
-    NSString *statusString = @"";
-    NSString *loggingString = @"";
-    NSString *returnString = @"";
-
-    NSString *dvid = [self getValueFrom:device withKey:@"id"];
-    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
-
-    if (!boolean.boolValue) statusString = @"offline";
-    if ([ide isDeviceLogging:dvid]) loggingString = @"logging";
-
-    // Assemble the menuString, eg.
-    // "(offline)", "(offline, logging)", "(logging)"
-
-    if (loggingString.length > 0 || statusString.length > 0)
-    {
-        // Start with a space and an open bracket
-
-        returnString = @" (";
-
-        // Add in the offline status indicator if there is one
-
-        if (statusString.length > 0) returnString = [returnString stringByAppendingString:statusString];
-
-        // If we are logging too, add that in too, prefixing with a comma and space
-        // if we have already added offline status
-
-        if (loggingString.length > 0)
-        {
-            if (statusString.length > 0) returnString = [returnString stringByAppendingString:@", "];
-            returnString = @" (logging)";
-        }
-
-        // Finish with a close bracket
-
-        returnString = [returnString stringByAppendingString:@")"];
-    }
-
-    return returnString;
+    return [NSImage imageNamed:imageNameString];
 }
 
 
@@ -11728,6 +11725,11 @@
 
 - (void)refreshDeviceMenu
 {
+    // Called to set the state of the main Device Menu
+    // The sub-menu 'Unassigned Devices' is set by refreshDevicesPopup:
+
+    // Title menus according to whether there is a currently selected device or not
+
     if (selectedDevice != nil)
     {
         NSString *dName = [self getValueFrom:selectedDevice withKey:@"name"];
@@ -11742,7 +11744,7 @@
         deleteDeviceMenuItem.title = [NSString stringWithFormat:@"Delete “%@”", dName];
 
         BOOL flag = [ide isDeviceLogging:[selectedDevice objectForKey:@"id"]];
-        streamLogsMenuItem.title = (flag) ? @"Stop Log Streaming" : @"Start Log Streaming";
+        streamLogsMenuItem.title = flag ? @"Stop Log Streaming" : @"Start Log Streaming";
     }
     else
     {
@@ -11757,19 +11759,23 @@
         streamLogsMenuItem.title = @"Start Log Streaming";
     }
 
-    showDeviceInfoMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    restartDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    copyAgentURLMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    openAgentURLMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    unassignDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    getLogsMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    getHistoryMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    streamLogsMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    deleteDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-	
-    unassignDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
-    renameDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
-    assignDeviceMenuItem.enabled = (devicesArray.count > 0 && projectArray.count > 0) ? YES : NO;
+    // Title menus according to whether there is a currently selected device or not
+
+    showDeviceInfoMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    restartDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    copyAgentURLMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    openAgentURLMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    unassignDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    getLogsMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    getHistoryMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    streamLogsMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    deleteDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
+
+    // Title menus according to whether there is a loaded list of devices or not
+
+    unassignDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
+    renameDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
+    assignDeviceMenuItem.enabled = devicesArray.count > 0 && projectArray.count > 0 ? YES : NO;
 }
 
 
@@ -11788,6 +11794,9 @@
     {
         for (NSUInteger i = 0 ; i < devicesArray.count ; ++i)
         {
+            // For each device in the list, set the popup with its name and appropriate graphics
+            // for its connectivity state and its logging state (via menuImage:)
+
             NSMutableDictionary *device = [devicesArray objectAtIndex:i];
             NSString *dvName = [self getValueFrom:device withKey:@"name"];
             [devicesPopUp addItemWithTitle:dvName];
@@ -11810,6 +11819,22 @@
         item.enabled = NO;
     }
 
+    // Show the device selection in the UI
+
+    [self setDevicesPopupTick];
+
+    // Update the list of unassigned devices - this only happens here
+
+    [self refreshUnassignedDevicesMenu];
+}
+
+
+
+- (void)setDevicesPopupTick
+{
+    // Mark the device on the popup which has been selected
+    // Or the select the first on the list if there is not selected device yet
+
     if (selectedDevice != nil)
     {
         // Select the correct pop-up item
@@ -11819,83 +11844,101 @@
     }
     else
     {
-        // Select the first device on the list - if there is a list
+        // Select the first device on the list - but only if there is a list
 
         if (devicesArray.count > 0)
         {
             [devicesPopUp selectItemAtIndex:0];
-                selectedDevice = [devicesArray objectAtIndex:0];
+            selectedDevice = [devicesArray objectAtIndex:0];
+
+            // Also show the device in the Inspector
+
             iwvc.device = selectedDevice;
         }
     }
-
-    // Update the list of unassigned devices - this only happens here
-
-    [self refreshUnassignedDevicesMenu];
 }
 
 
 
 - (void)refreshUnassignedDevicesMenu
 {
-    // Rebuild the various sub-menus of development devices assigned to the
-    // listed device groups, ie. those belonging to the current project
+    // Rebuild the Devices menu's sub-menu listing unassigned devices
 
-    // NOTE 'refreshDevicesPopup:' handles the 'no devices' warning
-
-    // NOTE #2 This should ALWAYS be called after 'refreshDevicesPopup:' — it is called by 'refreshDevicesPopup:'
+    // NOTE This should ALWAYS be called after 'refreshDevicesPopup:'
+    //      Indeed, it is ONLY called by 'refreshDevicesPopup:'
 
     [unassignedDevicesMenu removeAllItems];
 
-    NSMutableArray *items = nil;
-    NSMutableArray *repos = nil;
+    NSMutableArray *unnassignedDevices = nil;
+    NSMutableArray *representedObjects = nil;
+
+    // Determine which devices we know about (ie. we have a downloaded list) are unassigned
 
     if (devicesArray.count > 0)
     {
-        // Only proceed if we have a list of devices for this account
-
         for (NSMutableDictionary *device in devicesArray)
         {
+            // Run through the list of devices and find those what are unassigned, ie. have no device group ID
+
             NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = [dg objectForKey:@"id"];
             NSString *dvName = [self getValueFrom:device withKey:@"name"];
+            NSString *dgid = [dg objectForKey:@"id"];
+            dgid = [self checkForNull:dgid];
 
-            if (dgid == nil || ((NSNull *)dgid == [NSNull null]))
+            if (dgid == nil)
             {
-                // If there is no device group ID, so the device must be unassigned
+                // If there is no device group ID, the device must be unassigned
 
-                if (items == nil) items = [[NSMutableArray alloc] init];
-                if (repos == nil) repos = [[NSMutableArray alloc] init];
+                if (unnassignedDevices == nil) unnassignedDevices = [[NSMutableArray alloc] init];
+                if (representedObjects == nil) representedObjects = [[NSMutableArray alloc] init];
 
-                [items addObject:dvName];
-                [repos addObject:device];
+                [unnassignedDevices addObject:dvName];
+                [representedObjects addObject:device];
             }
         }
     }
 
-    if (items.count > 0)
+    if (unnassignedDevices != nil && unnassignedDevices.count > 0)
     {
-        // Populate the menu
+        // Populate the submenu
 
-        for (NSUInteger i = 0 ; i < items.count ; ++i)
+        for (NSUInteger i = 0 ; i < unnassignedDevices.count ; ++i)
         {
-            NSString *device = [items objectAtIndex:i];
-            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:device action:@selector(chooseDevice:) keyEquivalent:@""];
+            // For each unassigned device, add its name to the menu and add an approrpriate
+            // graphic indicating its connection state and its logging state (via 'menuImage:)
+            // We also bind the submenu item to the device in the devices array it represents
 
-            NSMutableDictionary *rep = [repos objectAtIndex:i];
-            item.representedObject = rep;
-            item.state = (selectedDevice == rep) ? NSOnState : NSOffState;
-            item.image = [self menuImage:rep];
+            NSString *device = [unnassignedDevices objectAtIndex:i];
+            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:device action:@selector(chooseDevice:) keyEquivalent:@""];
+            NSMutableDictionary *representedObject = [representedObjects objectAtIndex:i];
+            item.representedObject = representedObject;
+            item.state = selectedDevice == representedObject ? NSOnState : NSOffState;
+            item.image = [self menuImage:representedObject];
             [unassignedDevicesMenu addItem:item];
         }
     }
     else
     {
-        // No unassigned devices, so add 'None'
+        // There are no unassigned devices, so add 'None'
 
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
         item.enabled = NO;
         [unassignedDevicesMenu addItem:item];
+    }
+
+    [self setUnassignedDevicesMenuTick];
+}
+
+
+
+- (void)setUnassignedDevicesMenuTick
+{
+    // Run through the 'Unassigned Devices' submenu and switch all the entries off
+    // EXCEPT the one matching 'selectedDevice'
+
+    for (NSMenuItem *unassignedDeviceitem in unassignedDevicesMenu.itemArray)
+    {
+        unassignedDeviceitem.state = (selectedDevice != nil && unassignedDeviceitem.representedObject == selectedDevice) ? NSOnState : NSOffState;
     }
 }
 

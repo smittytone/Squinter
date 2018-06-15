@@ -35,6 +35,7 @@
 #define kAllLogs                            0
 #define kStreamLogs                         -1
 #define kMaxLogStreamDevices                8
+#define kMaxLogStreamDevicesText            @"eight"
 #define kMaxLogStreams                      8
 
 #define kOfflineTag                         @" (offline)"

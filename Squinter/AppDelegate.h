@@ -380,11 +380,13 @@
 
 - (void)dockMenuAction:(id)sender;
 
+
 // Inspector Methods
 
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showProjectInspector:(id)sender;
 - (IBAction)showDeviceInspector:(id)sender;
+
 
 // Login Methods
 
@@ -399,6 +401,7 @@
 - (IBAction)setSecureEntry:(id)sender;
 - (IBAction)switchAccount:(id)sender;
 - (IBAction)signup:(id)sender;
+
 
 // New Project Methods
 
@@ -427,6 +430,7 @@
 - (IBAction)clearRecent:(id)sender;
 - (void)addToRecentMenu:(NSString *)filename :(NSString *)path;
 
+
 // Product Methods
 
 - (void)chooseProduct:(id)sender;
@@ -434,6 +438,7 @@
 - (IBAction)deleteProduct:(id)sender;
 - (IBAction)downloadProduct:(id)sender;
 - (IBAction)linkProjectToProduct:(id)sender;
+
 
 // New Device Group Mehods
 
@@ -463,6 +468,7 @@
 - (IBAction)chooseProductionTarget:(id)sender;
 - (IBAction)showTestBlessedDevices:(id)sender;
 
+
 // Existing Device Methods
 
 - (void)selectDevice;
@@ -483,6 +489,7 @@
 - (IBAction)getLogs:(id)sender;
 - (IBAction)streamLogs:(id)sender;
 
+
 // File Location and Opening Methods
 
 - (void)presentOpenFilePanel:(NSInteger)openActionType;
@@ -501,6 +508,7 @@
 - (IBAction)cancelSourceTypeSheet:(id)sender;
 - (void)processAddedFilesStageTwo:(NSMutableArray *)urls :(NSString *)fileType;
 
+
 // Save Project Methods
 
 - (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName;
@@ -512,9 +520,11 @@
 - (void)saveModelFiles:(Project *)project;
 - (void)saveFiles:(NSMutableArray *)files;
 
+
 // Squint Methods
 
 - (IBAction)squint:(id)sender;
+
 
 // BuildAPIAccess Response Handler Methods
 
@@ -540,6 +550,7 @@
 - (void)renameDeviceStageTwo:(NSNotification *)note;
 - (void)deleteDeviceStageTwo:(NSNotification *)note;
 - (void)loggedIn:(NSNotification *)note;
+
 
 // Log and Logging Methods
 
@@ -572,6 +583,7 @@
 - (void)writeStreamToLog:(NSAttributedString *)string;
 - (void)displayError:(NSNotification *)note;
 
+
 // External Editor Methods
 
 - (IBAction)externalOpen:(id)sender;
@@ -586,26 +598,22 @@
 - (IBAction)showModelFilesInFinder:(id)sender;
 - (void)launchLibsPage;
 
-// UI Update Methods
 
+// UI Update Methods
+// Projects menu
 - (void)refreshProjectsMenu;
 - (void)refreshOpenProjectsMenu;
 - (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
 - (void)refreshProductsMenu;
 - (void)setProductsMenuTick;
+
+// Device Groups menu
 - (void)refreshDevicegroupMenu;
 - (void)refreshDevicegroupByType:(NSString *)type;
 - (void)refreshMainDevicegroupsMenu;
 - (void)defaultExternalMenus;
 - (void)refreshDevicesMenus;
-- (void)refreshDeviceMenu;
-- (void)refreshDevicesPopup;
-- (NSImage *)menuImage:(NSMutableDictionary *)device;
-- (NSString *)menuString:(NSMutableDictionary *)device;
-- (void)refreshUnassignedDevicesMenu;
-- (void)refreshViewMenu;
-- (void)refreshRecentFilesMenu;
-- (IBAction)showHideToolbar:(id)sender;
+- (void)setDevicesMenusTicks;
 - (void)refreshLibraryMenus;
 - (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib;
 - (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive;
@@ -613,7 +621,24 @@
 - (void)fileAdder:(NSMutableArray *)models;
 - (void)addFileToMenu:(File *)file :(BOOL)isActive;
 - (void)addItemToFileMenu:(NSString *)text :(BOOL)isActive;
+
+// Device menu
+- (void)refreshDeviceMenu;
+- (void)refreshDevicesPopup;
+- (void)setDevicesPopupTick;
+- (NSImage *)menuImage:(NSMutableDictionary *)device;
+- (NSString *)menuString:(NSMutableDictionary *)device;
+- (void)refreshUnassignedDevicesMenu;
+- (void)setUnassignedDevicesMenuTick;
+
+// View menu
+- (void)refreshViewMenu;
+- (void)refreshRecentFilesMenu;
+- (IBAction)showHideToolbar:(id)sender;
+
+// Toolbar
 - (void)setToolbar;
+
 
 // About Sheet Methods
 
@@ -621,9 +646,11 @@
 - (IBAction)viewSquinterSite:(id)sender;
 - (IBAction)closeAboutSheet:(id)sender;
 
+
 // Help Menu Methods
 
 - (IBAction)showAuthor:(id)sender;
+
 
 // Preferences Sheet Methods
 
@@ -633,17 +660,20 @@
 - (IBAction)setPrefs:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;
 
+
 // Check Electric Imp Libraries Methods
 
 - (IBAction)checkElectricImpLibraries:(id)sender;
 - (void)checkElectricImpLibs;
 - (void)compareElectricImpLibs;
 
+
 // Pasteboard Methods
 
 - (IBAction)copyDeviceCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentURL:(id)sender;
+
 
 // File Watching Methods
 
