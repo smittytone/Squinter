@@ -50,6 +50,7 @@
 // Utility Methods
 
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;
+- (id)checkForNull:(id)value;
 - (void)updateDevicegroup:(Devicegroup	 *)devicegroup;
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
 - (Project *)getParentProject:(Devicegroup *)devicegroup;

@@ -507,7 +507,7 @@
 {
     // Computer is about to sleep, so quickly
     
-    [self writeStringToLog:@"Device sleeping..." :YES];
+    [self writeStringToLog:@"Device sleeping - closing connections..." :YES];
 
     if (ide.isLoggedIn)
     {
@@ -557,15 +557,15 @@
     if ([key compare:@"name"] == NSOrderedSame)
     {
         NSString *name = [apiDict valueForKeyPath:@"attributes.name"];
-        if ((NSNull *)name == [NSNull null]) return nil;
-        return name;
+        //if ((NSNull *)name == [NSNull null]) return nil;
+        return [self checkForNull:name];
     }
 
     if ([key compare:@"description"] == NSOrderedSame)
     {
         NSString *desc = [apiDict valueForKeyPath:@"attributes.description"];
-        if ((NSNull *)desc == [NSNull null]) return nil;
-        return desc;
+        //if ((NSNull *)desc == [NSNull null]) return nil;
+        return [self checkForNull:desc];
     }
 
     // Attributes Device properties
@@ -576,21 +576,21 @@
     if ([key compare:@"agent_id"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.agent_id"];
     if ([key compare:@"agent_running"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.agent_running"] boolValue]];
     if ([key compare:@"swversion"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.swversion"];
-
 	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
 
 	if ([key compare:@"ip_address"] == NSOrderedSame)
 	{
 		NSString *ip = [apiDict valueForKeyPath:@"attributes.ip_address"];
-		if ((NSNull *)ip == [NSNull null]) return nil;
-		return ip;
+		//if ((NSNull *)ip == [NSNull null]) return nil;
+		return [self checkForNull:ip];
 	}
 
 	if ([key compare:@"last_enrolled_at"] == NSOrderedSame)
 	{
 		NSString *date = [apiDict valueForKeyPath:@"attributes.last_enrolled_at"];
-		if ((NSNull *)date == [NSNull null]) return nil;
-		return [self convertTimestring:date];
+		//if ((NSNull *)date == [NSNull null]) return nil;
+        date = [self checkForNull:date];
+        return [self convertTimestring:date];
 	}
 
     // Attributes Deployment properties - non-nullable
@@ -603,47 +603,47 @@
     if ([key compare:@"agent_code"] == NSOrderedSame)
     {
         NSString *ac = [apiDict valueForKeyPath:@"attributes.agent_code"];
-        if ((NSNull *)ac == [NSNull null]) return nil;
-        return ac;
+        //if ((NSNull *)ac == [NSNull null]) return nil;
+        return [self checkForNull:ac];
     }
 
     if ([key compare:@"device_code"] == NSOrderedSame)
     {
         NSString *dc = [apiDict valueForKeyPath:@"attributes.device_code"];
-        if ((NSNull *)dc == [NSNull null]) return nil;
-        return dc;
+        //if ((NSNull *)dc == [NSNull null]) return nil;
+        return [self checkForNull:dc];
     }
 
     if ([key compare:@"origin"] == NSOrderedSame)
     {
         NSString *or = [apiDict valueForKeyPath:@"attributes.origin"];
-        if ((NSNull *)or == [NSNull null]) return nil;
-        return or;
+        //if ((NSNull *)or == [NSNull null]) return nil;
+        return [self checkForNull:or];
     }
 
     if ([key compare:@"tags"] == NSOrderedSame)
     {
         NSArray *tags = [apiDict valueForKeyPath:@"attributes.tags"];
-        if ((NSNull *)tags == [NSNull null]) return nil;
-        return tags;
+        //if ((NSNull *)tags == [NSNull null]) return nil;
+        return [self checkForNull:tags];
     }
 
 	if ([key compare:@"free_memory"] == NSOrderedSame) {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.free_memory"];
-		if ((NSNull *)num == [NSNull null]) return nil;
-		return num;
+		//if ((NSNull *)num == [NSNull null]) return nil;
+		return [self checkForNull:num];
 	}
 
 	if ([key compare:@"rssi"] == NSOrderedSame) {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.rssi"];
-		if ((NSNull *)num == [NSNull null]) return nil;
-		return num;
+		//if ((NSNull *)num == [NSNull null]) return nil;
+		return [self checkForNull:num];
 	}
 
 	if ([key compare:@"plan_id"] == NSOrderedSame) {
 		NSString *plan = [apiDict valueForKeyPath:@"plan_id"];
-		if ((NSNull *)plan == [NSNull null]) return nil;
-		return plan;
+		//if ((NSNull *)plan == [NSNull null]) return nil;
+		return [self checkForNull:plan];
 	}
 
     // Relationships properties
@@ -655,8 +655,15 @@
     if ([key compare:@"min_supported_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.min_supported_deployment"];
 	if ([key compare:@"current_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.current_deployment"];
 
-    if ((NSNull *)rd == [NSNull null]) return nil;
-    return rd;
+    //if ((NSNull *)rd == [NSNull null]) return nil;
+    return [self checkForNull:rd];
+}
+
+
+
+- (id)checkForNull:(id)value
+{
+    return ((NSNull *)value == [NSNull null] ? nil : value);
 }
 
 
