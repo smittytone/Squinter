@@ -627,7 +627,6 @@
 - (void)refreshDevicesPopup;
 - (void)setDevicesPopupTick;
 - (NSImage *)menuImage:(NSMutableDictionary *)device;
-- (NSString *)menuString:(NSMutableDictionary *)device;
 - (void)refreshUnassignedDevicesMenu;
 - (void)setUnassignedDevicesMenuTick;
 
