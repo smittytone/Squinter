@@ -356,7 +356,7 @@
                             [NSNumber numberWithFloat:0.0],
                             [NSNumber numberWithFloat:0.6],
                             [NSNumber numberWithBool:NO],
-                            [NSString stringWithString:NSStringFromRect(iwvc2.view.window.frame)],
+                            [NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)],
                             [NSNumber numberWithBool:NO], nil];
 
     // Drop the arrays into the Defauts
@@ -394,12 +394,12 @@
     {
         NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
         NSRect nuRect = NSRectFromString(frameString);
-        [iwvc2.view.window setFrame:nuRect display:NO];
+        [iwvc.view.window setFrame:nuRect display:NO];
     }
     else
     {
-        iwvc2.mainWindowFrame = _window.frame;
-        [iwvc2 positionWindow];
+        iwvc.mainWindowFrame = _window.frame;
+        [iwvc positionWindow];
     }
 
     // Set the Log TextView's font
@@ -689,7 +689,7 @@
     //[_window setTitle:@"Squinter Beta"];
     [_window makeKeyAndOrderFront:self];
 
-    if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc2.view.window makeKeyAndOrderFront:self];
+    if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:self];
 
     // Check for updates if that is requested
 
@@ -794,7 +794,7 @@
 
     [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
     [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
-    if (iwvc2.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc2.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
+    if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
     [defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
     // Stop watching for notifications
@@ -924,27 +924,27 @@
     // Show the Inspector if it's closed
     // If the Inspector is obscured by the main window, or not key, bring it forward
     
-    [iwvc2.view.window makeKeyAndOrderFront:self];
+    [iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
 
 - (IBAction)showProjectInspector:(id)sender
 {
-    if (currentProject != nil) iwvc2.project = currentProject;
+    if (currentProject != nil) iwvc.project = currentProject;
     
-    [iwvc2 setTab:kInspectorTabProject];
-    [iwvc2.view.window makeKeyAndOrderFront:self];
+    [iwvc setTab:kInspectorTabProject];
+    [iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
 
 - (IBAction)showDeviceInspector:(id)sender
 {
-    if (selectedDevice != nil) iwvc2.device = selectedDevice;
+    if (selectedDevice != nil) iwvc.device = selectedDevice;
     
-    [iwvc2 setTab:kInspectorTabDevice];
-    [iwvc2.view.window makeKeyAndOrderFront:self];
+    [iwvc setTab:kInspectorTabDevice];
+    [iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -1018,7 +1018,7 @@
     selectedProduct = nil;
 
     selectedDevice = nil;
-    iwvc2.device = nil;
+    iwvc.device = nil;
     
     // Stop auto-updating account devices' status
     
@@ -1522,7 +1522,7 @@
     [self refreshProjectsMenu];
     [self setToolbar];
 
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
 
     // Mark the status light as empty, ie. in need of saving
 
@@ -1714,7 +1714,7 @@
 	
     // Set the inspector
 	
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
 }
 
 
@@ -1891,7 +1891,7 @@
     [self refreshDevicegroupMenu];
     [self setToolbar];
 
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
 }
 
 
@@ -3280,7 +3280,7 @@
 
         // Update the inspector, if required
 
-        if (iwvc2.tabIndex == kInspectorTabProject) iwvc2.project = currentProject;
+        if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
 
         // Create the new device group's files as requested
 
@@ -4267,7 +4267,7 @@
             if ([aDevId compare:devId] == NSOrderedSame)
             {
                 selectedDevice = (NSMutableDictionary *)device;
-                iwvc2.device = selectedDevice;
+                iwvc.device = selectedDevice;
                 [self refreshDevicesPopup];
                 [self refreshDeviceMenu];
                 return;
@@ -4283,7 +4283,7 @@
             if ([aDevId compare:devId] == NSOrderedSame)
             {
                 selectedDevice = (NSMutableDictionary *)device;
-                iwvc2.device = selectedDevice;
+                iwvc.device = selectedDevice;
                 [self refreshDevicesPopup];
                 [self refreshDeviceMenu];
                 return;
@@ -4898,7 +4898,7 @@
     [self refreshDeviceMenu];
     [self setToolbar];
 
-    iwvc2.device = selectedDevice;
+    iwvc.device = selectedDevice;
 }
 
 
@@ -5841,7 +5841,7 @@
 
             // Update the Inspector
 
-            iwvc2.project = currentProject;
+            iwvc.project = currentProject;
         }
     }
     else
@@ -6751,7 +6751,7 @@
 
     [projectArray addObject:project];
 
-    iwvc2.project = project;
+    iwvc.project = project;
     currentProject = project;
 
     // Set the current device group to the first on the list of the project's
@@ -8056,7 +8056,7 @@
         [self setToolbar];
 
         // Update the Inspector
-        iwvc2.devices = devicesArray;
+        iwvc.devices = devicesArray;
     }
     else
     {
@@ -8244,7 +8244,7 @@
 
                 // Update the inspector, if required
 
-                if (iwvc2.tabIndex == kInspectorTabProject) iwvc2.project = currentProject;
+                if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
             }
 
             // Now we can produce the source code file, as the user requested
@@ -8450,7 +8450,7 @@
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
 
     selectedDevice = nil;
-    iwvc2.device = nil;
+    iwvc.device = nil;
 
     // Now refresh the devices list
 
@@ -8474,7 +8474,7 @@
     if (selectedDevice == device)
     {
         selectedDevice = nil;
-        iwvc2.device = nil;
+        iwvc.device = nil;
     }
 
     // Now refresh the devices list
@@ -10998,7 +10998,7 @@
 
     [self refreshDevicesMenus];
 
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
 }
 
 
@@ -11311,7 +11311,7 @@
                         // Set 'selectedDevice' to point at the right object
 
                         selectedDevice = sdict;
-                        iwvc2.device = selectedDevice;
+                        iwvc.device = selectedDevice;
                         sitem.state = NSOnState;
                         flag = YES;
                         break;
@@ -11825,7 +11825,7 @@
         {
             [devicesPopUp selectItemAtIndex:0];
                 selectedDevice = [devicesArray objectAtIndex:0];
-            iwvc2.device = selectedDevice;
+            iwvc.device = selectedDevice;
         }
     }
 

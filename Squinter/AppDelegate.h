@@ -314,7 +314,7 @@
 
 	// Inspector Panel
 
-	IBOutlet InspectorWindow2ViewController *iwvc2;
+	IBOutlet InspectorWindow2ViewController *iwvc;
 
     // Connection Variables
 
