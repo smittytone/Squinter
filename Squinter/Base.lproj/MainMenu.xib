@@ -87,7 +87,7 @@
                 <outlet property="impLibrariesMenu" destination="siM-Mq-fJp" id="oBR-za-vPG"/>
                 <outlet property="infoItem" destination="5z3-es-brQ" id="1Fd-Wj-L65"/>
                 <outlet property="inspectorItem" destination="3Qg-aT-d3K" id="4ME-hb-a90"/>
-                <outlet property="iwvc2" destination="Jc5-83-wpp" id="N09-Xy-LVY"/>
+                <outlet property="iwvc" destination="Jc5-83-wpp" id="gIf-yD-6z6"/>
                 <outlet property="linkProductMenuItem" destination="7Yw-EV-inT" id="IUI-Rs-fLh"/>
                 <outlet property="listCommitsItem" destination="Z6i-XT-ijk" id="per-O5-Bag"/>
                 <outlet property="listCommitsMenuItem" destination="8zD-er-ik6" id="Tui-r3-0FI"/>
@@ -1691,7 +1691,7 @@ Gw
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="1" id="evn-9T-0q2">
-                                <view key="view" id="dVn-Xe-jNr">
+                                <view key="view" ambiguous="YES" id="dVn-Xe-jNr">
                                     <rect key="frame" x="10" y="33" width="129" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1857,7 +1857,7 @@ Gw
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Log" identifier="2" id="Y7C-jA-NpV">
-                                <view key="view" ambiguous="YES" id="NBx-iW-M9L">
+                                <view key="view" id="NBx-iW-M9L">
                                     <rect key="frame" x="10" y="33" width="566" height="331"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -4051,7 +4051,7 @@ Gw
                         <rect key="frame" x="0.0" y="0.0" width="340" height="474"/>
                         <clipView key="contentView" drawsBackground="NO" id="EfT-Sg-QuC">
                             <rect key="frame" x="0.0" y="0.0" width="340" height="474"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="14" outlineTableColumn="hFO-tg-8AA" id="h7b-hJ-8PD">
                                     <rect key="frame" x="0.0" y="0.0" width="340" height="474"/>
