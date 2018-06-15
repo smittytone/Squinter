@@ -10543,7 +10543,8 @@
 - (void)refreshOpenProjectsMenu
 {
     // This method manages the Open projects submenu of the Projects menu
-    // It also handles the Projects Popup
+    // It also handles the Projects Popup, which is dynamically titled so we need to
+    // rebuild the lot each time
 
     [openProjectsMenu removeAllItems];
     [projectsPopUp removeAllItems];
