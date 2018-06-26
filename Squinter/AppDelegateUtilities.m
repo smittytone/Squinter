@@ -293,6 +293,95 @@
 
 
 
+#pragma mark - File Watch Methods
+
+
+- (BOOL)checkAndWatchFile:(NSString *)filePath
+{
+    // This method takes an ABSOLUTE file path and checks first that the file exists at that path
+    // If if doesn't, it returns NO, otherwise it attempts to add the file to the watch queue, in
+    // which case it returns YES
+
+    if (filePath == nil || filePath.length == 0) return NO;
+
+    BOOL result = [nsfm fileExistsAtPath:filePath];
+
+    if (result)
+    {
+        // Instantiate the file watch queue if it hasn't been instantiated already
+
+        if (fileWatchQueue == nil)
+        {
+            fileWatchQueue = [[VDKQueue alloc] init];
+            [fileWatchQueue setDelegate:self];
+        }
+
+        // Add the file to the queue
+
+        [fileWatchQueue addPath:filePath
+                 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
+    }
+
+    return result;
+}
+
+
+
+- (void)watchfiles:(Project *)project
+{
+    // Work throgh project's files and add them to the file watch queue
+    // This is usually called only after opening an existing project
+
+    NSString *aPath = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
+    BOOL wasAdded = [self checkAndWatchFile:aPath];
+
+    if (project.devicegroups.count > 0)
+    {
+        // The project contains one or more deviece groups so run through them
+        // and add their component files to the watch queue
+
+        for (Devicegroup *devicegroup in project.devicegroups)
+        {
+            if (devicegroup.models.count > 0)
+            {
+                // The device group contains one or more models (code representation objects)
+
+                for (Model *model in devicegroup.models)
+                {
+                    aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", model.path, model.filename]];
+                    wasAdded = [self checkAndWatchFile:aPath];
+
+                    if (model.libraries.count > 0)
+                    {
+                        // The model code references one or more imported libraries
+
+                        for (File *library in model.libraries)
+                        {
+                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", library.path, library.filename]];
+                            wasAdded = [self checkAndWatchFile:aPath];
+                        }
+                    }
+
+                    if (model.files.count > 0)
+                    {
+                        // The model code references one or more imported files
+
+                        for (File *file in model.files)
+                        {
+                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", file.path, file.filename]];
+                            wasAdded = [self checkAndWatchFile:aPath];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (!wasAdded) NSLog(@"Some files couldn't be added");
+}
+
+
+
 #pragma mark - Boookmark Methods
 
 

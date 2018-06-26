@@ -20,6 +20,11 @@
 - (NSData *)bookmarkForURL:(NSURL *)url;
 - (NSURL *)urlForBookmark:(NSData *)bookmark;
 
+// File Watch Methods
+
+- (BOOL)checkAndWatchFile:(NSString *)filePath;
+- (void)watchfiles:(Project *)project;
+
 // Progress Indicator Methods
 
 - (void)startProgress;
