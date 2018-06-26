@@ -45,6 +45,7 @@
 
     currentProject = nil;
     currentDevicegroup = nil;
+    eiDeviceGroup = nil;
     selectedProduct = nil;
     selectedDevice = nil;
     projectArray = nil;
@@ -3487,6 +3488,10 @@
 
         if (currentDevicegroup.models == nil) currentDevicegroup.models = [[NSMutableArray alloc] init];
 
+        // Watch the new file
+
+        BOOL added = [self checkAndWatchFile:savePath];
+
         if (action == kActionNewDGBothFiles)
         {
             // We have just written the agent code file, so now go and write the device file in the same place
@@ -3520,6 +3525,8 @@
 
             [self refreshMainDevicegroupsMenu];
         }
+
+        if (!added) NSLog(@"Some files couldn't be added");
     }
     else
     {
@@ -5786,7 +5793,7 @@
 #endif
                                 // Check that the file is where we think it is
 
-                                result = [self checkFile:modelAbsPath];
+                                result = [self checkAndWatchFile:modelAbsPath];
                                 modelAbsPath = [modelAbsPath stringByDeletingLastPathComponent];
 
                                 if (!result)
@@ -5918,7 +5925,7 @@
     NSLog(@"%@ Abs: %@", type, fileAbsPath);
 #endif
 
-    BOOL result = [self checkFile:fileAbsPath];
+    BOOL result = [self checkAndWatchFile:fileAbsPath];
     fileAbsPath = [fileAbsPath stringByDeletingLastPathComponent];
 
     if (!result)
@@ -5952,56 +5959,6 @@
     }
 }
 
-
-
-- (void)watchfiles:(Project *)project
-{
-    // Work throgh project's files and add them to the queue
-
-    if (fileWatchQueue == nil)
-    {
-        fileWatchQueue = [[VDKQueue alloc] init];
-        [fileWatchQueue setDelegate:self];
-    }
-
-    NSString *aPath = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
-    BOOL added = [self checkFile:aPath];
-
-    if (project.devicegroups.count > 0)
-    {
-        for (Devicegroup *dg in project.devicegroups)
-        {
-            if (dg.models.count > 0)
-            {
-                for (Model *md in dg.models)
-                {
-                    aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", md.path, md.filename]];
-                    added = [self checkFile:aPath];
-
-                    if (md.libraries.count > 0)
-                    {
-                        for (File *lib in md.libraries)
-                        {
-                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", lib.path, lib.filename]];
-                            added = [self checkFile:aPath];
-                        }
-                    }
-
-                    if (md.files.count > 0)
-                    {
-                        for (File *file in md.files)
-                        {
-                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", file.path, file.filename]];
-                            added = [self checkFile:aPath];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (!added) NSLog(@"Some files couldn't be added");
-}
 
 
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath
@@ -6100,25 +6057,6 @@
     }
 
     return NO;
-}
-
-
-
-- (BOOL)checkFile:(NSString *)filePath
-{
-    // This method takes an ABSOLUTE file path and checks first that the file exists at that path
-    // If if doesn't, it returns NO, otherwise it attempts to add the file to the watch queue, in
-    // which case it returns YES
-
-    BOOL result = [nsfm fileExistsAtPath:filePath];
-
-    if (result)
-    {
-        [fileWatchQueue addPath:filePath
-                 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
-    }
-
-    return result;
 }
 
 
@@ -12428,29 +12366,29 @@
 
 - (IBAction)checkElectricImpLibraries:(id)sender
 {
-    [self checkElectricImpLibs];
+    [self checkElectricImpLibs:currentDevicegroup];
 }
 
 
 
-- (void)checkElectricImpLibs
+- (void)checkElectricImpLibs:(Devicegroup *)devicegroup
 {
     // Initiate a read of the current Electric Imp library versions
     // Only do this if the project contains EI libraries and 1 hour has
     // passed since the last look-up
 
-    if (currentDevicegroup.models.count > 0)
+    if (devicegroup.models.count > 0)
     {
         if (eiLibListTime != nil)
         {
             NSDate *now = [NSDate date];
             NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
 
-            if (interval >= kEILibCheckInterval && eiLibListData != nil)
+            if (interval >= kEILibCheckInterval && eiLibListData != nil && eiLibListData.length > 0)
             {
                 // Last check was less than 1 hour earlier, so use existing list if it exists
 
-                [self compareElectricImpLibs];
+                [self compareElectricImpLibs:devicegroup];
                 return;
             }
         }
@@ -12470,6 +12408,7 @@
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
         [request setHTTPMethod:@"GET"];
         eiLibListData = [NSMutableData dataWithCapacity:0];
+        eiDeviceGroup = devicegroup;
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         NSURLSession *session = [NSURLSession sessionWithConfiguration: config
                                                               delegate: self
@@ -12481,9 +12420,11 @@
 
 
 
-- (void)compareElectricImpLibs
+- (void)compareElectricImpLibs:(Devicegroup *)devicegroup
 {
     NSString *parsedData;
+
+    if (devicegroup != nil && devicegroup.models.count == 0) return;
 
     if (eiLibListData != nil && eiLibListData.length > 0)
     {
@@ -12520,7 +12461,7 @@
                     NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
                     NSString *libVer = [libParts objectAtIndex:1];
 
-                    for (Model *model in currentDevicegroup.models)
+                    for (Model *model in devicegroup.models)
                     {
                         if (model.impLibraries.count > 0)
                         {
@@ -12592,8 +12533,10 @@
 
         if (allOKFlag)
         {
-            [self writeStringToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", currentDevicegroup.name] :YES];
+            [self writeStringToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", devicegroup.name] :YES];
         }
+
+        eiDeviceGroup = nil;
     }
 }
 
@@ -12657,7 +12600,7 @@ didReceiveResponse:(NSURLResponse *)response
         // The connection has come to a conclusion without error
 
         [task cancel];
-        [self compareElectricImpLibs];
+        [self compareElectricImpLibs:eiDeviceGroup];
     }
 }
 

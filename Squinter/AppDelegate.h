@@ -333,7 +333,7 @@
 	IBOutlet NSTouchBar *appBar;
 
     Project *currentProject, *creatingProject, *savingProject;
-    Devicegroup *currentDevicegroup;
+    Devicegroup *currentDevicegroup, *eiDeviceGroup;
 
     VDKQueue *fileWatchQueue;
 
@@ -496,11 +496,9 @@
 - (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
 - (void)openSquirrelProjects:(NSMutableArray *)urls;
 - (void)checkFiles:(File *)file :(NSString *)oldPath :(NSString *)type :(Devicegroup *)devicegroup :(BOOL)projectMoved;
-- (void)watchfiles:(Project *)project;
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
 - (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orName;
 - (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName;
-- (BOOL)checkFile:(NSString *)filePath;
 - (IBAction)selectFile:(id)sender;
 - (IBAction)newDevicegroupCheckboxHander:(id)sender;
 - (void)processAddedFiles:(NSMutableArray *)urls;
@@ -663,7 +661,7 @@
 // Check Electric Imp Libraries Methods
 
 - (IBAction)checkElectricImpLibraries:(id)sender;
-- (void)checkElectricImpLibs;
+- (void)checkElectricImpLibs:(Devicegroup *)devicegroup;
 - (void)compareElectricImpLibs;
 
 
