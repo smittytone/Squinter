@@ -10,6 +10,7 @@
 #import "Model.h"
 #import "File.h"
 #import "InspectorDataCellView.h"
+#import "TreeNode.h"
 
 
 @interface InspectorWindow2ViewController : NSViewController <NSOutlineViewDelegate, NSOutlineViewDataSource>
@@ -19,7 +20,7 @@
 	IBOutlet NSSegmentedControl *panelSelector;
 	IBOutlet NSTextField *field;
 	
-	NSMutableArray *projectKeys, *projectValues;
+	NSMutableArray *projectKeys, *projectValues, *projectData;
 	NSMutableArray *deviceKeys, *deviceValues;
 	
 	NSWorkspace *nswsw;
@@ -35,8 +36,10 @@
 - (void)setDevice:(NSMutableDictionary *)aDevice;
 - (void)positionWindow;
 - (void)setTab:(NSUInteger)aTab;
-- (BOOL)isLinkRow:(NSInteger)row;
+
+- (BOOL)isLinkRow:(TreeNode *)node;
 - (BOOL)isURLRow:(NSInteger)row;
+
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;

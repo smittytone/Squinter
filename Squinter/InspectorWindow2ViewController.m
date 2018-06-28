@@ -21,6 +21,10 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
+
+    // Remove (almost) the indentation on the outline view
+
+    deviceOutlineView.indentationPerLevel = 1.0;
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(appWillBecomeActive)
@@ -35,6 +39,7 @@
 	
 	projectKeys = [[NSMutableArray alloc] init];
 	projectValues = [[NSMutableArray alloc] init];
+    projectData = [[NSMutableArray alloc] init];
 	deviceKeys = [[NSMutableArray alloc] init];
 	deviceValues = [[NSMutableArray alloc] init];
 	
@@ -119,8 +124,9 @@
 	
 	NSButton *linkButton = (NSButton *)sender;
 	InspectorDataCellView *cellView = (InspectorDataCellView *)linkButton.superview;
-	NSString *path = [projectValues objectAtIndex:cellView.row];
-	
+	//NSString *path = [projectValues objectAtIndex:cellView.row];
+    NSString *path = cellView.path;
+
 	if (cellView.row < 5)
 	{
 		// This will be the location of the project file, which is already open,
@@ -166,30 +172,53 @@
 
 	// Clear the data arrays
 
-	[projectKeys removeAllObjects];
-	[projectValues removeAllObjects];
+	//[projectKeys removeAllObjects];
+	//[projectValues removeAllObjects];
+    [projectData removeAllObjects];
+
+    NSInteger devPos = 0;
 	
 	// If project does equal nil, we ignore the content creation section
 	// and reload the table with empty data
 	
 	if (project != nil)
 	{
-		[projectKeys addObject:@"Project Information"];
-		[projectValues addObject:@""];
+        TreeNode *pnode = [[TreeNode alloc] init];
+        pnode.key = @"Project Information";
+
+        [projectData addObject:pnode];
+
+        TreeNode *node = [[TreeNode alloc] init];
+        node.key = @"Project Name";
+        node.value = project.name;
+        [projectData addObject:node];
+
+        //[projectKeys addObject:@"Project Information"];
+		//[projectValues addObject:@""];
 		
 		[projectKeys addObject:@"Project Name"];
 		[projectValues addObject:project.name];
 		
 		if (project.description != nil && project.description.length > 0)
 		{
-			[projectKeys addObject:@"Description"];
-			[projectValues addObject:project.description];
+			//[projectKeys addObject:@"Description"];
+			//[projectValues addObject:project.description];
+
+            node = [[TreeNode alloc] init];
+            node.key = @"Description";
+            node.value = project.description;
+            [projectData addObject:node];
 		}
 		
 		if (products == nil || products.count == 0 || project.pid == nil)
 		{
-			[projectKeys addObject:@"Product ID"];
-			[projectValues addObject:(project.pid.length > 0 ? project.pid : @"Project not linked to a product")];
+			//[projectKeys addObject:@"Product ID"];
+			//[projectValues addObject:(project.pid.length > 0 ? project.pid : @"Project not linked to a product")];
+
+            node = [[TreeNode alloc] init];
+            node.key = @"Product ID";
+            node.value = project.pid.length > 0 ? project.pid : @"Project not linked to a product";
+            [projectData addObject:node];
 		}
 		else
 		{
@@ -199,8 +228,13 @@
 				
 				if ([apid compare:project.pid] == NSOrderedSame)
 				{
-					[projectKeys addObject:@"Product Name"];
-					[projectValues addObject:[product valueForKeyPath:@"attributes.name"]];
+					//[projectKeys addObject:@"Product Name"];
+					//[projectValues addObject:[product valueForKeyPath:@"attributes.name"]];
+
+                    node = [[TreeNode alloc] init];
+                    node.key = @"Product Name";
+                    node.value = [product valueForKeyPath:@"attributes.name"];
+                    [projectData addObject:node];
 				}
 			}
 		}
@@ -209,115 +243,217 @@
         {
             if (project.cid != nil && project.cid.length > 0)
             {
-                [projectKeys addObject:@"Creator ID"];
-                [projectValues addObject:project.cid];
+                //[projectKeys addObject:@"Creator ID"];
+                //[projectValues addObject:project.cid];
+
+                node = [[TreeNode alloc] init];
+                node.key = @"Creator ID";
+                node.value = project.cid;
+                [projectData addObject:node];
                 
                 if ([project.cid compare:project.aid] != NSOrderedSame)
                 {
-                    [projectKeys addObject:@"Account ID"];
-                    [projectValues addObject:project.aid];
+                    //[projectKeys addObject:@"Account ID"];
+                    //[projectValues addObject:project.aid];
+
+                    node = [[TreeNode alloc] init];
+                    node.key = @"Account ID";
+                    node.value = project.aid;
+                    [projectData addObject:node];
                 }
             }
             else
             {
-                [projectKeys addObject:@"Account ID"];
-                [projectValues addObject:project.aid];
+                //[projectKeys addObject:@"Account ID"];
+                //[projectValues addObject:project.aid];
+
+                node = [[TreeNode alloc] init];
+                node.key = @"Account ID";
+                node.value = project.aid;
+                [projectData addObject:node];
             }
         }
         else
         {
-            [projectValues addObject:@"Project not associated with an account"];
+            //[projectKeys addObject:@"Account ID"];
+            //[projectValues addObject:@"Project not associated with an account"];
+
+            node = [[TreeNode alloc] init];
+            node.key = @"Account ID";
+            node.value = @"Project not associated with an account";
+            [projectData addObject:node];
         }
         
-		[projectKeys addObject:@"Path"];
+		//[projectKeys addObject:@"Path"];
+
+        node = [[TreeNode alloc] init];
+        node.key = @"Path";
 		
 		if (project.path != nil)
 		{
-			[projectValues addObject:[NSString stringWithFormat:@"%@/%@", project.path, project.filename]];
+			//[projectValues addObject:[NSString stringWithFormat:@"%@/%@", project.path, project.filename]];
+
+            node.value = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
+            node.flag = YES;
+            [projectData addObject:node];
 		}
 		else
 		{
-			[projectValues addObject:@"Project has not yet been saved"];
+			//[projectValues addObject:@"Project has not yet been saved"];
+
+            node.value = @"Project has not yet been saved";
+            [projectData addObject:node];
 		}
-		
-		[projectKeys addObject:@"Device Group Information"];
-		[projectValues addObject:@""];
-		
-		if (project.devicegroups != nil && project.devicegroups.count > 0)
+
+        //[projectKeys addObject:@"Device Group Information"];
+		//[projectValues addObject:@""];
+
+        pnode = [[TreeNode alloc] init];
+        pnode.key = @"Device Group Information";
+        pnode.children = [[NSMutableArray alloc] init];
+
+        if (project.devicegroups != nil && project.devicegroups.count > 0)
 		{
 			NSUInteger dgcount = 1;
 			
 			for (Devicegroup *devicegroup in project.devicegroups)
 			{
-				if (dgcount > 1)
+                /*
+                if (dgcount > 1)
 				{
 					[projectKeys addObject:@" "];
 					[projectValues addObject:@" "];
 				}
-				
+
 				[projectKeys addObject:[NSString stringWithFormat:@"Device Group %li", (long)dgcount]];
 				[projectValues addObject:devicegroup.name];
-				[projectKeys addObject:@"ID"];
+                */
+
+                node = [[TreeNode alloc] init];
+                node.key = [NSString stringWithFormat:@"Device Group %li", (long)dgcount];
+                node.flag = YES;
+                [pnode.children addObject:node];
+
+                node = [[TreeNode alloc] init];
+                node.key = @"Name";
+                node.value = devicegroup.name;
+                [pnode.children addObject:node];
+
+				//[projectKeys addObject:@"ID"];
+
+                node = [[TreeNode alloc] init];
+                node.key = @"ID";
 				
 				if (devicegroup.did != nil && devicegroup.did.length > 0)
 				{
-					[projectValues addObject:devicegroup.did];
+					//[projectValues addObject:devicegroup.did];
+
+                    node.value = devicegroup.did;
 				}
 				else
 				{
-					[projectValues addObject:@"Not uploaded"];
+					//[projectValues addObject:@"Not uploaded"];
+
+                    node.value = @"Not uploaded";
 				}
-				
-				[projectKeys addObject:@"Type"];
-				[projectValues addObject:[self convertDevicegroupType:devicegroup.type :NO]];
+
+                [pnode.children addObject:node];
+
+				//[projectKeys addObject:@"Type"];
+				//[projectValues addObject:[self convertDevicegroupType:devicegroup.type :NO]];
+
+                node = [[TreeNode alloc] init];
+                node.key = @"Type";
+                node.value = [self convertDevicegroupType:devicegroup.type :NO];
+                [pnode.children addObject:node];
 				
 				if (devicegroup.description != nil && devicegroup.description.length > 0)
 				{
-					[projectKeys addObject:@"Description"];
-					[projectValues addObject:devicegroup.description];
+					//[projectKeys addObject:@"Description"];
+					//[projectValues addObject:devicegroup.description];
+
+                    node = [[TreeNode alloc] init];
+                    node.key = @"Description";
+                    node.value = devicegroup.description;
+                    [pnode.children addObject:node];
 				}
 				
 				if (devicegroup.models.count > 0)
 				{
 					NSUInteger modcount = 1;
 					
-					for (Model *model in devicegroup.models)
+                    for (Model *model in devicegroup.models)
 					{
 						NSString *typeString = [model.type compare:@"agent"] == NSOrderedSame ? @"Agent" : @"Device";
-						
+
+                        TreeNode *mnode = [[TreeNode alloc] init];
+                        mnode.children = [[NSMutableArray alloc] init];
+                        mnode.flag = YES;
+
 						if ([typeString compare:@"Agent"] == NSOrderedSame)
 						{
-							[projectKeys addObject:@"Agent Code Information"];
+							//[projectKeys addObject:@"Agent Code Information"];
+
+                            mnode.key = @"Agent Code Information";
 						}
 						else
 						{
-							[projectKeys addObject:@"Device Code Information"];
+							//[projectKeys addObject:@"Device Code Information"];
+
+                            mnode.key = @"Device Code Information";
 						}
 						
-						[projectValues addObject:@""];
+						[pnode.children addObject:mnode];
+
+                        //[projectValues addObject:@""];
 						
-						[projectKeys addObject:[NSString stringWithFormat:@"%@ Code File", typeString]];
-						[projectValues addObject:model.filename];
-						[projectKeys addObject:@"Path "];
-						[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename]];
+						//[projectKeys addObject:[NSString stringWithFormat:@"%@ Code File", typeString]];
+						//[projectValues addObject:model.filename];
+
+                        node = [[TreeNode alloc] init];
+                        node.key = [NSString stringWithFormat:@"%@ Code File", typeString];
+                        node.value = model.filename;
+                        [mnode.children addObject:node];
+
+						//[projectKeys addObject:@"Path "];
+						//[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename]];
+
+                        node = [[TreeNode alloc] init];
+                        node.key = @"Path";
+                        node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename];
+                        [mnode.children addObject:node];
 						
-						[projectKeys addObject:@"Uploaded"];
+						//[projectKeys addObject:@"Uploaded"];
 						NSString *date = model.updated;
+
+                        node = [[TreeNode alloc] init];
+                        node.key = @"Uploaded";
 						
 						if (date != nil && date.length > 0)
 						{
 							date = [outLogDef stringFromDate:[inLogDef dateFromString:date]];
 							date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
 							date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-							[projectValues addObject:date];
+							node.value = date;
+
+                            //[projectValues addObject:date];
 						}
 						else
 						{
-							[projectValues addObject:@"No code uploaded"];
+							//[projectValues addObject:@"No code uploaded"];
+
+                            node.value = @"No code uploaded";
 						}
+
+                        [mnode.children addObject:node];
 						
-						[projectKeys addObject:@"SHA"];
-						[projectValues addObject:(model.sha != nil && model.sha.length > 0 ? model.sha : @"No code uploaded")];
+						//[projectKeys addObject:@"SHA"];
+						//[projectValues addObject:(model.sha != nil && model.sha.length > 0 ? model.sha : @"No code uploaded")];
+
+                        node = [[TreeNode alloc] init];
+                        node.key = @"SHA";
+                        node.value = model.sha != nil && model.sha.length > 0 ? model.sha : @"No code uploaded";
+                        [mnode.children addObject:node];
 						
 						if (model.libraries != nil && model.libraries.count > 0)
 						{
@@ -325,18 +461,33 @@
 							
 							for (File *library in model.libraries)
 							{
-								[projectKeys addObject:[NSString stringWithFormat:@"Library %li", (long)libcount]];
-								[projectValues addObject:library.filename];
-								[projectKeys addObject:@"Path"];
-								[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename]];
+								//[projectKeys addObject:[NSString stringWithFormat:@"Library %li", (long)libcount]];
+								//[projectValues addObject:library.filename];
+								//[projectKeys addObject:@"Path"];
+								//[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename]];
 								
 								++libcount;
+
+                                node = [[TreeNode alloc] init];
+                                node.key = [NSString stringWithFormat:@"Library %li", (long)libcount];
+                                node.value = library.filename;
+                                [mnode.children addObject:node];
+
+                                node = [[TreeNode alloc] init];
+                                node.key = @"Path";
+                                node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename];
+                                [mnode.children addObject:node];
 							}
 						}
 						else
 						{
-							[projectKeys addObject:@"Libraries"];
-							[projectValues addObject:@"No local libraries imported"];
+							//[projectKeys addObject:@"Libraries"];
+							//[projectValues addObject:@"No local libraries imported"];
+
+                            node = [[TreeNode alloc] init];
+                            node.key = @"Libraries";
+                            node.value = @"No local libraries imported";
+                            [mnode.children addObject:node];
 						}
 						
 						if (model.files != nil && model.files.count > 0)
@@ -345,18 +496,33 @@
 							
 							for (File *file in model.files)
 							{
-								[projectKeys addObject:[NSString stringWithFormat:@"File %li", (long)filecount]];
-								[projectValues addObject:file.filename];
-								[projectKeys addObject:@"Path "];
-								[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename]];
+								//[projectKeys addObject:[NSString stringWithFormat:@"File %li", (long)filecount]];
+								//[projectValues addObject:file.filename];
+								//[projectKeys addObject:@"Path "];
+								//[projectValues addObject:[NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename]];
 								
 								++filecount;
+
+                                node = [[TreeNode alloc] init];
+                                node.key = [NSString stringWithFormat:@"File %li", (long)filecount];
+                                node.value = file.filename;
+                                [mnode.children addObject:node];
+
+                                node = [[TreeNode alloc] init];
+                                node.key = @"Path";
+                                node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename];
+                                [mnode.children addObject:node];
 							}
 						}
 						else
 						{
-							[projectKeys addObject:@"Files"];
-							[projectValues addObject:@"No local files imported"];
+							//[projectKeys addObject:@"Files"];
+							//[projectValues addObject:@"No local files imported"];
+
+                            node = [[TreeNode alloc] init];
+                            node.key = @"Files";
+                            node.value = @"No local files imported";
+                            [mnode.children addObject:node];
 						}
 						
 						++modcount;
@@ -368,9 +534,17 @@
 		}
 		else
 		{
-			[projectKeys addObject:@"Device Groups"];
-			[projectValues addObject:@"None"];
+			//[projectKeys addObject:@"Device Groups"];
+			//[projectValues addObject:@"None"];
+
+            node = [[TreeNode alloc] init];
+            node.key = @"Device Groups";
+            node.value = @"None";
+            [pnode.children addObject:node];
 		}
+
+        [projectData addObject:pnode];
+        devPos = [projectData indexOfObject:pnode];
 	}
 
 	if (panelSelector.selectedSegment == 0)
@@ -380,6 +554,7 @@
 
 		[deviceOutlineView reloadData];
 		[deviceOutlineView setNeedsDisplay];
+        if (projectData.count > 0) [deviceOutlineView expandItem:[projectData objectAtIndex:devPos] expandChildren:YES];
 
 		if (oProject != nil && aProject != nil && deviceOutlineView.isHidden)
 		{
@@ -569,7 +744,7 @@
 	// This is the 'tabIndex' setter method, which we trap in order
 	// to trigger a switch to the implicitly requested tab
 	
-	if (aTab > panelSelector.segmentCount || aTab == panelSelector.selectedSegment) return;
+	if ((aTab > panelSelector.segmentCount || aTab == panelSelector.selectedSegment) && !deviceOutlineView.hidden) return;
 	panelSelector.selectedSegment = aTab;
 	[self switchTable:nil];
 }
@@ -626,16 +801,18 @@
 
 
 
-- (BOOL)isLinkRow:(NSInteger)row
+- (BOOL)isLinkRow:(TreeNode *)node
 {
 	// Does the title column of content row being displayed
 	// include the word 'path'? If so the content is a link
 	// so we return YES so that the table data source method knows
 	// which type of NSTableCellView to use
 	
-	NSString *key = [projectKeys objectAtIndex:row];
-	NSString *value = [projectValues objectAtIndex:row];
-	if ([key containsString:@"Path"] && value.length > 1 ) return YES;
+
+
+    //NSString *key = [projectKeys objectAtIndex:row];
+	//NSString *value = [projectValues objectAtIndex:row];
+	if ([node.key containsString:@"Path"] && node.value.length > 1 ) return YES;
 	return NO;
 }
 
@@ -661,6 +838,12 @@
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
 	// Nothing is expandable
+
+    if (panelSelector.selectedSegment == 0 && item != nil)
+    {
+        TreeNode *node = (TreeNode *)item;
+        if (node.children != nil && node.children.count > 0) return YES;
+    }
 	
 	return NO;
 }
@@ -680,6 +863,13 @@
 {
 	// This will always be the number of items in the root item, ie.
 	// the number of items in the appropriate data set
+
+    if (panelSelector.selectedSegment == 0)
+    {
+        if (item == nil) return projectData.count;
+        TreeNode *node = (TreeNode *)item;
+        if (node.children != nil && node.children.count > 0) return node.children.count;
+    }
 	
 	return (item == nil ? (tabIndex == 0 ? projectKeys.count : deviceKeys.count) : 0);
 }
@@ -690,7 +880,14 @@
 {
 	// We use 'item' as a proxy for row number by converting 'index' (which
 	// is the row number) to an NSNumber so it can be referenced via 'item'
-	
+
+    if (panelSelector.selectedSegment == 0)
+    {
+        if (item == nil) return (projectData.count > 0 ? [projectData objectAtIndex:index] : nil);
+        TreeNode *node = (TreeNode *)item;
+        if (node.children != nil && node.children.count > 0) return [node.children objectAtIndex:index];
+    }
+
 	return [NSNumber numberWithInteger:index];
 }
 
@@ -709,87 +906,93 @@
 {
 	id cellView = nil;
 	
-	// Retrieve the row number encoded as an NSNumber referenced by 'item'
-	
-	NSNumber *num = (NSNumber *)item;
-	NSInteger row = num.integerValue;
-	
 	// Use 'valueArray' and 'keyArray' as proxies for the appropriate data set
 	// (project or device)
 	
-	NSMutableArray *valueArray = nil;
-	NSMutableArray *keyArray = nil;
-	
 	if (panelSelector.selectedSegment == 1)
 	{
-		keyArray = deviceKeys;
-		valueArray = deviceValues;
+        // Retrieve the row number encoded as an NSNumber referenced by 'item'
+
+        NSNumber *num = (NSNumber *)item;
+        NSInteger row = num.integerValue;
+        NSString *key = [deviceKeys objectAtIndex:row];
+        NSString *value = [deviceValues objectAtIndex:row];
+
+        if (value.length == 0)
+        {
+            // This is a Header row
+
+            NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
+            cv.textField.stringValue = [key uppercaseString];
+            cellView = cv;
+        }
+        else
+        {
+            // Data row
+
+            InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
+            cv.title.stringValue = key;
+            cv.data.stringValue = value;
+
+            if ([self isURLRow:row])
+            {
+                // If data is a URL, make sure there's an active button at the end of the row
+
+                [cv.goToButton setTarget:self];
+                [cv.goToButton setAction:@selector(goToURL:)];
+
+                cv.goToButton.hidden = NO;
+                cv.row = row;
+            }
+            else
+            {
+                cv.goToButton.hidden = YES;
+            }
+
+            cellView = cv;
+        }
 	}
 	else
 	{
-		keyArray = projectKeys;
-		valueArray = projectValues;
+        // Display the Project node
+
+        TreeNode *node = (TreeNode *)item;
+
+        if (node.value.length == 0)
+        {
+            // This is a Header row
+
+            NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
+            cv.textField.stringValue = !node.flag ? [node.key uppercaseString] : node.key;
+            cellView = cv;
+        }
+        else
+        {
+            // Data row
+
+            InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
+            cv.title.stringValue = node.key;
+            cv.data.stringValue = node.value;
+
+            if ([self isLinkRow:node])
+            {
+                // If data is a URL, make sure there's an active button at the end of the row
+
+                [cv.goToButton setTarget:self];
+                [cv.goToButton setAction:@selector(link:)];
+
+                cv.goToButton.hidden = NO;
+                cv.path = node.value;
+                cv.row = node.flag ? 0 : 99;
+            }
+            else
+            {
+                cv.goToButton.hidden = YES;
+            }
+            cellView = cv;
+        }
 	}
-	
-	NSString *key = [keyArray objectAtIndex:row];
-	NSString *value = [valueArray objectAtIndex:row];
-			
-	if (value.length == 0)
-	{
-		// This is a Header row
-		
-		NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
-		cv.textField.stringValue = [key uppercaseString];
-		cellView = cv;
-	}
-	else
-	{
-		// Data row
-		
-		InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
-		cv.title.stringValue = key;
-		cv.data.stringValue = value;
-		
-		if (panelSelector.selectedSegment == 1)
-		{
-			// This is a device
-			
-			if ([self isURLRow:row])
-			{
-				// If data is a URL, make sure there's an active button at the end of the row
-				
-				[cv.goToButton setTarget:self];
-				[cv.goToButton setAction:@selector(goToURL:)];
-				[cv.goToButton setHidden:NO];
-				cv.row = row;
-			}
-			else
-			{
-				[cv.goToButton setHidden:YES];
-			}
-		}
-		else
-		{
-			// This is a project
-			
-			if ([self isLinkRow:row])
-			{
-				// If data is a file path, make sure there's an active button at the end of the row
-				
-				[cv.goToButton setTarget:self];
-				[cv.goToButton setAction:@selector(link:)];
-				[cv.goToButton setHidden:NO];
-				cv.row = row;
-			}
-			else
-			{
-				[cv.goToButton setHidden:YES];
-			}
-		}
-		
-		cellView = cv;
-	}
-	
+
 	return cellView;
 }
 
@@ -800,56 +1003,47 @@
 	// Return the appropriate height of the row, set by the deepest of the row's elements
 	// This should be the main data field
 	
-	// Get the row we're working on
-	
-	NSNumber *num = (NSNumber *)item;
-	NSInteger index = num.integerValue;
-	
-	// Set 'keyArray' and 'valueArray' as proxies for whichever data set (projects or
-	// devices) that we are working with
-	
-	NSMutableArray *valueArray = nil;
-	NSMutableArray *keyArray = nil;
-	
-	if (panelSelector.selectedSegment == 1)
+    NSString *key = nil;
+    NSString *value = nil;
+
+    // Get the data of the cell we're sizing
+
+    if (panelSelector.selectedSegment == 1)
 	{
-		keyArray = deviceKeys;
-		valueArray = deviceValues;
+        NSNumber *num = (NSNumber *)item;
+        NSInteger index = num.integerValue;
+        key = [deviceKeys objectAtIndex:index];
+        value = [deviceValues objectAtIndex:index];
 	}
 	else
 	{
-		keyArray = projectKeys;
-		valueArray = projectValues;
+        TreeNode *node = (TreeNode *)item;
+        key = node.key;
+        value = node.value;
 	}
-	
-	NSString *key = [keyArray objectAtIndex:index];
-	NSString *value = [valueArray objectAtIndex:index];
-	
-	// Spacer row — ie. 'key' and 'value' equal a single space
-	
-	if (key.length == 1 && value.length == 1) return 10;
-	
-	// Information row - but is it a header ('value' equals zero-length
-	// string) or a data row?
-	
-	if (value.length > 1)
-	{
-		// Get the rendered height of the data text - it's drawn into
-		// an area as wide as the data column
-		
-		CGFloat renderHeight = [self renderedHeightOfString:value];
-		
-		// 20 is the height of one standard line
-		if (renderHeight < 20) renderHeight = 20;
-		
-		// Calculate the maximum, dealing with a fudge factor
-		if (renderHeight > 20 && fmod(renderHeight, 20) > 0)
-		{
-			renderHeight = renderHeight - fmod(renderHeight, 20) + 20;
-		}
-		
-		return renderHeight;
-	}
+
+    // Is it a spacer row — ie. 'key' and 'value' equal a single space
+
+    if (key.length == 1 && value.length == 1) return 10;
+
+    // Information row - but is it a header ('value' equals zero-length string) or a data row?
+
+    if (value.length > 1)
+    {
+        // Get the rendered height of the data text - it's drawn into an area as wide as the data column
+
+        CGFloat renderHeight = [self renderedHeightOfString:value];
+
+        // 20 is the height of one standard line
+
+        if (renderHeight < 20) renderHeight = 20;
+
+        // Calculate the maximum, dealing with a fudge factor
+
+        if (renderHeight > 20 && fmod(renderHeight, 20) > 0) renderHeight = renderHeight - fmod(renderHeight, 20) + 20;
+
+        return renderHeight;
+    }
 	
 	// Return the height of a header row
 	
