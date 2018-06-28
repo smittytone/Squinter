@@ -662,7 +662,7 @@
 
 - (IBAction)checkElectricImpLibraries:(id)sender;
 - (void)checkElectricImpLibs:(Devicegroup *)devicegroup;
-- (void)compareElectricImpLibs;
+- (void)compareElectricImpLibs:(Devicegroup *)devicegroup;
 
 
 // Pasteboard Methods
