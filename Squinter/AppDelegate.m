@@ -2137,8 +2137,16 @@
                 changed = YES;
             }
 
+
+
             if (changed)
             {
+                // Add the device group's type to the keys - values arrays. It will not be changed,
+                // but it hacks around an issue with BuildAPIAccess
+                
+                [keys addObject:@"type"];
+                [values addObject:currentDevicegroup.type];
+
                 NSDictionary *dict = @{ @"action" : @"devicegroupchanged",
                                         @"devicegroup" : currentDevicegroup };
 
