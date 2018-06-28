@@ -1524,6 +1524,7 @@
     [self setToolbar];
 
     iwvc.project = currentProject;
+    [iwvc setTab:0];
 
     // Mark the status light as empty, ie. in need of saving
 
