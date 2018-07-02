@@ -6,9 +6,9 @@ A binary download and much more information is available at the [Squinter web si
 
 ## Copyright Notice ##
 
-Squinter is copyright 2015-2018 Tony Smith.
-BuildAPIAccess is copyright 2015-2018 Tony Smith.
-The impCentral API is copyright 2015-2018 Electric Imp, Inc.
+- Squinter is copyright 2015-2018 Tony Smith.
+- BuildAPIAccess is copyright 2015-2018 Tony Smith.
+- The impCentral API is copyright 2015-2018 Electric Imp, Inc.
 
 ## Licence ##
 
