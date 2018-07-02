@@ -1,16 +1,16 @@
-# Squinter
+# Squinter #
 
-A macOS GUI application for managing Squirrel programming projects, particularly those targeting the [Electric Imp Platform](https://electricimp.com/docs/).
+Squinter is a macOS GUI application for managing Squirrel programming projects targeting the [Electric Imp Platform](https://devloper.electricimp.com).
 
+A binary download and much more information is available at the [Squinter web site](https://smittytone.github.io/squinter/index.html).
 
+## Copyright Notice ##
 
-## Copyright Notice
+Squinter is copyright 2015-2018 Tony Smith.
+BuildAPIAccess is copyright 2015-2018 Tony Smith.
+The impCentral API is copyright 2015-2018 Electric Imp, Inc.
 
-Squinter is copyright 2015-2016 Tony Smith.
-BuildAPIAccess is copyright 2015-2016 Tony Smith.
-The Build API is copyright 2015-2016 Electric Imp, Inc.
-
-## Licence
+## Licence ##
 
 This project is licensed under the 'BSD 2-clause license'.
 
@@ -20,7 +20,7 @@ Redistribution and use in source code form, with or without modification, are pe
 
 2. The software must NOT be redistributed in binary form.
 
-### Disclaimer
+### Disclaimer ###
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -33,7 +33,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-## Third-Party Components
+## Third-Party Components ##
 
 Squinter makes use of the following components.
 
