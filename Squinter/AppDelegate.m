@@ -1518,7 +1518,7 @@
     [self addProjectMenuItem:projectName :currentProject];
 
     // Enable project-related UI items for the new project
-    // NOTE 'addProjectMenuItem:' will have update the sub-menus already
+    // NOTE 'addProjectMenuItem:' will have updated the sub-menus already
 
     [self refreshProjectsMenu];
     [self setToolbar];
@@ -2085,8 +2085,10 @@
             {
                 currentProject.description = newDesc;
                 currentProject.haschanged = YES;
-                [self refreshOpenProjectsMenu];
+                iwvc.project = currentProject;
             }
+
+            // Report if no changes were made
 
             if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
 
@@ -6978,6 +6980,8 @@
         [self refreshProjectsMenu];
         [self setToolbar];
 
+        iwvc.products = products;
+
         if ([action compare:@"uploadproject"] == NSOrderedSame)
         {
             // We are coming here because we want to upload a new project, so go back
@@ -7536,6 +7540,8 @@
 
                 [self writeStringToLog:@"Refreshing your list of products..." :YES];
                 [self getProductsFromServer:nil];
+
+                // NOTE 'getProductsFromServer:' will go to 'listProducts:' which will update Inspector's 'products' property
             }
         }
         else if ([action compare:@"syncproduct"] == NSOrderedSame)
@@ -8038,6 +8044,7 @@
         [self setToolbar];
 
         // Update the Inspector
+
         iwvc.devices = devicesArray;
     }
     else
