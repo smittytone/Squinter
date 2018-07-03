@@ -2735,7 +2735,12 @@
     {
         [ide getProducts:dict];
 
-        // Pick up the action in 'listProducts:'
+        // Pick up the action in **listProducts:**
+        // NOTE This will trigger updates to:
+        //      The Project Inspector (sets 'products' array)
+        //      Projects menu
+        //      Projects > Products sub-menu
+        //      Toolbar
     }
     else
     {
@@ -2835,7 +2840,7 @@
 
                 [ide getDevicegroupsWithFilter:@"product.id" :[selectedProduct objectForKey:@"id"] :dict];
 
-                // Pick up the action in 'productToProjectStageTwo:'
+                // Pick up the action in **productToProjectStageTwo:**
             }
         }];
     }
@@ -6822,7 +6827,7 @@
             if ([action compare:@"getproducts"] == NSOrderedSame)
             {
                 // Just re-call 'getProductsFromServer:' as the check on the BuildAPIAccess instance's
-                // currentAccount property will pass, and the products list will be requested from the server
+                // 'currentAccount' property will pass, and the products list will be requested from the server
                 
                 [self getProductsFromServer:nil];
             }
@@ -6881,7 +6886,8 @@
     if (action != nil)
     {
         // 'selectedProduct' may point to an entry in the existing 'productsArray', but this is
-        // about to be zapped, so preserved the ID of the product it points to
+        // about to be zapped, so preserved the ID of the product it points to so that we can
+        // reselect it after updating 'productsArray'
 
         if (selectedProduct != nil)
         {
@@ -6900,6 +6906,8 @@
         {
             [productsArray removeAllObjects];
         }
+
+        NSString *noneString = @"There are no products listed on the server for this account.";
 
         if (products != nil)
         {
@@ -6964,14 +6972,14 @@
             }
             else
             {
-                [self writeStringToLog:@"There are no products listed on the server for this account." :YES];
+                [self writeStringToLog:noneString :YES];
             }
         }
         else
         {
             // TODO Indicate an issue???
 			
-            [self writeStringToLog:@"There are no products listed on the server for this account." :YES];
+            [self writeStringToLog:noneString :YES];
         }
 		
         // Update the UI
@@ -6980,7 +6988,9 @@
         [self refreshProjectsMenu];
         [self setToolbar];
 
-        iwvc.products = products;
+        // Point the Inspector at the current products list
+
+        iwvc.products = productsArray;
 
         if ([action compare:@"uploadproject"] == NSOrderedSame)
         {
@@ -7058,7 +7068,7 @@
 
                             [ide getDeployment:dpid :dict];
 
-                            // At this point we have to wait for multiple async calls to 'productToProjectStageThree:'
+                            // At this point we have to wait for multiple async calls to **productToProjectStageThree:**
                         }
                         else
                         {
@@ -7114,7 +7124,7 @@
 
                     [ide getDevicesWithFilter:@"devicegroup.id" :[devicegroup objectForKey:@"id"] :dict];
 
-                    // Pick up the action in 'listDevices:'
+                    // Pick up the action in **listDevices:**
                 }
             }
             else
@@ -7122,7 +7132,6 @@
                 // The product has no devicegroups - ergo no devices — so go direct to the next stage,
                 // ie. don't bother to check device groups for devices
 
-                // [self listDevices:note];
                 [self deleteProductStageTwo:productToDelete];
             }
         }
@@ -7396,7 +7405,7 @@
                 }
             }
 
-            // Pick up the action at 'createDevicegroupStageTwo:'
+            // Pick up the action at **createDevicegroupStageTwo:**
         }
     }
     else
@@ -7433,6 +7442,8 @@
                 project.pid = @"";
                 project.haschanged = YES;
                 if (project == currentProject) [saveLight needSave:YES];
+
+                // NOTE Project Inspector will be updated later, in 'deleteProductStageThree:'
             }
         }
     }
@@ -7458,7 +7469,7 @@
             [ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
         }
 
-        // Pick up the action in 'deleteDevicegroupStageTwo:'
+        // Pick up the action in **deleteDevicegroupStageTwo:**
     }
     else
     {
@@ -7471,7 +7482,7 @@
 
         [ide deleteProduct:[product objectForKey:@"id"] :source];
 
-        // Pick this up at 'deleteProductStageThree:'
+        // Pick this up at **deleteProductStageThree:**
     }
 }
 
@@ -7498,9 +7509,10 @@
     // Go and get an updated list of products
 	
     NSDictionary *dict = @{ @"action" : @"getproducts" };
+
     [ide getProducts:dict];
 	
-    // Pick up the action at 'listProducts:'
+    // Pick up the action at **listProducts:**
 }
 
 
