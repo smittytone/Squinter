@@ -16,16 +16,16 @@
 @interface InspectorWindow2ViewController : NSViewController <NSOutlineViewDelegate, NSOutlineViewDataSource>
 
 {
-	IBOutlet NSOutlineView *deviceOutlineView;
-	IBOutlet NSSegmentedControl *panelSelector;
-	IBOutlet NSTextField *field;
-	
-	NSMutableArray *projectKeys, *projectValues, *projectData;
-	NSMutableArray *deviceKeys, *deviceValues;
-	
-	NSWorkspace *nswsw;
-	
-	NSDateFormatter *inLogDef, *outLogDef;
+    IBOutlet NSOutlineView *deviceOutlineView;
+    IBOutlet NSSegmentedControl *panelSelector;
+    IBOutlet NSTextField *field;
+
+    NSMutableArray *projectData;
+    NSMutableArray *deviceKeys, *deviceValues;
+
+    NSWorkspace *nswsw;
+
+    NSDateFormatter *inLogDef, *outLogDef;
 }
 
 

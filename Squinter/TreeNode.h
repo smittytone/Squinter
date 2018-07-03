@@ -12,5 +12,6 @@
 @property (nonatomic, strong) NSString *value;
 @property (nonatomic, strong) NSMutableArray *children;
 @property (nonatomic, assign) BOOL flag;
+@property (nonatomic, assign) BOOL expanded;
 
 @end
