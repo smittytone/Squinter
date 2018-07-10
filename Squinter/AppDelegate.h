@@ -308,6 +308,11 @@
     IBOutlet NSTextField *uploadTagsTextField;
     IBOutlet NSTextField *uploadTagsCountField;
 
+    // OTP
+
+    IBOutlet NSPanel *otpSheet;
+    IBOutlet NSTextField *otpTextField;
+
     // Set Minimum Deployment
 
     IBOutlet NSWindow *commitSheet;
@@ -401,7 +406,10 @@
 - (IBAction)setSecureEntry:(id)sender;
 - (IBAction)switchAccount:(id)sender;
 - (IBAction)signup:(id)sender;
+- (void)handleLoginKey:(NSNotification *)note;
 - (void)getOtp:(NSNotification *)note;
+- (IBAction)setOtp:(id)sender;
+- (IBAction)cancelOtpSheet:(id)sender;
 
 
 // New Project Methods
@@ -411,6 +419,7 @@
 - (IBAction)newProjectSheetCreate:(id)sender;
 - (void)newProjectSheetCreateStageTwo:(NSString *)projectName :(NSString *)projectDesc :(BOOL)make :(BOOL)associate;
 - (IBAction)newProjectCheckboxStateHandler:(id)sender;
+
 
 // Existing Project Methods
 

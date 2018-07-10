@@ -1293,6 +1293,37 @@
 }
 
 
+- (void)getOtp:(NSNotification *)note
+{
+    NSDictionary *data = (NSDictionary *)note.object;
+    loginKey = [data objectForKey:@"token"];
+
+    // Show OTP request box
+
+    [_window beginSheet:otpSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)setOtp:(id)sender
+{
+    [_window endSheet:otpSheet];
+
+    NSString *otp = otpTextField.stringValue;
+    [ide twoFactorLogin:loginKey :otp];
+}
+
+
+
+- (IBAction)cancelOtpSheet:(id)sender
+{
+    [_window endSheet:otpSheet];
+}
+
+
+
+
+
 
 #pragma mark - New Project Methods
 
@@ -12662,6 +12693,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newProjectNameCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)newProjectNameTextField.stringValue.length];
+        return;
     }
 
     if (sender == newProjectDescTextField)
@@ -12673,6 +12705,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newProjectDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)newProjectDescTextField.stringValue.length];
+        return;
     }
 
     // Rename Project Sheet
@@ -12686,6 +12719,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         renameProjectCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)renameProjectTextField.stringValue.length];
+        return;
     }
 
     if (sender == renameProjectDescTextField)
@@ -12697,6 +12731,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         renameProjectDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)renameProjectDescTextField.stringValue.length];
+        return;
     }
 
     // New Device Group Sheet
@@ -12710,6 +12745,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newDevicegroupNameCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)newDevicegroupNameTextField.stringValue.length];
+        return;
     }
 
     if (sender == newDevicegroupDescTextField)
@@ -12721,6 +12757,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newDevicegroupDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)newDevicegroupDescTextField.stringValue.length];
+        return;
     }
 
     // Rename Device Group Sheet
@@ -12736,6 +12773,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         uploadCommitCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)uploadCommitTextField.stringValue.length];
+        return;
     }
 
     if (sender == uploadOriginTextField)
@@ -12747,6 +12785,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         uploadOriginCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)uploadOriginTextField.stringValue.length];
+        return;
     }
 
     if (sender == uploadTagsTextField)
@@ -12758,6 +12797,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         uploadTagsCountField.stringValue = [NSString stringWithFormat:@"%li/500", (long)uploadTagsTextField.stringValue.length];
+        return;
     }
 
     // Rename Device Sheet
@@ -12771,6 +12811,37 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         renameNameLength.stringValue = [NSString stringWithFormat:@"%li/140", (long)renameName.stringValue.length];
+        return;
+    }
+
+    // OTP Sheet
+
+    if (sender == otpTextField)
+    {
+        // Makes sure the string isn't longer than six characters
+
+        if (otpTextField.stringValue.length > 6)
+        {
+            otpTextField.stringValue = [otpTextField.stringValue substringToIndex:6];
+            NSBeep();
+        }
+
+        // Make sure the string doesn't contain non-numeral characters
+        
+        NSCharacterSet *set = [NSCharacterSet decimalDigitCharacterSet];
+
+        for (NSInteger i = 0 ; i < otpTextField.stringValue.length ; ++i)
+        {
+            unichar chara = [otpTextField.stringValue characterAtIndex:i];
+
+            if (![set characterIsMember:chara])
+            {
+                NSBeep();
+                NSString *new = i > 0 ? [otpTextField.stringValue substringToIndex:i] : @"";
+                new = i < otpTextField.stringValue.length - 1 ? [new stringByAppendingString:[otpTextField.stringValue substringFromIndex: i + 1]] : new;
+                otpTextField.stringValue = new;
+            }
+        }
     }
 }
 
@@ -12899,9 +12970,6 @@ didReceiveResponse:(NSURLResponse *)response
     }
 }
 
-
-
-#pragma mark - Misc Methods
 
 
 
