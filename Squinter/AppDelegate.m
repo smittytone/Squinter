@@ -620,6 +620,11 @@
                name:@"BuildAPILogStreamEnd"
              object:ide];
 
+    [nsncdc addObserver:self
+               selector:@selector(getOtp:)
+                   name:@"BuildAPINeedOTP"
+                 object:ide];
+
     // Set up sleep/wake notification
 
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
@@ -2027,7 +2032,7 @@
             {
                 // We're logged in, but to the wrong account
 				
-                [self projectAccountAlert:currentProject :@"update the product linked to"];
+                [self projectAccountAlert:currentProject :@"update the product linked to" :_window];
                 return;
             }
 
@@ -2117,7 +2122,7 @@
             {
                 // We're logged in, but to the wrong account
 				
-                [self devicegroupAccountAlert:currentDevicegroup :@"update"];
+                [self devicegroupAccountAlert:currentDevicegroup :@"update" :_window];
                 return;
             }
 			
@@ -2963,7 +2968,7 @@
     {
         // We have selected a project that is NOT tied to the current account, so we can't link them
 
-        [self projectAccountAlert:currentProject :[NSString stringWithFormat:@"link product “%@” with", [self getValueFrom:selectedProduct withKey:@"name"]]];
+        [self projectAccountAlert:currentProject :[NSString stringWithFormat:@"link product “%@” with", [self getValueFrom:selectedProduct withKey:@"name"]] :_window];
         return;
     }
 
@@ -3027,7 +3032,7 @@
         {
             // We are working on a project that is NOT tied to the current account
 
-            [self projectAccountAlert:currentProject :@"add a device group to"];
+            [self projectAccountAlert:currentProject :@"add a device group to" :_window];
             return;
         }
     }
@@ -3637,7 +3642,7 @@
         {
             // We are working on a project that is NOT tied to the current account
 
-            [self devicegroupAccountAlert:currentDevicegroup :@"delete"];
+            [self devicegroupAccountAlert:currentDevicegroup :@"delete" :_window];
             return;
         }
 
@@ -3655,7 +3660,8 @@
                     // The device group has at least one device assigned to it so we can't delete
 
                     [self accountAlert:[NSString stringWithFormat:@"Device group \"%@\" can’t be deleted.", currentDevicegroup.name]
-                                      :[NSString stringWithFormat:@"Device group \"%@\" has devices assigned to it. A device group can’t be deleted until all of its devices have been re-assigned.", currentDevicegroup.name]];
+                                      :[NSString stringWithFormat:@"Device group \"%@\" has devices assigned to it. A device group can’t be deleted until all of its devices have been re-assigned.", currentDevicegroup.name]
+                                      :_window];
                     return;
                 }
             }
@@ -3741,7 +3747,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"edit"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"edit" :_window];
         return;
     }
 
@@ -3782,7 +3788,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"upload code to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"upload code to" :_window];
         return;
     }
 
@@ -4062,7 +4068,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"list commits to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"list commits to" :_window];
         return;
     }
 
@@ -4122,7 +4128,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"set the minimum deployment for"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"set the minimum deployment for" :_window];
         return;
     }
 
@@ -4218,7 +4224,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"set a production device group as a target for"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"set a production device group as a target for" :_window];
         return;
     }
 
@@ -4255,7 +4261,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"show test blessed devices in"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"show test blessed devices in" :_window];
         return;
     }
 
@@ -4477,7 +4483,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"restart all the devices assigned to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"restart all the devices assigned to" :_window];
         return;
     }
 
@@ -4509,7 +4515,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"conditionally restart all the devices assigned to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"conditionally restart all the devices assigned to" :_window];
         return;
     }
 
@@ -4587,7 +4593,8 @@
         // We are working on a project that is NOT tied to the current account
 
         [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", currentProject.name]
-                          :[NSString stringWithFormat:@"To assign devices to any of this project’s device groups, you need to log out of your current account and log into the account it is associated with (ID %@)", currentProject.aid]];
+                          :[NSString stringWithFormat:@"To assign devices to any of this project’s device groups, you need to log out of your current account and log into the account it is associated with (ID %@)", currentProject.aid]
+                          :_window];
         return;
     }
 
@@ -5558,7 +5565,7 @@
                                     {
                                         // Whoops - they don't match so warn the use that they can't work with this project
 										
-                                        [self projectAccountAlert:currentProject :@"**apply changes to this project"];
+                                        [self projectAccountAlert:currentProject :@"**apply changes to this project" :_window];
 										
                                         // DON'T go on to select the product or set the creator ID as it will be wrong
                                         // Same product ID but wrong account ID
@@ -5634,7 +5641,7 @@
                                 {
                                     // Whoops - they don't match so warn the use that they can't work with this project
 
-                                    [self projectAccountAlert:currentProject :@"*apply changes to this project"];
+                                    [self projectAccountAlert:currentProject :@"*apply changes to this project" :_window];
                                 }
 
                                 // NOTE If account IDs match, we could suggest the user logs in at this point...
@@ -5656,7 +5663,7 @@
                         {
                             // If the account IDs don't match, then the product ID won't no matter what
 							
-                            [self projectAccountAlert:currentProject :@"***apply changes to this project"];
+                            [self projectAccountAlert:currentProject :@"***apply changes to this project" :_window];
                         }
                     }
                 }
@@ -5677,7 +5684,7 @@
                     {
                         // Whoops - they don't match so warn the use that they can't work with this project
 
-                        [self projectAccountAlert:currentProject :@"*apply changes to this project"];
+                        [self projectAccountAlert:currentProject :@"*apply changes to this project" :_window];
                     }
                 }
 				else
@@ -12897,40 +12904,6 @@ didReceiveResponse:(NSURLResponse *)response
 #pragma mark - Misc Methods
 
 
-- (BOOL)isCorrectAccount:(Project *)project
-{
-    // Returns YES or NO depending on whether the user is signed into the correct account
-
-    return (project.aid.length > 0 && [project.aid compare:ide.currentAccount] != NSOrderedSame) ? NO : YES;
-}
-
-
-
-- (void)projectAccountAlert:(Project *)project :(NSString *)action
-{
-    [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
-                      :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]];
-}
-
-
-- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action
-{
-    Project *project = [self getParentProject:devicegroup];
-
-    [self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
-                      :[NSString stringWithFormat:@"To %@ this device group, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]];
-}
-
-
-
-- (void)accountAlert:(NSString *)head :(NSString *)body
-{
-    NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = head;
-    alert.informativeText = body;
-    [alert addButtonWithTitle:@"OK"];
-    [alert beginSheetModalForWindow:_window completionHandler:nil];
-}
 
 
 @end

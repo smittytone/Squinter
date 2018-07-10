@@ -401,6 +401,7 @@
 - (IBAction)setSecureEntry:(id)sender;
 - (IBAction)switchAccount:(id)sender;
 - (IBAction)signup:(id)sender;
+- (void)getOtp:(NSNotification *)note;
 
 
 // New Project Methods
@@ -676,10 +677,6 @@
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
 
-- (BOOL)isCorrectAccount:(Project *)project;
-- (void)projectAccountAlert:(Project *)project :(NSString *)action;
-- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action;
-- (void)accountAlert:(NSString *)head :(NSString *)body;
 
 
 @property (nonatomic, strong) NSTouchBar *touchBar;
