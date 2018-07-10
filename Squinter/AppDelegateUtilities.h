@@ -70,6 +70,10 @@
 - (NSInteger)perceivedBrightness:(NSColor *)colour;
 - (NSString *)getCloudName:(NSInteger)cloudCode;
 - (NSString *)recodeLogTags:(NSString *)string;
+- (BOOL)isCorrectAccount:(Project *)project;
+- (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow;
+- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow;
+- (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow;
 
 
 @end

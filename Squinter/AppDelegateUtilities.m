@@ -1069,4 +1069,43 @@
 }
 
 
+
+- (BOOL)isCorrectAccount:(Project *)project
+{
+    // Returns YES or NO depending on whether the user is signed into the correct account
+
+    return (project.aid.length > 0 && [project.aid compare:ide.currentAccount] != NSOrderedSame) ? NO : YES;
+}
+
+
+
+- (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow
+{
+    [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
+                      :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
+                      :sheetWindow];
+}
+
+
+- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow
+{
+    Project *project = [self getParentProject:devicegroup];
+
+    [self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
+                      :[NSString stringWithFormat:@"To %@ this device group, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
+                      :sheetWindow];
+}
+
+
+
+- (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow
+{
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = head;
+    alert.informativeText = body;
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:sheetWindow completionHandler:nil];
+}
+
+
 @end
