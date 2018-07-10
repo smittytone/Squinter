@@ -310,7 +310,7 @@
                     {
                         NSString *typeString = [model.type compare:@"agent"] == NSOrderedSame ? @"Agent" : @"Device";
 
-                        TreeNode *mnode = [[TreeNode alloc] init];
+                        //TreeNode *mnode = [[TreeNode alloc] init];
                         //mnode.children = [[NSMutableArray alloc] init];
                         //mnode.flag = YES;
                         //mnode.key = ([typeString compare:@"Agent"] == NSOrderedSame) ? @"Agent Code Information" : @"Device Code Information";
