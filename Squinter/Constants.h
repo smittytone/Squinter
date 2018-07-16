@@ -56,8 +56,8 @@
 #define kLoginResultCodeNetFail             1
 #define kLoginResultCodeCredFail            2
 
-#define kImpCloudTypeAWS					0
-#define kImpCloudTypeAzure					1
+#define kImpCloudTypeAWS                    0
+#define kImpCloudTypeAzure                  1
 
 // Squinted
 
@@ -73,7 +73,7 @@
 
 // Inspector Tabs
 
-#define kInspectorTabProject				0
+#define kInspectorTabProject                0
 #define kInspectorTabDevice                 1
 
 #endif
