@@ -541,6 +541,18 @@
             [deviceValues addObject:@"Unknown"];
         }
 
+        [deviceKeys addObject:@"RSSI "];
+        NSNumber *rssi = [device valueForKeyPath:@"attributes.rssi"];
+
+        if ((NSNull *)rssi == [NSNull null] || rssi.integerValue == 0)
+        {
+            [deviceValues addObject:@"Unknown"];
+        }
+        else
+        {
+            [deviceValues addObject:[NSString stringWithFormat:@"%i", rssi.intValue]];
+        }
+
         [deviceKeys addObject:@"Agent Information"];
         [deviceValues addObject:@""];
 
