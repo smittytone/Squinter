@@ -4404,6 +4404,11 @@
 {
     if (refreshTimer != nil)
     {
+        // If 'refreshTimer' is not nil, we are already auto-refreshing, so it's
+        // clear that the the user wants to turn auto-updates off. Turn off the
+        // timer, update the menu item and nil the refreshTimer reference, so we
+        // don't come back here next time the menu is selected
+
         [refreshTimer invalidate];
 		
         checkDeviceStatusMenuItem.state = NSOffState;
@@ -4413,9 +4418,15 @@
 	
     if (ide.isLoggedIn)
     {
+        // If we are logged in to the impCloud, we can start to auto-refresh device info
+
         checkDeviceStatusMenuItem.state = NSOnState;
-		
+
+        // If there are no known devices yet, go and get the list
+
         if (devicesArray == nil || devicesArray.count == 0) [self updateDevicesStatus:nil];
+
+        // Now set the refresh timer to call repeatedly
 
         refreshTimer = [NSTimer scheduledTimerWithTimeInterval:updateDevicePeriod
                                                         target:self
@@ -4435,16 +4446,23 @@
 
 - (void)deviceStatusCheck
 {
+    // If we're in the process of checking already when the timer fires, don't proceed any further
+
     if (deviceCheckCount != -1) return;
-	
+
     if (devicesArray != nil && devicesArray.count > 0)
     {
-        // [self writeStringToLog:@"Refreshing devices’ status information..." :YES];
+        // We have a list of devices in place and there is at least one device in the list
+        // so go through each device in the list and update its details individually
+
+        [self writeStringToLog:@"Auto-updating devices' status. This can be disabled in the Device menu." :YES];
 		
         deviceCheckCount = 0;
 		
         for (NSUInteger i = 0 ; i < devicesArray.count ; ++i)
         {
+            // Re-acquire a single device's data
+
             NSDictionary *device = [devicesArray objectAtIndex:i];
             NSDictionary *dict = @{ @"action" : @"refreshdevice",
                                     @"device" : device };
