@@ -410,6 +410,7 @@
     NSInteger fontSize = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue];
     BOOL isBold = [[defaults objectForKey:@"com.bps.squinter.showboldtext"] boolValue];
     logTextView.font = [self setLogViewFont:fontName :fontSize :isBold];
+    logFont = logTextView.font;
 
     float r = [[defaults objectForKey:@"com.bps.squinter.text.red"] floatValue];
     float b = [[defaults objectForKey:@"com.bps.squinter.text.blue"] floatValue];
@@ -640,17 +641,29 @@
     // Get macOS version
 
     sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+
+
+    // Load in working directory, reading in the location from the defaults in case it has been changed by a previous launch
+
+    workingDirectory = [defaults stringForKey:@"com.bps.squinter.workingdirectory"];
+
+    // Set up parallel operation queue and limit it to serial operation
+
+    extraOpQueue = [[NSOperationQueue alloc] init];
+    extraOpQueue.maxConcurrentOperationCount = 1;
+
+    // Set up the project array, so it's ready for files being opened by double-click,
+    // or from the Dock Tile's menu
+
+    if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
 }
 
 
 
 - (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
 {
-    // If the user launched Squinter by double-clicking a squirrelproj file, this method will be called
-    // *before* applicationDidFinishLoading, so we need to instantiate the project array here. If it is
-    // nil (ie. applicationDidFinishLoading hasn't yet been called) we know to create it.
-
-    if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
+    // If the user launched Squinter by double-clicking a .squirrelproj file, this method will be called
+    // *before* applicationDidFinishLoading
 
     // Turn the opened file’s path into an NSURL an add to the array that openFileHandler: expects
 
@@ -664,35 +677,15 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // We check for an uninstantiated projectArray because we don't want to zap one already
-    // created by application:openFile if that was called before applicationDidFinishLoading,
-    // as it would have been if the user launched Squinter with a .squirrelproj file double-click
-
-    if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
-
     // Instantiate an IDE-access object
 
     ide = [[BuildAPIAccess alloc] init];
     ide.maxListCount = [defaults stringForKey:@"com.bps.squinter.logListCount"].integerValue;
     ide.pageSize = 50;
 
-    // Load in working directory, reading in the location from the defaults in case it has been changed by a previous launch
-
-    workingDirectory = [defaults stringForKey:@"com.bps.squinter.workingdirectory"];
-
-    // Set up parallel operation queue and limit it to serial operation
-
-    extraOpQueue = [[NSOperationQueue alloc] init];
-    extraOpQueue.maxConcurrentOperationCount = 1;
-
     // Update UI
 
-	NSInteger fontIndex = [[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue];
-	NSInteger fontSize = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue];
-    logFont = [self setLogViewFont:[self getFontName:fontIndex] :fontSize :NO];
-
-    [self setToolbar];
-    //[_window setTitle:@"Squinter Beta"];
+	[self setToolbar];
     [_window makeKeyAndOrderFront:self];
 
     if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:self];
