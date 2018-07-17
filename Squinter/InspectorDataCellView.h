@@ -12,6 +12,7 @@
 @property (nonatomic) IBOutlet NSTextField *title;
 @property (nonatomic) IBOutlet NSTextField *data;
 @property (nonatomic, readwrite) NSInteger row;
+@property (nonatomic) NSString *path;
 
 
 @end

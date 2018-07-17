@@ -45,6 +45,7 @@
 
     currentProject = nil;
     currentDevicegroup = nil;
+    eiDeviceGroup = nil;
     selectedProduct = nil;
     selectedDevice = nil;
     projectArray = nil;
@@ -356,7 +357,7 @@
                             [NSNumber numberWithFloat:0.0],
                             [NSNumber numberWithFloat:0.6],
                             [NSNumber numberWithBool:NO],
-                            [NSString stringWithString:NSStringFromRect(iwvc2.view.window.frame)],
+                            [NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)],
                             [NSNumber numberWithBool:NO], nil];
 
     // Drop the arrays into the Defauts
@@ -394,12 +395,12 @@
     {
         NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
         NSRect nuRect = NSRectFromString(frameString);
-        [iwvc2.view.window setFrame:nuRect display:NO];
+        [iwvc.view.window setFrame:nuRect display:NO];
     }
     else
     {
-        iwvc2.mainWindowFrame = _window.frame;
-        [iwvc2 positionWindow];
+        iwvc.mainWindowFrame = _window.frame;
+        [iwvc positionWindow];
     }
 
     // Set the Log TextView's font
@@ -409,6 +410,7 @@
     NSInteger fontSize = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue];
     BOOL isBold = [[defaults objectForKey:@"com.bps.squinter.showboldtext"] boolValue];
     logTextView.font = [self setLogViewFont:fontName :fontSize :isBold];
+    logFont = logTextView.font;
 
     float r = [[defaults objectForKey:@"com.bps.squinter.text.red"] floatValue];
     float b = [[defaults objectForKey:@"com.bps.squinter.text.blue"] floatValue];
@@ -619,6 +621,11 @@
                name:@"BuildAPILogStreamEnd"
              object:ide];
 
+    [nsncdc addObserver:self
+               selector:@selector(getOtp:)
+                   name:@"BuildAPINeedOTP"
+                 object:ide];
+
     // Set up sleep/wake notification
 
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
@@ -634,17 +641,29 @@
     // Get macOS version
 
     sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+
+
+    // Load in working directory, reading in the location from the defaults in case it has been changed by a previous launch
+
+    workingDirectory = [defaults stringForKey:@"com.bps.squinter.workingdirectory"];
+
+    // Set up parallel operation queue and limit it to serial operation
+
+    extraOpQueue = [[NSOperationQueue alloc] init];
+    extraOpQueue.maxConcurrentOperationCount = 1;
+
+    // Set up the project array, so it's ready for files being opened by double-click,
+    // or from the Dock Tile's menu
+
+    if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
 }
 
 
 
 - (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
 {
-    // If the user launched Squinter by double-clicking a squirrelproj file, this method will be called
-    // *before* applicationDidFinishLoading, so we need to instantiate the project array here. If it is
-    // nil (ie. applicationDidFinishLoading hasn't yet been called) we know to create it.
-
-    if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
+    // If the user launched Squinter by double-clicking a .squirrelproj file, this method will be called
+    // *before* applicationDidFinishLoading
 
     // Turn the opened file’s path into an NSURL an add to the array that openFileHandler: expects
 
@@ -658,38 +677,18 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // We check for an uninstantiated projectArray because we don't want to zap one already
-    // created by application:openFile if that was called before applicationDidFinishLoading,
-    // as it would have been if the user launched Squinter with a .squirrelproj file double-click
-
-    if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
-
     // Instantiate an IDE-access object
 
     ide = [[BuildAPIAccess alloc] init];
     ide.maxListCount = [defaults stringForKey:@"com.bps.squinter.logListCount"].integerValue;
     ide.pageSize = 50;
 
-    // Load in working directory, reading in the location from the defaults in case it has been changed by a previous launch
-
-    workingDirectory = [defaults stringForKey:@"com.bps.squinter.workingdirectory"];
-
-    // Set up parallel operation queue and limit it to serial operation
-
-    extraOpQueue = [[NSOperationQueue alloc] init];
-    extraOpQueue.maxConcurrentOperationCount = 1;
-
     // Update UI
 
-	NSInteger fontIndex = [[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue];
-	NSInteger fontSize = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue];
-    logFont = [self setLogViewFont:[self getFontName:fontIndex] :fontSize :NO];
-
-    [self setToolbar];
-    //[_window setTitle:@"Squinter Beta"];
+	[self setToolbar];
     [_window makeKeyAndOrderFront:self];
 
-    if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc2.view.window makeKeyAndOrderFront:self];
+    if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:self];
 
     // Check for updates if that is requested
 
@@ -794,7 +793,7 @@
 
     [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
     [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
-    if (iwvc2.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc2.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
+    if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
     [defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
     // Stop watching for notifications
@@ -924,27 +923,27 @@
     // Show the Inspector if it's closed
     // If the Inspector is obscured by the main window, or not key, bring it forward
     
-    [iwvc2.view.window makeKeyAndOrderFront:self];
+    [iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
 
 - (IBAction)showProjectInspector:(id)sender
 {
-    if (currentProject != nil) iwvc2.project = currentProject;
+    if (currentProject != nil) iwvc.project = currentProject;
     
-    [iwvc2 setTab:kInspectorTabProject];
-    [iwvc2.view.window makeKeyAndOrderFront:self];
+    [iwvc setTab:kInspectorTabProject];
+    [iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
 
 - (IBAction)showDeviceInspector:(id)sender
 {
-    if (selectedDevice != nil) iwvc2.device = selectedDevice;
+    if (selectedDevice != nil) iwvc.device = selectedDevice;
     
-    [iwvc2 setTab:kInspectorTabDevice];
-    [iwvc2.view.window makeKeyAndOrderFront:self];
+    [iwvc setTab:kInspectorTabDevice];
+    [iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -1018,7 +1017,7 @@
     selectedProduct = nil;
 
     selectedDevice = nil;
-    iwvc2.device = nil;
+    iwvc.device = nil;
     
     // Stop auto-updating account devices' status
     
@@ -1287,6 +1286,37 @@
 }
 
 
+- (void)getOtp:(NSNotification *)note
+{
+    NSDictionary *data = (NSDictionary *)note.object;
+    loginKey = [data objectForKey:@"token"];
+
+    // Show OTP request box
+
+    [_window beginSheet:otpSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)setOtp:(id)sender
+{
+    [_window endSheet:otpSheet];
+
+    NSString *otp = otpTextField.stringValue;
+    [ide twoFactorLogin:loginKey :otp];
+}
+
+
+
+- (IBAction)cancelOtpSheet:(id)sender
+{
+    [_window endSheet:otpSheet];
+}
+
+
+
+
+
 
 #pragma mark - New Project Methods
 
@@ -1517,12 +1547,13 @@
     [self addProjectMenuItem:projectName :currentProject];
 
     // Enable project-related UI items for the new project
-    // NOTE 'addProjectMenuItem:' will have update the sub-menus already
+    // NOTE 'addProjectMenuItem:' will have updated the sub-menus already
 
     [self refreshProjectsMenu];
     [self setToolbar];
 
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
+    [iwvc setTab:0];
 
     // Mark the status light as empty, ie. in need of saving
 
@@ -1714,7 +1745,7 @@
 	
     // Set the inspector
 	
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
 }
 
 
@@ -1891,7 +1922,7 @@
     [self refreshDevicegroupMenu];
     [self setToolbar];
 
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
 }
 
 
@@ -2025,7 +2056,7 @@
             {
                 // We're logged in, but to the wrong account
 				
-                [self projectAccountAlert:currentProject :@"update the product linked to"];
+                [self projectAccountAlert:currentProject :@"update the product linked to" :_window];
                 return;
             }
 
@@ -2083,8 +2114,10 @@
             {
                 currentProject.description = newDesc;
                 currentProject.haschanged = YES;
-                [self refreshOpenProjectsMenu];
+                iwvc.project = currentProject;
             }
+
+            // Report if no changes were made
 
             if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
 
@@ -2113,7 +2146,7 @@
             {
                 // We're logged in, but to the wrong account
 				
-                [self devicegroupAccountAlert:currentDevicegroup :@"update"];
+                [self devicegroupAccountAlert:currentDevicegroup :@"update" :_window];
                 return;
             }
 			
@@ -2136,8 +2169,16 @@
                 changed = YES;
             }
 
+
+
             if (changed)
             {
+                // Add the device group's type to the keys - values arrays. It will not be changed,
+                // but it hacks around an issue with BuildAPIAccess
+                
+                [keys addObject:@"type"];
+                [values addObject:currentDevicegroup.type];
+
                 NSDictionary *dict = @{ @"action" : @"devicegroupchanged",
                                         @"devicegroup" : currentDevicegroup };
 
@@ -2723,7 +2764,12 @@
     {
         [ide getProducts:dict];
 
-        // Pick up the action in 'listProducts:'
+        // Pick up the action in **listProducts:**
+        // NOTE This will trigger updates to:
+        //      The Project Inspector (sets 'products' array)
+        //      Projects menu
+        //      Projects > Products sub-menu
+        //      Toolbar
     }
     else
     {
@@ -2823,7 +2869,7 @@
 
                 [ide getDevicegroupsWithFilter:@"product.id" :[selectedProduct objectForKey:@"id"] :dict];
 
-                // Pick up the action in 'productToProjectStageTwo:'
+                // Pick up the action in **productToProjectStageTwo:**
             }
         }];
     }
@@ -2946,7 +2992,7 @@
     {
         // We have selected a project that is NOT tied to the current account, so we can't link them
 
-        [self projectAccountAlert:currentProject :[NSString stringWithFormat:@"link product “%@” with", [self getValueFrom:selectedProduct withKey:@"name"]]];
+        [self projectAccountAlert:currentProject :[NSString stringWithFormat:@"link product “%@” with", [self getValueFrom:selectedProduct withKey:@"name"]] :_window];
         return;
     }
 
@@ -3010,7 +3056,7 @@
         {
             // We are working on a project that is NOT tied to the current account
 
-            [self projectAccountAlert:currentProject :@"add a device group to"];
+            [self projectAccountAlert:currentProject :@"add a device group to" :_window];
             return;
         }
     }
@@ -3280,7 +3326,7 @@
 
         // Update the inspector, if required
 
-        if (iwvc2.tabIndex == kInspectorTabProject) iwvc2.project = currentProject;
+        if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
 
         // Create the new device group's files as requested
 
@@ -3487,6 +3533,10 @@
 
         if (currentDevicegroup.models == nil) currentDevicegroup.models = [[NSMutableArray alloc] init];
 
+        // Watch the new file
+
+        BOOL added = [self checkAndWatchFile:savePath];
+
         if (action == kActionNewDGBothFiles)
         {
             // We have just written the agent code file, so now go and write the device file in the same place
@@ -3520,6 +3570,8 @@
 
             [self refreshMainDevicegroupsMenu];
         }
+
+        if (!added) NSLog(@"Some files couldn't be added");
     }
     else
     {
@@ -3614,7 +3666,7 @@
         {
             // We are working on a project that is NOT tied to the current account
 
-            [self devicegroupAccountAlert:currentDevicegroup :@"delete"];
+            [self devicegroupAccountAlert:currentDevicegroup :@"delete" :_window];
             return;
         }
 
@@ -3632,7 +3684,8 @@
                     // The device group has at least one device assigned to it so we can't delete
 
                     [self accountAlert:[NSString stringWithFormat:@"Device group \"%@\" can’t be deleted.", currentDevicegroup.name]
-                                      :[NSString stringWithFormat:@"Device group \"%@\" has devices assigned to it. A device group can’t be deleted until all of its devices have been re-assigned.", currentDevicegroup.name]];
+                                      :[NSString stringWithFormat:@"Device group \"%@\" has devices assigned to it. A device group can’t be deleted until all of its devices have been re-assigned.", currentDevicegroup.name]
+                                      :_window];
                     return;
                 }
             }
@@ -3718,7 +3771,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"edit"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"edit" :_window];
         return;
     }
 
@@ -3759,7 +3812,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"upload code to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"upload code to" :_window];
         return;
     }
 
@@ -4039,7 +4092,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"list commits to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"list commits to" :_window];
         return;
     }
 
@@ -4099,7 +4152,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"set the minimum deployment for"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"set the minimum deployment for" :_window];
         return;
     }
 
@@ -4195,7 +4248,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"set a production device group as a target for"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"set a production device group as a target for" :_window];
         return;
     }
 
@@ -4232,7 +4285,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"show test blessed devices in"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"show test blessed devices in" :_window];
         return;
     }
 
@@ -4251,43 +4304,67 @@
 
 - (void)selectDevice
 {
-    // Select the first device in the current device group
+    // Select the first device in the current device group, if we have a list of devices
+    // and we actualy have a current device group. Called to select a device after a
+    // project has been opened, selected or downloaded from a product
+    //
+    // Called from: openSquirrelProject:
+    //              productToProjectStage2:
+    //              chooseProject:
 
     if (currentDevicegroup.devices.count > 0 && devicesArray.count > 0)
     {
-        NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
+        // The current device group should have a list of devices - get the ID of the first one
 
-        // First check by device ID — this is how the data should be stored,
-        // but earlier versions used device name...
-
-        for (NSDictionary *device in devicesArray)
+        if (currentDevicegroup.devices.count > 0)
         {
-            NSString *aDevId = [self getValueFrom:device withKey:@"id"];
+            NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
 
-            if ([aDevId compare:devId] == NSOrderedSame)
+            // First check by device ID — this is how the data should be stored,
+            // but earlier versions used device name...
+
+            for (NSDictionary *device in devicesArray)
             {
-                selectedDevice = (NSMutableDictionary *)device;
-                iwvc2.device = selectedDevice;
-                [self refreshDevicesPopup];
-                [self refreshDeviceMenu];
-                return;
+                NSString *aDevId = [self getValueFrom:device withKey:@"id"];
+
+                if ([aDevId compare:devId] == NSOrderedSame)
+                {
+                    selectedDevice = (NSMutableDictionary *)device;
+                    iwvc.device = selectedDevice;
+
+                    [self setDevicesPopupTick];
+                    [self setUnassignedDevicesMenuTick];
+                    [self setDevicesMenusTicks];
+                    [self refreshDeviceMenu];
+
+                    return;
+                }
+            }
+
+            // ...so we also check by device name, just in case
+
+            for (NSDictionary *device in devicesArray)
+            {
+                NSString *aDevId = [self getValueFrom:device withKey:@"name"];
+
+                if ([aDevId compare:devId] == NSOrderedSame)
+                {
+                    selectedDevice = (NSMutableDictionary *)device;
+                    iwvc.device = selectedDevice;
+
+                    [self setDevicesPopupTick];
+                    [self setUnassignedDevicesMenuTick];
+                    [self setDevicesMenusTicks];
+                    [self refreshDeviceMenu];
+
+                    return;
+                }
             }
         }
-
-        // ...so we also check by device name, just in case
-
-        for (NSDictionary *device in devicesArray)
+        else
         {
-            NSString *aDevId = [self getValueFrom:device withKey:@"name"];
-
-            if ([aDevId compare:devId] == NSOrderedSame)
-            {
-                selectedDevice = (NSMutableDictionary *)device;
-                iwvc2.device = selectedDevice;
-                [self refreshDevicesPopup];
-                [self refreshDeviceMenu];
-                return;
-            }
+            // TODO Should we load up the devics — or has this been done?
+            //      If already attempted, it might have failed
         }
     }
 }
@@ -4320,6 +4397,11 @@
 {
     if (refreshTimer != nil)
     {
+        // If 'refreshTimer' is not nil, we are already auto-refreshing, so it's
+        // clear that the the user wants to turn auto-updates off. Turn off the
+        // timer, update the menu item and nil the refreshTimer reference, so we
+        // don't come back here next time the menu is selected
+
         [refreshTimer invalidate];
 		
         checkDeviceStatusMenuItem.state = NSOffState;
@@ -4329,9 +4411,15 @@
 	
     if (ide.isLoggedIn)
     {
+        // If we are logged in to the impCloud, we can start to auto-refresh device info
+
         checkDeviceStatusMenuItem.state = NSOnState;
-		
+
+        // If there are no known devices yet, go and get the list
+
         if (devicesArray == nil || devicesArray.count == 0) [self updateDevicesStatus:nil];
+
+        // Now set the refresh timer to call repeatedly
 
         refreshTimer = [NSTimer scheduledTimerWithTimeInterval:updateDevicePeriod
                                                         target:self
@@ -4351,16 +4439,23 @@
 
 - (void)deviceStatusCheck
 {
+    // If we're in the process of checking already when the timer fires, don't proceed any further
+
     if (deviceCheckCount != -1) return;
-	
+
     if (devicesArray != nil && devicesArray.count > 0)
     {
-        // [self writeStringToLog:@"Refreshing devices’ status information..." :YES];
+        // We have a list of devices in place and there is at least one device in the list
+        // so go through each device in the list and update its details individually
+
+        [self writeStringToLog:@"Auto-updating devices' status. This can be disabled in the Device menu." :YES];
 		
         deviceCheckCount = 0;
 		
         for (NSUInteger i = 0 ; i < devicesArray.count ; ++i)
         {
+            // Re-acquire a single device's data
+
             NSDictionary *device = [devicesArray objectAtIndex:i];
             NSDictionary *dict = @{ @"action" : @"refreshdevice",
                                     @"device" : device };
@@ -4430,7 +4525,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"restart all the devices assigned to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"restart all the devices assigned to" :_window];
         return;
     }
 
@@ -4462,7 +4557,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"conditionally restart all the devices assigned to"];
+        [self devicegroupAccountAlert:currentDevicegroup :@"conditionally restart all the devices assigned to" :_window];
         return;
     }
 
@@ -4540,7 +4635,8 @@
         // We are working on a project that is NOT tied to the current account
 
         [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", currentProject.name]
-                          :[NSString stringWithFormat:@"To assign devices to any of this project’s device groups, you need to log out of your current account and log into the account it is associated with (ID %@)", currentProject.aid]];
+                          :[NSString stringWithFormat:@"To assign devices to any of this project’s device groups, you need to log out of your current account and log into the account it is associated with (ID %@)", currentProject.aid]
+                          :_window];
         return;
     }
 
@@ -4804,68 +4900,69 @@
 - (IBAction)chooseDevice:(id)sender
 {
     // The user has selected a device from one of three places:
-    // - Device PopUp
-    // - Unassigned Devices submenu
-    // - Device Groups submenu
+    //   The Device PopUp
+    //   The 'Device' menu's 'Unassigned Devices' submenu
+    //   The 'Device Groups' menu's 'Project's Device Groups' submenu
 
     NSMenuItem *item;
     BOOL isUnassigned = NO;
-    BOOL isAssigned = NO;
     BOOL isPopup = NO;
 
     if (sender == devicesPopUp)
     {
-        // Device selected from the popup rather than the menu
+        // Device has been selected from the popup rather than the menu
 
+        isPopup = YES;
         item = devicesPopUp.selectedItem;
+
+        // Ignore the selection if it's 'None'
 
         if ([item.title compare:@"None"] == NSOrderedSame)
         {
             item.enabled = NO;
             return;
         }
-
-        selectedDevice = item.representedObject;
-        isPopup = YES;
     }
     else
     {
+        // We may be here from eiter the 'Unassigned Devices' or the 'Project's Device Groups' submenu
+
         item = (NSMenuItem *)sender;
-
-        // We may be here from the Unassigned Device menu or from a Device Groups submenu
-
-        if (item.menu == unassignedDevicesMenu)
-        {
-            isUnassigned = YES;
-        }
-        else
-        {
-            isAssigned = YES;
-        }
-
-        selectedDevice = item.representedObject;
+        isUnassigned = item.menu == unassignedDevicesMenu ? YES : NO;
     }
 
-    // Run through the Device Groups submenus and switch all the entries off
-    // EXCEPT the entry matching 'selectedDevice' IF we came here from this menu
+    // Set the currently selected device to the object the menu item is bound to
 
-    for (NSMenuItem *dgitem in deviceGroupsMenu.itemArray)
+    selectedDevice = item.representedObject;
+
+    if (!isPopup && !isUnassigned)
     {
-        if (dgitem.submenu != nil)
-        {
-            for (NSMenuItem *sitem in dgitem.submenu.itemArray)
-            {
-                sitem.state = NSOffState;
+        // Run through the Device Groups submenus to see if the selected device is not assigned to the
+        // currently selected device group (because we'll now need to select that group)
+        // NOTE But only if we DIDN'T select from the popup or an unassgined device, ie. these controls
+        //      do not force a devicegroup switch
 
-                if (isAssigned || isPopup)
+        for (NSMenuItem *menuitem in deviceGroupsMenu.itemArray)
+        {
+            if (menuitem.submenu != nil)
+            {
+                // The referenced device group has a submenu, ie. it has some assigned devices
+
+                for (NSMenuItem *subMenuItem in menuitem.submenu.itemArray)
                 {
-                    if (sitem.representedObject == selectedDevice)
+                    subMenuItem.state = NSOffState;
+
+                    if (subMenuItem.representedObject == selectedDevice)
                     {
-                        sitem.state = NSOnState;
-                        if (dgitem.representedObject != currentDevicegroup)
+                        if (menuitem.representedObject != currentDevicegroup)
                         {
+                            // We are selecting a new device group by selecting an assigned device
+                            // NOTE This doesn't force a project change because we are only selecting from
+                            //      among one project's device groups and devices
+
                             deviceSelectFlag = YES;
-                            [self chooseDevicegroup:dgitem];
+
+                            [self chooseDevicegroup:menuitem];
                         }
                     }
                 }
@@ -4873,32 +4970,19 @@
         }
     }
 
-    // Run through the Unassigned Devices menu and switch all the entries off
-    // EXCEPT the one matching 'selectedDevice' IF we came here from this menu
+    // Update the UI: First, the device menus tick marks:
 
-    for (NSMenuItem *unitem in unassignedDevicesMenu.itemArray)
-    {
-        unitem.state = NSOffState;
+    if (!isPopup) [self setDevicesPopupTick];
+    if (!isUnassigned) [self setUnassignedDevicesMenuTick];
+    if (isPopup || isUnassigned) [self setDevicesMenusTicks];
 
-        if (isUnassigned || isPopup)
-        {
-            if (unitem.representedObject == selectedDevice)
-            {
-                unitem.state = NSOnState;
-            }
-        }
-    }
-
-    NSInteger index = [devicesArray indexOfObject:selectedDevice];
-    [devicesPopUp selectItemWithTag:index];
-
-    // Update the UI
+    // Update the menus and toolbar
 
     [self refreshDevicegroupMenu];
     [self refreshDeviceMenu];
     [self setToolbar];
 
-    iwvc2.device = selectedDevice;
+    iwvc.device = selectedDevice;
 }
 
 
@@ -4967,41 +5051,58 @@
 
 - (IBAction)streamLogs:(id)sender
 {
+    // Called by the UI in response to user control, to begin streaming logs from the current device
+
+    // Is there a currently selected device? If not, bail
+
     if (selectedDevice == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
 
+    // We have a selected device
+
     NSString *devid = [self getValueFrom:selectedDevice withKey:@"id"];
     NSString *devname = [self getValueFrom:selectedDevice withKey:@"name"];
 
+    // Is the selected device already being streamed?
+
     if (![ide isDeviceLogging:devid])
     {
+        // No, the device is not in the log stream, so add it
+
         if (ide.numberOfLogStreams == kMaxLogStreamDevices)
         {
+            // We have reached the maximum number of logs per stream, so warn the user
+            // TODO Support multiple streams as one
+
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = @"You are already logging five devices";
-            alert.informativeText = @"The impCentral API only supports logging for up to five devices simultaneously. To stream logs from another device, you will need to stop logging from one of the current streaming devices.";
+            alert.messageText = [NSString stringWithFormat:@"You are already logging %@ devices", kMaxLogStreamDevicesText];
+            alert.informativeText = [NSString stringWithFormat:@"The impCentral API only supports logging for up to %@ devices simultaneously. To stream logs from another device, you will need to stop logging from one of the current streaming devices.", kMaxLogStreamDevicesText];
             [alert addButtonWithTitle:@"OK"];
             [alert beginSheetModalForWindow:_window
-                          completionHandler:^(NSModalResponse response)
-             {
-                 return;
-             }
-             ];
+                          completionHandler:nil];
 
             return;
         }
 
+        // Set the Toolbar Item's state
+
         streamLogsItem.state = 1;
 
+        // Start logging
+
         [ide startLogging:devid :@{ @"device" : selectedDevice }];
+
+        // Set the spacing for the log output so that log messages align after the device name
 
         if (devname.length > logPaddingLength) logPaddingLength = devname.length;
     }
     else
     {
+        // Yes, the device is in the log stream, so remove it
+
         [ide stopLogging:devid];
 
         // Reset the log padding to the longest logging device name
@@ -5019,6 +5120,8 @@
                 if (devname.length > logPaddingLength) logPaddingLength = devname.length;
             }
         }
+
+        // Set the Toolbar Item's state
 
         streamLogsItem.state = 1;
     }
@@ -5504,7 +5607,7 @@
                                     {
                                         // Whoops - they don't match so warn the use that they can't work with this project
 										
-                                        [self projectAccountAlert:currentProject :@"**apply changes to this project"];
+                                        [self projectAccountAlert:currentProject :@"**apply changes to this project" :_window];
 										
                                         // DON'T go on to select the product or set the creator ID as it will be wrong
                                         // Same product ID but wrong account ID
@@ -5580,7 +5683,7 @@
                                 {
                                     // Whoops - they don't match so warn the use that they can't work with this project
 
-                                    [self projectAccountAlert:currentProject :@"*apply changes to this project"];
+                                    [self projectAccountAlert:currentProject :@"*apply changes to this project" :_window];
                                 }
 
                                 // NOTE If account IDs match, we could suggest the user logs in at this point...
@@ -5602,7 +5705,7 @@
                         {
                             // If the account IDs don't match, then the product ID won't no matter what
 							
-                            [self projectAccountAlert:currentProject :@"***apply changes to this project"];
+                            [self projectAccountAlert:currentProject :@"***apply changes to this project" :_window];
                         }
                     }
                 }
@@ -5623,7 +5726,7 @@
                     {
                         // Whoops - they don't match so warn the use that they can't work with this project
 
-                        [self projectAccountAlert:currentProject :@"*apply changes to this project"];
+                        [self projectAccountAlert:currentProject :@"*apply changes to this project" :_window];
                     }
                 }
 				else
@@ -5755,7 +5858,7 @@
 #endif
                                 // Check that the file is where we think it is
 
-                                result = [self checkFile:modelAbsPath];
+                                result = [self checkAndWatchFile:modelAbsPath];
                                 modelAbsPath = [modelAbsPath stringByDeletingLastPathComponent];
 
                                 if (!result)
@@ -5817,7 +5920,8 @@
                 currentProject.devicegroupIndex = -1;
             }
 			
-            // Select a device
+            // Select the first device assigned to this project's first device group
+            // NOTE This will update the UI ticks
 			
             [self selectDevice];
 
@@ -5828,6 +5932,7 @@
             [self refreshDevicegroupMenu];
             [self refreshMainDevicegroupsMenu];
             [self refreshDeviceMenu];
+
             [self setToolbar];
 
             // Set the status light - light is YES to be not greyed out; full is YES (solid) or NO (empty)
@@ -5841,7 +5946,7 @@
 
             // Update the Inspector
 
-            iwvc2.project = currentProject;
+            iwvc.project = currentProject;
         }
     }
     else
@@ -5885,7 +5990,7 @@
     NSLog(@"%@ Abs: %@", type, fileAbsPath);
 #endif
 
-    BOOL result = [self checkFile:fileAbsPath];
+    BOOL result = [self checkAndWatchFile:fileAbsPath];
     fileAbsPath = [fileAbsPath stringByDeletingLastPathComponent];
 
     if (!result)
@@ -5919,56 +6024,6 @@
     }
 }
 
-
-
-- (void)watchfiles:(Project *)project
-{
-    // Work throgh project's files and add them to the queue
-
-    if (fileWatchQueue == nil)
-    {
-        fileWatchQueue = [[VDKQueue alloc] init];
-        [fileWatchQueue setDelegate:self];
-    }
-
-    NSString *aPath = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
-    BOOL added = [self checkFile:aPath];
-
-    if (project.devicegroups.count > 0)
-    {
-        for (Devicegroup *dg in project.devicegroups)
-        {
-            if (dg.models.count > 0)
-            {
-                for (Model *md in dg.models)
-                {
-                    aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", md.path, md.filename]];
-                    added = [self checkFile:aPath];
-
-                    if (md.libraries.count > 0)
-                    {
-                        for (File *lib in md.libraries)
-                        {
-                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", lib.path, lib.filename]];
-                            added = [self checkFile:aPath];
-                        }
-                    }
-
-                    if (md.files.count > 0)
-                    {
-                        for (File *file in md.files)
-                        {
-                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", file.path, file.filename]];
-                            added = [self checkFile:aPath];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (!added) NSLog(@"Some files couldn't be added");
-}
 
 
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath
@@ -6067,25 +6122,6 @@
     }
 
     return NO;
-}
-
-
-
-- (BOOL)checkFile:(NSString *)filePath
-{
-    // This method takes an ABSOLUTE file path and checks first that the file exists at that path
-    // If if doesn't, it returns NO, otherwise it attempts to add the file to the watch queue, in
-    // which case it returns YES
-
-    BOOL result = [nsfm fileExistsAtPath:filePath];
-
-    if (result)
-    {
-        [fileWatchQueue addPath:filePath
-                 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
-    }
-
-    return result;
 }
 
 
@@ -6751,7 +6787,7 @@
 
     [projectArray addObject:project];
 
-    iwvc2.project = project;
+    iwvc.project = project;
     currentProject = project;
 
     // Set the current device group to the first on the list of the project's
@@ -6840,7 +6876,7 @@
             if ([action compare:@"getproducts"] == NSOrderedSame)
             {
                 // Just re-call 'getProductsFromServer:' as the check on the BuildAPIAccess instance's
-                // currentAccount property will pass, and the products list will be requested from the server
+                // 'currentAccount' property will pass, and the products list will be requested from the server
                 
                 [self getProductsFromServer:nil];
             }
@@ -6899,7 +6935,8 @@
     if (action != nil)
     {
         // 'selectedProduct' may point to an entry in the existing 'productsArray', but this is
-        // about to be zapped, so preserved the ID of the product it points to
+        // about to be zapped, so preserved the ID of the product it points to so that we can
+        // reselect it after updating 'productsArray'
 
         if (selectedProduct != nil)
         {
@@ -6918,6 +6955,8 @@
         {
             [productsArray removeAllObjects];
         }
+
+        NSString *noneString = @"There are no products listed on the server for this account.";
 
         if (products != nil)
         {
@@ -6982,14 +7021,14 @@
             }
             else
             {
-                [self writeStringToLog:@"There are no products listed on the server for this account." :YES];
+                [self writeStringToLog:noneString :YES];
             }
         }
         else
         {
             // TODO Indicate an issue???
 			
-            [self writeStringToLog:@"There are no products listed on the server for this account." :YES];
+            [self writeStringToLog:noneString :YES];
         }
 		
         // Update the UI
@@ -6997,6 +7036,10 @@
         [self refreshProductsMenu];
         [self refreshProjectsMenu];
         [self setToolbar];
+
+        // Point the Inspector at the current products list
+
+        iwvc.products = productsArray;
 
         if ([action compare:@"uploadproject"] == NSOrderedSame)
         {
@@ -7074,7 +7117,7 @@
 
                             [ide getDeployment:dpid :dict];
 
-                            // At this point we have to wait for multiple async calls to 'productToProjectStageThree:'
+                            // At this point we have to wait for multiple async calls to **productToProjectStageThree:**
                         }
                         else
                         {
@@ -7130,7 +7173,7 @@
 
                     [ide getDevicesWithFilter:@"devicegroup.id" :[devicegroup objectForKey:@"id"] :dict];
 
-                    // Pick up the action in 'listDevices:'
+                    // Pick up the action in **listDevices:**
                 }
             }
             else
@@ -7138,7 +7181,6 @@
                 // The product has no devicegroups - ergo no devices — so go direct to the next stage,
                 // ie. don't bother to check device groups for devices
 
-                // [self listDevices:note];
                 [self deleteProductStageTwo:productToDelete];
             }
         }
@@ -7412,7 +7454,7 @@
                 }
             }
 
-            // Pick up the action at 'createDevicegroupStageTwo:'
+            // Pick up the action at **createDevicegroupStageTwo:**
         }
     }
     else
@@ -7449,6 +7491,8 @@
                 project.pid = @"";
                 project.haschanged = YES;
                 if (project == currentProject) [saveLight needSave:YES];
+
+                // NOTE Project Inspector will be updated later, in 'deleteProductStageThree:'
             }
         }
     }
@@ -7474,7 +7518,7 @@
             [ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
         }
 
-        // Pick up the action in 'deleteDevicegroupStageTwo:'
+        // Pick up the action in **deleteDevicegroupStageTwo:**
     }
     else
     {
@@ -7487,7 +7531,7 @@
 
         [ide deleteProduct:[product objectForKey:@"id"] :source];
 
-        // Pick this up at 'deleteProductStageThree:'
+        // Pick this up at **deleteProductStageThree:**
     }
 }
 
@@ -7514,9 +7558,10 @@
     // Go and get an updated list of products
 	
     NSDictionary *dict = @{ @"action" : @"getproducts" };
+
     [ide getProducts:dict];
 	
-    // Pick up the action at 'listProducts:'
+    // Pick up the action at **listProducts:**
 }
 
 
@@ -7556,6 +7601,8 @@
 
                 [self writeStringToLog:@"Refreshing your list of products..." :YES];
                 [self getProductsFromServer:nil];
+
+                // NOTE 'getProductsFromServer:' will go to 'listProducts:' which will update Inspector's 'products' property
             }
         }
         else if ([action compare:@"syncproduct"] == NSOrderedSame)
@@ -8049,6 +8096,8 @@
         [self writeStringToLog:@"List of devices loaded: see 'Current Device' and 'Devices' > 'Unassigned Devices'." :YES];
 
         // Update the UI
+        // NOTE Because we have just updated the device list, we need to refresh it with refreshDevicesPopup and refreshDeviceMenu
+        //      rather than just change the popup's selection
 
         [self refreshDevicesPopup];
         [self refreshDeviceMenu];
@@ -8056,7 +8105,8 @@
         [self setToolbar];
 
         // Update the Inspector
-        iwvc2.devices = devicesArray;
+
+        iwvc.devices = devicesArray;
     }
     else
     {
@@ -8244,7 +8294,7 @@
 
                 // Update the inspector, if required
 
-                if (iwvc2.tabIndex == kInspectorTabProject) iwvc2.project = currentProject;
+                if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
             }
 
             // Now we can produce the source code file, as the user requested
@@ -8450,7 +8500,7 @@
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
 
     selectedDevice = nil;
-    iwvc2.device = nil;
+    iwvc.device = nil;
 
     // Now refresh the devices list
 
@@ -8474,7 +8524,7 @@
     if (selectedDevice == device)
     {
         selectedDevice = nil;
-        iwvc2.device = nil;
+        iwvc.device = nil;
     }
 
     // Now refresh the devices list
@@ -10999,7 +11049,7 @@
 
     [self refreshDevicesMenus];
 
-    iwvc2.project = currentProject;
+    iwvc.project = currentProject;
 }
 
 
@@ -11184,7 +11234,7 @@
 
 - (void)refreshDevicesMenus
 {
-    // Rebuild the various sub-menus of devices assigned to the
+    // Rebuild the various sub-menus listing devices assigned to
     // listed device groups, ie. those belonging to the current project
 
     if (currentProject == nil || currentProject.devicegroups.count == 0)
@@ -11199,7 +11249,9 @@
 
     if (deviceGroupsMenu.numberOfItems > 2)
     {
-        // Remove existing device sub-menus
+        // Remove existing the devices sub-submenus
+        // NOTE The 'deviceGroupsMenu' submenu has at least two non-device group items:
+        //      'Create New Device Group' and a separator item
 
         for (menuItem in deviceGroupsMenu.itemArray)
         {
@@ -11211,14 +11263,16 @@
         }
     }
 
-    // Rebuild the sub-menus
+    // Rebuild the devices sub-sub menus
 
     if (devicesArray.count > 0)
     {
+        // Set through all the known devices and add them to the appropriate sub-submenu
+
         for (NSMutableDictionary *device in devicesArray)
         {
             NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = (NSString *)[dg objectForKey:@"id"];
+            NSString *dgid = [self getValueFrom:dg withKey:@"id"]; // (NSString *)[dg objectForKey:@"id"];
 
             if (dgid != nil)
             {
@@ -11237,7 +11291,7 @@
 
                             if (submenu == nil)
                             {
-                                // If there's no devices submenu, add one
+                                // There's no devices submenu, so add one
 
                                 submenu = [[NSMenu alloc] initWithTitle:adg.name];
                                 item.submenu = submenu;
@@ -11256,6 +11310,9 @@
                             ditem.image = [self menuImage:device];
 
                             break;
+
+                            // TODO We don't check for multiple devices with the same name but different (of course)
+                            //      device IDs — we should sort that out here or (better) when we load the device list
                         }
                     }
                 }
@@ -11278,44 +11335,47 @@
             for (NSMenuItem *ditem in items)
             {
                 [item.submenu addItem:ditem];
-                if (ditem.isHidden) ditem.hidden = NO;
+                if (ditem.isHidden) ditem.hidden = NO; // What's this for?
             }
         }
     }
 
     // Re-select the selected device, if there is one
-    // NOTE the selected device may not be represented here becuase
-    // it's assigned to another device group or is assigned
-    // NOTE A new device group will have no devices, so this won't
-    // select any part of the menu
+
+    [self setDevicesMenusTicks];
+}
+
+
+
+- (void)setDevicesMenusTicks
+{
+    // Run through all of the 'Project's Device Groups' submenu items to find those with
+    // devices sub-submenus. Of those that do, if a listed device matches the currently
+    // selected device, tick it; otherwise untick it (just in case)
 
     if (selectedDevice != nil)
     {
         BOOL flag = NO;
-        NSString *devid = [selectedDevice objectForKey:@"id"];
 
         // For 'deviceGroupsMenu' we have to iterate through any submenus
         // and compare the IDs of the represented device and the selectedDevice
         // as the objects may be identical by value but not by reference
 
-        for (NSMenuItem *item in deviceGroupsMenu.itemArray)
+        for (NSMenuItem *menuItem in deviceGroupsMenu.itemArray)
         {
-            if (item.submenu != nil)
+            if (menuItem.submenu != nil)
             {
-                for (NSMenuItem *sitem in item.submenu.itemArray)
+                for (NSMenuItem *subMenuItem in menuItem.submenu.itemArray)
                 {
-                    NSMutableDictionary *sdict = (NSMutableDictionary *)sitem.representedObject;
-                    NSString *sid = [sdict objectForKey:@"id"];
-
-                    if ([devid compare:sid] == NSOrderedSame)
+                    if (subMenuItem.representedObject == selectedDevice)
                     {
-                        // Set 'selectedDevice' to point at the right object
-
-                        selectedDevice = sdict;
-                        iwvc2.device = selectedDevice;
-                        sitem.state = NSOnState;
+                        subMenuItem.state = NSOnState;
                         flag = YES;
                         break;
+                    }
+                    else
+                    {
+                        subMenuItem.state = NSOffState;
                     }
                 }
             }
@@ -11500,67 +11560,19 @@
 }
 
 
+
 - (NSImage *)menuImage:(NSMutableDictionary *)device
 {
-    // Sets a device menu's icon according to the device's connection status
+    // Sets a device's menu and/or popup icon according to the device's connection status
 
-    NSImage *returnImage = nil;
-    NSString *nameString = @"";
-
+    NSString *imageNameString = @"";
     NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
     NSString *dvid = [self getValueFrom:device withKey:@"id"];
 
-    nameString = boolean.boolValue ? @"online" : @"offline";
-    if ([ide isDeviceLogging:dvid]) nameString = [nameString stringByAppendingString:@"_logging"];
+    imageNameString = boolean.boolValue ? @"online" : @"offline";
+    if ([ide isDeviceLogging:dvid]) imageNameString = [imageNameString stringByAppendingString:@"_logging"];
 
-    returnImage = [NSImage imageNamed:nameString];
-    return returnImage;
-}
-
-
-- (NSString *)menuString:(NSMutableDictionary *)device
-{
-    // Creates the status readout that will be added to the device's name in menus
-    // eg. "Action (logging)"
-
-    NSString *statusString = @"";
-    NSString *loggingString = @"";
-    NSString *returnString = @"";
-
-    NSString *dvid = [self getValueFrom:device withKey:@"id"];
-    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
-
-    if (!boolean.boolValue) statusString = @"offline";
-    if ([ide isDeviceLogging:dvid]) loggingString = @"logging";
-
-    // Assemble the menuString, eg.
-    // "(offline)", "(offline, logging)", "(logging)"
-
-    if (loggingString.length > 0 || statusString.length > 0)
-    {
-        // Start with a space and an open bracket
-
-        returnString = @" (";
-
-        // Add in the offline status indicator if there is one
-
-        if (statusString.length > 0) returnString = [returnString stringByAppendingString:statusString];
-
-        // If we are logging too, add that in too, prefixing with a comma and space
-        // if we have already added offline status
-
-        if (loggingString.length > 0)
-        {
-            if (statusString.length > 0) returnString = [returnString stringByAppendingString:@", "];
-            returnString = @" (logging)";
-        }
-
-        // Finish with a close bracket
-
-        returnString = [returnString stringByAppendingString:@")"];
-    }
-
-    return returnString;
+    return [NSImage imageNamed:imageNameString];
 }
 
 
@@ -11729,6 +11741,11 @@
 
 - (void)refreshDeviceMenu
 {
+    // Called to set the state of the main Device Menu
+    // The sub-menu 'Unassigned Devices' is set by refreshDevicesPopup:
+
+    // Title menus according to whether there is a currently selected device or not
+
     if (selectedDevice != nil)
     {
         NSString *dName = [self getValueFrom:selectedDevice withKey:@"name"];
@@ -11743,7 +11760,7 @@
         deleteDeviceMenuItem.title = [NSString stringWithFormat:@"Delete “%@”", dName];
 
         BOOL flag = [ide isDeviceLogging:[selectedDevice objectForKey:@"id"]];
-        streamLogsMenuItem.title = (flag) ? @"Stop Log Streaming" : @"Start Log Streaming";
+        streamLogsMenuItem.title = flag ? @"Stop Log Streaming" : @"Start Log Streaming";
     }
     else
     {
@@ -11758,19 +11775,23 @@
         streamLogsMenuItem.title = @"Start Log Streaming";
     }
 
-    showDeviceInfoMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    restartDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    copyAgentURLMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    openAgentURLMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    unassignDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    getLogsMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    getHistoryMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    streamLogsMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-    deleteDeviceMenuItem.enabled = (selectedDevice != nil) ? YES : NO;
-	
-    unassignDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
-    renameDeviceMenuItem.enabled = (devicesArray.count > 0) ? YES : NO;
-    assignDeviceMenuItem.enabled = (devicesArray.count > 0 && projectArray.count > 0) ? YES : NO;
+    // Title menus according to whether there is a currently selected device or not
+
+    showDeviceInfoMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    restartDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    copyAgentURLMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    openAgentURLMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    unassignDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    getLogsMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    getHistoryMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    streamLogsMenuItem.enabled = selectedDevice != nil ? YES : NO;
+    deleteDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
+
+    // Title menus according to whether there is a loaded list of devices or not
+
+    unassignDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
+    renameDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
+    assignDeviceMenuItem.enabled = devicesArray.count > 0 && projectArray.count > 0 ? YES : NO;
 }
 
 
@@ -11789,6 +11810,9 @@
     {
         for (NSUInteger i = 0 ; i < devicesArray.count ; ++i)
         {
+            // For each device in the list, set the popup with its name and appropriate graphics
+            // for its connectivity state and its logging state (via menuImage:)
+
             NSMutableDictionary *device = [devicesArray objectAtIndex:i];
             NSString *dvName = [self getValueFrom:device withKey:@"name"];
             [devicesPopUp addItemWithTitle:dvName];
@@ -11811,6 +11835,22 @@
         item.enabled = NO;
     }
 
+    // Show the device selection in the UI
+
+    [self setDevicesPopupTick];
+
+    // Update the list of unassigned devices - this only happens here
+
+    [self refreshUnassignedDevicesMenu];
+}
+
+
+
+- (void)setDevicesPopupTick
+{
+    // Mark the device on the popup which has been selected
+    // Or the select the first on the list if there is not selected device yet
+
     if (selectedDevice != nil)
     {
         // Select the correct pop-up item
@@ -11820,83 +11860,101 @@
     }
     else
     {
-        // Select the first device on the list - if there is a list
+        // Select the first device on the list - but only if there is a list
 
         if (devicesArray.count > 0)
         {
             [devicesPopUp selectItemAtIndex:0];
-                selectedDevice = [devicesArray objectAtIndex:0];
-            iwvc2.device = selectedDevice;
+            selectedDevice = [devicesArray objectAtIndex:0];
+
+            // Also show the device in the Inspector
+
+            iwvc.device = selectedDevice;
         }
     }
-
-    // Update the list of unassigned devices - this only happens here
-
-    [self refreshUnassignedDevicesMenu];
 }
 
 
 
 - (void)refreshUnassignedDevicesMenu
 {
-    // Rebuild the various sub-menus of development devices assigned to the
-    // listed device groups, ie. those belonging to the current project
+    // Rebuild the Devices menu's sub-menu listing unassigned devices
 
-    // NOTE 'refreshDevicesPopup:' handles the 'no devices' warning
-
-    // NOTE #2 This should ALWAYS be called after 'refreshDevicesPopup:' — it is called by 'refreshDevicesPopup:'
+    // NOTE This should ALWAYS be called after 'refreshDevicesPopup:'
+    //      Indeed, it is ONLY called by 'refreshDevicesPopup:'
 
     [unassignedDevicesMenu removeAllItems];
 
-    NSMutableArray *items = nil;
-    NSMutableArray *repos = nil;
+    NSMutableArray *unnassignedDevices = nil;
+    NSMutableArray *representedObjects = nil;
+
+    // Determine which devices we know about (ie. we have a downloaded list) are unassigned
 
     if (devicesArray.count > 0)
     {
-        // Only proceed if we have a list of devices for this account
-
         for (NSMutableDictionary *device in devicesArray)
         {
+            // Run through the list of devices and find those what are unassigned, ie. have no device group ID
+
             NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = [dg objectForKey:@"id"];
             NSString *dvName = [self getValueFrom:device withKey:@"name"];
+            NSString *dgid = [dg objectForKey:@"id"];
+            dgid = [self checkForNull:dgid];
 
-            if (dgid == nil || ((NSNull *)dgid == [NSNull null]))
+            if (dgid == nil)
             {
-                // If there is no device group ID, so the device must be unassigned
+                // If there is no device group ID, the device must be unassigned
 
-                if (items == nil) items = [[NSMutableArray alloc] init];
-                if (repos == nil) repos = [[NSMutableArray alloc] init];
+                if (unnassignedDevices == nil) unnassignedDevices = [[NSMutableArray alloc] init];
+                if (representedObjects == nil) representedObjects = [[NSMutableArray alloc] init];
 
-                [items addObject:dvName];
-                [repos addObject:device];
+                [unnassignedDevices addObject:dvName];
+                [representedObjects addObject:device];
             }
         }
     }
 
-    if (items.count > 0)
+    if (unnassignedDevices != nil && unnassignedDevices.count > 0)
     {
-        // Populate the menu
+        // Populate the submenu
 
-        for (NSUInteger i = 0 ; i < items.count ; ++i)
+        for (NSUInteger i = 0 ; i < unnassignedDevices.count ; ++i)
         {
-            NSString *device = [items objectAtIndex:i];
-            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:device action:@selector(chooseDevice:) keyEquivalent:@""];
+            // For each unassigned device, add its name to the menu and add an approrpriate
+            // graphic indicating its connection state and its logging state (via 'menuImage:)
+            // We also bind the submenu item to the device in the devices array it represents
 
-            NSMutableDictionary *rep = [repos objectAtIndex:i];
-            item.representedObject = rep;
-            item.state = (selectedDevice == rep) ? NSOnState : NSOffState;
-            item.image = [self menuImage:rep];
+            NSString *device = [unnassignedDevices objectAtIndex:i];
+            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:device action:@selector(chooseDevice:) keyEquivalent:@""];
+            NSMutableDictionary *representedObject = [representedObjects objectAtIndex:i];
+            item.representedObject = representedObject;
+            item.state = selectedDevice == representedObject ? NSOnState : NSOffState;
+            item.image = [self menuImage:representedObject];
             [unassignedDevicesMenu addItem:item];
         }
     }
     else
     {
-        // No unassigned devices, so add 'None'
+        // There are no unassigned devices, so add 'None'
 
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"None" action:nil keyEquivalent:@""];
         item.enabled = NO;
         [unassignedDevicesMenu addItem:item];
+    }
+
+    [self setUnassignedDevicesMenuTick];
+}
+
+
+
+- (void)setUnassignedDevicesMenuTick
+{
+    // Run through the 'Unassigned Devices' submenu and switch all the entries off
+    // EXCEPT the one matching 'selectedDevice'
+
+    for (NSMenuItem *unassignedDeviceitem in unassignedDevicesMenu.itemArray)
+    {
+        unassignedDeviceitem.state = (selectedDevice != nil && unassignedDeviceitem.representedObject == selectedDevice) ? NSOnState : NSOffState;
     }
 }
 
@@ -12386,29 +12444,29 @@
 
 - (IBAction)checkElectricImpLibraries:(id)sender
 {
-    [self checkElectricImpLibs];
+    [self checkElectricImpLibs:currentDevicegroup];
 }
 
 
 
-- (void)checkElectricImpLibs
+- (void)checkElectricImpLibs:(Devicegroup *)devicegroup
 {
     // Initiate a read of the current Electric Imp library versions
     // Only do this if the project contains EI libraries and 1 hour has
     // passed since the last look-up
 
-    if (currentDevicegroup.models.count > 0)
+    if (devicegroup.models.count > 0)
     {
         if (eiLibListTime != nil)
         {
             NSDate *now = [NSDate date];
             NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
 
-            if (interval >= kEILibCheckInterval && eiLibListData != nil)
+            if (interval >= kEILibCheckInterval && eiLibListData != nil && eiLibListData.length > 0)
             {
                 // Last check was less than 1 hour earlier, so use existing list if it exists
 
-                [self compareElectricImpLibs];
+                [self compareElectricImpLibs:devicegroup];
                 return;
             }
         }
@@ -12428,6 +12486,7 @@
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
         [request setHTTPMethod:@"GET"];
         eiLibListData = [NSMutableData dataWithCapacity:0];
+        eiDeviceGroup = devicegroup;
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         NSURLSession *session = [NSURLSession sessionWithConfiguration: config
                                                               delegate: self
@@ -12439,9 +12498,11 @@
 
 
 
-- (void)compareElectricImpLibs
+- (void)compareElectricImpLibs:(Devicegroup *)devicegroup
 {
     NSString *parsedData;
+
+    if (devicegroup != nil && devicegroup.models.count == 0) return;
 
     if (eiLibListData != nil && eiLibListData.length > 0)
     {
@@ -12478,7 +12539,7 @@
                     NSString *libName = [[libParts objectAtIndex:0] lowercaseString];
                     NSString *libVer = [libParts objectAtIndex:1];
 
-                    for (Model *model in currentDevicegroup.models)
+                    for (Model *model in devicegroup.models)
                     {
                         if (model.impLibraries.count > 0)
                         {
@@ -12550,8 +12611,10 @@
 
         if (allOKFlag)
         {
-            [self writeStringToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", currentDevicegroup.name] :YES];
+            [self writeStringToLog:[NSString stringWithFormat:@"All the Electric Imp libraries used in device group \"%@\" are up to date.", devicegroup.name] :YES];
         }
+
+        eiDeviceGroup = nil;
     }
 }
 
@@ -12615,7 +12678,7 @@ didReceiveResponse:(NSURLResponse *)response
         // The connection has come to a conclusion without error
 
         [task cancel];
-        [self compareElectricImpLibs];
+        [self compareElectricImpLibs:eiDeviceGroup];
     }
 }
 
@@ -12642,6 +12705,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newProjectNameCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)newProjectNameTextField.stringValue.length];
+        return;
     }
 
     if (sender == newProjectDescTextField)
@@ -12653,6 +12717,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newProjectDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)newProjectDescTextField.stringValue.length];
+        return;
     }
 
     // Rename Project Sheet
@@ -12666,6 +12731,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         renameProjectCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)renameProjectTextField.stringValue.length];
+        return;
     }
 
     if (sender == renameProjectDescTextField)
@@ -12677,6 +12743,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         renameProjectDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)renameProjectDescTextField.stringValue.length];
+        return;
     }
 
     // New Device Group Sheet
@@ -12690,6 +12757,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newDevicegroupNameCountField.stringValue = [NSString stringWithFormat:@"%li/80", (long)newDevicegroupNameTextField.stringValue.length];
+        return;
     }
 
     if (sender == newDevicegroupDescTextField)
@@ -12701,6 +12769,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         newDevicegroupDescCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)newDevicegroupDescTextField.stringValue.length];
+        return;
     }
 
     // Rename Device Group Sheet
@@ -12716,6 +12785,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         uploadCommitCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)uploadCommitTextField.stringValue.length];
+        return;
     }
 
     if (sender == uploadOriginTextField)
@@ -12727,6 +12797,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         uploadOriginCountField.stringValue = [NSString stringWithFormat:@"%li/255", (long)uploadOriginTextField.stringValue.length];
+        return;
     }
 
     if (sender == uploadTagsTextField)
@@ -12738,6 +12809,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         uploadTagsCountField.stringValue = [NSString stringWithFormat:@"%li/500", (long)uploadTagsTextField.stringValue.length];
+        return;
     }
 
     // Rename Device Sheet
@@ -12751,6 +12823,37 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         renameNameLength.stringValue = [NSString stringWithFormat:@"%li/140", (long)renameName.stringValue.length];
+        return;
+    }
+
+    // OTP Sheet
+
+    if (sender == otpTextField)
+    {
+        // Makes sure the string isn't longer than six characters
+
+        if (otpTextField.stringValue.length > 6)
+        {
+            otpTextField.stringValue = [otpTextField.stringValue substringToIndex:6];
+            NSBeep();
+        }
+
+        // Make sure the string doesn't contain non-numeral characters
+        
+        NSCharacterSet *set = [NSCharacterSet decimalDigitCharacterSet];
+
+        for (NSInteger i = 0 ; i < otpTextField.stringValue.length ; ++i)
+        {
+            unichar chara = [otpTextField.stringValue characterAtIndex:i];
+
+            if (![set characterIsMember:chara])
+            {
+                NSBeep();
+                NSString *new = i > 0 ? [otpTextField.stringValue substringToIndex:i] : @"";
+                new = i < otpTextField.stringValue.length - 1 ? [new stringByAppendingString:[otpTextField.stringValue substringFromIndex: i + 1]] : new;
+                otpTextField.stringValue = new;
+            }
+        }
     }
 }
 
@@ -12881,43 +12984,6 @@ didReceiveResponse:(NSURLResponse *)response
 
 
 
-#pragma mark - Misc Methods
-
-
-- (BOOL)isCorrectAccount:(Project *)project
-{
-    // Returns YES or NO depending on whether the user is signed into the correct account
-
-    return (project.aid.length > 0 && [project.aid compare:ide.currentAccount] != NSOrderedSame) ? NO : YES;
-}
-
-
-
-- (void)projectAccountAlert:(Project *)project :(NSString *)action
-{
-    [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
-                      :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]];
-}
-
-
-- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action
-{
-    Project *project = [self getParentProject:devicegroup];
-
-    [self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
-                      :[NSString stringWithFormat:@"To %@ this device group, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]];
-}
-
-
-
-- (void)accountAlert:(NSString *)head :(NSString *)body
-{
-    NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = head;
-    alert.informativeText = body;
-    [alert addButtonWithTitle:@"OK"];
-    [alert beginSheetModalForWindow:_window completionHandler:nil];
-}
 
 
 @end

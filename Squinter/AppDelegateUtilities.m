@@ -293,6 +293,95 @@
 
 
 
+#pragma mark - File Watch Methods
+
+
+- (BOOL)checkAndWatchFile:(NSString *)filePath
+{
+    // This method takes an ABSOLUTE file path and checks first that the file exists at that path
+    // If if doesn't, it returns NO, otherwise it attempts to add the file to the watch queue, in
+    // which case it returns YES
+
+    if (filePath == nil || filePath.length == 0) return NO;
+
+    BOOL result = [nsfm fileExistsAtPath:filePath];
+
+    if (result)
+    {
+        // Instantiate the file watch queue if it hasn't been instantiated already
+
+        if (fileWatchQueue == nil)
+        {
+            fileWatchQueue = [[VDKQueue alloc] init];
+            [fileWatchQueue setDelegate:self];
+        }
+
+        // Add the file to the queue
+
+        [fileWatchQueue addPath:filePath
+                 notifyingAbout:VDKQueueNotifyAboutWrite | VDKQueueNotifyAboutDelete | VDKQueueNotifyAboutRename];
+    }
+
+    return result;
+}
+
+
+
+- (void)watchfiles:(Project *)project
+{
+    // Work throgh project's files and add them to the file watch queue
+    // This is usually called only after opening an existing project
+
+    NSString *aPath = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
+    BOOL wasAdded = [self checkAndWatchFile:aPath];
+
+    if (project.devicegroups.count > 0)
+    {
+        // The project contains one or more deviece groups so run through them
+        // and add their component files to the watch queue
+
+        for (Devicegroup *devicegroup in project.devicegroups)
+        {
+            if (devicegroup.models.count > 0)
+            {
+                // The device group contains one or more models (code representation objects)
+
+                for (Model *model in devicegroup.models)
+                {
+                    aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", model.path, model.filename]];
+                    wasAdded = [self checkAndWatchFile:aPath];
+
+                    if (model.libraries.count > 0)
+                    {
+                        // The model code references one or more imported libraries
+
+                        for (File *library in model.libraries)
+                        {
+                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", library.path, library.filename]];
+                            wasAdded = [self checkAndWatchFile:aPath];
+                        }
+                    }
+
+                    if (model.files.count > 0)
+                    {
+                        // The model code references one or more imported files
+
+                        for (File *file in model.files)
+                        {
+                            aPath = [self getAbsolutePath:project.path :[NSString stringWithFormat:@"%@/%@", file.path, file.filename]];
+                            wasAdded = [self checkAndWatchFile:aPath];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (!wasAdded) NSLog(@"Some files couldn't be added");
+}
+
+
+
 #pragma mark - Boookmark Methods
 
 
@@ -507,7 +596,7 @@
 {
     // Computer is about to sleep, so quickly
     
-    [self writeStringToLog:@"Device sleeping..." :YES];
+    [self writeStringToLog:@"Device sleeping - closing connections..." :YES];
 
     if (ide.isLoggedIn)
     {
@@ -557,15 +646,15 @@
     if ([key compare:@"name"] == NSOrderedSame)
     {
         NSString *name = [apiDict valueForKeyPath:@"attributes.name"];
-        if ((NSNull *)name == [NSNull null]) return nil;
-        return name;
+        //if ((NSNull *)name == [NSNull null]) return nil;
+        return [self checkForNull:name];
     }
 
     if ([key compare:@"description"] == NSOrderedSame)
     {
         NSString *desc = [apiDict valueForKeyPath:@"attributes.description"];
-        if ((NSNull *)desc == [NSNull null]) return nil;
-        return desc;
+        //if ((NSNull *)desc == [NSNull null]) return nil;
+        return [self checkForNull:desc];
     }
 
     // Attributes Device properties
@@ -576,21 +665,21 @@
     if ([key compare:@"agent_id"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.agent_id"];
     if ([key compare:@"agent_running"] == NSOrderedSame) return [NSNumber numberWithBool:[[apiDict valueForKeyPath:@"attributes.agent_running"] boolValue]];
     if ([key compare:@"swversion"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.swversion"];
-
 	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
 
 	if ([key compare:@"ip_address"] == NSOrderedSame)
 	{
 		NSString *ip = [apiDict valueForKeyPath:@"attributes.ip_address"];
-		if ((NSNull *)ip == [NSNull null]) return nil;
-		return ip;
+		//if ((NSNull *)ip == [NSNull null]) return nil;
+		return [self checkForNull:ip];
 	}
 
 	if ([key compare:@"last_enrolled_at"] == NSOrderedSame)
 	{
 		NSString *date = [apiDict valueForKeyPath:@"attributes.last_enrolled_at"];
-		if ((NSNull *)date == [NSNull null]) return nil;
-		return [self convertTimestring:date];
+		//if ((NSNull *)date == [NSNull null]) return nil;
+        date = [self checkForNull:date];
+        return [self convertTimestring:date];
 	}
 
     // Attributes Deployment properties - non-nullable
@@ -603,47 +692,47 @@
     if ([key compare:@"agent_code"] == NSOrderedSame)
     {
         NSString *ac = [apiDict valueForKeyPath:@"attributes.agent_code"];
-        if ((NSNull *)ac == [NSNull null]) return nil;
-        return ac;
+        //if ((NSNull *)ac == [NSNull null]) return nil;
+        return [self checkForNull:ac];
     }
 
     if ([key compare:@"device_code"] == NSOrderedSame)
     {
         NSString *dc = [apiDict valueForKeyPath:@"attributes.device_code"];
-        if ((NSNull *)dc == [NSNull null]) return nil;
-        return dc;
+        //if ((NSNull *)dc == [NSNull null]) return nil;
+        return [self checkForNull:dc];
     }
 
     if ([key compare:@"origin"] == NSOrderedSame)
     {
         NSString *or = [apiDict valueForKeyPath:@"attributes.origin"];
-        if ((NSNull *)or == [NSNull null]) return nil;
-        return or;
+        //if ((NSNull *)or == [NSNull null]) return nil;
+        return [self checkForNull:or];
     }
 
     if ([key compare:@"tags"] == NSOrderedSame)
     {
         NSArray *tags = [apiDict valueForKeyPath:@"attributes.tags"];
-        if ((NSNull *)tags == [NSNull null]) return nil;
-        return tags;
+        //if ((NSNull *)tags == [NSNull null]) return nil;
+        return [self checkForNull:tags];
     }
 
 	if ([key compare:@"free_memory"] == NSOrderedSame) {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.free_memory"];
-		if ((NSNull *)num == [NSNull null]) return nil;
-		return num;
+		//if ((NSNull *)num == [NSNull null]) return nil;
+		return [self checkForNull:num];
 	}
 
 	if ([key compare:@"rssi"] == NSOrderedSame) {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.rssi"];
-		if ((NSNull *)num == [NSNull null]) return nil;
-		return num;
+		//if ((NSNull *)num == [NSNull null]) return nil;
+		return [self checkForNull:num];
 	}
 
 	if ([key compare:@"plan_id"] == NSOrderedSame) {
 		NSString *plan = [apiDict valueForKeyPath:@"plan_id"];
-		if ((NSNull *)plan == [NSNull null]) return nil;
-		return plan;
+		//if ((NSNull *)plan == [NSNull null]) return nil;
+		return [self checkForNull:plan];
 	}
 
     // Relationships properties
@@ -655,8 +744,15 @@
     if ([key compare:@"min_supported_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.min_supported_deployment"];
 	if ([key compare:@"current_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.current_deployment"];
 
-    if ((NSNull *)rd == [NSNull null]) return nil;
-    return rd;
+    //if ((NSNull *)rd == [NSNull null]) return nil;
+    return [self checkForNull:rd];
+}
+
+
+
+- (id)checkForNull:(id)value
+{
+    return ((NSNull *)value == [NSNull null] ? nil : value);
 }
 
 
@@ -970,6 +1066,45 @@
     string = [string stringByReplacingOccurrencesOfString:@"[lastexitcode]" withString:@"[Exit Code]"];
 
     return string;
+}
+
+
+
+- (BOOL)isCorrectAccount:(Project *)project
+{
+    // Returns YES or NO depending on whether the user is signed into the correct account
+
+    return (project.aid.length > 0 && [project.aid compare:ide.currentAccount] != NSOrderedSame) ? NO : YES;
+}
+
+
+
+- (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow
+{
+    [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
+                      :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
+                      :sheetWindow];
+}
+
+
+- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow
+{
+    Project *project = [self getParentProject:devicegroup];
+
+    [self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
+                      :[NSString stringWithFormat:@"To %@ this device group, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
+                      :sheetWindow];
+}
+
+
+
+- (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow
+{
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = head;
+    alert.informativeText = body;
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:sheetWindow completionHandler:nil];
 }
 
 

@@ -10,6 +10,7 @@
 		195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9470FB833A59D9C952E82 /* libPods-Squinter.a */; };
 		3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */; };
 		3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B124BFC1F97AA9B00D8E4AD /* Token.m */; };
+		3B26B99A20E5647100AC5D04 /* TreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B26B99920E5647100AC5D04 /* TreeNode.m */; };
 		3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */; };
 		3B311E8F1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B311E8E1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m */; };
 		3B36D1C31970A0990029CEC0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B36D1C21970A0990029CEC0 /* Cocoa.framework */; };
@@ -87,6 +88,8 @@
 		3B124BFB1F97AA9B00D8E4AD /* Token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Token.h; path = ../../BuildAPIAccess/Token.h; sourceTree = "<group>"; };
 		3B124BFC1F97AA9B00D8E4AD /* Token.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = Token.m; path = ../../BuildAPIAccess/Token.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
+		3B26B99820E5647100AC5D04 /* TreeNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TreeNode.h; sourceTree = "<group>"; };
+		3B26B99920E5647100AC5D04 /* TreeNode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TreeNode.m; sourceTree = "<group>"; };
 		3B3015431CFDE44B00596CF2 /* BuildAPIAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BuildAPIAccess.h; path = ../../BuildAPIAccess/BuildAPIAccess.h; sourceTree = "<group>"; };
 		3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = BuildAPIAccess.m; path = ../../BuildAPIAccess/BuildAPIAccess.m; sourceTree = "<group>"; };
 		3B3015451CFDE44B00596CF2 /* BuildAPIAccessConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BuildAPIAccessConstants.h; path = ../../BuildAPIAccess/BuildAPIAccessConstants.h; sourceTree = "<group>"; };
@@ -294,6 +297,8 @@
 				3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */,
 				3B6F3AC41FC31A7700A7F5C1 /* CommitTableCellView.h */,
 				3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */,
+				3B26B99820E5647100AC5D04 /* TreeNode.h */,
+				3B26B99920E5647100AC5D04 /* TreeNode.m */,
 				3BB5DCBC202B88C600FA6F7D /* InspectorWindow2ViewController.h */,
 				3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */,
 				3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */,
@@ -537,6 +542,7 @@
 				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
 				3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */,
 				3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */,
+				3B26B99A20E5647100AC5D04 /* TreeNode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

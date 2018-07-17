@@ -20,6 +20,11 @@
 - (NSData *)bookmarkForURL:(NSURL *)url;
 - (NSURL *)urlForBookmark:(NSData *)bookmark;
 
+// File Watch Methods
+
+- (BOOL)checkAndWatchFile:(NSString *)filePath;
+- (void)watchfiles:(Project *)project;
+
 // Progress Indicator Methods
 
 - (void)startProgress;
@@ -50,6 +55,7 @@
 // Utility Methods
 
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;
+- (id)checkForNull:(id)value;
 - (void)updateDevicegroup:(Devicegroup	 *)devicegroup;
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
 - (Project *)getParentProject:(Devicegroup *)devicegroup;
@@ -64,6 +70,10 @@
 - (NSInteger)perceivedBrightness:(NSColor *)colour;
 - (NSString *)getCloudName:(NSInteger)cloudCode;
 - (NSString *)recodeLogTags:(NSString *)string;
+- (BOOL)isCorrectAccount:(Project *)project;
+- (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow;
+- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow;
+- (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow;
 
 
 @end

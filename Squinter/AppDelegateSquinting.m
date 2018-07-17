@@ -163,7 +163,7 @@
 
     // Auto-check EI Libs
 
-    [self checkElectricImpLibs];
+    [self checkElectricImpLibs:devicegroup];
 
 	// Update libraries menu with updated list of local, EI libraries and local files
     // TODO Do we need to do this here?
