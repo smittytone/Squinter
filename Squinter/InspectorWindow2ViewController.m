@@ -12,7 +12,7 @@
 
 @implementation InspectorWindow2ViewController
 
-@synthesize project, device, products, devices, mainWindowFrame, tabIndex;
+@synthesize project, device, products, mainWindowFrame, tabIndex;
 
 
 #pragma mark - ViewController Methods
