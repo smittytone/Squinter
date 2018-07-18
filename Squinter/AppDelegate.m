@@ -4312,7 +4312,7 @@
     //              productToProjectStage2:
     //              chooseProject:
 
-    if (currentDevicegroup.devices.count > 0 && devicesArray.count > 0)
+    if (devicesArray.count > 0)
     {
         // The current device group should have a list of devices - get the ID of the first one
 
@@ -4323,13 +4323,13 @@
             // First check by device ID — this is how the data should be stored,
             // but earlier versions used device name...
 
-            for (NSDictionary *device in devicesArray)
+            for (NSMutableDictionary *device in devicesArray)
             {
                 NSString *aDevId = [self getValueFrom:device withKey:@"id"];
 
                 if ([aDevId compare:devId] == NSOrderedSame)
                 {
-                    selectedDevice = (NSMutableDictionary *)device;
+                    selectedDevice = device;
                     iwvc.device = selectedDevice;
 
                     [self setDevicesPopupTick];
@@ -4340,16 +4340,16 @@
                     return;
                 }
             }
-
+/*
             // ...so we also check by device name, just in case
 
-            for (NSDictionary *device in devicesArray)
+            for (NSMutableDictionary *device in devicesArray)
             {
                 NSString *aDevId = [self getValueFrom:device withKey:@"name"];
 
                 if ([aDevId compare:devId] == NSOrderedSame)
                 {
-                    selectedDevice = (NSMutableDictionary *)device;
+                    selectedDevice = device;
                     iwvc.device = selectedDevice;
 
                     [self setDevicesPopupTick];
@@ -4360,6 +4360,7 @@
                     return;
                 }
             }
+ */
         }
         else
         {
@@ -4456,7 +4457,7 @@
         {
             // Re-acquire a single device's data
 
-            NSDictionary *device = [devicesArray objectAtIndex:i];
+            NSMutableDictionary *device = [devicesArray objectAtIndex:i];
             NSDictionary *dict = @{ @"action" : @"refreshdevice",
                                     @"device" : device };
 			
@@ -8106,7 +8107,7 @@
 
         // Update the Inspector
 
-        iwvc.devices = devicesArray;
+        // iwvc.devices = devicesArray;
     }
     else
     {
@@ -8188,7 +8189,9 @@
 			
             NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
             [attributes setObject:boolean forKey:@"device_online"];
-			
+
+            if (aDevice == selectedDevice) iwvc.device = aDevice;
+
             ++deviceCheckCount;
 			
             // NSLog(@"Device %li of %li", (long)deviceCheckCount, (long)devicesArray.count);
@@ -11272,7 +11275,7 @@
         for (NSMutableDictionary *device in devicesArray)
         {
             NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = [self getValueFrom:dg withKey:@"id"]; // (NSString *)[dg objectForKey:@"id"];
+            NSString *dgid = [self getValueFrom:dg withKey:@"id"];
 
             if (dgid != nil)
             {
