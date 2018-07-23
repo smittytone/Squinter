@@ -853,11 +853,11 @@
             {
                 // If data is a URL, make sure there's an active button at the end of the row
 
-                [cv.goToButton setTarget:self];
-                [cv.goToButton setAction:@selector(goToURL:)];
-
-                cv.goToButton.hidden = NO;
+                cv.goToButton.target = self;
+                cv.goToButton.action = @selector(goToURL:);
+                cv.goToButton.toolTip = @"Click this icon to open the displayed URL in a browser";
                 cv.row = row;
+                cv.goToButton.hidden = NO;
             }
             else
             {
@@ -893,12 +893,12 @@
             {
                 // If data is a URL, make sure there's an active button at the end of the row
 
-                [cv.goToButton setTarget:self];
-                [cv.goToButton setAction:@selector(link:)];
-
-                cv.goToButton.hidden = NO;
+                cv.goToButton.target = self;
+                cv.goToButton.action = @selector(link:);
+                cv.goToButton.toolTip = @"Click this icon to open the displayed file in your editor";
                 cv.path = node.value;
                 cv.row = (node.flag && [node.key compare:@"Path"] == NSOrderedSame) ? 0 : 99;
+                cv.goToButton.hidden = NO;
             }
             else
             {
@@ -976,6 +976,13 @@
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
         node.expanded = YES;
     }
+
+    // Should we expand all?  Yes, if the Command Key is held down
+
+    if (panelSelector.selectedSegment == 0 && (NSCommandKeyMask & [NSEvent modifierFlags]))
+    {
+        [deviceOutlineView expandItem:nil expandChildren:YES];
+    }
 }
 
 
@@ -987,6 +994,13 @@
         NSDictionary *ui = notification.userInfo;
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
         node.expanded = NO;
+    }
+
+    // Should we collapse all? Yes, if the Command Key is held down
+
+    if (panelSelector.selectedSegment == 0 && (NSCommandKeyMask & [NSEvent modifierFlags]))
+    {
+        [deviceOutlineView collapseItem:nil collapseChildren:YES];
     }
 }
 
