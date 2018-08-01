@@ -11,5 +11,4 @@
 @synthesize title, data, goToButton, row, path;
 
 
-
 @end
