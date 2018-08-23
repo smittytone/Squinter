@@ -559,6 +559,7 @@
 - (void)renameDeviceStageTwo:(NSNotification *)note;
 - (void)deleteDeviceStageTwo:(NSNotification *)note;
 - (void)loggedIn:(NSNotification *)note;
+- (void)loginRejected:(NSNotification *)note;
 
 
 // Log and Logging Methods

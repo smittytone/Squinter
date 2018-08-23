@@ -614,6 +614,16 @@
                    name:@"BuildAPIGotAnAccount"
                  object:ide];
 	
+    [nsncdc addObserver:self
+               selector:@selector(getOtp:)
+                   name:@"BuildAPINeedOTP"
+                 object:ide];
+
+    [nsncdc addObserver:self
+               selector:@selector(loginRejected:)
+                   name:@"BuildAPILoginRejected"
+                 object:ide];
+
     // **************
 
     [nsncdc addObserver:self
@@ -621,10 +631,7 @@
                name:@"BuildAPILogStreamEnd"
              object:ide];
 
-    [nsncdc addObserver:self
-               selector:@selector(getOtp:)
-                   name:@"BuildAPINeedOTP"
-                 object:ide];
+
 
     // Set up sleep/wake notification
 
@@ -8748,6 +8755,26 @@
     }
 }
 
+
+
+- (void)loginRejected:(NSNotification *)note
+{
+    // BuildAPIAccess has notified the host that a login attempt has been rejected
+
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = @"Sorry, your impCentral credentials have been rejected";
+    alert.informativeText = @"Please check your account details and then try to log in again.";
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:_window completionHandler:nil];
+
+    // Register we are no longer trying to log in
+
+    loginFlag = NO;
+    credsFlag = YES;
+    switchAccountFlag = NO;
+    otpLoginToken = nil;
+    loginMode = -1;
+}
 
 
 #pragma mark - Log and Logging Methods
