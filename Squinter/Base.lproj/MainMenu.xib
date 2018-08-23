@@ -230,7 +230,7 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Squinter" systemMenu="apple" id="uQy-DD-JDr">
                         <items>
-                            <menuItem title="About Squinter 2.0" id="5kV-Vb-QxS">
+                            <menuItem title="About Squinter" id="5kV-Vb-QxS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="showAboutSheet:" target="Voe-Tx-rLC" id="viE-bf-Tsl"/>
@@ -1552,7 +1552,7 @@ DQ
                         <constraints>
                             <constraint firstAttribute="height" constant="32" id="3JF-su-qWq"/>
                         </constraints>
-                        <buttonCell key="cell" type="bevel" title="Squinter 2.0" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="iqj-hb-Q2q">
+                        <buttonCell key="cell" type="bevel" title="Squinter" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="iqj-hb-Q2q">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="systemBold" size="16"/>
                         </buttonCell>
