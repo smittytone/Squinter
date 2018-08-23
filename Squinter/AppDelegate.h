@@ -367,7 +367,7 @@
 
     NSFont *logFont;
 
-    NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey;
+    NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
 	
 	NSTimeInterval updateDevicePeriod;
 	

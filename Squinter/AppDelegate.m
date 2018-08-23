@@ -957,8 +957,8 @@
 
     if (!ide.isLoggedIn)
     {
-        // We are not logged in, so show the log in sheet, but only if we're
-        // not already trying to log in
+        // We are not logged in, so we may need to show the log in sheet,
+        // but only if we're not already trying to log in ('loginFlag' is true)
 
         if (!loginFlag)
         {
@@ -978,15 +978,13 @@
     }
     else
     {
-        // We are logged in - or trying to log in - so log the user out
+        // We are logged in, so log the user out
         
         NSInteger cloudCode = ide.impCloudCode;
         
         [self logout];
 
         // Update the UI and report to the user
-
-        // Set the Account menu
 
         accountMenuItem.title = @"Not Signed in to any Account";
         loginMenuItem.title = @"Log in to your Primary Account";
@@ -1018,6 +1016,7 @@
     selectedDevice = nil;
     iwvc.device = nil;
     loginKey = nil;
+    otpLoginToken = nil;
     
     // Stop auto-updating account devices' status
     
@@ -1168,7 +1167,7 @@
 
     loginFlag = YES;
 
-    // Attempt to login with the current cgesredentials
+    // Attempt to login with the current credentials
 	
     if (loginKey != nil)
     {
@@ -1228,11 +1227,13 @@
 
 - (IBAction)switchAccount:(id)sender
 {
-    // We're switching account - presumably temporarily
+    // We're switching account - presumably temporarily - by holding the the option key
+    // when clicking the Account menu option. This allows the user to log into a different
+    // account ('loginMode' is 2) or switch to the primary
 
     if (loginMode != 2)
     {
-        // We a logging into a different account
+        // The user wants to log into a different account
 
         switchAccountFlag = YES;
 
@@ -1248,6 +1249,7 @@
     {
         // We a logging into the primary account
 
+        [self logout];
         [self autoLogin];
     }
 }
@@ -1286,12 +1288,14 @@
 }
 
 
+
 - (void)getOtp:(NSNotification *)note
 {
-    // The server has signalled that it needs an OTP
+    // The server has signalled BuildAPIAcces that it needs an OTP, and BuildAPIAccess
+    // has signalled the host app to get an OTP
     
     NSDictionary *data = (NSDictionary *)note.object;
-    loginKey = [data objectForKey:@"token"];
+    otpLoginToken = [data objectForKey:@"token"];
 
     // Show OTP request box
 
@@ -1304,19 +1308,27 @@
 {
     [_window endSheet:otpSheet];
 
+    // Clear the entered OTP value, if any
+
     NSString *otp = otpTextField.stringValue;
-    [ide twoFactorLogin:loginKey :otp];
+    otpTextField.stringValue = @"";
+
+    [ide twoFactorLogin:otpLoginToken :otp];
 }
 
 
 
 - (IBAction)cancelOtpSheet:(id)sender
 {
+    // Cancel the OTP Sheet - and therefore the login
+
+    otpTextField.stringValue = @"";
+    otpLoginToken = nil;
+    loginFlag = NO;
+    if (switchAccountFlag) switchAccountFlag = NO;
+
     [_window endSheet:otpSheet];
 }
-
-
-
 
 
 
@@ -8712,6 +8724,7 @@
     loginFlag = NO;
     credsFlag = YES;
     switchAccountFlag = NO;
+    otpLoginToken = nil;
 
     // Inform the user he or she is logged in - and to which cloud
     
