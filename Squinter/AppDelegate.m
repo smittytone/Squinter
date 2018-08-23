@@ -1015,9 +1015,9 @@
 	
     productsArray = nil;
     selectedProduct = nil;
-
     selectedDevice = nil;
     iwvc.device = nil;
+    loginKey = nil;
     
     // Stop auto-updating account devices' status
     
@@ -1288,6 +1288,8 @@
 
 - (void)getOtp:(NSNotification *)note
 {
+    // The server has signalled that it needs an OTP
+    
     NSDictionary *data = (NSDictionary *)note.object;
     loginKey = [data objectForKey:@"token"];
 
@@ -12984,8 +12986,6 @@ didReceiveResponse:(NSURLResponse *)response
         [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this device group's code.", [fpath lastPathComponent]] :YES];
     }
 }
-
-
 
 
 

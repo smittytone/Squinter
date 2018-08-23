@@ -25,7 +25,7 @@
 #import "CommitWindowViewController.h"
 #import "SelectWindowViewController.h"
 #import "InspectorWindow2ViewController.h"
-
+#import "LogView.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
                                    NSOpenSavePanelDelegate,
@@ -35,11 +35,11 @@
                                    NSURLSessionDataDelegate,
                                    NSURLSessionTaskDelegate,
                                    NSTextFieldDelegate,
-								  NSTouchBarProvider>
+								   NSTouchBarProvider>
 {
     // Main UI element outlets
 
-    IBOutlet NSTextView *logTextView;
+    IBOutlet LogView *logTextView;
     IBOutlet NSClipView *logClipView;
     IBOutlet NSScrollView *logScrollView;
     IBOutlet StatusLight *saveLight;
@@ -352,6 +352,7 @@
     NSOperationQueue *extraOpQueue;
     NSMenu *dockMenu;
 	NSTimer *refreshTimer;
+    NSTrackingArea *ta;
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
@@ -374,7 +375,7 @@
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag, doubleSaveFlag;
-    BOOL reconnectAfterSleepFlag;
+    BOOL reconnectAfterSleepFlag, isIn;
 }
 
 
