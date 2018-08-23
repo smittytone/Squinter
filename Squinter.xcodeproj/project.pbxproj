@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9470FB833A59D9C952E82 /* libPods-Squinter.a */; };
 		3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */; };
+		3B077B2E2111846100C17D25 /* LogView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B077B2C2111846000C17D25 /* LogView.m */; };
+		3B077B3121118A5E00C17D25 /* InspectorLinkButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B077B3021118A5E00C17D25 /* InspectorLinkButton.m */; };
 		3B124BFD1F97AA9B00D8E4AD /* Token.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B124BFC1F97AA9B00D8E4AD /* Token.m */; };
 		3B26B99A20E5647100AC5D04 /* TreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B26B99920E5647100AC5D04 /* TreeNode.m */; };
 		3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B3015441CFDE44B00596CF2 /* BuildAPIAccess.m */; };
@@ -85,6 +87,10 @@
 		3B06F88B1F8BBE930072A898 /* docpic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = docpic.png; path = ../../../OneDrive/Programming/Squinter/Images.xcassets/docpic.imageset/docpic.png; sourceTree = SOURCE_ROOT; };
 		3B06F88C1F8BBE930072A898 /* docpic@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@2x.png"; path = "../../../OneDrive/Programming/Squinter/Images.xcassets/docpic.imageset/docpic@2x.png"; sourceTree = SOURCE_ROOT; };
 		3B06F88D1F8BBE930072A898 /* docpic@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "docpic@3x.png"; path = "../../../OneDrive/Programming/Squinter/Images.xcassets/docpic.imageset/docpic@3x.png"; sourceTree = SOURCE_ROOT; };
+		3B077B2C2111846000C17D25 /* LogView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogView.m; sourceTree = "<group>"; };
+		3B077B2D2111846000C17D25 /* LogView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogView.h; sourceTree = "<group>"; };
+		3B077B2F21118A5D00C17D25 /* InspectorLinkButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorLinkButton.h; sourceTree = "<group>"; };
+		3B077B3021118A5E00C17D25 /* InspectorLinkButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorLinkButton.m; sourceTree = "<group>"; };
 		3B124BFB1F97AA9B00D8E4AD /* Token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Token.h; path = ../../BuildAPIAccess/Token.h; sourceTree = "<group>"; };
 		3B124BFC1F97AA9B00D8E4AD /* Token.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = Token.m; path = ../../BuildAPIAccess/Token.m; sourceTree = "<group>"; };
 		3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceCodePro-Regular.otf"; sourceTree = "<group>"; };
@@ -283,6 +289,8 @@
 		3B7ACF7D1CFEEBC10080C3DB /* UI Classes */ = {
 			isa = PBXGroup;
 			children = (
+				3B077B2D2111846000C17D25 /* LogView.h */,
+				3B077B2C2111846000C17D25 /* LogView.m */,
 				3BC56F311975BF17002CA8FE /* StatusLight.h */,
 				3BC56F321975BF17002CA8FE /* StatusLight.m */,
 				3BE897531B0608F100645092 /* SquinterToolbarItem.h */,
@@ -303,6 +311,8 @@
 				3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */,
 				3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */,
 				3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */,
+				3B077B2F21118A5D00C17D25 /* InspectorLinkButton.h */,
+				3B077B3021118A5E00C17D25 /* InspectorLinkButton.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -314,8 +324,8 @@
 				3BE520BA19752883000BAD52 /* Constants.h */,
 				3B36D1D41970A0990029CEC0 /* AppDelegate.h */,
 				3B36D1D51970A0990029CEC0 /* AppDelegate.m */,
-				3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */,
 				3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */,
+				3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */,
 				3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */,
 				3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */,
 				3B6AF0D9197127B10083744C /* Project.h */,
@@ -525,6 +535,7 @@
 				3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */,
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */,
+				3B077B3121118A5E00C17D25 /* InspectorLinkButton.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
 				3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
@@ -537,6 +548,7 @@
 				3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */,
 				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
+				3B077B2E2111846100C17D25 /* LogView.m in Sources */,
 				3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */,
 				3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */,
 				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
