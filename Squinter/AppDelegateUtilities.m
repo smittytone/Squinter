@@ -488,7 +488,41 @@
 
 - (void)setColours
 {
-	// Populate the 'colors' array with a set of colours for logging different devices
+    NSArray *savedColours = [defaults objectForKey:@"com.bps.squinter.devicecolours"];
+
+    if (colors.count > 0) [colors removeAllObjects];
+
+    if (savedColours.count != 0)
+    {
+        // If we have saved colours, use these to populate the array 'colors',
+        // which is the array of NSColors from which device log entries are coloured
+
+        for (NSArray *colour in savedColours)
+        {
+            [colors addObject:[NSColor colorWithSRGBRed:[[colour objectAtIndex:0] floatValue]
+                                                  green:[[colour objectAtIndex:1] floatValue]
+                                                   blue:[[colour objectAtIndex:2] floatValue]
+                                                  alpha:1.0]];
+        }
+    }
+    else
+    {
+        // If we have no saved colours, use the prefs panel colour wells to populate
+        // the array 'colors'
+
+        for (NSColorWell *colourWell in deviceColourWells)
+        {
+            [colors addObject:[NSColor colorWithSRGBRed:(float)colourWell.color.redComponent
+                                                  green:(float)colourWell.color.blueComponent
+                                                   blue:(float)colourWell.color.greenComponent
+                                                  alpha:1.0]];
+        }
+    }
+
+
+    /*
+
+    // Populate the 'colors' array with a set of colours for logging different devices
 
 	NSString *start = @"com.bps.squinter.dev";
 
@@ -511,7 +545,7 @@
 											  alpha:1.0]];
 	}
 
-	/*
+
 	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry (138)
 	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine (213)
 	 [colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green) (200)
@@ -586,6 +620,9 @@
 - (void)showPanelForDev3 { [dev3ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
 - (void)showPanelForDev4 { [dev4ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
 - (void)showPanelForDev5 { [dev5ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev6 { [dev6ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev7 { [dev7ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
+- (void)showPanelForDev8 { [dev8ColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
 
 
 

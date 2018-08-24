@@ -264,6 +264,9 @@
     IBOutlet NSColorWell *dev3ColorWell;
     IBOutlet NSColorWell *dev4ColorWell;
     IBOutlet NSColorWell *dev5ColorWell;
+    IBOutlet NSColorWell *dev6ColorWell;
+    IBOutlet NSColorWell *dev7ColorWell;
+    IBOutlet NSColorWell *dev8ColorWell;
     IBOutlet NSButton *autoUpdateCheckCheckbox;
     IBOutlet NSButton *autoLoadListsCheckbox;
     IBOutlet NSButton *boldTestCheckbox;
@@ -356,7 +359,7 @@
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
-
+    NSMutableArray *deviceColourWells;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
     NSURLSessionTask *eiLibListTask;

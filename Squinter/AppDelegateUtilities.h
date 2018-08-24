@@ -46,6 +46,9 @@
 - (void)showPanelForDev3;
 - (void)showPanelForDev4;
 - (void)showPanelForDev5;
+- (void)showPanelForDev6;
+- (void)showPanelForDev7;
+- (void)showPanelForDev8;
 
 // Sleep/wake Methods
 

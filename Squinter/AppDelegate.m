@@ -311,7 +311,8 @@
                          @"com.bps.squinter.dev5.green",
                          @"com.bps.squinter.show.inspector",
                          @"com.bps.squinter.inspectorsize",
-                         @"com.bps.squinter.updatedevs",nil];
+                         @"com.bps.squinter.updatedevs",
+                         @"com.bps.squinter.devicecolours", nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
                             [NSString stringWithString:NSStringFromRect(_window.frame)],
@@ -358,7 +359,8 @@
                             [NSNumber numberWithFloat:0.6],
                             [NSNumber numberWithBool:NO],
                             [NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)],
-                            [NSNumber numberWithBool:NO], nil];
+                            [NSNumber numberWithBool:NO],
+                            [[NSArray alloc] init], nil];
 
     // Drop the arrays into the Defauts
 
@@ -427,7 +429,6 @@
     [logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
     [logTextView setTextColor:textColour];
     [logClipView setBackgroundColor:backColour];
-    [self setColours];
 
     // Set the selection colour to mirror the fore-back setup
 
@@ -684,6 +685,30 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    // Set up the Preferences colour wells
+
+    [dev1ColorWell setAction:@selector(showPanelForDev1)];
+    [dev2ColorWell setAction:@selector(showPanelForDev2)];
+    [dev3ColorWell setAction:@selector(showPanelForDev3)];
+    [dev4ColorWell setAction:@selector(showPanelForDev4)];
+    [dev5ColorWell setAction:@selector(showPanelForDev5)];
+    [dev6ColorWell setAction:@selector(showPanelForDev6)];
+    [dev7ColorWell setAction:@selector(showPanelForDev7)];
+    [dev8ColorWell setAction:@selector(showPanelForDev8)];
+
+    deviceColourWells = [[NSMutableArray alloc] init];
+
+    [deviceColourWells addObject:dev1ColorWell];
+    [deviceColourWells addObject:dev2ColorWell];
+    [deviceColourWells addObject:dev3ColorWell];
+    [deviceColourWells addObject:dev4ColorWell];
+    [deviceColourWells addObject:dev5ColorWell];
+    [deviceColourWells addObject:dev6ColorWell];
+    [deviceColourWells addObject:dev7ColorWell];
+    [deviceColourWells addObject:dev8ColorWell];
+
+    [self setColours];
+    
     // Instantiate an IDE-access object
 
     ide = [[BuildAPIAccess alloc] init];
@@ -12175,7 +12200,7 @@
     workingDirectoryField.stringValue = @"";
     workingDirectoryField.stringValue = workingDirectory;
 
-    // Set colour wells
+    // Set the panel's text colour well
 
     float r = [[defaults objectForKey:@"com.bps.squinter.text.red"] floatValue];
     float b = [[defaults objectForKey:@"com.bps.squinter.text.blue"] floatValue];
@@ -12184,12 +12209,49 @@
     textColorWell.color = textColour;
     [textColorWell setAction:@selector(showPanelForText)];
 
+    // Set the panel's background colour well
+
     r = [[defaults objectForKey:@"com.bps.squinter.back.red"] floatValue];
     b = [[defaults objectForKey:@"com.bps.squinter.back.blue"] floatValue];
     g = [[defaults objectForKey:@"com.bps.squinter.back.green"] floatValue];
     backColour = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
     backColorWell.color = backColour;
     [backColorWell setAction:@selector(showPanelForBack)];
+
+    // Set the panel's various device log colour wells
+    // NOTE currently there are 8 wells, but there were 5, so we have migrated
+    //      from fixed defaults to an array containing RGB arrays for each colour
+
+    NSArray *savedColours = [defaults objectForKey:@"com.bps.squinter.devicecolours"];
+    NSUInteger colourIndex = 0;
+
+    for (NSUInteger i = 0 ; i < deviceColourWells.count ; i++)
+    {
+        NSColorWell *colourWell = [deviceColourWells objectAtIndex:i];
+
+        if (savedColours.count != 0)
+        {
+            // Only load in saved colours if we have any (at first launch we won't).
+            // Otherwise the colour wells will take the default colours
+
+            NSArray *colour = [savedColours objectAtIndex:colourIndex];
+
+            r = [[colour objectAtIndex:0] floatValue];
+            b = [[colour objectAtIndex:1] floatValue];
+            g = [[colour objectAtIndex:2] floatValue];
+
+            colourWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
+
+            // Walk the saved colours array separately, just in case there are
+            // suddenly more wells than colours (in which case, cycle through
+            // the colours)
+
+            ++colourIndex;
+            if (colourIndex > savedColours.count) colourIndex = 0;
+        }
+    }
+
+/*
 
     r = [[defaults objectForKey:@"com.bps.squinter.dev1.red"] floatValue];
     b = [[defaults objectForKey:@"com.bps.squinter.dev1.blue"] floatValue];
@@ -12220,6 +12282,7 @@
     g = [[defaults objectForKey:@"com.bps.squinter.dev5.green"] floatValue];
     dev5ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
     [dev5ColorWell setAction:@selector(showPanelForDev5)];
+*/
 
     // Set font name and size menus
 
@@ -12341,6 +12404,41 @@
 
     [logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
 
+    NSMutableArray *savedColours = [[NSMutableArray alloc] init];
+
+    if (colors.count > 0) [colors removeAllObjects];
+
+    for (NSUInteger i = 0 ; i < deviceColourWells.count ; i++)
+    {
+        // Get the current colour well's colours...
+
+        NSColorWell *colourWell = [deviceColourWells objectAtIndex:i];
+
+        r = (float)colourWell.color.redComponent;
+        b = (float)colourWell.color.blueComponent;
+        g = (float)colourWell.color.greenComponent;
+
+        // ...and convert to an array of NSNumbers for saving to defaults
+
+        NSArray *colour = @[ [NSNumber numberWithFloat:r], [NSNumber numberWithFloat:b], [NSNumber numberWithFloat:g]];
+
+        // Add colour to new default array...
+
+        [savedColours addObject:colour];
+
+        // ...and to the array we use for selecting colours when actually logging
+
+        [colors addObject:[NSColor colorWithSRGBRed:r
+                                              green:g
+                                               blue:b
+                                              alpha:1.0]];
+    }
+
+    // Finally, write out the array of saved colours as a default
+
+    [defaults setObject:[NSArray arrayWithArray:savedColours] forKey:@"com.bps.squinter.devicecolours"];
+
+/*
     r = (float)dev1ColorWell.color.redComponent;
     b = (float)dev1ColorWell.color.blueComponent;
     g = (float)dev1ColorWell.color.greenComponent;
@@ -12382,6 +12480,7 @@
     [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev5.blue"];
 
     [self setColours];
+*/
 
     NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
     NSNumber *num = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
