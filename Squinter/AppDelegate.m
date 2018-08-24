@@ -294,25 +294,26 @@
                          @"com.bps.squinter.recentFiles",
                          @"com.bps.squinter.recentFilesCount",
                          @"com.bps.squinter.logListCount",
-                         @"com.bps.squinter.dev1.red",
-                         @"com.bps.squinter.dev1.blue",
-                         @"com.bps.squinter.dev1.green",
-                         @"com.bps.squinter.dev2.red",
-                         @"com.bps.squinter.dev2.blue",
-                         @"com.bps.squinter.dev2.green",
-                         @"com.bps.squinter.dev3.red",
-                         @"com.bps.squinter.dev3.blue",
-                         @"com.bps.squinter.dev3.green",
-                         @"com.bps.squinter.dev4.red",
-                         @"com.bps.squinter.dev4.blue",
-                         @"com.bps.squinter.dev4.green",
-                         @"com.bps.squinter.dev5.red",
-                         @"com.bps.squinter.dev5.blue",
-                         @"com.bps.squinter.dev5.green",
+                         @"com.bps.squinter.dev1.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev1.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev1.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev2.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev2.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev2.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev3.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev3.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev3.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev4.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev4.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev4.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev5.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev5.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev5.green",        // Redundant from 2.0.123
                          @"com.bps.squinter.show.inspector",
                          @"com.bps.squinter.inspectorsize",
-                         @"com.bps.squinter.updatedevs",
-                         @"com.bps.squinter.devicecolours", nil];
+                         @"com.bps.squinter.updatedevs",        // New in 2.0.122
+                         @"com.bps.squinter.devicecolours",     // New in 2.0.123
+                         nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
                             [NSString stringWithString:NSStringFromRect(_window.frame)],
@@ -342,25 +343,26 @@
                             [[NSArray alloc] init],
                             [NSNumber numberWithInteger:5],
                             [NSNumber numberWithInteger:200],
-                            [NSNumber numberWithFloat:0.0],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:1.0],
-                            [NSNumber numberWithFloat:0.2],
-                            [NSNumber numberWithFloat:0.3],
-                            [NSNumber numberWithFloat:0.0],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:0.5],
-                            [NSNumber numberWithFloat:1.0],
-                            [NSNumber numberWithFloat:0.8],
-                            [NSNumber numberWithFloat:1.0],
-                            [NSNumber numberWithFloat:0.0],
-                            [NSNumber numberWithFloat:0.6],
+                            [NSNumber numberWithFloat:0.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:1.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.2],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.3],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.5],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:1.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.8],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:1.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
                             [NSNumber numberWithBool:NO],
                             [NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)],
-                            [NSNumber numberWithBool:NO],
-                            [[NSArray alloc] init], nil];
+                            [NSNumber numberWithBool:NO],           // New in 2.0.123
+                            [[NSArray alloc] init],                 // New in 2.0.123
+                            nil];
 
     // Drop the arrays into the Defauts
 
@@ -685,7 +687,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // Set up the Preferences colour wells
+    // Set up the Preferences panel's colour wells' on-click functions
 
     [dev1ColorWell setAction:@selector(showPanelForDev1)];
     [dev2ColorWell setAction:@selector(showPanelForDev2)];
@@ -695,6 +697,9 @@
     [dev6ColorWell setAction:@selector(showPanelForDev6)];
     [dev7ColorWell setAction:@selector(showPanelForDev7)];
     [dev8ColorWell setAction:@selector(showPanelForDev8)];
+
+    // Organize the Preferences panel's colour wells into an array
+    // See 'setPrefs:' for usage
 
     deviceColourWells = [[NSMutableArray alloc] init];
 
@@ -707,8 +712,10 @@
     [deviceColourWells addObject:dev7ColorWell];
     [deviceColourWells addObject:dev8ColorWell];
 
+    // Popular the logging colours array
+
     [self setColours];
-    
+
     // Instantiate an IDE-access object
 
     ide = [[BuildAPIAccess alloc] init];
@@ -12195,6 +12202,9 @@
 
 - (IBAction)showPrefs:(id)sender
 {
+    // The user has invoked the Preferences panel, so populate the panel's settings
+    // with the current saved defaults
+
     // Set working directory
 
     workingDirectoryField.stringValue = @"";
@@ -12223,13 +12233,12 @@
     //      from fixed defaults to an array containing RGB arrays for each colour
 
     NSArray *savedColours = [defaults objectForKey:@"com.bps.squinter.devicecolours"];
-    NSUInteger colourIndex = 0;
 
-    for (NSUInteger i = 0 ; i < deviceColourWells.count ; i++)
+    if (savedColours.count != 0)
     {
-        NSColorWell *colourWell = [deviceColourWells objectAtIndex:i];
+        NSUInteger colourIndex = 0;
 
-        if (savedColours.count != 0)
+        for (NSColorWell *colourWell in deviceColourWells)
         {
             // Only load in saved colours if we have any (at first launch we won't).
             // Otherwise the colour wells will take the default colours
@@ -12252,7 +12261,6 @@
     }
 
 /*
-
     r = [[defaults objectForKey:@"com.bps.squinter.dev1.red"] floatValue];
     b = [[defaults objectForKey:@"com.bps.squinter.dev1.blue"] floatValue];
     g = [[defaults objectForKey:@"com.bps.squinter.dev1.green"] floatValue];
@@ -12347,6 +12355,9 @@
 
 - (IBAction)setPrefs:(id)sender
 {
+    // The user clicks the Preferences panel's Save button, so apply all the changes
+    // and write values out to the defaults
+
     workingDirectory = workingDirectoryField.stringValue;
     BOOL textChange = NO;
 
@@ -12404,39 +12415,31 @@
 
     [logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
 
+    // Populate the colour wells on the Logs tab
+
     NSMutableArray *savedColours = [[NSMutableArray alloc] init];
 
-    if (colors.count > 0) [colors removeAllObjects];
-
-    for (NSUInteger i = 0 ; i < deviceColourWells.count ; i++)
+    for (NSColorWell *colourWell in deviceColourWells)
     {
         // Get the current colour well's colours...
-
-        NSColorWell *colourWell = [deviceColourWells objectAtIndex:i];
 
         r = (float)colourWell.color.redComponent;
         b = (float)colourWell.color.blueComponent;
         g = (float)colourWell.color.greenComponent;
 
-        // ...and convert to an array of NSNumbers for saving to defaults
+        // ...and convert to an array of NSNumbers for saving to defaults...
 
         NSArray *colour = @[ [NSNumber numberWithFloat:r], [NSNumber numberWithFloat:b], [NSNumber numberWithFloat:g]];
 
-        // Add colour to new default array...
+        // ...and add the colour to the new default array
 
         [savedColours addObject:colour];
-
-        // ...and to the array we use for selecting colours when actually logging
-
-        [colors addObject:[NSColor colorWithSRGBRed:r
-                                              green:g
-                                               blue:b
-                                              alpha:1.0]];
     }
 
-    // Finally, write out the array of saved colours as a default
+    // Write out the array of saved colours as a default
 
     [defaults setObject:[NSArray arrayWithArray:savedColours] forKey:@"com.bps.squinter.devicecolours"];
+    [self setColours];
 
 /*
     r = (float)dev1ColorWell.color.redComponent;
@@ -12478,8 +12481,6 @@
     [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev5.red"];
     [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev5.green"];
     [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev5.blue"];
-
-    [self setColours];
 */
 
     NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];

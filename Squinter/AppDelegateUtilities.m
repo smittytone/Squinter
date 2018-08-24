@@ -488,6 +488,9 @@
 
 - (void)setColours
 {
+    // Populate the array 'colors', which holds a series of NSColors that are
+    // used to colour device log entries during streaming
+
     NSArray *savedColours = [defaults objectForKey:@"com.bps.squinter.devicecolours"];
 
     if (colors.count > 0) [colors removeAllObjects];
@@ -518,7 +521,6 @@
                                                   alpha:1.0]];
         }
     }
-
 
     /*
 
