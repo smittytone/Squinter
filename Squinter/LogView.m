@@ -22,7 +22,7 @@
 - (void)resetCursorRects
 {
     [super resetCursorRects];
-    [self addCursorRect:self.visibleRect cursor:darkibeam];
+    // [self addCursorRect:self.visibleRect cursor:darkibeam];
 }
 
 
