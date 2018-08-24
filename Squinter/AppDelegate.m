@@ -1221,8 +1221,7 @@
 
     [ide login:usernameTextField.stringValue
               :passwordTextField.stringValue
-              :code
-              :NO];
+              :code];
 
     // Pick up the action in **loggedIn:** or **displayError:**, depending on success or failure
 }
