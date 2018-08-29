@@ -294,24 +294,26 @@
                          @"com.bps.squinter.recentFiles",
                          @"com.bps.squinter.recentFilesCount",
                          @"com.bps.squinter.logListCount",
-                         @"com.bps.squinter.dev1.red",
-                         @"com.bps.squinter.dev1.blue",
-                         @"com.bps.squinter.dev1.green",
-                         @"com.bps.squinter.dev2.red",
-                         @"com.bps.squinter.dev2.blue",
-                         @"com.bps.squinter.dev2.green",
-                         @"com.bps.squinter.dev3.red",
-                         @"com.bps.squinter.dev3.blue",
-                         @"com.bps.squinter.dev3.green",
-                         @"com.bps.squinter.dev4.red",
-                         @"com.bps.squinter.dev4.blue",
-                         @"com.bps.squinter.dev4.green",
-                         @"com.bps.squinter.dev5.red",
-                         @"com.bps.squinter.dev5.blue",
-                         @"com.bps.squinter.dev5.green",
+                         @"com.bps.squinter.dev1.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev1.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev1.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev2.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev2.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev2.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev3.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev3.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev3.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev4.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev4.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev4.green",        // Redundant from 2.0.123
+                         @"com.bps.squinter.dev5.red",          // Redundant from 2.0.123
+                         @"com.bps.squinter.dev5.blue",         // Redundant from 2.0.123
+                         @"com.bps.squinter.dev5.green",        // Redundant from 2.0.123
                          @"com.bps.squinter.show.inspector",
                          @"com.bps.squinter.inspectorsize",
-                         @"com.bps.squinter.updatedevs",nil];
+                         @"com.bps.squinter.updatedevs",        // New in 2.0.122
+                         @"com.bps.squinter.devicecolours",     // New in 2.0.123
+                         nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
                             [NSString stringWithString:NSStringFromRect(_window.frame)],
@@ -341,24 +343,26 @@
                             [[NSArray alloc] init],
                             [NSNumber numberWithInteger:5],
                             [NSNumber numberWithInteger:200],
-                            [NSNumber numberWithFloat:0.0],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:1.0],
-                            [NSNumber numberWithFloat:0.2],
-                            [NSNumber numberWithFloat:0.3],
-                            [NSNumber numberWithFloat:0.0],
-                            [NSNumber numberWithFloat:0.6],
-                            [NSNumber numberWithFloat:0.5],
-                            [NSNumber numberWithFloat:1.0],
-                            [NSNumber numberWithFloat:0.8],
-                            [NSNumber numberWithFloat:1.0],
-                            [NSNumber numberWithFloat:0.0],
-                            [NSNumber numberWithFloat:0.6],
+                            [NSNumber numberWithFloat:0.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:1.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.2],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.3],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.5],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:1.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.8],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:1.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.0],         // Redundant from 2.0.123
+                            [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
                             [NSNumber numberWithBool:NO],
                             [NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)],
-                            [NSNumber numberWithBool:NO], nil];
+                            [NSNumber numberWithBool:NO],           // New in 2.0.123
+                            [[NSArray alloc] init],                 // New in 2.0.123
+                            nil];
 
     // Drop the arrays into the Defauts
 
@@ -427,7 +431,6 @@
     [logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
     [logTextView setTextColor:textColour];
     [logClipView setBackgroundColor:backColour];
-    [self setColours];
 
     // Set the selection colour to mirror the fore-back setup
 
@@ -614,6 +617,21 @@
                    name:@"BuildAPIGotAnAccount"
                  object:ide];
 	
+    [nsncdc addObserver:self
+               selector:@selector(getOtp:)
+                   name:@"BuildAPINeedOTP"
+                 object:ide];
+
+    [nsncdc addObserver:self
+               selector:@selector(loginRejected:)
+                   name:@"BuildAPILoginRejected"
+                 object:ide];
+
+    [nsncdc addObserver:self
+               selector:@selector(loggedOut:)
+                   name:@"BuildAPILoggedOut"
+                 object:ide];
+
     // **************
 
     [nsncdc addObserver:self
@@ -621,10 +639,7 @@
                name:@"BuildAPILogStreamEnd"
              object:ide];
 
-    [nsncdc addObserver:self
-               selector:@selector(getOtp:)
-                   name:@"BuildAPINeedOTP"
-                 object:ide];
+
 
     // Set up sleep/wake notification
 
@@ -677,6 +692,35 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    // Set up the Preferences panel's colour wells' on-click functions
+
+    [dev1ColorWell setAction:@selector(showPanelForDev1)];
+    [dev2ColorWell setAction:@selector(showPanelForDev2)];
+    [dev3ColorWell setAction:@selector(showPanelForDev3)];
+    [dev4ColorWell setAction:@selector(showPanelForDev4)];
+    [dev5ColorWell setAction:@selector(showPanelForDev5)];
+    [dev6ColorWell setAction:@selector(showPanelForDev6)];
+    [dev7ColorWell setAction:@selector(showPanelForDev7)];
+    [dev8ColorWell setAction:@selector(showPanelForDev8)];
+
+    // Organize the Preferences panel's colour wells into an array
+    // See 'setPrefs:' for usage
+
+    deviceColourWells = [[NSMutableArray alloc] init];
+
+    [deviceColourWells addObject:dev1ColorWell];
+    [deviceColourWells addObject:dev2ColorWell];
+    [deviceColourWells addObject:dev3ColorWell];
+    [deviceColourWells addObject:dev4ColorWell];
+    [deviceColourWells addObject:dev5ColorWell];
+    [deviceColourWells addObject:dev6ColorWell];
+    [deviceColourWells addObject:dev7ColorWell];
+    [deviceColourWells addObject:dev8ColorWell];
+
+    // Popular the logging colours array
+
+    [self setColours];
+
     // Instantiate an IDE-access object
 
     ide = [[BuildAPIAccess alloc] init];
@@ -957,8 +1001,8 @@
 
     if (!ide.isLoggedIn)
     {
-        // We are not logged in, so show the log in sheet, but only if we're
-        // not already trying to log in
+        // We are not logged in, so we may need to show the log in sheet,
+        // but only if we're not already trying to log in ('loginFlag' is true)
 
         if (!loginFlag)
         {
@@ -978,15 +1022,13 @@
     }
     else
     {
-        // We are logged in - or trying to log in - so log the user out
+        // We are logged in, so log the user out
         
         NSInteger cloudCode = ide.impCloudCode;
         
         [self logout];
 
         // Update the UI and report to the user
-
-        // Set the Account menu
 
         accountMenuItem.title = @"Not Signed in to any Account";
         loginMenuItem.title = @"Log in to your Primary Account";
@@ -1014,10 +1056,12 @@
     [devicesArray removeAllObjects];
 	
     productsArray = nil;
+    devicesArray = nil;
     selectedProduct = nil;
-
     selectedDevice = nil;
     iwvc.device = nil;
+    loginKey = nil;
+    otpLoginToken = nil;
     
     // Stop auto-updating account devices' status
     
@@ -1168,7 +1212,7 @@
 
     loginFlag = YES;
 
-    // Attempt to login with the current cgesredentials
+    // Attempt to login with the current credentials
 	
     if (loginKey != nil)
     {
@@ -1183,8 +1227,7 @@
 
     [ide login:usernameTextField.stringValue
               :passwordTextField.stringValue
-              :code
-              :NO];
+              :code];
 
     // Pick up the action in **loggedIn:** or **displayError:**, depending on success or failure
 }
@@ -1228,11 +1271,13 @@
 
 - (IBAction)switchAccount:(id)sender
 {
-    // We're switching account - presumably temporarily
+    // We're switching account - presumably temporarily - by holding the the option key
+    // when clicking the Account menu option. This allows the user to log into a different
+    // account ('loginMode' is 2) or switch to the primary
 
     if (loginMode != 2)
     {
-        // We a logging into a different account
+        // The user wants to log into a different account
 
         switchAccountFlag = YES;
 
@@ -1248,6 +1293,7 @@
     {
         // We a logging into the primary account
 
+        [self logout];
         [self autoLogin];
     }
 }
@@ -1286,10 +1332,14 @@
 }
 
 
+
 - (void)getOtp:(NSNotification *)note
 {
+    // The server has signalled BuildAPIAcces that it needs an OTP, and BuildAPIAccess
+    // has signalled the host app to get an OTP
+    
     NSDictionary *data = (NSDictionary *)note.object;
-    loginKey = [data objectForKey:@"token"];
+    otpLoginToken = [data objectForKey:@"token"];
 
     // Show OTP request box
 
@@ -1302,19 +1352,27 @@
 {
     [_window endSheet:otpSheet];
 
+    // Clear the entered OTP value, if any
+
     NSString *otp = otpTextField.stringValue;
-    [ide twoFactorLogin:loginKey :otp];
+    otpTextField.stringValue = @"";
+
+    [ide twoFactorLogin:otpLoginToken :otp];
 }
 
 
 
 - (IBAction)cancelOtpSheet:(id)sender
 {
+    // Cancel the OTP Sheet - and therefore the login
+
+    otpTextField.stringValue = @"";
+    otpLoginToken = nil;
+    loginFlag = NO;
+    if (switchAccountFlag) switchAccountFlag = NO;
+
     [_window endSheet:otpSheet];
 }
-
-
-
 
 
 
@@ -4312,7 +4370,7 @@
     //              productToProjectStage2:
     //              chooseProject:
 
-    if (currentDevicegroup.devices.count > 0 && devicesArray.count > 0)
+    if (devicesArray.count > 0)
     {
         // The current device group should have a list of devices - get the ID of the first one
 
@@ -4323,13 +4381,13 @@
             // First check by device ID — this is how the data should be stored,
             // but earlier versions used device name...
 
-            for (NSDictionary *device in devicesArray)
+            for (NSMutableDictionary *device in devicesArray)
             {
                 NSString *aDevId = [self getValueFrom:device withKey:@"id"];
 
                 if ([aDevId compare:devId] == NSOrderedSame)
                 {
-                    selectedDevice = (NSMutableDictionary *)device;
+                    selectedDevice = device;
                     iwvc.device = selectedDevice;
 
                     [self setDevicesPopupTick];
@@ -4340,16 +4398,16 @@
                     return;
                 }
             }
-
+/*
             // ...so we also check by device name, just in case
 
-            for (NSDictionary *device in devicesArray)
+            for (NSMutableDictionary *device in devicesArray)
             {
                 NSString *aDevId = [self getValueFrom:device withKey:@"name"];
 
                 if ([aDevId compare:devId] == NSOrderedSame)
                 {
-                    selectedDevice = (NSMutableDictionary *)device;
+                    selectedDevice = device;
                     iwvc.device = selectedDevice;
 
                     [self setDevicesPopupTick];
@@ -4360,6 +4418,7 @@
                     return;
                 }
             }
+ */
         }
         else
         {
@@ -4456,7 +4515,7 @@
         {
             // Re-acquire a single device's data
 
-            NSDictionary *device = [devicesArray objectAtIndex:i];
+            NSMutableDictionary *device = [devicesArray objectAtIndex:i];
             NSDictionary *dict = @{ @"action" : @"refreshdevice",
                                     @"device" : device };
 			
@@ -8106,7 +8165,7 @@
 
         // Update the Inspector
 
-        iwvc.devices = devicesArray;
+        // iwvc.devices = devicesArray;
     }
     else
     {
@@ -8188,7 +8247,9 @@
 			
             NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
             [attributes setObject:boolean forKey:@"device_online"];
-			
+
+            if (aDevice == selectedDevice) iwvc.device = aDevice;
+
             ++deviceCheckCount;
 			
             // NSLog(@"Device %li of %li", (long)deviceCheckCount, (long)devicesArray.count);
@@ -8707,6 +8768,7 @@
     loginFlag = NO;
     credsFlag = YES;
     switchAccountFlag = NO;
+    otpLoginToken = nil;
 
     // Inform the user he or she is logged in - and to which cloud
     
@@ -8728,6 +8790,58 @@
     {
         [self updateDevicesStatus:nil];
     }
+}
+
+
+
+- (void)loginRejected:(NSNotification *)note
+{
+    // BuildAPIAccess has notified the host that a login attempt has been rejected
+
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = @"Sorry, your impCentral credentials have been rejected";
+    alert.informativeText = @"Please check your account details and then try to log in again.";
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:_window completionHandler:nil];
+
+    // Register we are no longer trying to log in
+
+    loginFlag = NO;
+    credsFlag = YES;
+    switchAccountFlag = NO;
+    otpLoginToken = nil;
+    loginMode = -1;
+}
+
+
+
+- (void)loggedOut:(NSNotification *)note
+{
+    // BuildAPIAccess has notified us that we have been logged out
+
+    loginKey = nil;
+    otpLoginToken = nil;
+
+    // Stop auto-updating account devices' status
+
+    [self keepDevicesStatusUpdated:nil];
+
+    // Update the UI elements relating to these items
+
+    [self refreshProductsMenu];
+    [self refreshProjectsMenu];
+    [self refreshDevicesMenus];
+    [self refreshDeviceMenu];
+    [self refreshDevicesPopup];
+    [self setToolbar];
+
+    // Set the account menu UI
+
+    accountMenuItem.title = @"Not Signed in to any Account";
+    loginMenuItem.title = @"Log in to your Primary Account";
+    switchAccountMenuItem.enabled = YES;
+    switchAccountMenuItem.title = @"Log in to a Different Account...";
+    loginMode = 0;
 }
 
 
@@ -11272,7 +11386,7 @@
         for (NSMutableDictionary *device in devicesArray)
         {
             NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = [self getValueFrom:dg withKey:@"id"]; // (NSString *)[dg objectForKey:@"id"];
+            NSString *dgid = [self getValueFrom:dg withKey:@"id"];
 
             if (dgid != nil)
             {
@@ -12125,12 +12239,15 @@
 
 - (IBAction)showPrefs:(id)sender
 {
+    // The user has invoked the Preferences panel, so populate the panel's settings
+    // with the current saved defaults
+
     // Set working directory
 
     workingDirectoryField.stringValue = @"";
     workingDirectoryField.stringValue = workingDirectory;
 
-    // Set colour wells
+    // Set the panel's text colour well
 
     float r = [[defaults objectForKey:@"com.bps.squinter.text.red"] floatValue];
     float b = [[defaults objectForKey:@"com.bps.squinter.text.blue"] floatValue];
@@ -12139,6 +12256,8 @@
     textColorWell.color = textColour;
     [textColorWell setAction:@selector(showPanelForText)];
 
+    // Set the panel's background colour well
+
     r = [[defaults objectForKey:@"com.bps.squinter.back.red"] floatValue];
     b = [[defaults objectForKey:@"com.bps.squinter.back.blue"] floatValue];
     g = [[defaults objectForKey:@"com.bps.squinter.back.green"] floatValue];
@@ -12146,6 +12265,39 @@
     backColorWell.color = backColour;
     [backColorWell setAction:@selector(showPanelForBack)];
 
+    // Set the panel's various device log colour wells
+    // NOTE currently there are 8 wells, but there were 5, so we have migrated
+    //      from fixed defaults to an array containing RGB arrays for each colour
+
+    NSArray *savedColours = [defaults objectForKey:@"com.bps.squinter.devicecolours"];
+
+    if (savedColours.count != 0)
+    {
+        NSUInteger colourIndex = 0;
+
+        for (NSColorWell *colourWell in deviceColourWells)
+        {
+            // Only load in saved colours if we have any (at first launch we won't).
+            // Otherwise the colour wells will take the default colours
+
+            NSArray *colour = [savedColours objectAtIndex:colourIndex];
+
+            r = [[colour objectAtIndex:0] floatValue];
+            b = [[colour objectAtIndex:1] floatValue];
+            g = [[colour objectAtIndex:2] floatValue];
+
+            colourWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
+
+            // Walk the saved colours array separately, just in case there are
+            // suddenly more wells than colours (in which case, cycle through
+            // the colours)
+
+            ++colourIndex;
+            if (colourIndex > savedColours.count) colourIndex = 0;
+        }
+    }
+
+/*
     r = [[defaults objectForKey:@"com.bps.squinter.dev1.red"] floatValue];
     b = [[defaults objectForKey:@"com.bps.squinter.dev1.blue"] floatValue];
     g = [[defaults objectForKey:@"com.bps.squinter.dev1.green"] floatValue];
@@ -12175,6 +12327,7 @@
     g = [[defaults objectForKey:@"com.bps.squinter.dev5.green"] floatValue];
     dev5ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
     [dev5ColorWell setAction:@selector(showPanelForDev5)];
+*/
 
     // Set font name and size menus
 
@@ -12239,6 +12392,9 @@
 
 - (IBAction)setPrefs:(id)sender
 {
+    // The user clicks the Preferences panel's Save button, so apply all the changes
+    // and write values out to the defaults
+
     workingDirectory = workingDirectoryField.stringValue;
     BOOL textChange = NO;
 
@@ -12296,6 +12452,33 @@
 
     [logScrollView setScrollerKnobStyle:(a < 30 ? NSScrollerKnobStyleLight : NSScrollerKnobStyleDark)];
 
+    // Populate the colour wells on the Logs tab
+
+    NSMutableArray *savedColours = [[NSMutableArray alloc] init];
+
+    for (NSColorWell *colourWell in deviceColourWells)
+    {
+        // Get the current colour well's colours...
+
+        r = (float)colourWell.color.redComponent;
+        b = (float)colourWell.color.blueComponent;
+        g = (float)colourWell.color.greenComponent;
+
+        // ...and convert to an array of NSNumbers for saving to defaults...
+
+        NSArray *colour = @[ [NSNumber numberWithFloat:r], [NSNumber numberWithFloat:b], [NSNumber numberWithFloat:g]];
+
+        // ...and add the colour to the new default array
+
+        [savedColours addObject:colour];
+    }
+
+    // Write out the array of saved colours as a default
+
+    [defaults setObject:[NSArray arrayWithArray:savedColours] forKey:@"com.bps.squinter.devicecolours"];
+    [self setColours];
+
+/*
     r = (float)dev1ColorWell.color.redComponent;
     b = (float)dev1ColorWell.color.blueComponent;
     g = (float)dev1ColorWell.color.greenComponent;
@@ -12335,8 +12518,7 @@
     [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev5.red"];
     [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev5.green"];
     [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev5.blue"];
-
-    [self setColours];
+*/
 
     NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
     NSNumber *num = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
@@ -12981,8 +13163,6 @@ didReceiveResponse:(NSURLResponse *)response
         [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this device group's code.", [fpath lastPathComponent]] :YES];
     }
 }
-
-
 
 
 

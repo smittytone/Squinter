@@ -20,7 +20,7 @@
     IBOutlet NSSegmentedControl *panelSelector;
     IBOutlet NSTextField *field;
 
-    NSMutableArray *projectData;
+    NSMutableArray *projectData, *deviceData;
     NSMutableArray *deviceKeys, *deviceValues;
 
     NSWorkspace *nswsw;
@@ -38,7 +38,6 @@
 - (void)setTab:(NSUInteger)aTab;
 
 - (BOOL)isLinkRow:(TreeNode *)node;
-- (BOOL)isURLRow:(NSInteger)row;
 
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
@@ -51,7 +50,7 @@
 @property (nonatomic, strong, setter=setProject:) Project *project;
 @property (nonatomic, strong, setter=setDevice:) NSMutableDictionary *device;
 @property (nonatomic, strong) NSMutableArray *products;
-@property (nonatomic, strong) NSMutableArray *devices;
+//@property (nonatomic, strong) NSMutableArray *devices;
 @property (nonatomic, readwrite) NSRect mainWindowFrame;
 @property (nonatomic, readwrite) NSUInteger tabIndex;
 

@@ -25,7 +25,7 @@
 #import "CommitWindowViewController.h"
 #import "SelectWindowViewController.h"
 #import "InspectorWindow2ViewController.h"
-
+#import "LogView.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
                                    NSOpenSavePanelDelegate,
@@ -35,11 +35,11 @@
                                    NSURLSessionDataDelegate,
                                    NSURLSessionTaskDelegate,
                                    NSTextFieldDelegate,
-								  NSTouchBarProvider>
+								   NSTouchBarProvider>
 {
     // Main UI element outlets
 
-    IBOutlet NSTextView *logTextView;
+    IBOutlet LogView *logTextView;
     IBOutlet NSClipView *logClipView;
     IBOutlet NSScrollView *logScrollView;
     IBOutlet StatusLight *saveLight;
@@ -264,6 +264,9 @@
     IBOutlet NSColorWell *dev3ColorWell;
     IBOutlet NSColorWell *dev4ColorWell;
     IBOutlet NSColorWell *dev5ColorWell;
+    IBOutlet NSColorWell *dev6ColorWell;
+    IBOutlet NSColorWell *dev7ColorWell;
+    IBOutlet NSColorWell *dev8ColorWell;
     IBOutlet NSButton *autoUpdateCheckCheckbox;
     IBOutlet NSButton *autoLoadListsCheckbox;
     IBOutlet NSButton *boldTestCheckbox;
@@ -352,10 +355,11 @@
     NSOperationQueue *extraOpQueue;
     NSMenu *dockMenu;
 	NSTimer *refreshTimer;
+    NSTrackingArea *ta;
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
-
+    NSMutableArray *deviceColourWells;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
     NSURLSessionTask *eiLibListTask;
@@ -366,7 +370,7 @@
 
     NSFont *logFont;
 
-    NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey;
+    NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
 	
 	NSTimeInterval updateDevicePeriod;
 	
@@ -374,7 +378,7 @@
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag, doubleSaveFlag;
-    BOOL reconnectAfterSleepFlag;
+    BOOL reconnectAfterSleepFlag, isIn;
 }
 
 
@@ -558,6 +562,8 @@
 - (void)renameDeviceStageTwo:(NSNotification *)note;
 - (void)deleteDeviceStageTwo:(NSNotification *)note;
 - (void)loggedIn:(NSNotification *)note;
+- (void)loginRejected:(NSNotification *)note;
+- (void)loggedOut:(NSNotification *)note;
 
 
 // Log and Logging Methods

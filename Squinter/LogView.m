@@ -1,20 +1,31 @@
 
 
-//  Created by Tony Smith on 12/05/2015.
-//  Copyright (c) 2015 Tony Smith. All rights reserved.
+//  Created by Tony Smith on 01/08/2018.
+//  Copyright (c) 2018 Tony Smith. All rights reserved.
 
 
 #import "LogView.h"
 
 @implementation LogView
 
-@synthesize originalSize;
 
-
-- (BOOL)knowsPageRange:(NSRangePointer)range
+- (void)awakeFromNib
 {
-    BOOL wrappingToFit = self.printPanelAccessoryController.wrappingToFit;
+    NSCursor *c = [NSCursor currentCursor];
+    NSImage *cr = [NSImage imageNamed:@"darkcursor"];
+    [cr setSize:c.image.size];
+    if (darkibeam == nil) darkibeam = [[NSCursor alloc] initWithImage:cr hotSpot:c.hotSpot];
 }
+
+
+
+- (void)resetCursorRects
+{
+    [super resetCursorRects];
+    // [self addCursorRect:self.visibleRect cursor:darkibeam];
+}
+
+
 
 
 

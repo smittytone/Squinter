@@ -12,7 +12,7 @@
 
 @implementation InspectorWindow2ViewController
 
-@synthesize project, device, products, devices, mainWindowFrame, tabIndex;
+@synthesize project, device, products, mainWindowFrame, tabIndex;
 
 
 #pragma mark - ViewController Methods
@@ -33,12 +33,10 @@
 
     // Clear the content arrays:
     // 'projectData' is the project outline view data
-    // 'deviceKeys' are the left column contents
-    // 'deviceValues' are the middle column contents
+    // 'deviceData' is the device outline view data
 
     projectData = [[NSMutableArray alloc] init];
-    deviceKeys = [[NSMutableArray alloc] init];
-    deviceValues = [[NSMutableArray alloc] init];
+    deviceData = [[NSMutableArray alloc] init];
 
     // Set up date handling
 
@@ -147,7 +145,7 @@
 
     // Open the URL
 
-    [nswsw openURL:[NSURL URLWithString:[deviceValues objectAtIndex:cellView.row]]];
+    [nswsw openURL:[NSURL URLWithString:cellView.path]];
 }
 
 
@@ -174,15 +172,20 @@
 
     if (project != nil)
     {
+        // Project Information Header
+
         TreeNode *pnode = [[TreeNode alloc] init];
         pnode.key = @"Project Information";
-
         [projectData addObject:pnode];
+
+        // Project Name
 
         TreeNode *node = [[TreeNode alloc] init];
         node.key = @"Name";
         node.value = project.name;
         [projectData addObject:node];
+
+        // Project Description
 
         if (project.description != nil && project.description.length > 0)
         {
@@ -191,6 +194,8 @@
             node.value = project.description;
             [projectData addObject:node];
         }
+
+        // Project Product Name or ID
 
         if (products == nil || products.count == 0 || project.pid == nil)
         {
@@ -214,6 +219,8 @@
                 }
             }
         }
+
+        // Project Accoint ID
 
         if (project.aid != nil && project.aid.length > 0)
         {
@@ -248,6 +255,8 @@
             [projectData addObject:node];
         }
 
+        // Project File Path
+
         node = [[TreeNode alloc] init];
         node.key = @"Path";
 
@@ -255,13 +264,15 @@
         {
             node.value = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
             node.flag = YES;
-            [projectData addObject:node];
         }
         else
         {
             node.value = @"Project has not yet been saved";
-            [projectData addObject:node];
         }
+
+        [projectData addObject:node];
+
+        // Device Groups Information Header
 
         node = [[TreeNode alloc] init];
         node.key = @"Device Group Information";
@@ -273,26 +284,29 @@
 
             for (Devicegroup *devicegroup in project.devicegroups)
             {
+                // Device Group x Header
+
                 pnode = [[TreeNode alloc] init];
                 pnode.key = [NSString stringWithFormat:@"Device Group %li", (long)dgcount];
                 pnode.value = devicegroup.name;
                 pnode.children = [[NSMutableArray alloc] init];
                 [projectData addObject:pnode];
 
-                //node = [[TreeNode alloc] init];
-                //node.key = @"Name";
-                //node.value = devicegroup.name;
-                //[pnode.children addObject:node];
+                // Device Group x ID
 
                 node = [[TreeNode alloc] init];
                 node.key = @"ID";
                 node.value = (devicegroup.did != nil && devicegroup.did.length > 0) ? devicegroup.did : @"Not uploaded";
                 [pnode.children addObject:node];
 
+                // Device Group x Type
+
                 node = [[TreeNode alloc] init];
                 node.key = @"Type";
                 node.value = [self convertDevicegroupType:devicegroup.type :NO];
                 [pnode.children addObject:node];
+
+                // Device Group x Description
 
                 if (devicegroup.description != nil && devicegroup.description.length > 0)
                 {
@@ -302,6 +316,8 @@
                     [pnode.children addObject:node];
                 }
 
+                // Device Group x Models
+
                 if (devicegroup.models.count > 0)
                 {
                     NSUInteger modcount = 1;
@@ -310,21 +326,22 @@
                     {
                         NSString *typeString = [model.type compare:@"agent"] == NSOrderedSame ? @"Agent" : @"Device";
 
-                        //TreeNode *mnode = [[TreeNode alloc] init];
-                        //mnode.children = [[NSMutableArray alloc] init];
-                        //mnode.flag = YES;
-                        //mnode.key = ([typeString compare:@"Agent"] == NSOrderedSame) ? @"Agent Code Information" : @"Device Code Information";
-                        //[pnode.children addObject:mnode];
+                        // Device Group x Model y Header
 
                         node = [[TreeNode alloc] init];
                         node.key = [NSString stringWithFormat:@"%@ Code File", typeString];
                         node.value = model.filename;
                         [pnode.children addObject:node];
 
+                        // Device Group x Model y Path
+
                         node = [[TreeNode alloc] init];
                         node.key = @"Path";
                         node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename];
+                        node.flag = YES;
                         [pnode.children addObject:node];
+
+                        // Device Group x Model y Uploaded Date
 
                         node = [[TreeNode alloc] init];
                         node.key = @"Uploaded";
@@ -344,14 +361,20 @@
 
                         [pnode.children addObject:node];
 
+                        // Device Group x Model y SHA
+
                         node = [[TreeNode alloc] init];
                         node.key = @"SHA";
                         node.value = model.sha != nil && model.sha.length > 0 ? model.sha : @"No code uploaded";
                         [pnode.children addObject:node];
 
+                        // Device Group x Model y Libraries and Files Header
+
                         if (model.libraries != nil && model.libraries.count > 0)
                         {
                             NSUInteger libcount = 1;
+
+                            // Device Group x Model y Library z Data
 
                             node = [[TreeNode alloc] init];
                             node.key = @"Libraries";
@@ -360,10 +383,7 @@
 
                             for (File *library in model.libraries)
                             {
-                                //node = [[TreeNode alloc] init];
-                                //node.key = [NSString stringWithFormat:@"Library %li", (long)libcount];
-                                //node.value = library.filename;
-                                //[mnode.children addObject:node];
+                                // Device Group x Model y Library z Path
 
                                 node = [[TreeNode alloc] init];
                                 node.key = [NSString stringWithFormat:@"Library %li", (long)libcount];
@@ -386,6 +406,8 @@
                         {
                             NSUInteger filecount = 1;
 
+                            // Device Group x Model y File z Data
+
                             node = [[TreeNode alloc] init];
                             node.key = @"Files";
                             node.value = [NSString stringWithFormat:@"%li local %@ imported", (long)model.files.count, (model.files.count > 1 ? @"files" : @"file")];
@@ -393,10 +415,7 @@
 
                             for (File *file in model.files)
                             {
-                                //node = [[TreeNode alloc] init];
-                                //node.key = [NSString stringWithFormat:@"File %li", (long)filecount];
-                                //node.value = file.filename;
-                                //[mnode.children addObject:node];
+                                // Device Group x Model y File z Path
 
                                 node = [[TreeNode alloc] init];
                                 node.key = [NSString stringWithFormat:@"File %li", (long)filecount];
@@ -439,13 +458,7 @@
         [deviceOutlineView reloadData];
         [deviceOutlineView setNeedsDisplay];
 
-        if (projectData.count > 0)
-        {
-            for (TreeNode *node in projectData)
-            {
-               [deviceOutlineView expandItem:node expandChildren:NO];
-            }
-        }
+        if (projectData.count > 0) [deviceOutlineView expandItem:nil expandChildren:YES];
 
         if (oProject != nil && aProject != nil && deviceOutlineView.isHidden)
         {
@@ -473,121 +486,184 @@
 
     // Clear the data arrays
 
-    [deviceKeys removeAllObjects];
-    [deviceValues removeAllObjects];
+    [deviceData removeAllObjects];
 
     // If device does equal nil, we ignore the content creation section
     // and reload the table with empty data
 
     if (device != nil)
     {
-        [deviceKeys addObject:@"Device Information"];
-        [deviceValues addObject:@""];
-        [deviceKeys addObject:@"Name "];
-        [deviceValues addObject:[device valueForKeyPath:@"attributes.name"]];
-        [deviceKeys addObject:@"ID "];
-        [deviceValues addObject:[device objectForKey:@"id"]];
+        // Device Information Header
+
+        TreeNode *dnode = [[TreeNode alloc] init];
+        dnode.key = @"Device Information";
+        [deviceData addObject:dnode];
+
+        // Device Name
+
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Name";
+        dnode.value = [device valueForKeyPath:@"attributes.name"];
+        [deviceData addObject:dnode];
+
+        // Device ID
+
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"ID";
+        dnode.value = [device objectForKey:@"id"];
+        [deviceData addObject:dnode];
+
+        // Device Type
 
         NSString *type = [device valueForKeyPath:@"attributes.imp_type"];
         if ((NSNull *)type == [NSNull null]) type = nil;
-        if (type != nil )
+        if (type != nil)
         {
-            [deviceKeys addObject:@"Type "];
-            [deviceValues addObject:type];
+            dnode = [[TreeNode alloc] init];
+            dnode.key = @"Type";
+            dnode.value = type;
+            [deviceData addObject:dnode];
         }
+
+        // Device impOS Version
 
         NSString *version = [device valueForKeyPath:@"attributes.swversion"];
         if ((NSNull *)version == [NSNull null]) version = nil;
-        [deviceKeys addObject:@"impOS "];
-        if (version != nil )
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"impOS";
+
+        if (version != nil)
         {
             NSArray *parts = [version componentsSeparatedByString:@" - "];
             parts = [[parts objectAtIndex:1] componentsSeparatedByString:@"-"];
-
-            [deviceValues addObject:[parts objectAtIndex:1]];
+            dnode.value = [parts objectAtIndex:1];
         }
         else
         {
-            [deviceValues addObject:@"Unknown"];
+            dnode.value = @"Unknown";
         }
+
+        [deviceData addObject:dnode];
+
+        // Device Free Memory
 
         NSNumber *number = [device valueForKeyPath:@"attributes.free_memory"];
         if ((NSNull *)number == [NSNull null]) number = nil;
-        [deviceKeys addObject:@"Free RAM "];
-        [deviceValues addObject:(number != nil ? [NSString stringWithFormat:@"%@KB", number] : @"Unknown")];
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Free RAM";
+        dnode.value = number != nil ? [NSString stringWithFormat:@"%@KB", number] : @"Unknown";
+        [deviceData addObject:dnode];
 
-        [deviceKeys addObject:@"Network Information"];
-        [deviceValues addObject:@""];
+        // Network Information Header
 
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Network Information";
+        [deviceData addObject:dnode];
+
+        // Device MAC Address
+
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"MAC";
         NSString *mac = [device valueForKeyPath:@"attributes.mac_address"];
-        mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
-        [deviceKeys addObject:@"MAC "];
-        [deviceValues addObject:mac];
+        dnode.value = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
+        [deviceData addObject:dnode];
 
-        NSNumber *boolean = [device valueForKeyPath:@"attributes.device_online"];
-        NSString *string = (boolean.boolValue) ? @"Online" : @"Offline";
-        [deviceKeys addObject:@"Status "];
-        [deviceValues addObject:string];
-        [deviceKeys addObject:@"IP "];
+        // Device Status
 
+        NSNumber *num = [device valueForKeyPath:@"attributes.device_online"];
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Status";
+        NSString *string = num.boolValue ? @"Online" : @"Offline";
+        dnode.value = string;
+        [deviceData addObject:dnode];
+
+        // Device IP Address
+
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"IP";
         if ([string compare:@"Online"] == NSOrderedSame)
         {
             NSNumber *ip = [device valueForKeyPath:@"attributes.ip_address"];
             if ((NSNull *)ip == [NSNull null]) ip = nil;
-            [deviceValues addObject:(ip != nil ? ip : @"Unknown")];
+            dnode.value = ip != nil ? [NSString stringWithFormat:@"%@", ip] : @"Unknown";
         }
         else
         {
-            [deviceValues addObject:@"Unknown"];
+            dnode.value = @"Unknown";
         }
 
-        [deviceKeys addObject:@"RSSI "];
+        [deviceData addObject:dnode];
+
+        // Device RSSI
+
         NSNumber *rssi = [device valueForKeyPath:@"attributes.rssi"];
-
-        if ((NSNull *)rssi == [NSNull null] || rssi.integerValue == 0)
+        if ((NSNull *)rssi != [NSNull null] && rssi.integerValue != 0)
         {
-            [deviceValues addObject:@"Unknown"];
-        }
-        else
-        {
-            [deviceValues addObject:[NSString stringWithFormat:@"%i", rssi.intValue]];
+            dnode = [[TreeNode alloc] init];
+            dnode.key = @"RSSI";
+            dnode.value = [NSString stringWithFormat:@"%i", rssi.intValue];
+            [deviceData addObject:dnode];
         }
 
-        [deviceKeys addObject:@"Agent Information"];
-        [deviceValues addObject:@""];
+        // Agent Information Header
 
-        boolean = [device valueForKeyPath:@"attributes.agent_running"];
-        string = (boolean.boolValue) ? @"Online" : @"Offline";
-        [deviceKeys addObject:@"Status "];
-        [deviceValues addObject:string];
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Agent Information";
+        [deviceData addObject:dnode];
+
+        // Agent Status
+
+        num = [device valueForKeyPath:@"attributes.agent_running"];
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Status";
+        dnode.value = num.boolValue ? @"Online" : @"Offline";;
+        [deviceData addObject:dnode];
+
+        // Agent URL
 
         string = [device valueForKeyPath:@"attributes.agent_id"];
         if ((NSNull *)string == [NSNull null]) string = nil;
-        [deviceKeys addObject:@"Agent URL "];
-        [deviceValues addObject:(string != nil ? [@"https://agent.electricimp.com/" stringByAppendingString:string] : @"No agent")];
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Agent URL";
+        dnode.value = string != nil ? [@"https://agent.electricimp.com/" stringByAppendingString:string] : @"No agent";
+        dnode.flag = YES;
+        [deviceData addObject:dnode];
 
-        [deviceKeys addObject:@"BlinkUp Information"];
-        [deviceValues addObject:@""];
+        // BlinkUp Information Header
+
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"BlinkUp Information";
+        [deviceData addObject:dnode];
+
+        // BlinkUp Date
 
         NSString *date = [device valueForKeyPath:@"attributes.last_enrolled_at"];
         if ((NSNull *)date == [NSNull null]) date = nil;
-        [deviceKeys addObject:@"Last Enrolled "];
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Last Enrolled";
+        dnode.value = @"Unknown";
 
         if (date != nil)
         {
             date = [outLogDef stringFromDate:[inLogDef dateFromString:date]];
             date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
             date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-            [deviceValues addObject:date];
-        }
-        else
-        {
-            [deviceValues addObject:@"Unknown"];
+            dnode.value = date;
         }
 
-        [deviceKeys addObject:@"Device Group Information"];
-        [deviceValues addObject:@""];
+        [deviceData addObject:dnode];
 
+        // Device Group Information Header
+
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Device Group Information";
+        [deviceData addObject:dnode];
+
+        // Device Group Name or ID
+
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"ID";
+        dnode.value = @"Unassigned";
         NSDictionary *dg = [device valueForKeyPath:@"relationships.devicegroup"];
         if ((NSNull *)dg == [NSNull null]) dg = nil;
         if (dg != nil)
@@ -599,24 +675,17 @@
             {
                 if ([devicegroup.did compare:dgid] == NSOrderedSame)
                 {
-                    [deviceKeys addObject:@"Name "];
-                    [deviceValues addObject:devicegroup.name];
+                    dnode.key = @"Name";
+                    dnode.value = devicegroup.name;
                     got = YES;
                     break;
                 }
             }
 
-            if (!got)
-            {
-                [deviceKeys addObject:@"ID "];
-                [deviceValues addObject:dgid];
-            }
+            if (!got) dnode.value = dgid;
         }
-        else
-        {
-            [deviceKeys addObject:@"ID "];
-            [deviceValues addObject:@"Unassigned"];
-        }
+
+        [deviceData addObject:dnode];
     }
 
     if (panelSelector.selectedSegment == 1)
@@ -702,7 +771,7 @@
     {
         // This is the project panel. If it is empty, just show the message
 
-        if (device == nil || deviceKeys.count == 0)
+        if (device == nil || deviceData.count == 0)
         {
             deviceOutlineView.hidden = YES;
             field.stringValue = @"No device selected";
@@ -723,26 +792,10 @@
 
 - (BOOL)isLinkRow:(TreeNode *)node
 {
-    // Does the title column of content row being displayed
-    // include the word 'path'? If so the content is a link
-    // so we return YES so that the table data source method knows
-    // which type of NSTableCellView to use
+    // If the node is flagged and its value is a valid string,
+    // the row should show a link button
 
-    if (node.flag && node.value.length > 1 ) return YES;
-    return NO;
-}
-
-
-
-- (BOOL)isURLRow:(NSInteger)row
-{
-    // Does the content column of content row being displayed
-    // include the word 'http:'? If so the content is a link
-    // so we return YES so that the table data source method knows
-    // which type of NSTableCellView to use
-
-    NSString *value = [deviceValues objectAtIndex:row];
-    if ([value containsString:@"https:"]) return YES;
+    if (node.flag && node.value.length > 1) return YES;
     return NO;
 }
 
@@ -775,7 +828,8 @@
 
 
 
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView
+  numberOfChildrenOfItem:(id)item
 {
     // This will always be the number of items in the root item, ie.
     // the number of items in the appropriate data set
@@ -787,15 +841,16 @@
         if (node.children != nil && node.children.count > 0) return node.children.count;
     }
 
-    return (item == nil ? deviceKeys.count : 0);
+    return (item == nil ? deviceData.count : 0);
 }
 
 
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
-    {
-    // We use 'item' as a proxy for row number by converting 'index' (which
-    // is the row number) to an NSNumber so it can be referenced via 'item'
+- (id)outlineView:(NSOutlineView *)outlineView
+            child:(NSInteger)index
+           ofItem:(id)item
+{
+    // Only the Project Inspector has children
 
     if (panelSelector.selectedSegment == 0)
     {
@@ -805,12 +860,15 @@
         return nil;
     }
 
-    return [NSNumber numberWithInteger:index];
+    if (item == nil) return (deviceData.count > 0 ? [deviceData objectAtIndex:index] : nil);
+    return nil;
 }
 
 
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(nullable NSTableColumn *)tableColumn byItem:(nullable id)item
+- (id)outlineView:(NSOutlineView *)outlineView
+objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
+           byItem:(nullable id)item
 {
     // This needs to be here or the NSOutlineView viewForColumn: method is never called
 
@@ -819,12 +877,64 @@
 
 
 
-- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item
+- (NSView *)outlineView:(NSOutlineView *)outlineView
+     viewForTableColumn:(nullable NSTableColumn *)tableColumn
+                   item:(nonnull id)item
 {
     id cellView = nil;
 
-    if (panelSelector.selectedSegment == 1)
+    TreeNode *node = (TreeNode *)item;
+
+    if (node.value.length == 0)
     {
+        // This is a header row - make text all caps if 'flag' is NO
+        // NOTE This is the same for both tables
+
+        NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
+        cv.textField.stringValue = !node.flag ? [node.key uppercaseString] : node.key;
+        cellView = cv;
+    }
+    else
+    {
+        // This is a a data row
+
+        InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
+        cv.title.stringValue = node.key;
+        cv.data.stringValue = node.value;
+
+        if ([self isLinkRow:node])
+        {
+            // If data is a URL or a file link, make sure there's an active button at the end of the row
+
+            cv.goToButton.target = self;
+            cv.path = node.value;
+            
+            if (panelSelector.selectedSegment == 1)
+            {
+                // Button setup for the Device Inspector
+
+                cv.goToButton.action = @selector(goToURL:);
+                cv.goToButton.toolTip = @"Click this icon to open the displayed URL in a browser";
+            }
+            else
+            {
+                // Button setup for the Project Inspector
+
+                cv.goToButton.action = @selector(link:);
+                cv.goToButton.toolTip = @"Click this icon to open the displayed file in your editor";
+                cv.row = (node.flag && [node.value hasSuffix:@"squirrelproj"]) ? 0 : 99;
+            }
+
+            cv.goToButton.hidden = NO;
+        }
+        else
+        {
+            cv.goToButton.hidden = YES;
+        }
+
+        cellView = cv;
+    }
+/*
         // This is the device view
         // Retrieve the row number encoded as an NSNumber referenced by 'item'
 
@@ -853,11 +963,11 @@
             {
                 // If data is a URL, make sure there's an active button at the end of the row
 
-                [cv.goToButton setTarget:self];
-                [cv.goToButton setAction:@selector(goToURL:)];
-
-                cv.goToButton.hidden = NO;
+                cv.goToButton.target = self;
+                cv.goToButton.action = @selector(goToURL:);
+                cv.goToButton.toolTip = @"Click this icon to open the displayed URL in a browser";
                 cv.row = row;
+                cv.goToButton.hidden = NO;
             }
             else
             {
@@ -866,6 +976,7 @@
 
             cellView = cv;
         }
+
     }
     else
     {
@@ -893,12 +1004,12 @@
             {
                 // If data is a URL, make sure there's an active button at the end of the row
 
-                [cv.goToButton setTarget:self];
-                [cv.goToButton setAction:@selector(link:)];
-
-                cv.goToButton.hidden = NO;
+                cv.goToButton.target = self;
+                cv.goToButton.action = @selector(link:);
+                cv.goToButton.toolTip = @"Click this icon to open the displayed file in your editor";
                 cv.path = node.value;
                 cv.row = (node.flag && [node.key compare:@"Path"] == NSOrderedSame) ? 0 : 99;
+                cv.goToButton.hidden = NO;
             }
             else
             {
@@ -908,6 +1019,7 @@
             cellView = cv;
         }
     }
+*/
 
     return cellView;
 }
@@ -922,22 +1034,11 @@
     NSString *key = nil;
     NSString *value = nil;
 
+    TreeNode *node = (TreeNode *)item;
+    key = node.key;
+    value = node.value;
+
     // Get the data of the cell we're sizing
-
-    if (panelSelector.selectedSegment == 1)
-    {
-        NSNumber *num = (NSNumber *)item;
-        NSInteger index = num.integerValue;
-        key = [deviceKeys objectAtIndex:index];
-        value = [deviceValues objectAtIndex:index];
-    }
-    else
-    {
-        TreeNode *node = (TreeNode *)item;
-        key = node.key;
-        value = node.value;
-    }
-
     // Is it a spacer row — ie. 'key' and 'value' equal a single space
 
     if (key.length == 1 && value.length == 1) return 10;
@@ -975,6 +1076,10 @@
         NSDictionary *ui = notification.userInfo;
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
         node.expanded = YES;
+
+        // Should we expand all?  Yes, if the Command Key is held down
+
+        if (NSCommandKeyMask & [NSEvent modifierFlags]) [deviceOutlineView expandItem:nil expandChildren:YES];
     }
 }
 
@@ -987,6 +1092,10 @@
         NSDictionary *ui = notification.userInfo;
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
         node.expanded = NO;
+
+        // Should we collapse all? Yes, if the Command Key is held down
+
+        if (NSCommandKeyMask & [NSEvent modifierFlags]) [deviceOutlineView collapseItem:nil collapseChildren:YES];
     }
 }
 
@@ -1180,7 +1289,6 @@
     for (NSUInteger i = 0 ; i < dgtypes.count ; ++i)
     {
         NSString *dgtype = back ? [dgnames objectAtIndex:i] : [dgtypes objectAtIndex:i];
-
         if ([dgtype compare:type] == NSOrderedSame) return (back ? [dgtypes objectAtIndex:i] : [dgnames objectAtIndex:i]);
     }
 

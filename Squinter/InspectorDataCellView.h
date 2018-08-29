@@ -5,10 +5,11 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import "InspectorLinkButton.h"
 
 @interface InspectorDataCellView : NSTableCellView
 
-@property (nonatomic) IBOutlet NSButton *goToButton;
+@property (nonatomic) IBOutlet InspectorLinkButton *goToButton;
 @property (nonatomic) IBOutlet NSTextField *title;
 @property (nonatomic) IBOutlet NSTextField *data;
 @property (nonatomic, readwrite) NSInteger row;
