@@ -4438,7 +4438,7 @@
         return;
     }
 
-    [self writeStringToLog:@"Updating devices’ status information - this may take a moment..." :YES];
+    // [self writeStringToLog:@"Updating devices’ status information - this may take a moment..." :YES];
     [connectionIndicator startAnimation:self];
 
     // Get all the devices from development device groups and unassigned devices
