@@ -627,6 +627,11 @@
                    name:@"BuildAPILoginRejected"
                  object:ide];
 
+    [nsncdc addObserver:self
+               selector:@selector(loggedOut:)
+                   name:@"BuildAPILoggedOut"
+                 object:ide];
+
     // **************
 
     [nsncdc addObserver:self
@@ -1051,6 +1056,7 @@
     [devicesArray removeAllObjects];
 	
     productsArray = nil;
+    devicesArray = nil;
     selectedProduct = nil;
     selectedDevice = nil;
     iwvc.device = nil;
@@ -8806,6 +8812,38 @@
     otpLoginToken = nil;
     loginMode = -1;
 }
+
+
+
+- (void)loggedOut:(NSNotification *)note
+{
+    // BuildAPIAccess has notified us that we have been logged out
+
+    loginKey = nil;
+    otpLoginToken = nil;
+
+    // Stop auto-updating account devices' status
+
+    [self keepDevicesStatusUpdated:nil];
+
+    // Update the UI elements relating to these items
+
+    [self refreshProductsMenu];
+    [self refreshProjectsMenu];
+    [self refreshDevicesMenus];
+    [self refreshDeviceMenu];
+    [self refreshDevicesPopup];
+    [self setToolbar];
+
+    // Set the account menu UI
+
+    accountMenuItem.title = @"Not Signed in to any Account";
+    loginMenuItem.title = @"Log in to your Primary Account";
+    switchAccountMenuItem.enabled = YES;
+    switchAccountMenuItem.title = @"Log in to a Different Account...";
+    loginMode = 0;
+}
+
 
 
 #pragma mark - Log and Logging Methods
