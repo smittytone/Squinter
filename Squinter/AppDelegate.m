@@ -4398,32 +4398,6 @@
                     return;
                 }
             }
-/*
-            // ...so we also check by device name, just in case
-
-            for (NSMutableDictionary *device in devicesArray)
-            {
-                NSString *aDevId = [self getValueFrom:device withKey:@"name"];
-
-                if ([aDevId compare:devId] == NSOrderedSame)
-                {
-                    selectedDevice = device;
-                    iwvc.device = selectedDevice;
-
-                    [self setDevicesPopupTick];
-                    [self setUnassignedDevicesMenuTick];
-                    [self setDevicesMenusTicks];
-                    [self refreshDeviceMenu];
-
-                    return;
-                }
-            }
- */
-        }
-        else
-        {
-            // TODO Should we load up the devics — or has this been done?
-            //      If already attempted, it might have failed
         }
     }
 }
@@ -4438,7 +4412,7 @@
         return;
     }
 
-    // [self writeStringToLog:@"Updating devices’ status information - this may take a moment..." :YES];
+    [self writeStringToLog:@"Updating devices’ status information - this may take a moment..." :YES];
     [connectionIndicator startAnimation:self];
 
     // Get all the devices from development device groups and unassigned devices
@@ -4507,7 +4481,7 @@
         // We have a list of devices in place and there is at least one device in the list
         // so go through each device in the list and update its details individually
 
-        [self writeStringToLog:@"Auto-updating devices' status. This can be disabled in the Device menu." :YES];
+        // [self writeStringToLog:@"Auto-updating devices' status. This can be disabled in the Device menu." :YES];
 		
         deviceCheckCount = 0;
 		
