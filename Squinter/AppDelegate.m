@@ -3648,9 +3648,16 @@
     // And, depending on prefs, select the first device, if there is one
     // then update the UI
 
+    BOOL devicegroupChanged = NO;
     NSMenuItem *item = (NSMenuItem *)sender;
-    currentDevicegroup = item.representedObject;
-    currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+    Devicegroup *dg = item.representedObject;
+
+    if (dg != currentDevicegroup)
+    {
+        devicegroupChanged = YES;
+        currentDevicegroup = dg;
+        currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+    }
 
     // Switch off unselected menus - and submenus
 
@@ -3675,16 +3682,15 @@
             // Use the flag to make sure we don't reselect the device
             // after coming here from 'chooseDevice:'
 
-            if (!deviceSelectFlag)
+            if (!deviceSelectFlag && dgitem.submenu != nil && devicegroupChanged)
             {
-                if (dgitem.submenu != nil)
-                {
-                    NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
+                // Only change the device if it's in a different devicegroup than before
 
-                    // Select the device using 'chooseDevice:' as this manages 'selectedDevice'
+                NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
 
-                    [self chooseDevice:sitem];
-                }
+                // Select the device using 'chooseDevice:' as this manages 'selectedDevice'
+
+                [self chooseDevice:sitem];
             }
         }
     }
