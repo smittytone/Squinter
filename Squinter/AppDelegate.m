@@ -4376,27 +4376,87 @@
 
         if (currentDevicegroup.devices.count > 0)
         {
-            NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
-
-            // First check by device ID — this is how the data should be stored,
-            // but earlier versions used device name...
-
-            for (NSMutableDictionary *device in devicesArray)
+            if (currentDevicegroup.devices.count == 1)
             {
-                NSString *aDevId = [self getValueFrom:device withKey:@"id"];
+                // 'currentDevicegroup.devices' only stores device IDs, so we need to find the
+                // referenced device first
 
-                if ([aDevId compare:devId] == NSOrderedSame)
+                NSString *devId = [currentDevicegroup.devices firstObject];
+
+                for (NSMutableDictionary *device in devicesArray)
                 {
-                    selectedDevice = device;
-                    iwvc.device = selectedDevice;
+                    NSString *aDevId = [self getValueFrom:device withKey:@"id"];
 
-                    [self setDevicesPopupTick];
-                    [self setUnassignedDevicesMenuTick];
-                    [self setDevicesMenusTicks];
-                    [self refreshDeviceMenu];
+                    if ([aDevId compare:devId] == NSOrderedSame)
+                    {
+                        selectedDevice = device;
+                        iwvc.device = selectedDevice;
 
-                    return;
+                        [self setDevicesPopupTick];
+                        [self setUnassignedDevicesMenuTick];
+                        [self setDevicesMenusTicks];
+                        [self refreshDeviceMenu];
+
+                        return;
+                    }
                 }
+            }
+            else
+            {
+                NSMutableArray *selectedDevices = [[NSMutableArray alloc] init];
+
+                for (NSString *devId in currentDevicegroup.devices)
+                {
+                    for (NSMutableDictionary *device in devicesArray)
+                    {
+                        NSString *aDevId = [self getValueFrom:device withKey:@"id"];
+
+                        if ([aDevId compare:devId] == NSOrderedSame)
+                        {
+                            [selectedDevices addObject:device];
+                        }
+                    }
+                }
+
+
+                NSMutableDictionary *device = [selectedDevices firstObject];
+                NSString *first = [self getValueFrom:device withKey:@"name"];
+                if (first == nil) first = [self getValueFrom:device withKey:@"id"];
+
+                NSString *list = @"";
+                NSUInteger count = 0;
+
+                for (NSMutableDictionary *device in selectedDevices)
+                {
+                    NSString *item = [self getValueFrom:device withKey:@"name"];
+                    if (item == nil) item = [self getValueFrom:device withKey:@"id"];
+
+                    ++count;
+
+                    if (count == selectedDevices.count)
+                    {
+                        list = [list substringToIndex:list.length - 2];
+                        list = [list stringByAppendingFormat:@" and %@", item];
+                    }
+                    else
+                    {
+                        list = [list stringByAppendingFormat:@"%@, ", item];
+                    }
+                }
+
+                selectedDevice = [selectedDevices firstObject];
+                iwvc.device = selectedDevice;
+
+                [self setDevicesPopupTick];
+                [self setUnassignedDevicesMenuTick];
+                [self setDevicesMenusTicks];
+                [self refreshDeviceMenu];
+
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.messageText = [NSString stringWithFormat:@"This device group has mulitple assigned devices: %@. The first device, %@, will be selected initially.", list, first];
+                [alert addButtonWithTitle:@"OK"];
+                [alert beginSheetModalForWindow:_window
+                              completionHandler:nil];
             }
         }
     }

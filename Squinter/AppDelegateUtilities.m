@@ -993,18 +993,19 @@
 
                 BOOL flag = NO;
 
-                NSString *dvn = [self getValueFrom:device withKey:@"name"];
+                NSString *dvn = [self getValueFrom:device withKey:@"id"]; // [self getValueFrom:device withKey:@"name"];
 
-                if (dvn == nil) dvn = [self getValueFrom:device withKey:@"id"];
-
-                for (NSString *dgdevice in devicegroup.devices)
+                if (devicegroup.devices.count > 0)
                 {
-                    if ([dvn compare:dgdevice] == NSOrderedSame)
+                    for (NSString *dgdevice in devicegroup.devices)
                     {
-                        // Device is already on the list
+                        if ([dvn compare:dgdevice] == NSOrderedSame)
+                        {
+                            // Device is already on the list
 
-                        flag = YES;
-                        break;
+                            flag = YES;
+                            break;
+                        }
                     }
                 }
 

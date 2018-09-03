@@ -18,10 +18,10 @@
 @property (nonatomic, strong) NSString *did;                // ID of Device Group's API equivalent
 @property (nonatomic, strong) NSString *type;               // The Device Group's type, eg. 'development_devicegroup'
 @property (nonatomic, strong) NSMutableArray *models;       // The Device Group's source code as models
-@property (nonatomic, strong) NSMutableArray *devices;      // The Device Group's associated devices
 
 // Properties that are NOT saved
 
+@property (nonatomic, strong) NSMutableArray *devices;      // The Device Group's associated devices
 @property (nonatomic, strong) NSMutableDictionary *data;    // The API representation
 @property (nonatomic, strong) NSArray *history;             // The device group's deployment history
 @property (nonatomic, strong) NSString *mdid;               // The minimum deployment ID
