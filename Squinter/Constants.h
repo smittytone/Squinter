@@ -59,6 +59,10 @@
 #define kImpCloudTypeAWS                    0
 #define kImpCloudTypeAzure                  1
 
+#define kLoginModeNone                      0
+#define kLoginModeMain                      1
+#define kLoginModeAlt                       2
+
 // Squinted
 
 #define kDeviceCodeSquinted                 0x01
