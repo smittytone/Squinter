@@ -67,7 +67,7 @@
     deviceSelectFlag = NO;
     renameProjectFlag = NO;
     saveAsFlag = YES;
-    stale = NO;
+    isBookmarkStale = NO;
     credsFlag = NO;
     switchAccountFlag = NO;
     doubleSaveFlag = NO;
@@ -77,7 +77,7 @@
     logPaddingLength = 0;
     deviceCheckCount = -1;
     updateDevicePeriod = 300.0;
-    loginMode = 0;
+    loginMode = kLoginModeNone;
 
     nswsw = NSWorkspace.sharedWorkspace;
     nsfm = NSFileManager.defaultManager;
@@ -143,7 +143,7 @@
 
     // Account Menu
 
-    switchAccountMenuItem.enabled = NO;
+    // switchAccountMenuItem.enabled = NO;
     accountMenuItem.enabled = NO;
 
     // View Menu
@@ -753,6 +753,9 @@
         // NOTE may remove this and leave users to select it from menu
 
         // [self showLoginWindow];
+
+        // switchAccountMenuItem.enabled = YES;
+        [self writeStringToLog:@"To make full use of Squinter, please log in to your Electric Imp account via the Account menu." :YES];
     }
 }
 
@@ -1002,9 +1005,9 @@
     if (!ide.isLoggedIn)
     {
         // We are not logged in, so we may need to show the log in sheet,
-        // but only if we're not already trying to log in ('loginFlag' is true)
+        // but only if we're not already trying to log in ('isLoggingIn' is true)
 
-        if (!loginFlag)
+        if (!isLoggingIn)
         {
             if (!credsFlag)
             {
@@ -1031,10 +1034,10 @@
         // Update the UI and report to the user
 
         accountMenuItem.title = @"Not Signed in to any Account";
-        loginMenuItem.title = @"Log in to your Primary Account";
-        switchAccountMenuItem.enabled = YES;
+        loginMenuItem.title = @"Log in to your Main Account";
+        // switchAccountMenuItem.enabled = YES;
         switchAccountMenuItem.title = @"Log in to a Different Account...";
-        loginMode = 0;
+        loginMode = kLoginModeNone;
 
         NSString *cloudName = [self getCloudName:cloudCode];
         [self writeStringToLog:[NSString stringWithFormat:@"You are now logged out of the %@impCloud.", cloudName] :YES];
@@ -1210,7 +1213,7 @@
 
     // Register that we're attempting a login
 
-    loginFlag = YES;
+    isLoggingIn = YES;
 
     // Attempt to login with the current credentials
 	
@@ -1275,7 +1278,7 @@
     // when clicking the Account menu option. This allows the user to log into a different
     // account ('loginMode' is 2) or switch to the primary
 
-    if (loginMode != 2)
+    if (loginMode != kLoginModeAlt)
     {
         // The user wants to log into a different account
 
@@ -1368,7 +1371,7 @@
 
     otpTextField.stringValue = @"";
     otpLoginToken = nil;
-    loginFlag = NO;
+    isLoggingIn = NO;
     if (switchAccountFlag) switchAccountFlag = NO;
 
     [_window endSheet:otpSheet];
@@ -2615,12 +2618,12 @@
     }
     else
     {
-        if (stale)
+        if (isBookmarkStale)
         {
             // The project's bookmark is stale, ie. it has changed location.
             // 'url' contains the new location
 
-            stale = NO;
+            isBookmarkStale = NO;
 
             // Update recent files list and UI
 
@@ -2650,10 +2653,10 @@
 
         for (NSDictionary *recent in recentFiles)
         {
-            stale = NO;
+            isBookmarkStale = NO;
             NSURL *url = [self urlForBookmark:[recent valueForKey:@"bookmark"]];
 
-            if (stale)
+            if (isBookmarkStale)
             {
                 changed = YES;
                 if (url != nil)
@@ -8786,26 +8789,28 @@
     accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
     if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
     loginMenuItem.title = @"Log out of this Account";
-    switchAccountMenuItem.enabled = YES;
+    // switchAccountMenuItem.enabled = YES;
 
     if (switchAccountFlag)
     {
         // We are switching to a secondary account, so we should change the login option
 
-        switchAccountMenuItem.title = @"Log in to Your Primary Account";
-        loginMode = 2;
+        switchAccountMenuItem.title = @"Log in to Your Main Account";
+        loginMode = kLoginModeAlt;
     }
     else
     {
+        // We have logged into the primary account
+
         switchAccountMenuItem.title = @"Log in to a Different Account...";
-        loginMode = 1;
+        loginMode = kLoginModeMain;
     }
 
     [self setToolbar];
 
     // Register we are no longer trying to log in
 
-    loginFlag = NO;
+    isLoggingIn = NO;
     credsFlag = YES;
     switchAccountFlag = NO;
     otpLoginToken = nil;
@@ -8846,11 +8851,11 @@
 
     // Register we are no longer trying to log in
 
-    loginFlag = NO;
+    isLoggingIn = NO;
     credsFlag = YES;
     switchAccountFlag = NO;
     otpLoginToken = nil;
-    loginMode = -1;
+    loginMode = kLoginModeNone;
 }
 
 
@@ -8878,10 +8883,10 @@
     // Set the account menu UI
 
     accountMenuItem.title = @"Not Signed in to any Account";
-    loginMenuItem.title = @"Log in to your Primary Account";
-    switchAccountMenuItem.enabled = YES;
+    loginMenuItem.title = @"Log in to your Main Account";
+    //switchAccountMenuItem.enabled = YES;
     switchAccountMenuItem.title = @"Log in to a Different Account...";
-    loginMode = 0;
+    loginMode = kLoginModeNone;
 }
 
 
@@ -10319,7 +10324,7 @@
     NSNumber *code = [error objectForKey:@"code"];
     NSInteger errorCode = [code integerValue];
 
-    if (loginFlag)
+    if (isLoggingIn)
     {
         // We are attempting to log in, so the error should relate to that action, ie.
         // most likely a failed connection, or missing or rejected credentials
@@ -10377,7 +10382,7 @@
 
         // Register that we are no longer trying to log in
 
-        loginFlag = NO;
+        isLoggingIn = NO;
     }
     else
     {

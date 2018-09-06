@@ -416,11 +416,11 @@
 
 	if (error != nil)
 	{
-		stale = YES;
+		isStale = YES;
 		return nil;
 	}
 
-	stale = isStale;
+	isStale = isStale;
     return url;
 }
 
