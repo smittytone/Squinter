@@ -12328,8 +12328,8 @@
             NSArray *colour = [savedColours objectAtIndex:colourIndex];
 
             r = [[colour objectAtIndex:0] floatValue];
-            b = [[colour objectAtIndex:1] floatValue];
-            g = [[colour objectAtIndex:2] floatValue];
+            g = [[colour objectAtIndex:1] floatValue];
+            b = [[colour objectAtIndex:2] floatValue];
 
             colourWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
 
@@ -12506,12 +12506,12 @@
         // Get the current colour well's colours...
 
         r = (float)colourWell.color.redComponent;
-        b = (float)colourWell.color.blueComponent;
         g = (float)colourWell.color.greenComponent;
+        b = (float)colourWell.color.blueComponent;
 
         // ...and convert to an array of NSNumbers for saving to defaults...
 
-        NSArray *colour = @[ [NSNumber numberWithFloat:r], [NSNumber numberWithFloat:b], [NSNumber numberWithFloat:g]];
+        NSArray *colour = @[ [NSNumber numberWithFloat:r], [NSNumber numberWithFloat:g], [NSNumber numberWithFloat:b] ];
 
         // ...and add the colour to the new default array
 

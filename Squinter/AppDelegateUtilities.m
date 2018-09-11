@@ -567,7 +567,7 @@
 }
 
 
-
+/*
 - (void)setLoggingColours
 {
 	// Pick colours from the 'colours' array that are darker/lighter than the log background
@@ -607,7 +607,7 @@
 		}
 	}
 }
-
+*/
 
 
 #pragma mark - Preferences Panel Subsidiary Methods
