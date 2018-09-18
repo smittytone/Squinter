@@ -10019,17 +10019,17 @@
 
     // Determine the number of characters in the longest line...
 
-    NSInteger dashCount = 0;
+    // NSInteger dashCount = 0;
 
-    for (NSString *string in lines) dashCount = string.length > dashCount ? string.length : dashCount;
+    // for (NSString *string in lines) dashCount = string.length > dashCount ? string.length : dashCount;
 
     // ...then build a string of dashes that long
 
-    NSString *dashes = [@"" stringByPaddingToLength:dashCount withString:@"-" startingAtIndex:0];
+    // NSString *dashes = [@"" stringByPaddingToLength:dashCount withString:@"-" startingAtIndex:0];
 
     // Write out the dashes
 
-    [self writeNoteToLog:dashes :textColour :NO];
+    // [self writeNoteToLog:dashes :textColour :NO];
 
     // Write out the lines themselves
 
@@ -10037,7 +10037,7 @@
 
     // Write out the dashes
 
-    [self writeNoteToLog:dashes :textColour :NO];
+    // [self writeNoteToLog:dashes :textColour :NO];
 }
 
 
