@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaDFRPlugin" version="14019"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
-        <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaDFRPlugin" version="14215.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="the Touch Bar" minToolsVersion="8.1" minSystemVersion="10.12.2" requiredIntegratedClassName="NSTouchBar"/>
     </dependencies>
@@ -971,12 +970,12 @@
             </items>
             <point key="canvasLocation" x="-843" y="335"/>
         </menu>
-        <window title="Squinter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="QvC-M9-y7g">
+        <window title="Squinter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="1024" height="582"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="1024" height="582"/>
             <value key="minFullScreenContentSize" type="size" width="1024" height="582"/>
             <view key="contentView" id="EiT-Mj-1SZ">
@@ -984,7 +983,7 @@
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kgZ-xK-Ij1">
-                        <rect key="frame" x="155" y="7" width="282" height="26"/>
+                        <rect key="frame" x="155" y="7" width="282" height="25"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="Ctf-46-VdV"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="277" id="pim-N9-Osd"/>
@@ -1012,7 +1011,7 @@
                         </constraints>
                     </progressIndicator>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oez-pq-fUm">
-                        <rect key="frame" x="698" y="7" width="319" height="26"/>
+                        <rect key="frame" x="698" y="7" width="319" height="25"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="2Ks-Vt-HNp"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="314" id="O2w-OW-V13"/>
@@ -1042,10 +1041,10 @@
                                     <rect key="frame" x="0.0" y="-1" width="1024" height="542"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <size key="minSize" width="1024" height="542"/>
                                     <size key="maxSize" width="1983" height="10000000"/>
-                                    <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
                             </subviews>
                             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -1257,11 +1256,11 @@
             </toolbar>
             <point key="canvasLocation" x="823" y="390"/>
         </window>
-        <window title="New Project" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="D74-Fr-OkO" customClass="NSPanel">
+        <window title="New Project" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" visibleAtLaunch="NO" animationBehavior="default" id="D74-Fr-OkO" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="612" height="359"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="359"/>
             <value key="maxSize" type="size" width="612" height="359"/>
             <view key="contentView" id="nog-1L-n3G">
@@ -1286,7 +1285,7 @@
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="charWrapping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Unnamed Project (80 characters max.)" drawsBackground="YES" id="jU2-kU-qPN">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -1300,7 +1299,7 @@
                         </constraints>
                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Optional description (255 characters max.)" drawsBackground="YES" id="qYE-32-wSq">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -1471,11 +1470,11 @@ DQ
             </constraints>
             <point key="canvasLocation" x="-502.5" y="-238"/>
         </customView>
-        <window title="About..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="lSs-4y-dIl" customClass="NSPanel">
+        <window title="About..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="lSs-4y-dIl" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="612" height="400"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="400"/>
             <view key="contentView" id="D0u-hz-bfS">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="400"/>
@@ -1596,11 +1595,11 @@ DQ
             </view>
             <point key="canvasLocation" x="-115" y="71"/>
         </window>
-        <window title="QuitSave" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="iXO-7c-Jbo" customClass="NSPanel">
+        <window title="QuitSave" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="iXO-7c-Jbo" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="612" height="100"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="100"/>
             <view key="contentView" id="5zF-NP-iig">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="100"/>
@@ -1677,11 +1676,11 @@ Gw
             </view>
             <point key="canvasLocation" x="180" y="256"/>
         </window>
-        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="h6Z-xR-T8e" customClass="NSPanel">
+        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="h6Z-xR-T8e" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="459"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="459"/>
             <value key="maxSize" type="size" width="612" height="459"/>
             <value key="minFullScreenContentSize" type="size" width="612" height="459"/>
@@ -1697,11 +1696,11 @@ Gw
                         <tabViewItems>
                             <tabViewItem label="General" identifier="1" id="evn-9T-0q2">
                                 <view key="view" ambiguous="YES" id="dVn-Xe-jNr">
-                                    <rect key="frame" x="10" y="33" width="129" height="0.0"/>
+                                    <rect key="frame" x="10" y="33" width="566" height="348"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zDH-Ht-72Y">
-                                            <rect key="frame" x="15" y="-31" width="536" height="17"/>
+                                            <rect key="frame" x="15" y="317" width="536" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Primary Projects Directory" id="2tw-rg-OiT">
                                                 <font key="font" metaFont="systemBold"/>
@@ -1710,16 +1709,16 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EQt-Hf-Xj6">
-                                            <rect key="frame" x="17" y="-61" width="437" height="22"/>
+                                            <rect key="frame" x="17" y="287" width="437" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="yWu-nH-OrX">
                                                 <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DkE-vS-yQU">
-                                            <rect key="frame" x="184" y="-206" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="142" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Preserve window size and location on quit" bezelStyle="regularSquare" imagePosition="left" inset="2" id="0y8-yG-B2s">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1727,7 +1726,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ebC-Zl-yYK">
-                                            <rect key="frame" x="184" y="-98" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="250" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Compile Projects when they are opened" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Oao-Lj-YmV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1735,7 +1734,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rcb-N4-0Pa">
-                                            <rect key="frame" x="184" y="-132" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="216" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Log in to the impCloud on launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Uac-2V-lgt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1743,7 +1742,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4RA-rZ-K8Y">
-                                            <rect key="frame" x="184" y="-226" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="122" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Automatically check for updates on launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="YNZ-qN-hCg">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1751,7 +1750,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QNH-MF-i5o">
-                                            <rect key="frame" x="15" y="-97" width="165" height="17"/>
+                                            <rect key="frame" x="15" y="251" width="165" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Projects:" id="tEd-wl-ozf">
                                                 <font key="font" metaFont="system"/>
@@ -1760,7 +1759,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nnl-zi-h5P">
-                                            <rect key="frame" x="104" y="-206" width="76" height="17"/>
+                                            <rect key="frame" x="104" y="142" width="76" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Application:" id="iyn-6O-3Cr">
                                                 <font key="font" metaFont="system"/>
@@ -1769,7 +1768,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hjS-TN-DBd">
-                                            <rect key="frame" x="184" y="-172" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="176" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Auto-load Product list on log-in" bezelStyle="regularSquare" imagePosition="left" inset="2" id="U1a-3i-4Fc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1777,7 +1776,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wVL-mp-vcF">
-                                            <rect key="frame" x="184" y="-152" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="196" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Auto-load Devices lists on log-in" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Evd-yN-RwP">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1785,7 +1784,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yY2-Ib-Odi">
-                                            <rect key="frame" x="15" y="-132" width="165" height="17"/>
+                                            <rect key="frame" x="15" y="216" width="165" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Login" id="MbW-MR-iAt">
                                                 <font key="font" metaFont="system"/>
@@ -1794,7 +1793,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nCa-C0-93c">
-                                            <rect key="frame" x="456" y="-68" width="99" height="32"/>
+                                            <rect key="frame" x="456" y="280" width="99" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Change..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" id="Uhg-U7-DrG">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1805,7 +1804,7 @@ Gw
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dds-o4-UR0">
-                                            <rect key="frame" x="184" y="-246" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="102" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Show Inspector at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="aTm-eQ-hOR">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1813,7 +1812,7 @@ Gw
                                             </buttonCell>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="257-jR-osq">
-                                            <rect key="frame" x="348" y="-317" width="86" height="26"/>
+                                            <rect key="frame" x="348" y="31" width="86" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="5" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="ZDa-ZJ-zlO" id="qle-RE-B2t">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1831,7 +1830,7 @@ Gw
                                             </popUpButtonCell>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="05Y-TQ-Ihn">
-                                            <rect key="frame" x="133" y="-312" width="211" height="17"/>
+                                            <rect key="frame" x="133" y="36" width="211" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Number of Recent Project Files:" id="0kE-l3-h7u">
                                                 <font key="font" metaFont="system"/>
@@ -1840,7 +1839,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b4t-2e-gXc">
-                                            <rect key="frame" x="526" y="-317" width="25" height="25"/>
+                                            <rect key="frame" x="526" y="31" width="25" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="k8W-dd-oMD">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1851,7 +1850,7 @@ Gw
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DjJ-Bw-YRL">
-                                            <rect key="frame" x="184" y="-266" width="367" height="18"/>
+                                            <rect key="frame" x="184" y="82" width="367" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Update Devices’ status periodically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="tOF-sy-pYr">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2211,11 +2210,11 @@ Gw
             </view>
             <point key="canvasLocation" x="204" y="168.5"/>
         </window>
-        <window title="Assign Device" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="DOx-Dm-xr6" customClass="NSPanel">
+        <window title="Assign Device" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" visibleAtLaunch="NO" animationBehavior="default" id="DOx-Dm-xr6" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="612" height="206"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="206"/>
             <value key="maxSize" type="size" width="612" height="206"/>
             <view key="contentView" id="4Uw-Cu-gD6">
@@ -2223,7 +2222,7 @@ Gw
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <popUpButton horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UC3-wk-scu">
-                        <rect key="frame" x="320" y="137" width="275" height="26"/>
+                        <rect key="frame" x="320" y="137" width="275" height="25"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="Puo-sa-DMK"/>
                         </constraints>
@@ -2263,7 +2262,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nh1-B0-bW0">
-                        <rect key="frame" x="18" y="137" width="275" height="26"/>
+                        <rect key="frame" x="18" y="137" width="275" height="25"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="TFl-ax-Noh"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="270" id="x6O-Ou-91G"/>
@@ -2349,11 +2348,11 @@ Gw
             </view>
             <point key="canvasLocation" x="487" y="-518"/>
         </window>
-        <window title="Rename" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="hav-Uy-J5n" customClass="NSPanel">
+        <window title="Rename" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="hav-Uy-J5n" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="276"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="276"/>
             <view key="contentView" id="iMu-Ht-Fna">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="276"/>
@@ -2371,7 +2370,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mdx-HT-kOU">
-                        <rect key="frame" x="18" y="207" width="296" height="26"/>
+                        <rect key="frame" x="18" y="207" width="296" height="25"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="BKF-rk-C0s"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="291" id="EHQ-3k-fYB"/>
@@ -2406,7 +2405,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="charWrapping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="New device name (140 characters max.)" drawsBackground="YES" id="3YZ-jN-ai2">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -2518,11 +2517,11 @@ Gw
             </constraints>
             <point key="canvasLocation" x="-502.5" y="-384"/>
         </customView>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="TMW-57-pcx" customClass="NSPanel">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="TMW-57-pcx" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="158" width="612" height="362"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="362"/>
             <view key="contentView" id="Uci-OE-MtE">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="362"/>
@@ -2546,7 +2545,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="charWrapping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="80 characters max." drawsBackground="YES" id="VZv-4g-VZl">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -2571,7 +2570,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Optional description (255 characters max)" drawsBackground="YES" id="U6D-ep-duH">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -2676,11 +2675,11 @@ Gw
             </view>
             <point key="canvasLocation" x="448" y="342"/>
         </window>
-        <window title="New Device Group" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="xnp-Pb-Uzx" customClass="NSPanel">
+        <window title="New Device Group" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="xnp-Pb-Uzx" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="158" width="612" height="356"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="356"/>
             <value key="maxSize" type="size" width="612" height="356"/>
             <view key="contentView" id="Ptw-bb-wdB">
@@ -2705,7 +2704,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="charWrapping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Unnamed Device Group (80 characters max.)" drawsBackground="YES" usesSingleLineMode="YES" id="p6w-r7-Ceb">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -2719,7 +2718,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Optional description (255 characters max.)" drawsBackground="YES" id="BjM-L2-S61">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -2794,7 +2793,7 @@ Gw
                         </connections>
                     </button>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iC4-F0-qh0">
-                        <rect key="frame" x="145" y="97" width="221" height="26"/>
+                        <rect key="frame" x="145" y="97" width="221" height="25"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="216" id="5tK-r1-h6A"/>
                             <constraint firstAttribute="height" constant="21" id="aDG-wN-4Oq"/>
@@ -2884,11 +2883,11 @@ Gw
             </constraints>
             <point key="canvasLocation" x="-502.5" y="-517"/>
         </customView>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="N7Z-aG-iXH" customClass="NSPanel">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="N7Z-aG-iXH" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="350"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="350"/>
             <value key="maxSize" type="size" width="612" height="350"/>
             <view key="contentView" id="rcs-tI-D8o">
@@ -2935,7 +2934,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="eVh-2U-UFi">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -2946,7 +2945,7 @@ Gw
                         </constraints>
                         <secureTextFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="mzG-0G-0je">
                             <font key="font" size="12" name="Menlo-Regular"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             <allowedInputSourceLocales>
                                 <string>NSAllRomanInputSourcesLocaleIdentifier</string>
@@ -3014,7 +3013,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fry-jq-bh7">
-                        <rect key="frame" x="18" y="17" width="25" height="25"/>
+                        <rect key="frame" x="18" y="16" width="25" height="25"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="1x5-MN-V69"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="21" id="zzv-Zp-GIN"/>
@@ -3028,7 +3027,7 @@ Gw
                         </connections>
                     </button>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fh4-xx-YWp">
-                        <rect key="frame" x="97" y="108" width="188" height="26"/>
+                        <rect key="frame" x="97" y="108" width="188" height="25"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="Qaz-KF-g2i"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="183" id="fjp-aa-cPq"/>
@@ -3106,11 +3105,11 @@ Gw
             </view>
             <point key="canvasLocation" x="-672" y="80"/>
         </window>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="x6k-bd-7Eg" customClass="NSPanel">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="x6k-bd-7Eg" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="480" height="124"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" id="zAt-fq-n0x">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="124"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -3164,11 +3163,11 @@ Gw
             </view>
             <point key="canvasLocation" x="-194" y="302"/>
         </window>
-        <window title="OTP" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qbF-qP-6eg" customClass="NSPanel">
+        <window title="OTP" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qbF-qP-6eg" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="205"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="205"/>
             <value key="maxSize" type="size" width="612" height="205"/>
             <view key="contentView" id="qDJ-C0-kV2">
@@ -3193,7 +3192,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" placeholderString="123456" drawsBackground="YES" id="qHH-4q-u0j">
                             <font key="font" metaFont="systemBold" size="46"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -3266,11 +3265,11 @@ Gw
             </view>
             <point key="canvasLocation" x="-555" y="941.5"/>
         </window>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="vvp-hd-nUu" customClass="NSPanel">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="vvp-hd-nUu" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="548" height="106"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="548" height="106"/>
             <view key="contentView" id="S6Y-2S-Xcv">
                 <rect key="frame" x="0.0" y="0.0" width="548" height="106"/>
@@ -3348,11 +3347,11 @@ Gw
             </view>
             <point key="canvasLocation" x="405.5" y="-219.5"/>
         </window>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="n0h-3u-1CF" customClass="NSPanel">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="n0h-3u-1CF" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="352"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="352"/>
             <view key="contentView" id="bVS-tJ-OiH">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="352"/>
@@ -3421,7 +3420,7 @@ Gw
                         <rect key="frame" x="20" y="62" width="572" height="220"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="c85-gn-qg4">
                             <rect key="frame" x="1" y="1" width="570" height="218"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="22" viewBased="YES" floatsGroupRows="NO" id="XO0-WA-HCG">
                                     <rect key="frame" x="0.0" y="0.0" width="570" height="218"/>
@@ -3526,7 +3525,7 @@ Gw
                                                             </constraints>
                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Table View Cell" id="bpM-Ob-2i2">
                                                                 <font key="font" metaFont="system"/>
-                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
@@ -3549,6 +3548,7 @@ Gw
                                     </connections>
                                 </tableView>
                             </subviews>
+                            <nil key="backgroundColor"/>
                         </clipView>
                         <constraints>
                             <constraint firstAttribute="height" constant="220" id="PZc-qH-uSC"/>
@@ -3584,11 +3584,11 @@ Gw
             </view>
             <point key="canvasLocation" x="-98" y="254"/>
         </window>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="lXp-El-Lhb" customClass="NSPanel">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="lXp-El-Lhb" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="315"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="315"/>
             <view key="contentView" id="i9v-DV-zkI">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="315"/>
@@ -3609,7 +3609,7 @@ Gw
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Optional commit message (255 characters max.)" drawsBackground="YES" id="aXO-AK-omq">
                                                 <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
@@ -3656,7 +3656,7 @@ Gw
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Optional code origin (255 characters max)" drawsBackground="YES" id="LYy-0R-4ga">
                                                 <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
@@ -3685,7 +3685,7 @@ Gw
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="charWrapping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Optional tags (500 characters max.)" drawsBackground="YES" id="kDL-dh-jUJ">
                                                 <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
@@ -3795,11 +3795,11 @@ Gw
                 <outlet property="view" destination="bVS-tJ-OiH" id="E8q-8Y-3wD"/>
             </connections>
         </viewController>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="ZPk-Wx-j2Q">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="ZPk-Wx-j2Q">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="612" height="324"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="324"/>
             <view key="contentView" id="SfP-J6-928">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="324"/>
@@ -3818,7 +3818,7 @@ Gw
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn identifier="" width="567" minWidth="40" maxWidth="1000" id="Wfq-Hp-ruQ">
+                                        <tableColumn width="567" minWidth="40" maxWidth="1000" id="Wfq-Hp-ruQ">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -4085,11 +4085,11 @@ Gw
             </connections>
             <point key="canvasLocation" x="-837.5" y="55"/>
         </touchBar>
-        <window title="Inspector" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" id="sRN-il-mwK" customClass="NSPanel">
+        <window title="Inspector" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" id="sRN-il-mwK" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="340" height="520"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="340" height="520"/>
             <value key="maxSize" type="size" width="340" height="1980"/>
             <view key="contentView" id="hqI-37-Q16">
@@ -4116,7 +4116,7 @@ Gw
                                     <color key="backgroundColor" red="1" green="0.5409764051" blue="0.84731429820000004" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="gridColor" red="1" green="0.1857388616" blue="0.57339501380000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <tableColumns>
-                                        <tableColumn identifier="" width="337" minWidth="337" maxWidth="337" id="hFO-tg-8AA">
+                                        <tableColumn width="337" minWidth="337" maxWidth="337" id="hFO-tg-8AA">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>

@@ -140,7 +140,7 @@
 			}
 
 			cell.textField.enabled = NO;
-			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.blackColor;
+			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.labelColor;
 		}
 
 		return cell;
@@ -161,7 +161,7 @@
 
 			cell.textField.stringValue = [NSString stringWithFormat:@"Committed at %@", sha];
 			cell.textField.enabled = NO;
-			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.blackColor;
+			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.labelColor;
 		}
 
 		return cell;
