@@ -8915,13 +8915,15 @@
     {
         [extraOpQueue addOperationWithBlock:^(void){
 
-            NSString *headString = [NSString stringWithFormat:@"Commits to Device Group \"%@\":", devicegroup.name];
-            NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
+            /* NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
 
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:lineString
                                 waitUntilDone:NO];
-
+             */
+            
+            NSString *headString = [NSString stringWithFormat:@"Most recent commits to Device Group \"%@\":", devicegroup.name];
+        
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:headString
                                 waitUntilDone:NO];
@@ -8951,7 +8953,7 @@
                 }
 
                 NSString *ns = [NSString stringWithFormat:@"%03lu. ", (deployments.count - i + 1)];
-                NSString *ss = [@"                               " substringToIndex:ns.length];
+                NSString *ss = [@"                               " substringToIndex:ns.length + 2];
                 NSString *cs;
 
                 if (message != nil && message.length > 0)
@@ -8966,24 +8968,43 @@
                 if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
                 if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
                 if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
-
+                
+                // Record whether the current entry is the min. supported deployment or the current
+                
+                bool flag = NO;
+                
                 if (mid.length > 0 || cid.length > 0)
                 {
                     NSString *did = [deployment objectForKey:@"id"];
-                    if ([did compare:mid] == NSOrderedSame) cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
-                    if ([did compare:cid] == NSOrderedSame) cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
+                    if ([did compare:mid] == NSOrderedSame)
+                    {
+                        cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
+                        flag = YES;
+                    }
+                    
+                    if ([did compare:cid] == NSOrderedSame)
+                    {
+                        cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
+                        flag = YES;
+                    }
                 }
 
                 cs = [cs stringByAppendingString:@"\n"];
+                
+                // Add a prefix to indicate min. supported deployment and/or current deployment
+                
+                cs = flag ? [@"* " stringByAppendingString:cs] : [@"  " stringByAppendingString:cs];
 
                 [self performSelectorOnMainThread:@selector(logLogs:)
                                        withObject:cs
                                     waitUntilDone:NO];
             }
-
+            
+            /*
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:lineString
                                 waitUntilDone:NO];
+             */
         }];
     }
 }
@@ -9931,7 +9952,7 @@
 
             done = YES;
             [self writeStringToLog:@"Device Code:" :NO];
-            [self writeStringToLog:@" " :NO];
+            //[self writeStringToLog:@" " :NO];
             [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
             break;
         }
@@ -9968,7 +9989,7 @@
 
             done = YES;
             [self writeStringToLog:@"Agent Code:" :NO];
-            [self writeStringToLog:@" " :NO];
+            //[self writeStringToLog:@" " :NO];
             [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
             break;
         }
