@@ -13,11 +13,11 @@
 
 // Properties that ARE saved
 
-@property (nonatomic, strong) NSString *path;               // The location of the source file
 @property (nonatomic, strong) NSString *filename;           // The name of the source file
-@property (nonatomic, strong) NSString *version;            // The version of the source file, using static VERSION =
-                                                            // "x.y.z"
+@property (nonatomic, strong) NSString *path;               // The location of the source file
 @property (nonatomic, strong) NSString *type;               // The source code type: "file" or "library"
+@property (nonatomic, strong) NSString *version;            // The version of the source file,
+                                                            // using static VERSION ="x.y.z"
 
 // Properties that are NOT saved
 
