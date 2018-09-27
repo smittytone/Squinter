@@ -12736,18 +12736,14 @@
 
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kSquinterFeedbackAddress]];
     request.HTTPMethod = @"POST";
-
-    [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
-    //[request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:kSquinterFeedbackUUID forHTTPHeaderField:@"X-Squinter-ID"];
-    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:dict options:0 error:&error]];
-
-
-    NSLog([[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
+    request.HTTPBody = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
     
+    [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setValue:kSquinterFeedbackUUID forHTTPHeaderField:@"X-Squinter-ID"];
+
     if (error != nil || request == nil)
     {
-        // Something went wrong at this point
+        // Something went wrong during the creation of the request, so tell the user and bail
 
         [self sendFeedbackError];
 
@@ -12826,8 +12822,10 @@
 
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
         request.HTTPMethod = @"GET";
-        eiLibListData = [NSMutableData dataWithCapacity:0];
+        
         eiDeviceGroup = devicegroup;
+        eiLibListData = [NSMutableData dataWithCapacity:0];
+        
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         NSURLSession *session = [NSURLSession sessionWithConfiguration: config
                                                               delegate: self
@@ -12975,8 +12973,6 @@ didReceiveResponse:(NSURLResponse *)response
     {
         // Were we sending feedback?
 
-        NSLog(@"%li", rps.statusCode);
-
         if (task == feedbackTask)
         {
             [self sendFeedbackError];
@@ -13028,30 +13024,30 @@ didReceiveResponse:(NSURLResponse *)response
 
     if (task == eiLibListTask)
     {
-        if (ide.numberOfConnections < 1)
-        {
-            // Only hide the connection indicator if 'ide' has no live connections
-
-            [connectionIndicator stopAnimation:self];
-            connectionIndicator.hidden = YES;
-        }
-
         // The connection has come to a conclusion without error
 
         [self compareElectricImpLibs:eiDeviceGroup];
     }
-    else
+    else if (task == feedbackTask)
     {
         // The user just successfully posted feedback
 
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = @"Thank You!";
+        alert.messageText = @"Thanks For Your Feedback!";
         alert.informativeText = @"Your comments have been received and we’ll take a look at them shortly.";
 
         [alert addButtonWithTitle:@"OK"];
         [alert beginSheetModalForWindow:_window completionHandler:nil];
     }
-
+    
+    if (ide.numberOfConnections < 1)
+    {
+        // Only hide the connection indicator if 'ide' has no live connections
+        
+        [connectionIndicator stopAnimation:self];
+        connectionIndicator.hidden = YES;
+    }
+    
     [task cancel];
 }
 
