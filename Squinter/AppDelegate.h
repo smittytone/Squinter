@@ -38,7 +38,7 @@
                                    NSTextFieldDelegate,
 								   NSTouchBarProvider>
 {
-    // Main UI element outlets
+    #pragma mark - Main UI element outlets
 
     IBOutlet LogView             *logTextView;
     IBOutlet NSClipView          *logClipView;
@@ -48,7 +48,7 @@
     IBOutlet NSPopUpButton       *projectsPopUp;
     IBOutlet NSPopUpButton       *devicesPopUp;
 
-    // File Menu outlets
+    #pragma mark File Menu outlets
 
     IBOutlet NSMenu     *fileMenu;
     IBOutlet NSMenuItem *fileSaveMenuItem;
@@ -56,7 +56,7 @@
     IBOutlet NSMenuItem *fileAddFilesMenuItem;
     IBOutlet NSMenu     *openRecentMenu;
 
-    // Project Menu outlets
+    #pragma mark Project Menu outlets
 
     IBOutlet NSMenu     *projectsMenu;
     IBOutlet NSMenu     *openProjectsMenu;
@@ -70,7 +70,7 @@
     IBOutlet NSMenuItem *deleteProductMenuItem;
     IBOutlet NSMenuItem *renameProductMenuItem;
 
-    // Device Groups Menu outlets
+    #pragma mark Device Groups Menu outlets
 
     IBOutlet NSMenu     *deviceGroupsMainMenu;
     IBOutlet NSMenu     *deviceGroupsMenu;
@@ -100,7 +100,7 @@
     IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
 	IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
 
-    // Device Menu outlets
+    #pragma mark Device Menu outlets
 
     IBOutlet NSMenu     *deviceMenu;
     IBOutlet NSMenuItem *showDeviceInfoMenuItem;
@@ -118,24 +118,24 @@
     IBOutlet NSMenuItem *deleteDeviceMenuItem;
     IBOutlet NSMenu     *unassignedDevicesMenu;
 
-    // Account Menu Outlets
+    #pragma mark Account Menu Outlets
 
 	IBOutlet NSMenu     *accountMenu;
     IBOutlet NSMenuItem *loginMenuItem;
 	IBOutlet NSMenuItem *accountMenuItem;
 	IBOutlet NSMenuItem *switchAccountMenuItem;
 
-    // View Menu outlets
+    #pragma mark View Menu outlets
 
     IBOutlet NSMenuItem *logDeviceCodeMenuItem;
     IBOutlet NSMenuItem *logAgentCodeMenuItem;
     IBOutlet NSMenuItem *showHideToolbarMenuItem;
 
-    // File Menu outlets
+    #pragma mark File Menu outlets
 
     IBOutlet NSMenuItem *closeAllMenuItem;
 
-    // Help Menu
+    #pragma mark Help Menu
 
     IBOutlet NSMenuItem *author01;
     IBOutlet NSMenuItem *author02;
@@ -144,7 +144,7 @@
     IBOutlet NSMenuItem *author05;
     IBOutlet NSMenuItem *author06;
 
-    // Toolbar outlets
+    #pragma mark Toolbar outlets
 
     IBOutlet NSToolbar           *squinterToolbar;
     IBOutlet SquinterToolbarItem *squintItem;
@@ -173,7 +173,7 @@
 
     // Sheets, dialogs and windows
 
-    // Login
+    #pragma mark Login Sheet
 
     IBOutlet NSPanel               *loginSheet;
     IBOutlet NSTextField           *usernameTextField;
@@ -183,7 +183,7 @@
     IBOutlet NSButton              *showPassCheckbox;
 	IBOutlet NSPopUpButton         *impCloudPopup;
 
-    // Open
+    #pragma mark Open Panel
 
     NSOpenPanel       *openDialog;
     IBOutlet NSView   *accessoryView;
@@ -193,7 +193,7 @@
     IBOutlet NSButton *projectFromFilesAccessoryViewCheckbox;
     IBOutlet NSButton *projectFromFilesAccessoryViewLocCheckbox;
 
-    // Save
+    #pragma mark Save Panel
 
     NSSavePanel          *saveProjectDialog;
     IBOutlet id          saveChangesSheet;
@@ -201,7 +201,7 @@
     IBOutlet NSView      *saveDevicegroupFilesAccessoryView;
     IBOutlet NSButton    *saveDevicegroupFilesAccessoryViewCheckbox;
 
-    // New Project
+    #pragma mark New Project Sheet
 
     IBOutlet NSPanel     *newProjectSheet;
     IBOutlet NSTextField *newProjectNameTextField;
@@ -212,7 +212,7 @@
     IBOutlet NSButton    *newProjectAssociateCheckbox;
     IBOutlet NSButton    *newProjectNewProductCheckbox;
 
-    // Rename Project/Device Group
+    #pragma mark Rename Project/Device Group Sheet
 
     IBOutlet NSPanel     *renameProjectSheet;
     IBOutlet NSTextField *renameProjectLabel;
@@ -223,13 +223,13 @@
     IBOutlet NSButton    *renameProjectLinkCheckbox;
     IBOutlet NSTextField *renameProjectHintField;
 
-    // Sync Project
+    #pragma mark Sync Project Sheet
 
     IBOutlet NSPanel             *syncProjectSheet;
     IBOutlet NSProgressIndicator *syncProjectProgress;
     IBOutlet NSTextField         *syncProjectLabel;
 
-    // New Device Group
+    #pragma mark New Device Group Sheet
 
     IBOutlet NSPanel       *newDevicegroupSheet;
     IBOutlet NSTextField   *newDevicegroupLabel;
@@ -240,15 +240,18 @@
     IBOutlet NSButton      *newDevicegroupCheckbox;
     IBOutlet NSPopUpButton *newDevicegroupTypePopup;
 
+    #pragma mark Select Target Sheet
+    
 	IBOutlet NSWindow                   *selectTargetSheet;
 	IBOutlet SelectWindowViewController *swvc;
 
-    // About
+    #pragma mark About Sheet
 
     IBOutlet id aboutSheet;
     IBOutlet id aboutVersionLabel;
+    IBOutlet NSButton *feedbackButton;
 
-    // Prefs
+    #pragma mark Prefs Sheet
 
     IBOutlet id            preferencesSheet;
     IBOutlet NSTextField   *workingDirectoryField;
@@ -277,7 +280,7 @@
     IBOutlet NSButton      *showInspectorCheckbox;
 	IBOutlet NSButton      *updateDevicesCheckbox;
 
-    // Assign Device
+    #pragma mark Assign Device Sheet
 
     IBOutlet NSPanel       *assignDeviceSheet;
     IBOutlet NSPopUpButton *assignDeviceMenuDevices;
@@ -285,7 +288,7 @@
 
     NSOpenPanel *choosePanel;
 
-    // Rename
+    #pragma mark Rename Device/Device Group/Project Sheet
 
     IBOutlet NSPanel       *renameSheet;
     IBOutlet NSTextField   *renameLabel;
@@ -293,14 +296,14 @@
     IBOutlet NSTextField   *renameName;
     IBOutlet NSTextField   *renameNameLength;
 
-    // Agent or Device?
-
+    #pragma mark Agent or Device Code? Sheet
+    
     IBOutlet NSPanel     *sourceTypeSheet;
     IBOutlet NSTextField *sourceTypeLabel;
     IBOutlet NSButton    *sourceTypeAgentButton;
     IBOutlet NSButton    *sourceTypeDeviceButton;
 
-    // Upload Code
+    #pragma mark Upload Code Sheet
 
     IBOutlet NSPanel     *uploadSheet;
     IBOutlet NSTextField *uploadDevicegroupTextField;
@@ -312,28 +315,26 @@
     IBOutlet NSTextField *uploadTagsTextField;
     IBOutlet NSTextField *uploadTagsCountField;
 
-    // OTP
+    #pragma mark OTP Sheet
 
     IBOutlet NSPanel     *otpSheet;
     IBOutlet NSTextField *otpTextField;
 
-    // Set Minimum Deployment
+    #pragma mark Set Minimum Deployment Sheet
 
     IBOutlet NSWindow *commitSheet;
 
-    // Report a Problem
+    #pragma mark Report a Problem Sheet
 
     IBOutlet NSPanel *feedbackSheet;
     IBOutlet NSTextField *feedbackField;
 
-	// Inspector Panel
+	#pragma mark Inspector Panel
 
 	IBOutlet InspectorWindow2ViewController *iwvc;
 
-    // Connection Variables
-
-    BuildAPIAccess *ide;
-
+    #pragma mark Other Sheets
+    
     // Update Tracking
 
     IBOutlet SUUpdater *sparkler;
@@ -346,6 +347,9 @@
 	
 	IBOutlet NSTouchBar *appBar;
 
+    #pragma mark Main Properties
+    
+    BuildAPIAccess *ide;
     Project *currentProject, *creatingProject, *savingProject;
     Devicegroup *currentDevicegroup, *eiDeviceGroup;
 

@@ -12701,6 +12701,12 @@
     // Show the sheet
 
     feedbackField.stringValue = @"";
+    
+    if (sender == feedbackButton)
+    {
+        [self closeAboutSheet:sender];
+    }
+    
     [_window beginSheet:feedbackSheet completionHandler:nil];
 }
 
