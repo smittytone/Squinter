@@ -9263,7 +9263,7 @@
         // NOTE {message} comprises the remaining parts of the string
 
         NSUInteger width = 11;
-        NSArray *values;
+        NSColor *logColour;
         NSString *device;
         NSString *log;
 
@@ -9317,20 +9317,22 @@
         {
             NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
             log = [NSString stringWithFormat:@"\"%@\"%@: %@ %@%@", device, subspacer, stype, spacer, message];
-            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
+            //values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
         else
         {
             log = [NSString stringWithFormat:@"\"%@\": %@ %@%@", device, stype, spacer, message];
-            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
+            //values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
 
         log = [timestamp stringByAppendingFormat:@" %@", log];
-        NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
-        NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-        NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
+        logColour = [colors objectAtIndex:index];
+        
+        //NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
+        //NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+        //NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
 
-        [self writeStyledStringToLog:attrString :NO];
+        [self writeNoteToLog:log :logColour :NO];
     }
 }
 
@@ -10098,7 +10100,12 @@
     NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
-    [self writeStyledStringToLog:attrString :addTimestamp];
+    
+    // Make sure the actual writing is done on the main thread
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self writeStyledStringToLog:attrString :addTimestamp];
+    });
 }
 
 
@@ -13043,9 +13050,13 @@ didReceiveResponse:(NSURLResponse *)response
     if (ide.numberOfConnections < 1)
     {
         // Only hide the connection indicator if 'ide' has no live connections
+        // Make sure it's on the main thread
         
-        [connectionIndicator stopAnimation:self];
-        connectionIndicator.hidden = YES;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [connectionIndicator stopAnimation:self];
+            connectionIndicator.hidden = YES;
+        });
+        
     }
     
     [task cancel];
