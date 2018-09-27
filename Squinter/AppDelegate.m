@@ -12687,6 +12687,99 @@
 
 
 
+#pragma mark - Report a Problem Sheet Methods
+
+- (IBAction)showFeedbackSheet:(id)sender
+{
+    // Show the sheet
+
+    feedbackField.stringValue = @"";
+    [_window beginSheet:feedbackSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)cancelFeedbackSheet:(id)sender
+{
+    [_window endSheet:feedbackSheet];
+}
+
+
+
+- (IBAction)sendFeedback:(id)sender
+{
+    NSString *feedback = feedbackField.stringValue;
+
+    [_window endSheet:feedbackSheet];
+
+    if (feedback.length == 0) return;
+
+    // Send the string etc.
+
+    NSError *error = nil;
+
+    NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+    NSString *userAgent = [NSString stringWithFormat:@"%@/%@.%@ (macOS %li.%li.%li)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleExecutable"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+                 [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], (long)sysVer.majorVersion, (long)sysVer.minorVersion, (long)sysVer.patchVersion];
+
+    NSDictionary *dict = @{ @"comment" : feedback,
+                            @"useragent" : userAgent };
+
+
+    if (connectionIndicator.hidden == YES)
+    {
+        // Start the connection indicator
+
+        connectionIndicator.hidden = NO;
+        [connectionIndicator startAnimation:self];
+    }
+
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kSquinterFeedbackAddress]];
+    request.HTTPMethod = @"POST";
+
+    [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+    //[request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:kSquinterFeedbackUUID forHTTPHeaderField:@"X-Squinter-ID"];
+    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:dict options:0 error:&error]];
+
+
+    NSLog([[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
+    
+    if (error != nil || request == nil)
+    {
+        // Something went wrong at this point
+
+        [self sendFeedbackError];
+
+        return;
+    }
+
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration: config
+                                                          delegate: self
+                                                     delegateQueue: [NSOperationQueue mainQueue]];
+    feedbackTask = [session dataTaskWithRequest:request];
+    [feedbackTask resume];
+}
+
+
+
+- (void)sendFeedbackError
+{
+    // Present an error message specific to sending feedback
+    // This is called from multiple locations: if the initial request can't be created,
+    // there was a send failure, or a server error
+
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = @"Could Not Send Your Feedback";
+    alert.informativeText = @"Unfortunately, your comments could not be send at this time. Please try again later.";
+
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:_window completionHandler:nil];
+}
+
+
+
 #pragma mark - Check Electric Imp Libraries Methods
 
 
@@ -12732,13 +12825,13 @@
         }
 
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
-        [request setHTTPMethod:@"GET"];
+        request.HTTPMethod = @"GET";
         eiLibListData = [NSMutableData dataWithCapacity:0];
         eiDeviceGroup = devicegroup;
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         NSURLSession *session = [NSURLSession sessionWithConfiguration: config
                                                               delegate: self
-                                                         delegateQueue: [NSOperationQueue mainQueue]];
+                                                         delegateQueue: nil];
         eiLibListTask = [session dataTaskWithRequest:request];
         [eiLibListTask resume];
     }
@@ -12872,7 +12965,7 @@
 
 
 - (void)URLSession:(NSURLSession *)session
-          dataTask:(NSURLSessionDataTask *)dataTask
+          dataTask:(NSURLSessionDataTask *)task
 didReceiveResponse:(NSURLResponse *)response
  completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler
 {
@@ -12880,8 +12973,20 @@ didReceiveResponse:(NSURLResponse *)response
 
     if (rps.statusCode != 200)
     {
-        NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
-        [self writeErrorToLog:errString :YES];
+        // Were we sending feedback?
+
+        NSLog(@"%li", rps.statusCode);
+
+        if (task == feedbackTask)
+        {
+            [self sendFeedbackError];
+        }
+        else
+        {
+            NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
+            [self writeErrorToLog:errString :YES];
+        }
+
         completionHandler(NSURLSessionResponseCancel);
         return;
     }
@@ -12891,15 +12996,36 @@ didReceiveResponse:(NSURLResponse *)response
 
 
 
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)task didReceiveData:(NSData *)data
 {
-    [eiLibListData appendData:data];
+    // Make sure we are recording data from the correct task
+
+    if (task == eiLibListTask) [eiLibListData appendData:data];
 }
 
 
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
+    // Was there an error?
+
+    if (error)
+    {
+        // React to a passed client-side error - most likely a timeout or inability to resolve the URL
+        // ie. the client is not connected to the Internet
+
+        if (error.code == NSURLErrorCancelled) return;
+
+        [task cancel];
+
+        // NOTE We will already have reported other errors, eg. connection errors,
+        // so we can just bail here
+
+        return;
+    }
+    
+    // Make sure we are recording data from the correct task
+
     if (task == eiLibListTask)
     {
         if (ide.numberOfConnections < 1)
@@ -12910,29 +13036,24 @@ didReceiveResponse:(NSURLResponse *)response
             connectionIndicator.hidden = YES;
         }
 
-        if (error)
-        {
-            // React to a passed client-side error - most likely a timeout or inability to resolve the URL
-            // ie. the client is not connected to the Internet
-
-            // 'error.code' will equal NSURLErrorCancelled when we kill all connections
-
-            if (error.code == NSURLErrorCancelled) return;
-
-            [task cancel];
-            return;
-        }
-
         // The connection has come to a conclusion without error
 
-        [task cancel];
         [self compareElectricImpLibs:eiDeviceGroup];
     }
+    else
+    {
+        // The user just successfully posted feedback
+
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = @"Thank You!";
+        alert.informativeText = @"Your comments have been received and we’ll take a look at them shortly.";
+
+        [alert addButtonWithTitle:@"OK"];
+        [alert beginSheetModalForWindow:_window completionHandler:nil];
+    }
+
+    [task cancel];
 }
-
-
-
-
 
 
 
@@ -13101,6 +13222,19 @@ didReceiveResponse:(NSURLResponse *)response
                 new = i < otpTextField.stringValue.length - 1 ? [new stringByAppendingString:[otpTextField.stringValue substringFromIndex: i + 1]] : new;
                 otpTextField.stringValue = new;
             }
+        }
+    }
+
+    // Report a Problem sheet
+
+    if (sender == feedbackField)
+    {
+        // Make sure the content isn't longerr than 512 characters
+
+        if (feedbackField.stringValue.length > 512)
+        {
+            feedbackField.stringValue = [feedbackField.stringValue substringToIndex:512];
+            NSBeep();
         }
     }
 }

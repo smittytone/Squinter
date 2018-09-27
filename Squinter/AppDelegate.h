@@ -10,6 +10,7 @@
 #include <Foundation/Foundation.h>
 #include <Sparkle/Sparkle.h>
 #include <math.h>
+#import "ConstantsPrivate.h"
 #import "Constants.h"
 #import "StatusLight.h"
 #import "Project.h"
@@ -320,6 +321,11 @@
 
     IBOutlet NSWindow *commitSheet;
 
+    // Report a Problem
+
+    IBOutlet NSPanel *feedbackSheet;
+    IBOutlet NSTextField *feedbackField;
+
 	// Inspector Panel
 
 	IBOutlet InspectorWindow2ViewController *iwvc;
@@ -362,7 +368,7 @@
     NSMutableArray *deviceColourWells;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
-    NSURLSessionTask *eiLibListTask;
+    NSURLSessionTask *eiLibListTask, *feedbackTask;
     NSMutableData *eiLibListData;
     NSDate *eiLibListTime;
 
@@ -465,6 +471,7 @@
 - (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles;
 - (IBAction)cancelSelectTarget:(id)sender;
 - (IBAction)selectTarget:(id)sender;
+
 
 // Existing Device Group Methods
 
@@ -672,6 +679,14 @@
 - (IBAction)cancelPrefs:(id)sender;
 - (IBAction)setPrefs:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;
+
+
+// Report a Problem Sheet Methods
+
+- (IBAction)showFeedbackSheet:(id)sender;
+- (IBAction)cancelFeedbackSheet:(id)sender;
+- (IBAction)sendFeedback:(id)sender;
+- (void)sendFeedbackError;
 
 
 // Check Electric Imp Libraries Methods
