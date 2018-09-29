@@ -24,7 +24,7 @@
     // The second, 'inLogDef', sets the format for incoming timestamps from impCentral.
     // The third, 'outLogDef', is used to present timestamps from impCentral;
     // It is the same as 'def' but adds three decimals to the seconds count
-	
+
     touchBar = appBar;
 
     def = [[NSDateFormatter alloc] init];
@@ -581,7 +581,7 @@
                selector:@selector(listLogs:)
                    name:@"BuildAPIGotHistory"
                  object:ide];
-	
+
     [nsncdc addObserver:self
                selector:@selector(listCommits:)
                    name:@"BuildAPIGotDeploymentsList"
@@ -606,17 +606,17 @@
                selector:@selector(handleLoginKey:)
                    name:@"BuildAPILoginKey"
                  object:ide];
-    
+
     [nsncdc addObserver:self
                selector:@selector(gotMyAccount:)
                    name:@"BuildAPIGotMyAccount"
                  object:ide];
-    
+
     [nsncdc addObserver:self
                selector:@selector(gotAnAccount:)
                    name:@"BuildAPIGotAnAccount"
                  object:ide];
-	
+
     [nsncdc addObserver:self
                selector:@selector(getOtp:)
                    name:@"BuildAPINeedOTP"
@@ -831,9 +831,9 @@
     // Kill any connections to the API
 
     [ide killAllConnections];
-	
+
     // Kill any timers
-	
+
     if (refreshTimer != nil) [refreshTimer invalidate];
 
     // Record settings that are not set by the Prefs dialog
@@ -969,7 +969,7 @@
 {
     // Show the Inspector if it's closed
     // If the Inspector is obscured by the main window, or not key, bring it forward
-    
+
     [iwvc.view.window makeKeyAndOrderFront:self];
 }
 
@@ -978,7 +978,7 @@
 - (IBAction)showProjectInspector:(id)sender
 {
     if (currentProject != nil) iwvc.project = currentProject;
-    
+
     [iwvc setTab:kInspectorTabProject];
     [iwvc.view.window makeKeyAndOrderFront:self];
 }
@@ -988,7 +988,7 @@
 - (IBAction)showDeviceInspector:(id)sender
 {
     if (selectedDevice != nil) iwvc.device = selectedDevice;
-    
+
     [iwvc setTab:kInspectorTabDevice];
     [iwvc.view.window makeKeyAndOrderFront:self];
 }
@@ -1026,9 +1026,9 @@
     else
     {
         // We are logged in, so log the user out
-        
+
         NSInteger cloudCode = ide.impCloudCode;
-        
+
         [self logout];
 
         // Update the UI and report to the user
@@ -1057,7 +1057,7 @@
 
     [productsArray removeAllObjects];
     [devicesArray removeAllObjects];
-	
+
     productsArray = nil;
     devicesArray = nil;
     selectedProduct = nil;
@@ -1065,9 +1065,9 @@
     iwvc.device = nil;
     loginKey = nil;
     otpLoginToken = nil;
-    
+
     // Stop auto-updating account devices' status
-    
+
     [self keepDevicesStatusUpdated:nil];
 
     // Update the UI elements relating to these items
@@ -1085,7 +1085,7 @@
 - (void)autoLogin
 {
     // Set the credentials for reading
-    
+
     [self setLoginCreds];
 
     if (usernameTextField.stringValue.length == 0 || passwordTextField.stringValue.length == 0)
@@ -1116,9 +1116,9 @@
     saveDetailsCheckbox.state = NSOnState;
 
     // Set the credentials for reading
-    
+
     [self setLoginCreds];
-    
+
     [_window beginSheet:loginSheet completionHandler:nil];
 }
 
@@ -1176,9 +1176,9 @@
 {
     // If the user hits 'save' while going to another account, warn them that
     // they will overwrite their currently saved credentials
-    
+
     NSButton *checkbox = (NSButton *)sender;
-	
+
     if (checkbox.state == NSOnState && switchAccountFlag)
     {
         NSAlert *alert = [[NSAlert alloc] init];
@@ -1203,7 +1203,7 @@
     if (sender != nil) [_window endSheet:loginSheet];
 
     // If we're switching accounts, log out first
-	
+
     if (switchAccountFlag)
     {
         [self logout];
@@ -1216,16 +1216,16 @@
     isLoggingIn = YES;
 
     // Attempt to login with the current credentials
-	
+
     if (loginKey != nil)
     {
         [ide loginWithKey:loginKey];
         return;
     }
-	
+
     // NOTE the following will bork autologin if the user changes the popup (eg. to Azure)
     //      and the account we're autoloading is AWS
-	
+
     NSInteger code = [impCloudPopup indexOfSelectedItem];
 
     [ide login:usernameTextField.stringValue
@@ -1314,12 +1314,12 @@
 {
     NSDictionary *data = (NSDictionary *)note.object;
     NSString *key = [data objectForKey:@"id"];
-	
+
     // Pull the login credentials from the keychain
-	
+
     PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
     NSString *lk = [pc stringForKey:@"com.bps.Squinter.ak.notional.telly"];
-	
+
     if (lk == nil)
     {
         [pc setString:key forKey:@"com.bps.Squinter.ak.notional.telly"];
@@ -1327,10 +1327,10 @@
     else
     {
         // Warn user and ask if they want to replace key
-		
+
         [pc setString:key forKey:@"com.bps.Squinter.ak.notional.telly"];
     }
-	
+
     loginKey = key;
 }
 
@@ -1340,7 +1340,7 @@
 {
     // The server has signalled BuildAPIAcces that it needs an OTP, and BuildAPIAccess
     // has signalled the host app to get an OTP
-    
+
     NSDictionary *data = (NSDictionary *)note.object;
     otpLoginToken = [data objectForKey:@"token"];
 
@@ -1422,7 +1422,7 @@
 
         newProjectNewProductCheckbox.enabled = NO;
         newProjectNewProductCheckbox.state = NSOffState;
-		
+
         // TODO - Add warning here and suggest the user log in
     }
 
@@ -1506,7 +1506,7 @@
     if (makeNewProduct)
     {
         // NOTE 'makeNewProduct' is not selectable (ie. always NO) if the user is not logged in
-		
+
         if (productsArray != nil)
         {
             // User wants to make a new product or doesn't want to associate with an exitsting one
@@ -1558,7 +1558,7 @@
     // This needs to be a separate method because of the async nature of the first phase,
     // embodied in 'newProjectSheetCreate:', which may pop up an alert whose effect may be
     // to take the user away from here
-	
+
     // Make the new project
 
     currentProject = [[Project alloc] init];
@@ -1717,7 +1717,7 @@
     if (currentProject == chosenProject) return;
 
     // Switch in the newly chosen project and select its known selected device group
-	
+
     currentProject = chosenProject;
     currentDevicegroup = (currentProject.devicegroupIndex != -1) ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
 
@@ -1804,9 +1804,9 @@
     [self refreshMainDevicegroupsMenu];
     [self refreshDevicegroupMenu];
     [self setToolbar];
-	
+
     // Set the inspector
-	
+
     iwvc.project = currentProject;
 }
 
@@ -2015,12 +2015,12 @@
         [self loginAlert:@"edit device group information"];
         return;
     }
-	
+
     if (renameProjectFlag && !ide.isLoggedIn && currentProject.pid.length > 0)
     {
         // We now disallow editing project information when Squinter is not logged in,
         // but only if the project points to a product, ie. it has a PID
-		
+
         [self loginAlert:@"update information for a project linked to a product"];
         return;
     }
@@ -2113,11 +2113,11 @@
         {
             // Update the source product before doing anything else, so that if there is an
             // error, we don't affect the local version either
-			
+
             if (![self isCorrectAccount:currentProject])
             {
                 // We're logged in, but to the wrong account
-				
+
                 [self projectAccountAlert:currentProject :@"update the product linked to" :_window];
                 return;
             }
@@ -2207,11 +2207,11 @@
             if (![self isCorrectAccount:currentProject])
             {
                 // We're logged in, but to the wrong account
-				
+
                 [self devicegroupAccountAlert:currentDevicegroup :@"update" :_window];
                 return;
             }
-			
+
             BOOL changed = NO;
 
             NSMutableArray *keys = [[NSMutableArray alloc] init];
@@ -2237,7 +2237,7 @@
             {
                 // Add the device group's type to the keys - values arrays. It will not be changed,
                 // but it hacks around an issue with BuildAPIAccess
-                
+
                 [keys addObject:@"type"];
                 [values addObject:currentDevicegroup.type];
 
@@ -2331,13 +2331,13 @@
             if (productsArray != nil)
             {
                 // Compare the project's name against existing product names
-				
+
                 if (productsArray.count > 0)
                 {
                     for (NSDictionary *product in productsArray)
                     {
                         NSString *name = [self getValueFrom:product withKey:@"name"];
-						
+
                         if ([name compare:project.name] == NSOrderedSame)
                         {
                             // The project's name matches an existing product name
@@ -2784,7 +2784,7 @@
 - (void)chooseProduct:(id)sender
 {
     // We only need to update the Projects menu's product-specific entries when a product is chosen
-	
+
     // Set the selected product to the chosen menu item's represented object
     // NOTE all products menu items reference their source this way
 
@@ -2819,9 +2819,9 @@
     }
 
     [self writeStringToLog:@"Getting a list of this account's products from the impCloud..." :YES];
-    
+
     NSDictionary *dict = @{ @"action" : @"getproducts" };
-    
+
     if (ide.currentAccount != nil && ide.currentAccount.length > 0)
     {
         [ide getProducts:dict];
@@ -2856,7 +2856,7 @@
         [self loginAlert:@"delete products"];
         return;
     }
-	
+
     // NOTE we shouldn't need to check the account at this point as we are dealing with server-only
     // entities, ie. only the products from the current account are presented for possible deletion
 
@@ -2895,7 +2895,7 @@
             }
 
             // Break out here because we know we have a match
-			
+
             if (flag) break;
         }
     }
@@ -2949,7 +2949,7 @@
     // The project is created with the requisite number of device groups, each of which
     // has its current deployment downloaded and saved as source code files.
     // This is only possible if the user is logged in (and has a list of products)
-	
+
     if (selectedProduct == nil)
     {
         [self writeErrorToLog:@"[ERROR] You have not selected a product as the new project's source." :YES];
@@ -2974,14 +2974,14 @@
     newProject.description = [self getValueFrom:selectedProduct withKey:@"description"];
     newProject.path = workingDirectory;
     newProject.aid = ide.currentAccount;
-    
+
     NSString *cid = [selectedProduct valueForKeyPath:@"relationships.creator.id"];
-    
+
     if ([cid compare:newProject.aid] != NSOrderedSame) newProject.cid = cid;
-    
+
     NSInteger count = 1;
     BOOL done = YES;
-	
+
     // Update the name if it matches a loaded project - the user can change this at the saving stage
 
     if (projectArray.count > 0)
@@ -2990,7 +2990,7 @@
         // against existing names, until we are safe to proceed. This deals with
         // the case where we have multiple uses of the same name, each with a
         // number to differentiate them, eg. 'project', 'project 1', 'project 2', etc.
-		
+
         do
         {
             for (Project *project in projectArray)
@@ -3014,7 +3014,7 @@
         }
         while (!done);
     }
-	
+
     newProject.name = name;
 
     NSDictionary *dict = @{ @"action" : @"downloadproduct",
@@ -3063,7 +3063,7 @@
     if (currentProject.pid != nil && [currentProject.pid compare:pid] == NSOrderedSame)
     {
         [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is already linked to product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
-		
+
         // TODO - give the user the choice to change
     }
     else
@@ -3071,14 +3071,14 @@
         // Link the project to the new product by ID, and set the project's
         // account association — by linking to a product, the project MUST be
         // also linked to the product's parent account
-		
+
         currentProject.pid = pid;
         currentProject.aid = ide.currentAccount;
         currentProject.haschanged = YES;
 
         [self refreshOpenProjectsMenu];
         [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
-		
+
         // TODO This has to have an implicit sync eg. if the project has device groups
         //      not in the product, and vice versa. What about matching device groups?
     }
@@ -3099,13 +3099,13 @@
     // Because this also adds a device group to the linked product,
     // this can only be done when we are logged in UNLESS the project
     // has no linked product
-	
+
     if (currentProject == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
-	
+
     if (currentProject.pid.length > 0)
     {
         if (!ide.isLoggedIn)
@@ -3438,7 +3438,7 @@
     }
 
     resetTargetFlag = NO;
-	
+
     // Check that the selected device group is not the current one
 
     if (currentDevicegroup.data != nil)
@@ -4505,12 +4505,12 @@
         // don't come back here next time the menu is selected
 
         [refreshTimer invalidate];
-		
+
         checkDeviceStatusMenuItem.state = NSOffState;
         refreshTimer = nil;
         return;
     }
-	
+
     if (ide.isLoggedIn)
     {
         // If we are logged in to the impCloud, we can start to auto-refresh device info
@@ -4551,9 +4551,9 @@
         // so go through each device in the list and update its details individually
 
         // [self writeStringToLog:@"Auto-updating devices' status. This can be disabled in the Device menu." :YES];
-		
+
         deviceCheckCount = 0;
-		
+
         for (NSUInteger i = 0 ; i < devicesArray.count ; ++i)
         {
             // Re-acquire a single device's data
@@ -4561,9 +4561,9 @@
             NSMutableDictionary *device = [devicesArray objectAtIndex:i];
             NSDictionary *dict = @{ @"action" : @"refreshdevice",
                                     @"device" : device };
-			
+
             [ide getDevice:[device objectForKey:@"id"] :dict];
-			
+
             // Pick up the action at updateDevice:
         }
     }
@@ -5615,7 +5615,7 @@
 #pragma mark Opened project is tied to a product
 
                 // Project is associated with a product, or is being updated - ie. pid = "old"
-				
+
                 if ([currentProject.pid compare:@"old"] == NSOrderedSame)
                 {
                     // We have a converted project we probably need to upload becuase it won't
@@ -5670,30 +5670,30 @@
                         // We have a list of products so we should check the project against them
 
                         BOOL match = NO;
-						
+
                         for (NSMutableDictionary *product in productsArray)
                         {
                             NSString *pid = [self getValueFrom:product withKey:@"id"];
-							
+
                             if ([pid compare:currentProject.pid] == NSOrderedSame)
                             {
                                 // The opened project has a PID and it matches one of the account's known products
-								
+
                                 match = YES;
-								
+
                                 if ((currentProject.aid == nil || currentProject.aid.length == 0))
                                 {
                                     // The current project does not have an associated accoint, but since we have a
                                     // match on the ID of a product in the current account, so we can perform the
                                     // association anyway
-									
+
                                     if (ide.isLoggedIn)
                                     {
                                         // We can only associate the project with the account if we're logged in
 
                                         currentProject.aid = ide.currentAccount;
                                         currentProject.haschanged = YES;
-										
+
                                         [saveLight needSave:YES];
                                         [self writeStringToLog:[NSString stringWithFormat:@"Associating project \"%@\" with account ID %@", currentProject.name, currentProject.aid] :YES];
                                     }
@@ -5704,20 +5704,20 @@
                                 else
                                 {
                                     // The opened project has an account ID - is it the same as the current account's ID?
-									
+
                                     if (ide.isLoggedIn && [currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
                                     {
                                         // Whoops - they don't match so warn the use that they can't work with this project
-										
+
                                         [self projectAccountAlert:currentProject :@"**apply changes to this project" :_window];
-										
+
                                         // DON'T go on to select the product or set the creator ID as it will be wrong
                                         // Same product ID but wrong account ID
 
                                         break;
                                     }
                                 }
-								
+
                                 if (currentProject.cid != nil && currentProject.cid.length == 0)
                                 {
                                     // We don't have a creator ID stored for the project, so set it to the account ID
@@ -5778,7 +5778,7 @@
                         if (!match)
                         {
                             // The project doesn't match any known product. Perhaps it's on the wrong account, so check
-							
+
                             if (currentProject.aid != nil && currentProject.aid.length > 0 && ide.isLoggedIn)
                             {
                                 if ([currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
@@ -5800,13 +5800,13 @@
                         // We have no loaded list of products, so we can't see if the project's PID refers to a product
                         // in the current account, but we can check, if we're logged in, that the project account ID and the
                         // current account ID match — if not, we need to warn the user
-						
+
                         if (ide.isLoggedIn && currentProject.aid != nil &&
                             currentProject.aid.length > 0 &&
                             [ide.currentAccount compare:currentProject.aid] != NSOrderedSame)
                         {
                             // If the account IDs don't match, then the product ID won't no matter what
-							
+
                             [self projectAccountAlert:currentProject :@"***apply changes to this project" :_window];
                         }
                     }
@@ -5819,11 +5819,11 @@
 
                 // The opened project is not assigned to a product
                 // If it also has no account affiliation we can ignore it
-				
+
                 if (currentProject.aid != nil && currentProject.aid.length > 0)
                 {
                     // The opened project has an accout ID we can attempt to match against the logged in account
-					
+
                     if (ide.isLoggedIn && [currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
                     {
                         // Whoops - they don't match so warn the use that they can't work with this project
@@ -6021,10 +6021,10 @@
                 currentDevicegroup = nil;
                 currentProject.devicegroupIndex = -1;
             }
-			
+
             // Select the first device assigned to this project's first device group
             // NOTE This will update the UI ticks
-			
+
             [self selectDevice];
 
             // Update the Menus and the Toolbar
@@ -6833,7 +6833,7 @@
     {
         // 'closeProjectFlag' is YES if this method has been called when the user
         // wants to save a changed project before closing it or quitting the app
-		
+
         savingProject = currentProject;
         [self saveProject:nil];
         closeProjectFlag = NO;
@@ -6967,19 +6967,19 @@
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *so = [data objectForKey:@"object"];
     NSString *action = [so objectForKey:@"action"];
-    
+
     if (so != nil)
     {
         // Because the BuildAPIAccess instance's own attempt to get the account info will come here, we
         // (uniquely) need to make sure that we have a passed object ('so') to work with before processing
-        
+
         if (action != nil)
         {
             if ([action compare:@"getproducts"] == NSOrderedSame)
             {
                 // Just re-call 'getProductsFromServer:' as the check on the BuildAPIAccess instance's
                 // 'currentAccount' property will pass, and the products list will be requested from the server
-                
+
                 [self getProductsFromServer:nil];
             }
         }
@@ -7001,13 +7001,13 @@
     NSDictionary *so = [data objectForKey:@"object"];
     NSMutableDictionary *product = [so objectForKey:@"product"];
     NSString *action = [so objectForKey:@"action"];
-    
+
     if (action != nil)
     {
         if ([action compare:@"getaccountid"] == NSOrderedSame)
         {
             NSString *productName = [account valueForKeyPath:@"attributes.name"];
-            
+
             if ([product objectForKey:@"shared"])
             {
                 [product setValue:productName forKeyPath:@"shared.name"];
@@ -7075,40 +7075,40 @@
                     [aProduct setObject:[product objectForKey:@"relationships"] forKey:@"relationships"];
                     [aProduct setObject:[NSMutableDictionary dictionaryWithDictionary:[product objectForKey:@"attributes"]] forKey:@"attributes"];
                     [productsArray addObject:aProduct];
-                    
+
                     NSString *cid = [aProduct valueForKeyPath:@"relationships.creator.id"];
                     NSString *oid = ide.currentAccount;
-                    
+
                     if ([cid compare:oid] != NSOrderedSame)
                     {
                         // The Product is being shared with a collaborator
-                        
+
                         NSMutableDictionary *shared = [[NSMutableDictionary alloc] init];
                         [shared setObject:@"" forKey:@"name"];
                         [shared setObject:cid forKey:@"id"];
                         [aProduct setObject:shared forKey:@"shared"];
-                        
+
                         // Get the account name
-                        
+
                         NSDictionary *dict = @{ @"product" : aProduct,
                                                 @"action" : @"getaccountid" };
-                        
+
                         [ide getAccount:cid :dict];
-                        
+
                         // Pick up the asynchronous action at **gotAnAccount:**
                     }
 
                     // If we need to match against a previous 'selectedProduct' ID, do it now
 
                     if (sid != nil && [sid compare:[product objectForKey:@"id"]] == NSOrderedSame) selectedProduct = aProduct;
-					
+
                     // If we are here after creating a product, make sure it's the selected one
-					
+
                     if (selectedProduct == nil && [action compare:@"newproduct"] == NSOrderedSame)
                     {
                         NSString *pid = [so objectForKey:@"productid"];
                         NSString *apid = [product objectForKey:@"id"];
-						
+
                         if ([pid compare:apid] == NSOrderedSame) selectedProduct = aProduct;
                     }
                 }
@@ -7116,9 +7116,9 @@
                 // Inform the user
 
                 [self writeStringToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
-				
+
                 // If we don't have a selected product, just pick the first on the list
-				
+
                 if (selectedProduct == nil) selectedProduct = [productsArray objectAtIndex:0];
             }
             else
@@ -7129,12 +7129,12 @@
         else
         {
             // TODO Indicate an issue???
-			
+
             [self writeStringToLog:noneString :YES];
         }
-		
+
         // Update the UI
-		
+
         [self refreshProductsMenu];
         [self refreshProjectsMenu];
         [self setToolbar];
@@ -7238,7 +7238,7 @@
                     // NOTE if 'cd' or 'dpid' is nil, the device group has no current deployment
                     // TODO do we get a historical, or create an empty file?
                 }
-                
+
                 if (newProject.count == 0) [self productToProjectStageFour:newProject];
             }
             else
@@ -7476,10 +7476,10 @@
     if (action != nil)
     {
         // Link the project to the new product
-		
+
         project.pid = [data objectForKey:@"id"];
         project.cid = [data valueForKeyPath:@"relationships.creator.id"];
-		
+
         if ([action compare:@"newproject"] == NSOrderedSame)
         {
             // This is the action flow for a new project, new product
@@ -7488,12 +7488,12 @@
 
             [self writeStringToLog:[NSString stringWithFormat:@"Created product for project \"%@\".", project.name] :YES];
             [self writeStringToLog:@"Refreshing your list of products..." :YES];
-			
+
             NSDictionary *dict = @{ @"action" : @"newproduct",
                                     @"productid" : project.pid };
-			
+
             [ide getProducts:dict];
-			
+
             // -> Pick up the async outcomce in 'listProducts:'
 
             // Add the new project to the project menu. We've already checked for a name clash,
@@ -7502,7 +7502,7 @@
             //BOOL result = [self addProjectMenuItem:project.name :project];
 
             // Enable project-related UI items
-			
+
             [self refreshOpenProjectsMenu];
             [self refreshProjectsMenu];
             [self refreshMainDevicegroupsMenu];
@@ -7574,20 +7574,20 @@
 
     NSArray *devicegroups = [productToDelete objectForKey:@"devicegroups"];
     NSDictionary *product = [productToDelete objectForKey:@"product"];
-	
+
     // At this point we can be pretty sure we can delete the product and any device groups it has,
     // so we can break its link with any current projects. Run through the open projects and clear
     // their PID.
-	
+
     // TODO should we also clear the account ID, since the link to the account is the product, and
     //      that has now gone? With no account ID, the project is free to be uploaded to a new acct
-	
+
     if (projectArray.count > 0)
     {
         for (Project *project in projectArray)
         {
             NSString *pid = [self getValueFrom:product withKey:@"id"];
-			
+
             if ([pid compare:project.pid] == NSOrderedSame)
             {
                 project.pid = @"";
@@ -7604,9 +7604,9 @@
     if (devicegroups.count > 0)
     {
         // Reset the value of the 'count' key
-		
+
         [productToDelete setObject:[NSNumber numberWithInteger:devicegroups.count] forKey:@"count"];
-		
+
         [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - deleting device groups...", [self getValueFrom:product withKey:@"name"]] :YES];
 
         // Run through the device group list and delete each entry
@@ -7656,13 +7656,13 @@
 
     [self writeStringToLog:[NSString stringWithFormat:@"Deleted product \"%@\".", [self getValueFrom:product withKey:@"name"]] :YES];
     [self writeStringToLog:@"Refreshing your list of products..." :YES];
-	
+
     // Go and get an updated list of products
-	
+
     NSDictionary *dict = @{ @"action" : @"getproducts" };
 
     [ide getProducts:dict];
-	
+
     // Pick up the action at **listProducts:**
 }
 
@@ -7816,7 +7816,7 @@
         // NOTE we check for nil, but this is very unlikely (project closed before server responded)
 
         [self updateDevicegroup:devicegroup];
-		
+
         Project *project = [self getParentProject:devicegroup];
 
         if (project != nil)
@@ -8010,7 +8010,7 @@
             if (devices != nil && devices.count > 0)
             {
                 // The device group has devices, so the API won't let us delete the devcie group and thus the product
-				
+
                 // Set the count to doneChecking so that other calls to this method (which are async) will bail
 
                 [productToDelete setObject:[NSNumber numberWithInteger:kDoneChecking] forKey:@"count"];
@@ -8092,7 +8092,7 @@
         if ([action compare:@"getdevices"] == NSOrderedSame)
         {
             // Initialise or clear the current list of devices then prep to add the incoming list
-			
+
             if (devicesArray == nil)
             {
                 devicesArray = [[NSMutableArray alloc] init];
@@ -8101,7 +8101,7 @@
             {
                 [devicesArray removeAllObjects];
             }
-			
+
             action = @"adddevices";
         }
 
@@ -8140,7 +8140,7 @@
 
                 NSDictionary *dict = @{ @"action" : @"getdevice",
                                         @"device" : newDevice };
-				
+
                 [ide getDevice:[newDevice objectForKey:@"id"] :dict];
 
                 // Pick up the action at updateDevice:
@@ -8279,53 +8279,53 @@
     NSDictionary *source = [data objectForKey:@"object"];
     NSMutableDictionary *aDevice = [source objectForKey:@"device"];
     NSString *action = [source objectForKey:@"action"];
-	
+
     if (action != nil)
     {
         NSMutableDictionary *attributes = [aDevice objectForKey:@"attributes"];
-		
+
         if ([action compare:@"refreshdevice"] == NSOrderedSame)
         {
             // Update the existing record's status with the new info
-			
+
             NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
             [attributes setObject:boolean forKey:@"device_online"];
 
             if (aDevice == selectedDevice) iwvc.device = aDevice;
 
             ++deviceCheckCount;
-			
+
             // NSLog(@"Device %li of %li", (long)deviceCheckCount, (long)devicesArray.count);
-			
+
             if (deviceCheckCount == devicesArray.count)
             {
                 // All done so update the UI and set the not-checking marker
-				
+
                 deviceCheckCount = -1;
-				
+
                 [self refreshDevicesMenus];
                 [self refreshDevicesPopup];
                 if (projectArray.count > 0) [self refreshDevicesMenus];
-				
+
                 if (ide.numberOfConnections < 1)
                 {
                     // Only hide the connection indicator if 'ide' has no live connections
-					
+
                     [connectionIndicator stopAnimation:self];
                     connectionIndicator.hidden = YES;
                 }
-				
+
             }
-			
+
             return;
         }
-		
+
         NSString *version = [self getValueFrom:device withKey:@"swversion"];
         if (version != nil) [attributes setObject:version forKey:@"swversion"];
-		
+
         version = [self getValueFrom:device withKey:@"plan_id"];
         if (version != nil) [attributes setObject:version forKey:@"plan_id"];
-		
+
         NSNumber *free = [self getValueFrom:device withKey:@"free_memory"];
         if (free != nil) [attributes setObject:free forKey:@"free_memory"];
     }
@@ -8720,9 +8720,9 @@
         {
             Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
             Project *project = [self getParentProject:devicegroup];
-            
+
             // Re-acquire the device group data from the server so we have up-to-date info locally
-            
+
             [self updateDevicegroup:devicegroup];
 
             [self writeStringToLog:[NSString stringWithFormat:@"Minimum deployment set for project \"%@\"'s device group \"%@\".", project.name, devicegroup.name] :YES];
@@ -8784,7 +8784,7 @@
     }
 
     // Set the 'Accounts' menu
-    
+
     NSString *cloudName = [self getCloudName:ide.impCloudCode];
     accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
     if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
@@ -8816,7 +8816,7 @@
     otpLoginToken = nil;
 
     // Inform the user he or she is logged in - and to which cloud
-    
+
     [self writeStringToLog:[NSString stringWithFormat:@"You now are logged in to the %@impCloud.", cloudName] :YES];
 
     // Check for any post-login actions that need to be performed
@@ -8826,7 +8826,7 @@
     if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
 
     // User wants to update devices' status periodically, or the Device lists loaded on login
-	
+
     if ([defaults boolForKey:@"com.bps.squinter.updatedevs"])
     {
         [self keepDevicesStatusUpdated:nil];
@@ -8921,9 +8921,9 @@
                                    withObject:lineString
                                 waitUntilDone:NO];
              */
-            
+
             NSString *headString = [NSString stringWithFormat:@"Most recent commits to Device Group \"%@\":", devicegroup.name];
-        
+
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:headString
                                 waitUntilDone:NO];
@@ -8968,11 +8968,11 @@
                 if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
                 if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
                 if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
-                
+
                 // Record whether the current entry is the min. supported deployment or the current
-                
+
                 bool flag = NO;
-                
+
                 if (mid.length > 0 || cid.length > 0)
                 {
                     NSString *did = [deployment objectForKey:@"id"];
@@ -8981,7 +8981,7 @@
                         cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
                         flag = YES;
                     }
-                    
+
                     if ([did compare:cid] == NSOrderedSame)
                     {
                         cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
@@ -8990,16 +8990,16 @@
                 }
 
                 cs = [cs stringByAppendingString:@"\n"];
-                
+
                 // Add a prefix to indicate min. supported deployment and/or current deployment
-                
+
                 cs = flag ? [@"* " stringByAppendingString:cs] : [@"  " stringByAppendingString:cs];
 
                 [self performSelectorOnMainThread:@selector(logLogs:)
                                        withObject:cs
                                     waitUntilDone:NO];
             }
-            
+
             /*
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:lineString
@@ -9327,7 +9327,7 @@
 
         log = [timestamp stringByAppendingFormat:@" %@", log];
         logColour = [colors objectAtIndex:index];
-        
+
         //NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
         //NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
         //NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
@@ -9426,7 +9426,7 @@
     {
         [lines addObject:@"Project is not linked to a product"];
     }
-    
+
     if (currentProject.aid != nil && currentProject.aid.length > 0)
     {
         if (currentProject.cid != nil && currentProject.cid.length > 0)
@@ -9434,7 +9434,7 @@
             if ([currentProject.cid compare:currentProject.aid] != NSOrderedSame)
             {
                 [lines addObject:[NSString stringWithFormat:@"Project was created by account %@", currentProject.cid]];
-                
+
                 if (ide.isLoggedIn && [ide.currentAccount compare:currentProject.aid] == NSOrderedSame)
                 {
                     [lines addObject:@"Project is accessible via the account you are currently logged in to."];
@@ -10100,9 +10100,9 @@
     NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
-    
+
     // Make sure the actual writing is done on the main thread
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [self writeStyledStringToLog:attrString :addTimestamp];
     });
@@ -10952,18 +10952,18 @@
         [productsMenu addItem:item];
         return;
     }
-    
+
     NSMutableArray *sharers = nil;
-    
+
     for (NSMutableDictionary *aProduct in productsArray)
     {
         // Run through the list of products to see if any contain a 'shared' object
-        
+
         if (!aProduct[@"shared"])
         {
             // The product doesn't have a 'shared' object, so it belongs to the account holder -
             // just add it to the menu
-            
+
             NSString *name = [self getValueFrom:aProduct withKey:@"name"];
             item = [[NSMenuItem alloc] initWithTitle:name
                                               action:@selector(chooseProduct:)
@@ -10975,17 +10975,17 @@
         else
         {
             // The product does have a 'shared' object, so it belongs to another account
-            
+
             if (sharers == nil) sharers = [[NSMutableArray alloc] init];
-            
+
             NSMutableDictionary *sharer = [aProduct objectForKey:@"shared"];
             BOOL got = NO;
-            
+
             if (sharers.count > 0)
             {
                 // If we already know about at least one shared account (each one is referenced
                 // in 'sharers'), we get its ID and compare it to the creator ID of the current product
-                
+
                 for (NSUInteger i = 0 ; i < sharers.count ; i++)
                 {
                     NSMutableDictionary *product = [sharers objectAtIndex:i];
@@ -10994,37 +10994,37 @@
                     if ([aid compare:mid] == NSOrderedSame) got = YES;
                 }
             }
-            
+
             // If we've not seen this product's creator before, add it to 'sharers'
-            
+
             if (!got) [sharers addObject:sharer];
         }
     }
-    
+
     if (sharers != nil)
     {
         // Some of the user's products are shared, so set up a sub-menu for these
-        
+
         [productsMenu addItem:[NSMenuItem separatorItem]];
-        
+
         item = [[NSMenuItem alloc] initWithTitle:@"Products Shared With You"
                                               action:nil
                                        keyEquivalent:@""];
         NSMenu *sharedMenu = [[NSMenu alloc] initWithTitle:@"Products Shared With You"];
         item.submenu = sharedMenu;
-        
+
         // Now add the shared products to the sub-menu
-        
+
         for (NSUInteger i = 0 ; i < sharers.count ; i++)
         {
             NSMutableDictionary *sharer = [sharers objectAtIndex:i];
-            
+
             // If we have a stored name for the creator account, use it; otherwise use
             // the account ID (which may asynchronously be replaced - see 'gotAnAccount:'
-            
+
             NSString *name = [sharer objectForKey:@"name"];
             if (name.length == 0) name = [sharer objectForKey:@"id"];
-            
+
             // Add the account name (or ID) to the sub-menu...
             NSMenuItem *aitem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", name]
                                               action:nil
@@ -11032,17 +11032,17 @@
             aitem.state = NSOffState;
             aitem.enabled = NO;
             [sharedMenu addItem:aitem];
-            
+
             // ...now add all of its products
-        
+
             for (NSMutableDictionary *aProduct in productsArray)
             {
                 NSString *sid = [sharer objectForKey:@"id"];
-                
+
                 if (aProduct[@"shared"])
                 {
                     NSString *aid = [aProduct valueForKeyPath:@"shared.id"];
-                    
+
                     if ([sid compare:aid] == NSOrderedSame)
                     {
                         NSString *name = [self getValueFrom:aProduct withKey:@"name"];
@@ -11055,15 +11055,15 @@
                     }
                 }
             }
-            
+
             // Only add a separator between creators if we haven't just added the last
             // creator on the list
-            
+
             if (i < sharers.count - 1) [sharedMenu addItem:[NSMenuItem separatorItem]];
         }
-        
+
         // Add the 'shared with you' menu item with its sub-menu of shared products
-        
+
         [productsMenu addItem:item];
     }
 
@@ -12448,7 +12448,7 @@
 - (IBAction)selectFontName:(id)sender
 {
     // Disable the 'show bold' checkbox for fonts not available in bold
-    
+
     NSPopUpButton *list = (NSPopUpButton *)sender;
     NSInteger index = list.indexOfSelectedItem;
     boldTestCheckbox.enabled = index < 3 ? YES : NO;
@@ -12482,41 +12482,41 @@
     float r = (float)textColour.redComponent;
     float b = (float)textColour.blueComponent;
     float g = (float)textColour.greenComponent;
-	
+
     textColour = textColorWell.color;
-	
+
     float r2 = (float)textColour.redComponent;
     float b2 = (float)textColour.blueComponent;
     float g2 = (float)textColour.greenComponent;
-	
+
     if (r != r2 || b != b2 || g != g2)
     {
         textChange = YES;
-		
+
         [defaults setObject:[NSNumber numberWithFloat:r2] forKey:@"com.bps.squinter.text.red"];
         [defaults setObject:[NSNumber numberWithFloat:g2] forKey:@"com.bps.squinter.text.green"];
         [defaults setObject:[NSNumber numberWithFloat:b2] forKey:@"com.bps.squinter.text.blue"];
     }
-	
+
     r = (float)backColour.redComponent;
     b = (float)backColour.blueComponent;
     g = (float)backColour.greenComponent;
-	
+
     backColour = backColorWell.color;
 
     r2 = (float)backColour.redComponent;
     b2 = (float)backColour.blueComponent;
     g2 = (float)backColour.greenComponent;
-	
+
     if (r != r2 || b != b2 || g != g2)
     {
         textChange = YES;
-		
+
         [defaults setObject:[NSNumber numberWithFloat:r2] forKey:@"com.bps.squinter.back.red"];
         [defaults setObject:[NSNumber numberWithFloat:g2] forKey:@"com.bps.squinter.back.green"];
         [defaults setObject:[NSNumber numberWithFloat:b2] forKey:@"com.bps.squinter.back.blue"];
     }
-	
+
     if (r == 0) r = 0.1;
     if (b == 0) b = 0.1;
     if (g == 0) g = 0.1;
@@ -12596,17 +12596,17 @@
     NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
     NSNumber *num = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
     if (fontsMenu.indexOfSelectedItem != num.integerValue) textChange = YES;
-	
+
     NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
     if (fontSize == 15) fontSize = 18;
     num = [defaults objectForKey:@"com.bps.squinter.fontSizeIndex"];
     if (fontSize != num.integerValue) textChange = YES;
-    
+
     BOOL isBold = [defaults boolForKey:@"com.bps.squinter.showboldtext"];
     BOOL shouldBeBold = boldTestCheckbox.state == NSOnState ? YES : NO;
-    
+
     if (isBold != shouldBeBold) textChange = YES;
-	
+
     if (textChange)
     {
         logFont = [self setLogViewFont:fontName :fontSize :shouldBeBold];
@@ -12614,7 +12614,7 @@
         [logTextView setTextColor:textColour];
         [logClipView setBackgroundColor:backColour];
     }
-	
+
     [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
@@ -12640,7 +12640,7 @@
         while (recentFiles.count > count) [recentFiles removeLastObject];
         [self refreshRecentFilesMenu];
     }
-	
+
     // Start or stop auto-updating the device list
     if ([defaults boolForKey:@"com.bps.squinter.updatedevs"] != updateDevicesCheckbox.state == NSOnState)
     {
@@ -12701,12 +12701,12 @@
     // Show the sheet
 
     feedbackField.stringValue = @"";
-    
+
     if (sender == feedbackButton)
     {
         [self closeAboutSheet:sender];
     }
-    
+
     [_window beginSheet:feedbackSheet completionHandler:nil];
 }
 
@@ -12750,7 +12750,7 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kSquinterFeedbackAddress]];
     request.HTTPMethod = @"POST";
     request.HTTPBody = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
-    
+
     [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:kSquinterFeedbackUUID forHTTPHeaderField:@"X-Squinter-ID"];
 
@@ -12835,10 +12835,10 @@
 
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
         request.HTTPMethod = @"GET";
-        
+
         eiDeviceGroup = devicegroup;
         eiLibListData = [NSMutableData dataWithCapacity:0];
-        
+
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         NSURLSession *session = [NSURLSession sessionWithConfiguration: config
                                                               delegate: self
@@ -13032,7 +13032,7 @@ didReceiveResponse:(NSURLResponse *)response
 
         return;
     }
-    
+
     // Make sure we are recording data from the correct task
 
     if (task == eiLibListTask)
@@ -13052,19 +13052,19 @@ didReceiveResponse:(NSURLResponse *)response
         [alert addButtonWithTitle:@"OK"];
         [alert beginSheetModalForWindow:_window completionHandler:nil];
     }
-    
+
     if (ide.numberOfConnections < 1)
     {
         // Only hide the connection indicator if 'ide' has no live connections
         // Make sure it's on the main thread
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [connectionIndicator stopAnimation:self];
             connectionIndicator.hidden = YES;
         });
-        
+
     }
-    
+
     [task cancel];
 }
 
@@ -13221,7 +13221,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
 
         // Make sure the string doesn't contain non-numeral characters
-        
+
         NSCharacterSet *set = [NSCharacterSet decimalDigitCharacterSet];
 
         for (NSInteger i = 0 ; i < otpTextField.stringValue.length ; ++i)
