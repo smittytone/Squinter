@@ -4467,7 +4467,6 @@
                 [alert beginSheetModalForWindow:_window
                               completionHandler:nil];
             }
- */
         }
     }
 }
