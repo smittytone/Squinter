@@ -35,7 +35,7 @@
 - (void)parseLog;
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
 - (void)setColours;
-- (void)setLoggingColours;
+// - (void)setLoggingColours;
 
 // Preferences Panel Subsidiary Methods
 

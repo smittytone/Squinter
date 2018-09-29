@@ -10,6 +10,7 @@
 #include <Foundation/Foundation.h>
 #include <Sparkle/Sparkle.h>
 #include <math.h>
+#import "ConstantsPrivate.h"
 #import "Constants.h"
 #import "StatusLight.h"
 #import "Project.h"
@@ -37,42 +38,42 @@
                                    NSTextFieldDelegate,
 								   NSTouchBarProvider>
 {
-    // Main UI element outlets
+    #pragma mark - Main UI element outlets
 
-    IBOutlet LogView *logTextView;
-    IBOutlet NSClipView *logClipView;
-    IBOutlet NSScrollView *logScrollView;
-    IBOutlet StatusLight *saveLight;
+    IBOutlet LogView             *logTextView;
+    IBOutlet NSClipView          *logClipView;
+    IBOutlet NSScrollView        *logScrollView;
+    IBOutlet StatusLight         *saveLight;
     IBOutlet NSProgressIndicator *connectionIndicator;
-    IBOutlet NSPopUpButton *projectsPopUp;
-    IBOutlet NSPopUpButton *devicesPopUp;
+    IBOutlet NSPopUpButton       *projectsPopUp;
+    IBOutlet NSPopUpButton       *devicesPopUp;
 
-    // File Menu outlets
+    #pragma mark File Menu outlets
 
-    IBOutlet NSMenu *fileMenu;
+    IBOutlet NSMenu     *fileMenu;
     IBOutlet NSMenuItem *fileSaveMenuItem;
     IBOutlet NSMenuItem *fileSaveAsMenuItem;
     IBOutlet NSMenuItem *fileAddFilesMenuItem;
-    IBOutlet NSMenu *openRecentMenu;
+    IBOutlet NSMenu     *openRecentMenu;
 
-    // Project Menu outlets
+    #pragma mark Project Menu outlets
 
-    IBOutlet NSMenu *projectsMenu;
-    IBOutlet NSMenu *openProjectsMenu;
+    IBOutlet NSMenu     *projectsMenu;
+    IBOutlet NSMenu     *openProjectsMenu;
     IBOutlet NSMenuItem *renameProjectMenuItem;
     IBOutlet NSMenuItem *syncProjectMenuItem;
     IBOutlet NSMenuItem *showProjectInfoMenuItem;
     IBOutlet NSMenuItem *showProjectFinderMenuItem;
-    IBOutlet NSMenu *productsMenu;
+    IBOutlet NSMenu     *productsMenu;
     IBOutlet NSMenuItem *downloadProductMenuItem;
     IBOutlet NSMenuItem *linkProductMenuItem;
     IBOutlet NSMenuItem *deleteProductMenuItem;
     IBOutlet NSMenuItem *renameProductMenuItem;
 
-    // Device Groups Menu outlets
+    #pragma mark Device Groups Menu outlets
 
-    IBOutlet NSMenu *deviceGroupsMainMenu;
-    IBOutlet NSMenu *deviceGroupsMenu;
+    IBOutlet NSMenu     *deviceGroupsMainMenu;
+    IBOutlet NSMenu     *deviceGroupsMenu;
     IBOutlet NSMenuItem *showDeviceGroupInfoMenuItem;
     IBOutlet NSMenuItem *listCommitsMenuItem;
     IBOutlet NSMenuItem *showModelFilesFinderMenuItem;
@@ -83,25 +84,25 @@
     IBOutlet NSMenuItem *compileMenuItem;
     IBOutlet NSMenuItem *uploadMenuItem;
     IBOutlet NSMenuItem *uploadExtraMenuItem;
-	IBOutlet NSMenuItem *setMinimumMenuItem;
-	IBOutlet NSMenuItem *setProductionTargetMenuItem;
+    IBOutlet NSMenuItem *setMinimumMenuItem;
+	  IBOutlet NSMenuItem *setProductionTargetMenuItem;
     IBOutlet NSMenuItem *removeFilesMenuItem;
     IBOutlet NSMenuItem *externalOpenMenuItem;
-    IBOutlet NSMenu *externalSourceMenu;
+    IBOutlet NSMenu     *externalSourceMenu;
     IBOutlet NSMenuItem *externalOpenDeviceItem;
     IBOutlet NSMenuItem *externalOpenAgentItem;
     IBOutlet NSMenuItem *externalOpenBothItem;
     IBOutlet NSMenuItem *externalOpenLibsItem;
-    IBOutlet NSMenu *externalLibsMenu;
+    IBOutlet NSMenu     *externalLibsMenu;
     IBOutlet NSMenuItem *externalOpenFileItem;
-    IBOutlet NSMenu *externalFilesMenu;
-    IBOutlet NSMenu *impLibrariesMenu;
+    IBOutlet NSMenu     *externalFilesMenu;
+    IBOutlet NSMenu     *impLibrariesMenu;
     IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
-	IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
+	  IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
 
-    // Device Menu outlets
+    #pragma mark Device Menu outlets
 
-    IBOutlet NSMenu *deviceMenu;
+    IBOutlet NSMenu     *deviceMenu;
     IBOutlet NSMenuItem *showDeviceInfoMenuItem;
     IBOutlet NSMenuItem *restartDeviceMenuItem;
     IBOutlet NSMenuItem *copyAgentURLMenuItem;
@@ -113,28 +114,28 @@
     IBOutlet NSMenuItem *streamLogsMenuItem;
     IBOutlet NSMenuItem *renameDeviceMenuItem;
     IBOutlet NSMenuItem *updateDeviceStatusMenuItem;
-	IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
+	  IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
     IBOutlet NSMenuItem *deleteDeviceMenuItem;
-    IBOutlet NSMenu *unassignedDevicesMenu;
+    IBOutlet NSMenu     *unassignedDevicesMenu;
 
-    // Account Menu Outlets
+    #pragma mark Account Menu Outlets
 
-	IBOutlet NSMenu *accountMenu;
+	  IBOutlet NSMenu     *accountMenu;
     IBOutlet NSMenuItem *loginMenuItem;
-	IBOutlet NSMenuItem *accountMenuItem;
-	IBOutlet NSMenuItem *switchAccountMenuItem;
+	  IBOutlet NSMenuItem *accountMenuItem;
+	  IBOutlet NSMenuItem *switchAccountMenuItem;
 
-    // View Menu outlets
+    #pragma mark View Menu outlets
 
     IBOutlet NSMenuItem *logDeviceCodeMenuItem;
     IBOutlet NSMenuItem *logAgentCodeMenuItem;
     IBOutlet NSMenuItem *showHideToolbarMenuItem;
 
-    // File Menu outlets
+    #pragma mark File Menu outlets
 
     IBOutlet NSMenuItem *closeAllMenuItem;
 
-    // Help Menu
+    #pragma mark Help Menu
 
     IBOutlet NSMenuItem *author01;
     IBOutlet NSMenuItem *author02;
@@ -143,9 +144,9 @@
     IBOutlet NSMenuItem *author05;
     IBOutlet NSMenuItem *author06;
 
-    // Toolbar outlets
+    #pragma mark Toolbar outlets
 
-    IBOutlet NSToolbar *squinterToolbar;
+    IBOutlet NSToolbar           *squinterToolbar;
     IBOutlet SquinterToolbarItem *squintItem;
     IBOutlet SquinterToolbarItem *newProjectItem;
     IBOutlet SquinterToolbarItem *infoItem;
@@ -160,150 +161,153 @@
     IBOutlet SquinterToolbarItem *printItem;
     IBOutlet SquinterToolbarItem *openDeviceCode;
     IBOutlet SquinterToolbarItem *openAgentCode;
-    IBOutlet StreamToolbarItem *streamLogsItem;
+    IBOutlet StreamToolbarItem   *streamLogsItem;
     IBOutlet SquinterToolbarItem *refreshModelsItem;
     IBOutlet SquinterToolbarItem *newDevicegroupItem;
     IBOutlet SquinterToolbarItem *devicegroupInfoItem;
-    IBOutlet LoginToolbarItem *loginAndOutItem;
+    IBOutlet LoginToolbarItem    *loginAndOutItem;
     IBOutlet SquinterToolbarItem *uploadCodeExtraItem;
     IBOutlet SquinterToolbarItem *listCommitsItem;
     IBOutlet SquinterToolbarItem *downloadProductItem;
-	IBOutlet SquinterToolbarItem *inspectorItem;
+	  IBOutlet SquinterToolbarItem *inspectorItem;
 
     // Sheets, dialogs and windows
 
-    // Login
+    #pragma mark Login Sheet
 
-    IBOutlet NSPanel *loginSheet;
-    IBOutlet NSTextField *usernameTextField;
-    IBOutlet NSSecureTextField *passwordTextField;
+    IBOutlet NSPanel               *loginSheet;
+    IBOutlet NSTextField           *usernameTextField;
+    IBOutlet NSSecureTextField     *passwordTextField;
     IBOutlet NSSecureTextFieldCell *passwordTextFieldCell;
-    IBOutlet NSButton *saveDetailsCheckbox;
-    IBOutlet NSButton *showPassCheckbox;
-	IBOutlet NSPopUpButton *impCloudPopup;
+    IBOutlet NSButton              *saveDetailsCheckbox;
+    IBOutlet NSButton              *showPassCheckbox;
+	  IBOutlet NSPopUpButton         *impCloudPopup;
 
-    // Open
+    #pragma mark Open Panel
 
-    NSOpenPanel *openDialog;
-    IBOutlet NSView *accessoryView;
+    NSOpenPanel       *openDialog;
+    IBOutlet NSView   *accessoryView;
     IBOutlet NSButton *accessoryViewNewProjectCheckbox;
 
-    IBOutlet NSView *projectFromFilesAccessoryView;
+    IBOutlet NSView   *projectFromFilesAccessoryView;
     IBOutlet NSButton *projectFromFilesAccessoryViewCheckbox;
     IBOutlet NSButton *projectFromFilesAccessoryViewLocCheckbox;
 
-    // Save
+    #pragma mark Save Panel
 
-    NSSavePanel *saveProjectDialog;
-    IBOutlet id saveChangesSheet;
+    NSSavePanel          *saveProjectDialog;
+    IBOutlet id          saveChangesSheet;
     IBOutlet NSTextField *saveChangesSheetLabel;
-    IBOutlet NSView *saveDevicegroupFilesAccessoryView;
-    IBOutlet NSButton *saveDevicegroupFilesAccessoryViewCheckbox;
+    IBOutlet NSView      *saveDevicegroupFilesAccessoryView;
+    IBOutlet NSButton    *saveDevicegroupFilesAccessoryViewCheckbox;
 
-    // New Project
+    #pragma mark New Project Sheet
 
-    IBOutlet NSPanel *newProjectSheet;
+    IBOutlet NSPanel     *newProjectSheet;
     IBOutlet NSTextField *newProjectNameTextField;
     IBOutlet NSTextField *newProjectNameCountField;
     IBOutlet NSTextField *newProjectDescTextField;
     IBOutlet NSTextField *newProjectDescCountField;
     IBOutlet NSTextField *newProjectLabel;
-    IBOutlet NSButton *newProjectAssociateCheckbox;
-    IBOutlet NSButton *newProjectNewProductCheckbox;
+    IBOutlet NSButton    *newProjectAssociateCheckbox;
+    IBOutlet NSButton    *newProjectNewProductCheckbox;
 
-    // Rename Project/Device Group
+    #pragma mark Rename Project/Device Group Sheet
 
-    IBOutlet NSPanel *renameProjectSheet;
+    IBOutlet NSPanel     *renameProjectSheet;
     IBOutlet NSTextField *renameProjectLabel;
     IBOutlet NSTextField *renameProjectTextField;
     IBOutlet NSTextField *renameProjectCountField;
     IBOutlet NSTextField *renameProjectDescTextField;
     IBOutlet NSTextField *renameProjectDescCountField;
-    IBOutlet NSButton *renameProjectLinkCheckbox;
+    IBOutlet NSButton    *renameProjectLinkCheckbox;
     IBOutlet NSTextField *renameProjectHintField;
 
-    // Sync Project
+    #pragma mark Sync Project Sheet
 
-    IBOutlet NSPanel *syncProjectSheet;
+    IBOutlet NSPanel             *syncProjectSheet;
     IBOutlet NSProgressIndicator *syncProjectProgress;
-    IBOutlet NSTextField *syncProjectLabel;
+    IBOutlet NSTextField         *syncProjectLabel;
 
-    // New Device Group
+    #pragma mark New Device Group Sheet
 
-    IBOutlet NSPanel *newDevicegroupSheet;
-    IBOutlet NSTextField *newDevicegroupLabel;
-    IBOutlet NSTextField *newDevicegroupNameTextField;
-    IBOutlet NSTextField *newDevicegroupNameCountField;
-    IBOutlet NSTextField *newDevicegroupDescTextField;
-    IBOutlet NSTextField *newDevicegroupDescCountField;
-    IBOutlet NSButton *newDevicegroupCheckbox;
+    IBOutlet NSPanel       *newDevicegroupSheet;
+    IBOutlet NSTextField   *newDevicegroupLabel;
+    IBOutlet NSTextField   *newDevicegroupNameTextField;
+    IBOutlet NSTextField   *newDevicegroupNameCountField;
+    IBOutlet NSTextField   *newDevicegroupDescTextField;
+    IBOutlet NSTextField   *newDevicegroupDescCountField;
+    IBOutlet NSButton      *newDevicegroupCheckbox;
     IBOutlet NSPopUpButton *newDevicegroupTypePopup;
 
-	IBOutlet NSWindow *selectTargetSheet;
-	IBOutlet SelectWindowViewController *swvc;
+    #pragma mark Select Target Sheet
+    
+	  IBOutlet NSWindow                   *selectTargetSheet;
+	  IBOutlet SelectWindowViewController *swvc;
 
-    // About
+    #pragma mark About Sheet
 
     IBOutlet id aboutSheet;
     IBOutlet id aboutVersionLabel;
+    IBOutlet NSButton *feedbackButton;
 
-    // Prefs
+    #pragma mark Prefs Sheet
 
-    IBOutlet id preferencesSheet;
-    IBOutlet NSTextField *workingDirectoryField;
-    IBOutlet NSButton *preserveCheckbox;
-    IBOutlet NSButton *autoCompileCheckbox;
-    IBOutlet NSButton *loadModelsCheckbox;
-    IBOutlet NSButton *loadDevicesCheckbox;
+    IBOutlet id            preferencesSheet;
+    IBOutlet NSTextField   *workingDirectoryField;
+    IBOutlet NSButton      *preserveCheckbox;
+    IBOutlet NSButton      *autoCompileCheckbox;
+    IBOutlet NSButton      *loadModelsCheckbox;
+    IBOutlet NSButton      *loadDevicesCheckbox;
     IBOutlet NSPopUpButton *fontsMenu;
     IBOutlet NSPopUpButton *sizeMenu;
-    IBOutlet NSColorWell *textColorWell;
-    IBOutlet NSColorWell *backColorWell;
-    IBOutlet NSColorWell *dev1ColorWell;
-    IBOutlet NSColorWell *dev2ColorWell;
-    IBOutlet NSColorWell *dev3ColorWell;
-    IBOutlet NSColorWell *dev4ColorWell;
-    IBOutlet NSColorWell *dev5ColorWell;
-    IBOutlet NSColorWell *dev6ColorWell;
-    IBOutlet NSColorWell *dev7ColorWell;
-    IBOutlet NSColorWell *dev8ColorWell;
-    IBOutlet NSButton *autoUpdateCheckCheckbox;
-    IBOutlet NSButton *autoLoadListsCheckbox;
-    IBOutlet NSButton *boldTestCheckbox;
+    IBOutlet NSColorWell   *textColorWell;
+    IBOutlet NSColorWell   *backColorWell;
+    IBOutlet NSColorWell   *dev1ColorWell;
+    IBOutlet NSColorWell   *dev2ColorWell;
+    IBOutlet NSColorWell   *dev3ColorWell;
+    IBOutlet NSColorWell   *dev4ColorWell;
+    IBOutlet NSColorWell   *dev5ColorWell;
+    IBOutlet NSColorWell   *dev6ColorWell;
+    IBOutlet NSColorWell   *dev7ColorWell;
+    IBOutlet NSColorWell   *dev8ColorWell;
+    IBOutlet NSButton      *autoUpdateCheckCheckbox;
+    IBOutlet NSButton      *autoLoadListsCheckbox;
+    IBOutlet NSButton      *boldTestCheckbox;
     IBOutlet NSPopUpButton *locationMenu;
     IBOutlet NSPopUpButton *recentFilesCountMenu;
     IBOutlet NSPopUpButton *maxLogCountMenu;
-    IBOutlet NSButton *showInspectorCheckbox;
-	IBOutlet NSButton *updateDevicesCheckbox;
+    IBOutlet NSButton      *showInspectorCheckbox;
+	  IBOutlet NSButton      *updateDevicesCheckbox;
 
-    // Assign Device
+    #pragma mark Assign Device Sheet
 
-    IBOutlet NSPanel *assignDeviceSheet;
+    IBOutlet NSPanel       *assignDeviceSheet;
     IBOutlet NSPopUpButton *assignDeviceMenuDevices;
     IBOutlet NSPopUpButton *assignDeviceMenuModels;
 
     NSOpenPanel *choosePanel;
 
-    // Rename
+    #pragma mark Rename Device/Device Group/Project Sheet
 
-    IBOutlet NSPanel *renameSheet;
-    IBOutlet NSTextField *renameLabel;
+    IBOutlet NSPanel       *renameSheet;
+    IBOutlet NSTextField   *renameLabel;
     IBOutlet NSPopUpButton *renameMenu;
-    IBOutlet NSTextField *renameName;
-    IBOutlet NSTextField *renameNameLength;
+    IBOutlet NSTextField   *renameName;
+    IBOutlet NSTextField   *renameNameLength;
 
-    // Agent or Device?
-
-    IBOutlet NSPanel *sourceTypeSheet;
+    #pragma mark Agent or Device Code? Sheet
+    
+    IBOutlet NSPanel     *sourceTypeSheet;
     IBOutlet NSTextField *sourceTypeLabel;
-    IBOutlet NSButton *sourceTypeAgentButton;
-    IBOutlet NSButton *sourceTypeDeviceButton;
+    IBOutlet NSButton    *sourceTypeAgentButton;
+    IBOutlet NSButton    *sourceTypeDeviceButton;
 
-    // Upload Code
+    #pragma mark Upload Code Sheet
 
-    IBOutlet NSPanel *uploadSheet;
+    IBOutlet NSPanel     *uploadSheet;
     IBOutlet NSTextField *uploadDevicegroupTextField;
-    IBOutlet NSTabView *uploadTab;
+    IBOutlet NSTabView   *uploadTab;
     IBOutlet NSTextField *uploadCommitTextField;
     IBOutlet NSTextField *uploadCommitCountField;
     IBOutlet NSTextField *uploadOriginTextField;
@@ -311,35 +315,41 @@
     IBOutlet NSTextField *uploadTagsTextField;
     IBOutlet NSTextField *uploadTagsCountField;
 
-    // OTP
+    #pragma mark OTP Sheet
 
-    IBOutlet NSPanel *otpSheet;
+    IBOutlet NSPanel     *otpSheet;
     IBOutlet NSTextField *otpTextField;
 
-    // Set Minimum Deployment
+    #pragma mark Set Minimum Deployment Sheet
 
     IBOutlet NSWindow *commitSheet;
 
-	// Inspector Panel
+    #pragma mark Report a Problem Sheet
 
-	IBOutlet InspectorWindow2ViewController *iwvc;
+    IBOutlet NSPanel *feedbackSheet;
+    IBOutlet NSTextField *feedbackField;
 
-    // Connection Variables
+	  #pragma mark Inspector Panel
 
-    BuildAPIAccess *ide;
+	  IBOutlet InspectorWindow2ViewController *iwvc;
 
+    #pragma mark Other Sheets
+    
     // Update Tracking
 
     IBOutlet SUUpdater *sparkler;
 	
-	// Commit Window
+	  // Commit Window
 	
-	IBOutlet CommitWindowViewController *cwvc;
+	  IBOutlet CommitWindowViewController *cwvc;
 	
-	// Touch Bar
+	  // Touch Bar
 	
-	IBOutlet NSTouchBar *appBar;
+	  IBOutlet NSTouchBar *appBar;
 
+    #pragma mark Main Properties
+    
+    BuildAPIAccess *ide;
     Project *currentProject, *creatingProject, *savingProject;
     Devicegroup *currentDevicegroup, *eiDeviceGroup;
 
@@ -354,7 +364,7 @@
     NSDateFormatter *def, *inLogDef, *outLogDef;
     NSOperationQueue *extraOpQueue;
     NSMenu *dockMenu;
-	NSTimer *refreshTimer;
+	  NSTimer *refreshTimer;
     NSTrackingArea *ta;
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
@@ -362,7 +372,7 @@
     NSMutableArray *deviceColourWells;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
-    NSURLSessionTask *eiLibListTask;
+    NSURLSessionTask *eiLibListTask, *feedbackTask;
     NSMutableData *eiLibListData;
     NSDate *eiLibListTime;
 
@@ -372,13 +382,13 @@
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
 	
-	NSTimeInterval updateDevicePeriod;
+	  NSTimeInterval updateDevicePeriod;
 	
-	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
+	  NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
-    BOOL loginFlag, renameProjectFlag, saveAsFlag, stale, credsFlag, switchAccountFlag, doubleSaveFlag;
-    BOOL reconnectAfterSleepFlag, isIn;
+    BOOL renameProjectFlag, saveAsFlag, credsFlag, switchAccountFlag, doubleSaveFlag, reconnectAfterSleepFlag;
+    BOOL isLoggingIn, isBookmarkStale;
 }
 
 
@@ -465,6 +475,7 @@
 - (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles;
 - (IBAction)cancelSelectTarget:(id)sender;
 - (IBAction)selectTarget:(id)sender;
+
 
 // Existing Device Group Methods
 
@@ -672,6 +683,14 @@
 - (IBAction)cancelPrefs:(id)sender;
 - (IBAction)setPrefs:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;
+
+
+// Report a Problem Sheet Methods
+
+- (IBAction)showFeedbackSheet:(id)sender;
+- (IBAction)cancelFeedbackSheet:(id)sender;
+- (IBAction)sendFeedback:(id)sender;
+- (void)sendFeedbackError;
 
 
 // Check Electric Imp Libraries Methods

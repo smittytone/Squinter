@@ -67,7 +67,7 @@
     deviceSelectFlag = NO;
     renameProjectFlag = NO;
     saveAsFlag = YES;
-    stale = NO;
+    isBookmarkStale = NO;
     credsFlag = NO;
     switchAccountFlag = NO;
     doubleSaveFlag = NO;
@@ -77,7 +77,7 @@
     logPaddingLength = 0;
     deviceCheckCount = -1;
     updateDevicePeriod = 300.0;
-    loginMode = 0;
+    loginMode = kLoginModeNone;
 
     nswsw = NSWorkspace.sharedWorkspace;
     nsfm = NSFileManager.defaultManager;
@@ -143,7 +143,7 @@
 
     // Account Menu
 
-    switchAccountMenuItem.enabled = NO;
+    // switchAccountMenuItem.enabled = NO;
     accountMenuItem.enabled = NO;
 
     // View Menu
@@ -753,6 +753,9 @@
         // NOTE may remove this and leave users to select it from menu
 
         // [self showLoginWindow];
+
+        // switchAccountMenuItem.enabled = YES;
+        [self writeStringToLog:@"To make full use of Squinter, please log in to your Electric Imp account via the Account menu." :YES];
     }
 }
 
@@ -1002,9 +1005,9 @@
     if (!ide.isLoggedIn)
     {
         // We are not logged in, so we may need to show the log in sheet,
-        // but only if we're not already trying to log in ('loginFlag' is true)
+        // but only if we're not already trying to log in ('isLoggingIn' is true)
 
-        if (!loginFlag)
+        if (!isLoggingIn)
         {
             if (!credsFlag)
             {
@@ -1031,10 +1034,10 @@
         // Update the UI and report to the user
 
         accountMenuItem.title = @"Not Signed in to any Account";
-        loginMenuItem.title = @"Log in to your Primary Account";
-        switchAccountMenuItem.enabled = YES;
+        loginMenuItem.title = @"Log in to your Main Account";
+        // switchAccountMenuItem.enabled = YES;
         switchAccountMenuItem.title = @"Log in to a Different Account...";
-        loginMode = 0;
+        loginMode = kLoginModeNone;
 
         NSString *cloudName = [self getCloudName:cloudCode];
         [self writeStringToLog:[NSString stringWithFormat:@"You are now logged out of the %@impCloud.", cloudName] :YES];
@@ -1210,7 +1213,7 @@
 
     // Register that we're attempting a login
 
-    loginFlag = YES;
+    isLoggingIn = YES;
 
     // Attempt to login with the current credentials
 	
@@ -1275,7 +1278,7 @@
     // when clicking the Account menu option. This allows the user to log into a different
     // account ('loginMode' is 2) or switch to the primary
 
-    if (loginMode != 2)
+    if (loginMode != kLoginModeAlt)
     {
         // The user wants to log into a different account
 
@@ -1368,7 +1371,8 @@
 
     otpTextField.stringValue = @"";
     otpLoginToken = nil;
-    loginFlag = NO;
+    isLoggingIn = NO;
+
     if (switchAccountFlag) switchAccountFlag = NO;
 
     [_window endSheet:otpSheet];
@@ -2615,12 +2619,12 @@
     }
     else
     {
-        if (stale)
+        if (isBookmarkStale)
         {
             // The project's bookmark is stale, ie. it has changed location.
             // 'url' contains the new location
 
-            stale = NO;
+            isBookmarkStale = NO;
 
             // Update recent files list and UI
 
@@ -2650,10 +2654,10 @@
 
         for (NSDictionary *recent in recentFiles)
         {
-            stale = NO;
+            isBookmarkStale = NO;
             NSURL *url = [self urlForBookmark:[recent valueForKey:@"bookmark"]];
 
-            if (stale)
+            if (isBookmarkStale)
             {
                 changed = YES;
                 if (url != nil)
@@ -3648,9 +3652,16 @@
     // And, depending on prefs, select the first device, if there is one
     // then update the UI
 
+    BOOL devicegroupChanged = NO;
     NSMenuItem *item = (NSMenuItem *)sender;
-    currentDevicegroup = item.representedObject;
-    currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+    Devicegroup *dg = item.representedObject;
+
+    if (dg != currentDevicegroup)
+    {
+        devicegroupChanged = YES;
+        currentDevicegroup = dg;
+        currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+    }
 
     // Switch off unselected menus - and submenus
 
@@ -3675,16 +3686,15 @@
             // Use the flag to make sure we don't reselect the device
             // after coming here from 'chooseDevice:'
 
-            if (!deviceSelectFlag)
+            if (!deviceSelectFlag && dgitem.submenu != nil && devicegroupChanged)
             {
-                if (dgitem.submenu != nil)
-                {
-                    NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
+                // Only change the device if it's in a different devicegroup than before
 
-                    // Select the device using 'chooseDevice:' as this manages 'selectedDevice'
+                NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
 
-                    [self chooseDevice:sitem];
-                }
+                // Select the device using 'chooseDevice:' as this manages 'selectedDevice'
+
+                [self chooseDevice:sitem];
             }
         }
     }
@@ -4376,54 +4386,88 @@
 
         if (currentDevicegroup.devices.count > 0)
         {
-            NSString *devId = [currentDevicegroup.devices objectAtIndex:0];
-
-            // First check by device ID — this is how the data should be stored,
-            // but earlier versions used device name...
-
-            for (NSMutableDictionary *device in devicesArray)
+            if (currentDevicegroup.devices.count == 1)
             {
-                NSString *aDevId = [self getValueFrom:device withKey:@"id"];
+                // 'currentDevicegroup.devices' only stores device IDs, so we need to find the
+                // referenced device first
 
-                if ([aDevId compare:devId] == NSOrderedSame)
+                NSString *devId = [currentDevicegroup.devices firstObject];
+
+                for (NSMutableDictionary *device in devicesArray)
                 {
-                    selectedDevice = device;
-                    iwvc.device = selectedDevice;
+                    NSString *aDevId = [self getValueFrom:device withKey:@"id"];
 
-                    [self setDevicesPopupTick];
-                    [self setUnassignedDevicesMenuTick];
-                    [self setDevicesMenusTicks];
-                    [self refreshDeviceMenu];
+                    if ([aDevId compare:devId] == NSOrderedSame)
+                    {
+                        selectedDevice = device;
+                        iwvc.device = selectedDevice;
 
-                    return;
+                        [self setDevicesPopupTick];
+                        [self setUnassignedDevicesMenuTick];
+                        [self setDevicesMenusTicks];
+                        [self refreshDeviceMenu];
+
+                        return;
+                    }
                 }
             }
-/*
-            // ...so we also check by device name, just in case
-
-            for (NSMutableDictionary *device in devicesArray)
+            else
             {
-                NSString *aDevId = [self getValueFrom:device withKey:@"name"];
+                NSMutableArray *selectedDevices = [[NSMutableArray alloc] init];
 
-                if ([aDevId compare:devId] == NSOrderedSame)
+                for (NSString *devId in currentDevicegroup.devices)
                 {
-                    selectedDevice = device;
-                    iwvc.device = selectedDevice;
+                    for (NSMutableDictionary *device in devicesArray)
+                    {
+                        NSString *aDevId = [self getValueFrom:device withKey:@"id"];
 
-                    [self setDevicesPopupTick];
-                    [self setUnassignedDevicesMenuTick];
-                    [self setDevicesMenusTicks];
-                    [self refreshDeviceMenu];
-
-                    return;
+                        if ([aDevId compare:devId] == NSOrderedSame)
+                        {
+                            [selectedDevices addObject:device];
+                        }
+                    }
                 }
+
+                NSMutableDictionary *device = [selectedDevices firstObject];
+                NSString *first = [self getValueFrom:device withKey:@"name"];
+                if (first == nil) first = [self getValueFrom:device withKey:@"id"];
+
+                NSString *list = @"";
+                NSUInteger count = 0;
+
+                for (NSMutableDictionary *device in selectedDevices)
+                {
+                    NSString *item = [self getValueFrom:device withKey:@"name"];
+                    if (item == nil) item = [self getValueFrom:device withKey:@"id"];
+
+                    ++count;
+
+                    if (count == selectedDevices.count)
+                    {
+                        list = [list substringToIndex:list.length - 2];
+                        list = [list stringByAppendingFormat:@" and %@", item];
+                    }
+                    else
+                    {
+                        list = [list stringByAppendingFormat:@"%@, ", item];
+                    }
+                }
+
+                selectedDevice = [selectedDevices firstObject];
+                iwvc.device = selectedDevice;
+
+                [self setDevicesPopupTick];
+                [self setUnassignedDevicesMenuTick];
+                [self setDevicesMenusTicks];
+                [self refreshDeviceMenu];
+
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.messageText = [NSString stringWithFormat:@"This device group has mulitple assigned devices: %@. The first device, %@, will be selected initially.", list, first];
+                [alert addButtonWithTitle:@"OK"];
+                [alert beginSheetModalForWindow:_window
+                              completionHandler:nil];
             }
  */
-        }
-        else
-        {
-            // TODO Should we load up the devics — or has this been done?
-            //      If already attempted, it might have failed
         }
     }
 }
@@ -4507,7 +4551,7 @@
         // We have a list of devices in place and there is at least one device in the list
         // so go through each device in the list and update its details individually
 
-        [self writeStringToLog:@"Auto-updating devices' status. This can be disabled in the Device menu." :YES];
+        // [self writeStringToLog:@"Auto-updating devices' status. This can be disabled in the Device menu." :YES];
 		
         deviceCheckCount = 0;
 		
@@ -8746,26 +8790,28 @@
     accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
     if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
     loginMenuItem.title = @"Log out of this Account";
-    switchAccountMenuItem.enabled = YES;
+    // switchAccountMenuItem.enabled = YES;
 
     if (switchAccountFlag)
     {
         // We are switching to a secondary account, so we should change the login option
 
-        switchAccountMenuItem.title = @"Log in to Your Primary Account";
-        loginMode = 2;
+        switchAccountMenuItem.title = @"Log in to Your Main Account";
+        loginMode = kLoginModeAlt;
     }
     else
     {
+        // We have logged into the primary account
+
         switchAccountMenuItem.title = @"Log in to a Different Account...";
-        loginMode = 1;
+        loginMode = kLoginModeMain;
     }
 
     [self setToolbar];
 
     // Register we are no longer trying to log in
 
-    loginFlag = NO;
+    isLoggingIn = NO;
     credsFlag = YES;
     switchAccountFlag = NO;
     otpLoginToken = nil;
@@ -8806,11 +8852,11 @@
 
     // Register we are no longer trying to log in
 
-    loginFlag = NO;
+    isLoggingIn = NO;
     credsFlag = YES;
     switchAccountFlag = NO;
     otpLoginToken = nil;
-    loginMode = -1;
+    loginMode = kLoginModeNone;
 }
 
 
@@ -8838,10 +8884,10 @@
     // Set the account menu UI
 
     accountMenuItem.title = @"Not Signed in to any Account";
-    loginMenuItem.title = @"Log in to your Primary Account";
-    switchAccountMenuItem.enabled = YES;
+    loginMenuItem.title = @"Log in to your Main Account";
+    //switchAccountMenuItem.enabled = YES;
     switchAccountMenuItem.title = @"Log in to a Different Account...";
-    loginMode = 0;
+    loginMode = kLoginModeNone;
 }
 
 
@@ -8870,13 +8916,15 @@
     {
         [extraOpQueue addOperationWithBlock:^(void){
 
-            NSString *headString = [NSString stringWithFormat:@"Commits to Device Group \"%@\":", devicegroup.name];
-            NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
+            /* NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
 
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:lineString
                                 waitUntilDone:NO];
-
+             */
+            
+            NSString *headString = [NSString stringWithFormat:@"Most recent commits to Device Group \"%@\":", devicegroup.name];
+        
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:headString
                                 waitUntilDone:NO];
@@ -8906,7 +8954,7 @@
                 }
 
                 NSString *ns = [NSString stringWithFormat:@"%03lu. ", (deployments.count - i + 1)];
-                NSString *ss = [@"                               " substringToIndex:ns.length];
+                NSString *ss = [@"                               " substringToIndex:ns.length + 2];
                 NSString *cs;
 
                 if (message != nil && message.length > 0)
@@ -8921,24 +8969,43 @@
                 if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
                 if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
                 if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
-
+                
+                // Record whether the current entry is the min. supported deployment or the current
+                
+                bool flag = NO;
+                
                 if (mid.length > 0 || cid.length > 0)
                 {
                     NSString *did = [deployment objectForKey:@"id"];
-                    if ([did compare:mid] == NSOrderedSame) cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
-                    if ([did compare:cid] == NSOrderedSame) cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
+                    if ([did compare:mid] == NSOrderedSame)
+                    {
+                        cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
+                        flag = YES;
+                    }
+                    
+                    if ([did compare:cid] == NSOrderedSame)
+                    {
+                        cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
+                        flag = YES;
+                    }
                 }
 
                 cs = [cs stringByAppendingString:@"\n"];
+                
+                // Add a prefix to indicate min. supported deployment and/or current deployment
+                
+                cs = flag ? [@"* " stringByAppendingString:cs] : [@"  " stringByAppendingString:cs];
 
                 [self performSelectorOnMainThread:@selector(logLogs:)
                                        withObject:cs
                                     waitUntilDone:NO];
             }
-
+            
+            /*
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:lineString
                                 waitUntilDone:NO];
+             */
         }];
     }
 }
@@ -9197,7 +9264,7 @@
         // NOTE {message} comprises the remaining parts of the string
 
         NSUInteger width = 11;
-        NSArray *values;
+        NSColor *logColour;
         NSString *device;
         NSString *log;
 
@@ -9251,20 +9318,22 @@
         {
             NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
             log = [NSString stringWithFormat:@"\"%@\"%@: %@ %@%@", device, subspacer, stype, spacer, message];
-            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
+            //values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
         else
         {
             log = [NSString stringWithFormat:@"\"%@\": %@ %@%@", device, stype, spacer, message];
-            values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
+            //values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
 
         log = [timestamp stringByAppendingFormat:@" %@", log];
-        NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
-        NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-        NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
+        logColour = [colors objectAtIndex:index];
+        
+        //NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
+        //NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+        //NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
 
-        [self writeStyledStringToLog:attrString :NO];
+        [self writeNoteToLog:log :logColour :NO];
     }
 }
 
@@ -9886,7 +9955,7 @@
 
             done = YES;
             [self writeStringToLog:@"Device Code:" :NO];
-            [self writeStringToLog:@" " :NO];
+            //[self writeStringToLog:@" " :NO];
             [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
             break;
         }
@@ -9923,7 +9992,7 @@
 
             done = YES;
             [self writeStringToLog:@"Agent Code:" :NO];
-            [self writeStringToLog:@" " :NO];
+            //[self writeStringToLog:@" " :NO];
             [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
             break;
         }
@@ -9974,17 +10043,17 @@
 
     // Determine the number of characters in the longest line...
 
-    NSInteger dashCount = 0;
+    // NSInteger dashCount = 0;
 
-    for (NSString *string in lines) dashCount = string.length > dashCount ? string.length : dashCount;
+    // for (NSString *string in lines) dashCount = string.length > dashCount ? string.length : dashCount;
 
     // ...then build a string of dashes that long
 
-    NSString *dashes = [@"" stringByPaddingToLength:dashCount withString:@"-" startingAtIndex:0];
+    // NSString *dashes = [@"" stringByPaddingToLength:dashCount withString:@"-" startingAtIndex:0];
 
     // Write out the dashes
 
-    [self writeNoteToLog:dashes :textColour :NO];
+    // [self writeNoteToLog:dashes :textColour :NO];
 
     // Write out the lines themselves
 
@@ -9992,7 +10061,7 @@
 
     // Write out the dashes
 
-    [self writeNoteToLog:dashes :textColour :NO];
+    // [self writeNoteToLog:dashes :textColour :NO];
 }
 
 
@@ -10032,7 +10101,12 @@
     NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
-    [self writeStyledStringToLog:attrString :addTimestamp];
+    
+    // Make sure the actual writing is done on the main thread
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self writeStyledStringToLog:attrString :addTimestamp];
+    });
 }
 
 
@@ -10279,7 +10353,7 @@
     NSNumber *code = [error objectForKey:@"code"];
     NSInteger errorCode = [code integerValue];
 
-    if (loginFlag)
+    if (isLoggingIn)
     {
         // We are attempting to log in, so the error should relate to that action, ie.
         // most likely a failed connection, or missing or rejected credentials
@@ -10337,7 +10411,7 @@
 
         // Register that we are no longer trying to log in
 
-        loginFlag = NO;
+        isLoggingIn = NO;
     }
     else
     {
@@ -12283,8 +12357,8 @@
             NSArray *colour = [savedColours objectAtIndex:colourIndex];
 
             r = [[colour objectAtIndex:0] floatValue];
-            b = [[colour objectAtIndex:1] floatValue];
-            g = [[colour objectAtIndex:2] floatValue];
+            g = [[colour objectAtIndex:1] floatValue];
+            b = [[colour objectAtIndex:2] floatValue];
 
             colourWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];
 
@@ -12461,12 +12535,12 @@
         // Get the current colour well's colours...
 
         r = (float)colourWell.color.redComponent;
-        b = (float)colourWell.color.blueComponent;
         g = (float)colourWell.color.greenComponent;
+        b = (float)colourWell.color.blueComponent;
 
         // ...and convert to an array of NSNumbers for saving to defaults...
 
-        NSArray *colour = @[ [NSNumber numberWithFloat:r], [NSNumber numberWithFloat:b], [NSNumber numberWithFloat:g]];
+        NSArray *colour = @[ [NSNumber numberWithFloat:r], [NSNumber numberWithFloat:g], [NSNumber numberWithFloat:b] ];
 
         // ...and add the colour to the new default array
 
@@ -12621,6 +12695,101 @@
 
 
 
+#pragma mark - Report a Problem Sheet Methods
+
+- (IBAction)showFeedbackSheet:(id)sender
+{
+    // Show the sheet
+
+    feedbackField.stringValue = @"";
+    
+    if (sender == feedbackButton)
+    {
+        [self closeAboutSheet:sender];
+    }
+    
+    [_window beginSheet:feedbackSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)cancelFeedbackSheet:(id)sender
+{
+    [_window endSheet:feedbackSheet];
+}
+
+
+
+- (IBAction)sendFeedback:(id)sender
+{
+    NSString *feedback = feedbackField.stringValue;
+
+    [_window endSheet:feedbackSheet];
+
+    if (feedback.length == 0) return;
+
+    // Send the string etc.
+
+    NSError *error = nil;
+
+    NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+    NSString *userAgent = [NSString stringWithFormat:@"%@/%@.%@ (macOS %li.%li.%li)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleExecutable"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+                 [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], (long)sysVer.majorVersion, (long)sysVer.minorVersion, (long)sysVer.patchVersion];
+
+    NSDictionary *dict = @{ @"comment" : feedback,
+                            @"useragent" : userAgent };
+
+
+    if (connectionIndicator.hidden == YES)
+    {
+        // Start the connection indicator
+
+        connectionIndicator.hidden = NO;
+        [connectionIndicator startAnimation:self];
+    }
+
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kSquinterFeedbackAddress]];
+    request.HTTPMethod = @"POST";
+    request.HTTPBody = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+    
+    [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setValue:kSquinterFeedbackUUID forHTTPHeaderField:@"X-Squinter-ID"];
+
+    if (error != nil || request == nil)
+    {
+        // Something went wrong during the creation of the request, so tell the user and bail
+
+        [self sendFeedbackError];
+
+        return;
+    }
+
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration: config
+                                                          delegate: self
+                                                     delegateQueue: [NSOperationQueue mainQueue]];
+    feedbackTask = [session dataTaskWithRequest:request];
+    [feedbackTask resume];
+}
+
+
+
+- (void)sendFeedbackError
+{
+    // Present an error message specific to sending feedback
+    // This is called from multiple locations: if the initial request can't be created,
+    // there was a send failure, or a server error
+
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = @"Could Not Send Your Feedback";
+    alert.informativeText = @"Unfortunately, your comments could not be send at this time. Please try again later.";
+
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:_window completionHandler:nil];
+}
+
+
+
 #pragma mark - Check Electric Imp Libraries Methods
 
 
@@ -12666,13 +12835,15 @@
         }
 
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
-        [request setHTTPMethod:@"GET"];
-        eiLibListData = [NSMutableData dataWithCapacity:0];
+        request.HTTPMethod = @"GET";
+        
         eiDeviceGroup = devicegroup;
+        eiLibListData = [NSMutableData dataWithCapacity:0];
+        
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         NSURLSession *session = [NSURLSession sessionWithConfiguration: config
                                                               delegate: self
-                                                         delegateQueue: [NSOperationQueue mainQueue]];
+                                                         delegateQueue: nil];
         eiLibListTask = [session dataTaskWithRequest:request];
         [eiLibListTask resume];
     }
@@ -12806,7 +12977,7 @@
 
 
 - (void)URLSession:(NSURLSession *)session
-          dataTask:(NSURLSessionDataTask *)dataTask
+          dataTask:(NSURLSessionDataTask *)task
 didReceiveResponse:(NSURLResponse *)response
  completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler
 {
@@ -12814,8 +12985,18 @@ didReceiveResponse:(NSURLResponse *)response
 
     if (rps.statusCode != 200)
     {
-        NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
-        [self writeErrorToLog:errString :YES];
+        // Were we sending feedback?
+
+        if (task == feedbackTask)
+        {
+            [self sendFeedbackError];
+        }
+        else
+        {
+            NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
+            [self writeErrorToLog:errString :YES];
+        }
+
         completionHandler(NSURLSessionResponseCancel);
         return;
     }
@@ -12825,48 +13006,68 @@ didReceiveResponse:(NSURLResponse *)response
 
 
 
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)task didReceiveData:(NSData *)data
 {
-    [eiLibListData appendData:data];
+    // Make sure we are recording data from the correct task
+
+    if (task == eiLibListTask) [eiLibListData appendData:data];
 }
 
 
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-    if (task == eiLibListTask)
+    // Was there an error?
+
+    if (error)
     {
-        if (ide.numberOfConnections < 1)
-        {
-            // Only hide the connection indicator if 'ide' has no live connections
+        // React to a passed client-side error - most likely a timeout or inability to resolve the URL
+        // ie. the client is not connected to the Internet
 
-            [connectionIndicator stopAnimation:self];
-            connectionIndicator.hidden = YES;
-        }
-
-        if (error)
-        {
-            // React to a passed client-side error - most likely a timeout or inability to resolve the URL
-            // ie. the client is not connected to the Internet
-
-            // 'error.code' will equal NSURLErrorCancelled when we kill all connections
-
-            if (error.code == NSURLErrorCancelled) return;
-
-            [task cancel];
-            return;
-        }
-
-        // The connection has come to a conclusion without error
+        if (error.code == NSURLErrorCancelled) return;
 
         [task cancel];
+
+        // NOTE We will already have reported other errors, eg. connection errors,
+        // so we can just bail here
+
+        return;
+    }
+    
+    // Make sure we are recording data from the correct task
+
+    if (task == eiLibListTask)
+    {
+        // The connection has come to a conclusion without error
+
         [self compareElectricImpLibs:eiDeviceGroup];
     }
+    else if (task == feedbackTask)
+    {
+        // The user just successfully posted feedback
+
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = @"Thanks For Your Feedback!";
+        alert.informativeText = @"Your comments have been received and we’ll take a look at them shortly.";
+
+        [alert addButtonWithTitle:@"OK"];
+        [alert beginSheetModalForWindow:_window completionHandler:nil];
+    }
+    
+    if (ide.numberOfConnections < 1)
+    {
+        // Only hide the connection indicator if 'ide' has no live connections
+        // Make sure it's on the main thread
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [connectionIndicator stopAnimation:self];
+            connectionIndicator.hidden = YES;
+        });
+        
+    }
+    
+    [task cancel];
 }
-
-
-
-
 
 
 
@@ -13035,6 +13236,19 @@ didReceiveResponse:(NSURLResponse *)response
                 new = i < otpTextField.stringValue.length - 1 ? [new stringByAppendingString:[otpTextField.stringValue substringFromIndex: i + 1]] : new;
                 otpTextField.stringValue = new;
             }
+        }
+    }
+
+    // Report a Problem sheet
+
+    if (sender == feedbackField)
+    {
+        // Make sure the content isn't longerr than 512 characters
+
+        if (feedbackField.stringValue.length > 512)
+        {
+            feedbackField.stringValue = [feedbackField.stringValue substringToIndex:512];
+            NSBeep();
         }
     }
 }
