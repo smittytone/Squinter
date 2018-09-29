@@ -1,6 +1,6 @@
 PODS:
   - PDKeychainBindingsController (0.0.1)
-  - Sparkle (1.19.0)
+  - Sparkle (1.20.0)
 
 DEPENDENCIES:
   - PDKeychainBindingsController (~> 0.0)
@@ -13,8 +13,8 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   PDKeychainBindingsController: fa8cb3cf99f2ea9240d61066ed0549f34e2cec3c
-  Sparkle: 8486d2493599665e466b5076e72b28849776e32f
+  Sparkle: 48999e7ee032f05ca05e28451eadf4af8ede6b44
 
 PODFILE CHECKSUM: b7e95c55c85d7c7c8cac1277cf73b44af26b7f77
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.5.3
