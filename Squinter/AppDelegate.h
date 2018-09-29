@@ -84,8 +84,8 @@
     IBOutlet NSMenuItem *compileMenuItem;
     IBOutlet NSMenuItem *uploadMenuItem;
     IBOutlet NSMenuItem *uploadExtraMenuItem;
-	IBOutlet NSMenuItem *setMinimumMenuItem;
-	IBOutlet NSMenuItem *setProductionTargetMenuItem;
+    IBOutlet NSMenuItem *setMinimumMenuItem;
+	  IBOutlet NSMenuItem *setProductionTargetMenuItem;
     IBOutlet NSMenuItem *removeFilesMenuItem;
     IBOutlet NSMenuItem *externalOpenMenuItem;
     IBOutlet NSMenu     *externalSourceMenu;
@@ -98,7 +98,7 @@
     IBOutlet NSMenu     *externalFilesMenu;
     IBOutlet NSMenu     *impLibrariesMenu;
     IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
-	IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
+	  IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
 
     #pragma mark Device Menu outlets
 
@@ -114,16 +114,16 @@
     IBOutlet NSMenuItem *streamLogsMenuItem;
     IBOutlet NSMenuItem *renameDeviceMenuItem;
     IBOutlet NSMenuItem *updateDeviceStatusMenuItem;
-	IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
+	  IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
     IBOutlet NSMenuItem *deleteDeviceMenuItem;
     IBOutlet NSMenu     *unassignedDevicesMenu;
 
     #pragma mark Account Menu Outlets
 
-	IBOutlet NSMenu     *accountMenu;
+	  IBOutlet NSMenu     *accountMenu;
     IBOutlet NSMenuItem *loginMenuItem;
-	IBOutlet NSMenuItem *accountMenuItem;
-	IBOutlet NSMenuItem *switchAccountMenuItem;
+	  IBOutlet NSMenuItem *accountMenuItem;
+	  IBOutlet NSMenuItem *switchAccountMenuItem;
 
     #pragma mark View Menu outlets
 
@@ -169,7 +169,7 @@
     IBOutlet SquinterToolbarItem *uploadCodeExtraItem;
     IBOutlet SquinterToolbarItem *listCommitsItem;
     IBOutlet SquinterToolbarItem *downloadProductItem;
-	IBOutlet SquinterToolbarItem *inspectorItem;
+	  IBOutlet SquinterToolbarItem *inspectorItem;
 
     // Sheets, dialogs and windows
 
@@ -181,7 +181,7 @@
     IBOutlet NSSecureTextFieldCell *passwordTextFieldCell;
     IBOutlet NSButton              *saveDetailsCheckbox;
     IBOutlet NSButton              *showPassCheckbox;
-	IBOutlet NSPopUpButton         *impCloudPopup;
+	  IBOutlet NSPopUpButton         *impCloudPopup;
 
     #pragma mark Open Panel
 
@@ -242,8 +242,8 @@
 
     #pragma mark Select Target Sheet
     
-	IBOutlet NSWindow                   *selectTargetSheet;
-	IBOutlet SelectWindowViewController *swvc;
+	  IBOutlet NSWindow                   *selectTargetSheet;
+	  IBOutlet SelectWindowViewController *swvc;
 
     #pragma mark About Sheet
 
@@ -278,7 +278,7 @@
     IBOutlet NSPopUpButton *recentFilesCountMenu;
     IBOutlet NSPopUpButton *maxLogCountMenu;
     IBOutlet NSButton      *showInspectorCheckbox;
-	IBOutlet NSButton      *updateDevicesCheckbox;
+	  IBOutlet NSButton      *updateDevicesCheckbox;
 
     #pragma mark Assign Device Sheet
 
@@ -329,9 +329,9 @@
     IBOutlet NSPanel *feedbackSheet;
     IBOutlet NSTextField *feedbackField;
 
-	#pragma mark Inspector Panel
+	  #pragma mark Inspector Panel
 
-	IBOutlet InspectorWindow2ViewController *iwvc;
+	  IBOutlet InspectorWindow2ViewController *iwvc;
 
     #pragma mark Other Sheets
     
@@ -339,13 +339,13 @@
 
     IBOutlet SUUpdater *sparkler;
 	
-	// Commit Window
+	  // Commit Window
 	
-	IBOutlet CommitWindowViewController *cwvc;
+	  IBOutlet CommitWindowViewController *cwvc;
 	
-	// Touch Bar
+	  // Touch Bar
 	
-	IBOutlet NSTouchBar *appBar;
+	  IBOutlet NSTouchBar *appBar;
 
     #pragma mark Main Properties
     
@@ -364,7 +364,7 @@
     NSDateFormatter *def, *inLogDef, *outLogDef;
     NSOperationQueue *extraOpQueue;
     NSMenu *dockMenu;
-	NSTimer *refreshTimer;
+	  NSTimer *refreshTimer;
     NSTrackingArea *ta;
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
@@ -382,9 +382,9 @@
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
 	
-	NSTimeInterval updateDevicePeriod;
+	  NSTimeInterval updateDevicePeriod;
 	
-	NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
+	  NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL renameProjectFlag, saveAsFlag, credsFlag, switchAccountFlag, doubleSaveFlag, reconnectAfterSleepFlag;

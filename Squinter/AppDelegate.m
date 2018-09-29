@@ -1372,6 +1372,7 @@
     otpTextField.stringValue = @"";
     otpLoginToken = nil;
     isLoggingIn = NO;
+
     if (switchAccountFlag) switchAccountFlag = NO;
 
     [_window endSheet:otpSheet];
@@ -4427,7 +4428,6 @@
                     }
                 }
 
-
                 NSMutableDictionary *device = [selectedDevices firstObject];
                 NSString *first = [self getValueFrom:device withKey:@"name"];
                 if (first == nil) first = [self getValueFrom:device withKey:@"id"];
@@ -4467,6 +4467,7 @@
                 [alert beginSheetModalForWindow:_window
                               completionHandler:nil];
             }
+ */
         }
     }
 }
