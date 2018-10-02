@@ -26,38 +26,39 @@ static PDKeychainBindingsController *sharedInstance = nil;
 #pragma mark Keychain Access
 
 - (NSString*)serviceName {
-	return [[NSBundle mainBundle] bundleIdentifier];
+    return [[NSBundle mainBundle] bundleIdentifier];
 }
 
 - (NSString*)stringForKey:(NSString*)key {
-	OSStatus status;
+    OSStatus status;
 #if TARGET_OS_IPHONE
     NSDictionary *query = [NSDictionary dictionaryWithObjectsAndKeys:(id)kCFBooleanTrue, kSecReturnData,
                            kSecClassGenericPassword, kSecClass,
                            key, kSecAttrAccount,
                            [self serviceName], kSecAttrService,
                            nil];
-	
+    
     CFDataRef stringData = NULL;
     status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef*)&stringData);
 #else //OSX
     //SecKeychainItemRef item = NULL;
     UInt32 stringLength = 0;
     void *stringBuffer = NULL;
-    status = SecKeychainFindGenericPassword(NULL,
-                                            (uint) [[self serviceName] lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+    status = SecKeychainFindGenericPassword(NULL, 
+                                            (uint) [[self serviceName] lengthOfBytesUsingEncoding:NSUTF8StringEncoding], 
                                             [[self serviceName] UTF8String],
-                                            (uint) [key lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+                                            (uint) [key lengthOfBytesUsingEncoding:NSUTF8StringEncoding], 
                                             [key UTF8String],
-                                            &stringLength,
-                                            &stringBuffer,
+                                            &stringLength, 
+                                            &stringBuffer, 
                                             NULL);
 #endif
-	if (status)
+    if (status)
     {
         if (stringLength != 0) SecKeychainItemFreeContent(NULL, stringBuffer);
         return nil;
     }
+    
 #if TARGET_OS_IPHONE
     NSString *string = [[NSString alloc] initWithData:(__bridge id)stringData encoding:NSUTF8StringEncoding];
     CFRelease(stringData);
@@ -66,13 +67,13 @@ static PDKeychainBindingsController *sharedInstance = nil;
     //SecKeychainItemFreeAttributesAndData(NULL, stringBuffer);
     SecKeychainItemFreeContent(NULL, stringBuffer);
 #endif
-	return string;	
+    return string;    
 }
 
 
 - (BOOL)storeString:(NSString*)string forKey:(NSString*)key {
-	if (!string)  {
-		//Need to delete the Key 
+    if (!string)  {
+        //Need to delete the Key 
 #if TARGET_OS_IPHONE
         NSDictionary *spec = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)kSecClassGenericPassword, kSecClass,
                               key, kSecAttrAccount,[self serviceName], kSecAttrService, nil];
@@ -134,12 +135,12 @@ static PDKeychainBindingsController *sharedInstance = nil;
 + (PDKeychainBindingsController *)sharedKeychainBindingsController 
 {
     static dispatch_once_t onceQueue;
-
+    
     dispatch_once(&onceQueue, ^{
         sharedInstance = [[self alloc] init];
     });
-
-	return sharedInstance;
+    
+    return sharedInstance;
 }
 
 #pragma mark -
