@@ -13,10 +13,10 @@ Squinter/*.icns
 *.pages
 
 #Podfile.lock
-#Podfile
+Podfile
 #Pods/*
 Squinter.xcodeproj/*
-Squinter.xcworkspace/*
+Squinter.xcworkspace/
 
 ## From GitHub
 ## Build generated
