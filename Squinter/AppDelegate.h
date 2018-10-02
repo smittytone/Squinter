@@ -698,6 +698,7 @@
 - (IBAction)checkElectricImpLibraries:(id)sender;
 - (void)checkElectricImpLibs:(Devicegroup *)devicegroup;
 - (void)compareElectricImpLibs:(Devicegroup *)devicegroup;
+- (void)gotLibraries:(NSNotification *)note;
 
 
 // Pasteboard Methods

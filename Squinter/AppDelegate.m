@@ -632,12 +632,15 @@
                    name:@"BuildAPILoggedOut"
                  object:ide];
 
-    // **************
-
     [nsncdc addObserver:self
            selector:@selector(endLogging:)
                name:@"BuildAPILogStreamEnd"
              object:ide];
+
+    [nsncdc addObserver:self
+               selector:@selector(gotLibraries:)
+                   name:@"BuildAPIGotLibrariesList"
+                 object:ide];
 
 
 
@@ -12824,6 +12827,8 @@
         // Set/reset the time of the most recent check
 
         eiLibListTime = [NSDate date];
+        [ide getLibraries];
+        return;
 
         if (connectionIndicator.hidden == YES)
         {
@@ -12970,6 +12975,49 @@
     }
 }
 
+
+- (void)gotLibraries:(NSNotification *)note
+{
+    // This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
+    // This list may have been request by many methods — check the source object's 'action' key to find out
+    // which flow we need to run here
+
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSArray *libs = [data objectForKey:@"data"];
+
+    NSString *eilibs = @"";
+    NSInteger count = 0;
+
+    for (NSDictionary *lib in libs)
+    {
+        NSString *name = [lib valueForKeyPath:@"attributes.name"];
+
+        if ([name hasPrefix:@"private:"]) break;
+
+        bool supported = [lib valueForKeyPath:@"attributes.supported"];
+        NSString *latest;
+
+        if (supported)
+        {
+            NSArray *versions = [lib valueForKeyPath:@"relationships.versions"];
+            NSDictionary *version = [versions objectAtIndex:0];
+            latest = [version objectForKey:@"id"];
+            NSArray *parts = [latest componentsSeparatedByString:@":"];
+            latest = [parts objectAtIndex:1];
+        }
+        else
+        {
+            latest = @"dep";
+        }
+
+        name = [name stringByAppendingFormat:@",%@\n", latest];
+        eilibs = [eilibs stringByAppendingString:name];
+        count++;
+    }
+
+    eiLibListData = [NSMutableData dataWithData:[eilibs dataUsingEncoding:NSUTF8StringEncoding]];
+    [self compareElectricImpLibs:currentDevicegroup];
+}
 
 
 #pragma mark - NSURLSession Delegate Methods
