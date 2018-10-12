@@ -55,6 +55,7 @@ playground.xcworkspace
 
 *.txt
 *.pages
+.DS_Store
 
 Art/*
 Art-Source/*
