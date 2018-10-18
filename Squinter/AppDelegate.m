@@ -3715,6 +3715,59 @@
 
 
 
+- (IBAction)incrementCurrentDevicegroup:(id)sender
+{
+    // Move to the next device group in the list by determining which
+    // one that is from the device group submenu, and sending that item
+    // to chooseDevicegroup:
+
+    if (currentProject.devicegroups.count > 1)
+    {
+        NSInteger next = currentProject.devicegroupIndex + 1;
+        if (next >= currentProject.devicegroups.count) next = 0;
+        Devicegroup *target = [currentProject.devicegroups objectAtIndex:next];
+
+        for (NSInteger i = 1 ; i < deviceGroupsMenu.itemArray.count - 1 ; ++i)
+        {
+            NSMenuItem *item = [deviceGroupsMenu.itemArray objectAtIndex:i];
+            Devicegroup *dg = item.representedObject;
+
+            if (dg == target) {
+                [self chooseDevicegroup:item];
+                return;
+            }
+        }
+    }
+}
+
+
+- (IBAction)decrementCurrentDevicegroup:(id)sender
+{
+    // Move to the previous device group in the list by determining which
+    // one that is from the device group submenu, and sending that item
+    // to chooseDevicegroup:
+
+    if (currentProject.devicegroups.count > 1)
+    {
+        NSInteger previous = currentProject.devicegroupIndex - 1;
+        if (previous < 0) previous = currentProject.devicegroups.count - 1;
+        Devicegroup *target = [currentProject.devicegroups objectAtIndex:previous];
+
+        for (NSInteger i = 1 ; i < deviceGroupsMenu.itemArray.count - 1 ; ++i)
+        {
+            NSMenuItem *item = [deviceGroupsMenu.itemArray objectAtIndex:i];
+            Devicegroup *dg = item.representedObject;
+
+            if (dg == target) {
+                [self chooseDevicegroup:item];
+                return;
+            }
+        }
+    }
+}
+
+
+
 - (IBAction)deleteDevicegroup:(id)sender
 {
     if (currentDevicegroup == nil)
@@ -6504,11 +6557,19 @@
                                          if (response == NSAlertFirstButtonReturn)
                                          {
                                              // User wants to replace the existing code file
+                                             // Remove the current file from the watch queue
 
+                                             [fileWatchQueue removePath:[self getAbsolutePath:currentProject.path :[model.path stringByAppendingPathComponent:model.filename]]];
+
+                                             // Add the new file to the model
+                                             
                                              model.filename = [filePath lastPathComponent];
                                              model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
-                                             currentProject.haschanged = YES;
+
+                                            currentProject.haschanged = YES;
+
                                              [saveLight needSave:YES];
+                                             [self checkAndWatchFile:filePath];
                                          }
 
                                          // We may still have files to process, so go on to the next one
@@ -6528,6 +6589,9 @@
 
                     model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
                     model.filename = [filePath lastPathComponent];
+
+                    [self checkAndWatchFile:filePath];
+
                     break;
                 }
             }
@@ -6542,6 +6606,7 @@
             newModel.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
             newModel.filename = [filePath lastPathComponent];
             [currentDevicegroup.models addObject:newModel];
+            [self checkAndWatchFile:filePath];
         }
     }
     else
@@ -6553,6 +6618,7 @@
         newModel.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
         newModel.filename = [filePath lastPathComponent];
         [currentDevicegroup.models addObject:newModel];
+        [self checkAndWatchFile:filePath];
     }
 
     // Having added the first file on the current list, we remove it from the list
@@ -10685,6 +10751,15 @@
     // Open the Electric Imp libraries page on the Dev Center in the default Web browser
 
     [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/codelibraries/"]];
+}
+
+
+
+- (IBAction)launchReleaseNotesPage:(id)sender
+{
+    // Open the Squinter home page as the Release Notes section
+
+    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#rn"]];
 }
 
 
