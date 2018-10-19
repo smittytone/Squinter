@@ -13079,6 +13079,7 @@
         // Cache the specified device group and get the library list
         
         [eiDeviceGroupCache addObject:devicegroup];
+        [self writeStringToLog:@"Loading a list of supported Electric Imp libraries from the Electric Imp impCloud..." :YES];
         [ide getLibraries];
         return;
         
