@@ -602,7 +602,7 @@
 - (void)showCodeErrors:(NSNotification *)note;
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
 - (void)logCode;
-- (void)writeStreamToLog:(NSAttributedString *)string;
+//- (void)writeStreamToLog:(NSAttributedString *)string;
 - (void)displayError:(NSNotification *)note;
 
 

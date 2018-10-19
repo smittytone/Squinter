@@ -10406,7 +10406,7 @@
 }
 
 
-
+/*
 - (void)writeStreamToLog:(NSAttributedString *)string
 {
     // Write a decoded log stream event to the main window log view
@@ -10428,7 +10428,7 @@
 
     logTextView.editable = NO;
 }
-
+*/
 
 
 - (void)displayError:(NSNotification *)note;
