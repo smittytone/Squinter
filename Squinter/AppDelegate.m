@@ -7111,6 +7111,7 @@
     NSDictionary *so = [data objectForKey:@"object"];
     NSString *action = [so objectForKey:@"action"];
     NSString *sid = nil;
+    NSInteger index = 0;
 
     if (action != nil)
     {
@@ -7152,7 +7153,6 @@
                     [aProduct setObject:[product objectForKey:@"type"] forKey:@"type"];
                     [aProduct setObject:[product objectForKey:@"relationships"] forKey:@"relationships"];
                     [aProduct setObject:[NSMutableDictionary dictionaryWithDictionary:[product objectForKey:@"attributes"]] forKey:@"attributes"];
-                    [productsArray addObject:aProduct];
 
                     NSString *cid = [aProduct valueForKeyPath:@"relationships.creator.id"];
                     NSString *oid = ide.currentAccount;
@@ -7174,6 +7174,32 @@
                         [ide getAccount:cid :dict];
 
                         // Pick up the asynchronous action at **gotAnAccount:**
+                        
+                        // Add shared products to the end of the list
+                        
+                        [productsArray addObject:aProduct];
+                        
+                        // Get the index of the first shared product
+                        // 'index' will be zero until then
+                        
+                        if (index == 0) index = [productsArray indexOfObject:aProduct];
+                    }
+                    else
+                    {
+                        if (index == 0)
+                        {
+                            // No shared Products yet, so just add the owned Product to the end of the list
+                            
+                            [productsArray addObject:aProduct];
+                        }
+                        else
+                        {
+                            // There are shared Products so, insert the owned product just before the start
+                            // of the shared Products, and increment the index to grow as the array grows
+                            
+                            [productsArray insertObject:aProduct atIndex:(index - 1)];
+                            index++;
+                        }
                     }
 
                     // If we need to match against a previous 'selectedProduct' ID, do it now
@@ -7195,8 +7221,8 @@
 
                 [self writeStringToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
 
-                // If we don't have a selected product, just pick the first on the list
-
+                // Choose the first product on the list
+                
                 if (selectedProduct == nil) selectedProduct = [productsArray objectAtIndex:0];
             }
             else
@@ -11277,14 +11303,32 @@
     {
         for (item in productsMenu.itemArray)
         {
-            item.state = item.representedObject == selectedProduct ? NSOnState : NSOffState;
-
             if (item.submenu != nil)
             {
+                bool shouldClear = YES;
+                
                 for (NSMenuItem *sitem in item.submenu.itemArray)
                 {
-                    sitem.state = sitem.representedObject == selectedProduct ? NSOnState : NSOffState;
+                    if (sitem.representedObject == selectedProduct)
+                    {
+                        sitem.state = NSOnState;
+                        
+                        // Highlight the submenu title so the user knows a subsdiiary Product has been selected
+                        
+                        item.state = NSMixedState;
+                        shouldClear = NO;
+                    }
+                    else
+                    {
+                        sitem.state = NSOffState;
+                    }
                 }
+                
+                if (shouldClear) item.state = NSOffState;
+            }
+            else
+            {
+                item.state = item.representedObject == selectedProduct ? NSOnState : NSOffState;
             }
         }
     }
