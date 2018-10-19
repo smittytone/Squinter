@@ -367,7 +367,7 @@
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
-    NSMutableArray *deviceColourWells;
+    NSMutableArray *deviceColourWells, *eiDeviceGroupCache;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
     NSURLSessionTask *eiLibListTask, *feedbackTask;
@@ -569,6 +569,7 @@
 - (void)renameDeviceStageTwo:(NSNotification *)note;
 - (void)deleteDeviceStageTwo:(NSNotification *)note;
 - (void)loggedIn:(NSNotification *)note;
+- (void)loggedInStageTwo;
 - (void)loginRejected:(NSNotification *)note;
 - (void)loggedOut:(NSNotification *)note;
 

@@ -1220,7 +1220,7 @@
 
     // Attempt to login with the current credentials
 
-    if (loginKey != nil)
+    if (!credsFlag && loginKey != nil)
     {
         [ide loginWithKey:loginKey];
         return;
@@ -7051,6 +7051,14 @@
 
                 [self getProductsFromServer:nil];
             }
+            
+            if ([action compare:@"loggedin"] == NSOrderedSame)
+            {
+                // Just re-call 'getProductsFromServer:' as the check on the BuildAPIAccess instance's
+                // 'currentAccount' property will pass, and the products list will be requested from the server
+                
+                [self loggedInStageTwo];
+            }
         }
         else
         {
@@ -8810,8 +8818,10 @@
     // BuildAPIAccess has signalled login success
 
     // First, get the user's account ID
-
-    [ide getMyAccount];
+    
+    NSDictionary *dict = @{ @"action" : @"loggedin" };
+    
+    [ide getMyAccount:dict];
 
     // Action continues asynchronously at **gotMyAccount:**
     // Meatime, save credentials if they have changed required
@@ -8890,9 +8900,9 @@
 
     // Check for any post-login actions that need to be performed
 
-    // User wants the Product lists loaded on login
+    // User may want the Product lists loaded on login
 
-    if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
+    // NOTE From 125, this check takes place in 'inloggedInStageTwo:' which indirectly requires a correct account ID
 
     // User wants to update devices' status periodically, or the Device lists loaded on login
 
@@ -8904,6 +8914,15 @@
     {
         [self updateDevicesStatus:nil];
     }
+}
+
+
+
+- (void)loggedInStageTwo
+{
+    // User wants the Product lists loaded on login
+    
+    if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
 }
 
 
@@ -12887,6 +12906,57 @@
     {
         if (eiLibListTime != nil)
         {
+            // NOTE 'eiLibListTime' is a proxy flag for 'have I asked for the library list'
+            
+            if (eiLibListData == nil || eiLibListData.length == 0)
+            {
+                // We haven't acquired the library list yet, so just cache the specified device group.
+                // We'll process the cached devicegroups when we have the list
+                
+                [eiDeviceGroupCache addObject:devicegroup];
+                return;
+            }
+            
+            // Is the library list still valid? We assume it is for the hour after it was
+            // acquired - after that we need to get a new list
+            
+            NSDate *now = [NSDate date];
+            NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
+            
+            if (interval >= kEILibCheckInterval)
+            {
+                // Last check was less than 1 hour earlier, so use existing list if it exists
+                // NOTE 'interval' is negative
+                
+                [self compareElectricImpLibs:devicegroup];
+                return;
+            }
+        }
+        
+        // Set the library list acquisition time
+        
+        eiLibListTime = [NSDate date];
+        
+        // Initalize or clear the devicegroup cache
+        
+        if (eiDeviceGroupCache == nil)
+        {
+            eiDeviceGroupCache = [[NSMutableArray alloc] init];
+        }
+        else
+        {
+            [eiDeviceGroupCache removeAllObjects];
+        }
+        
+        // Cache the specified device group and get the library list
+        
+        [eiDeviceGroupCache addObject:devicegroup];
+        [ide getLibraries];
+        return;
+        
+        /*
+         if (eiLibListTime != nil)
+        {
             NSDate *now = [NSDate date];
             NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
 
@@ -12902,10 +12972,8 @@
         // Set/reset the time of the most recent check
 
         eiLibListTime = [NSDate date];
-        [ide getLibraries];
-        return;
-
-        if (connectionIndicator.hidden == YES)
+        
+         if (connectionIndicator.hidden == YES)
         {
             // Start the connection indicator
 
@@ -12925,6 +12993,7 @@
                                                          delegateQueue: nil];
         eiLibListTask = [session dataTaskWithRequest:request];
         [eiLibListTask resume];
+         */
     }
 }
 
@@ -12932,6 +13001,8 @@
 
 - (void)compareElectricImpLibs:(Devicegroup *)devicegroup
 {
+    // This is where we actually compare a devicegroup's EI libraries
+    
     NSString *parsedData;
 
     if (devicegroup != nil && devicegroup.models.count == 0) return;
@@ -13051,6 +13122,7 @@
 }
 
 
+
 - (void)gotLibraries:(NSNotification *)note
 {
     // This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
@@ -13091,7 +13163,13 @@
     }
 
     eiLibListData = [NSMutableData dataWithData:[eilibs dataUsingEncoding:NSUTF8StringEncoding]];
-    [self compareElectricImpLibs:currentDevicegroup];
+    
+    // Check all of the cached devicegroups
+    
+    for (Devicegroup *devicegroup in eiDeviceGroupCache)
+    {
+        [self compareElectricImpLibs:devicegroup];
+    }
 }
 
 
