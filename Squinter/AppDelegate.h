@@ -367,7 +367,7 @@
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
-    NSMutableArray *deviceColourWells, *eiDeviceGroupCache;
+    NSMutableArray *deviceColourWells, *eiDeviceGroupCache, *loggedDevices;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
     NSURLSessionTask *eiLibListTask, *feedbackTask;

@@ -51,6 +51,7 @@
     projectArray = nil;
     devicesArray = nil;
     productsArray = nil;
+    loggedDevices = nil;
     downloads = nil;
     ide = nil;
     dockMenu = nil;
@@ -9270,7 +9271,40 @@
             break;
         }
     }
-
+    
+    // Add the device to the list of logging devices
+    
+    if (loggedDevices == nil) loggedDevices = [[NSMutableArray alloc] init];
+    
+    if (loggedDevices.count < kMaxLogStreamDevices)
+    {
+        [loggedDevices addObject:dvid];
+    }
+    else
+    {
+        NSInteger index = -1;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:@"FREE"] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index != -1)
+        {
+            [loggedDevices replaceObjectAtIndex:index withObject:dvid];
+        }
+        else
+        {
+            NSLog(@"loggedDevices index error in loggingStarted:");
+        }
+    }
+    
     // Inform the user
 
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
@@ -9312,7 +9346,41 @@
             break;
         }
     }
-
+    
+    // Remove the device from the list of logging devices WITHOUT eliminating its index
+    
+    if (loggedDevices.count == 1)
+    {
+        // Only one device on the list which will now be removed,
+        // so we don't need to replace it, just empty the array
+        
+        [loggedDevices removeAllObjects];
+    }
+    else
+    {
+        NSInteger index = -1;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:dvid] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index != -1)
+        {
+            [loggedDevices replaceObjectAtIndex:index withObject:@"FREE"];
+        }
+        else
+        {
+            NSLog(@"loggedDevices index error in loggingStopped:");
+        }
+    }
+    
     // Inform the user
 
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
@@ -9379,9 +9447,24 @@
                 break;
             }
         }
-
-        NSUInteger index = [ide indexOfLoggedDevice:dvid];
-
+        
+        // Get the index of the entry's device in the loggedDevices array.
+        // We will use this to get correct logging colour
+        
+        NSUInteger index = 0;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:dvid] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        /*
         // Calculate colour table index
 
         BOOL done = NO;
@@ -9397,7 +9480,8 @@
                 done = YES;
             }
         }
-
+         */
+        
         NSRange range = [logItem rangeOfString:type];
         NSString *message = [logItem substringFromIndex:(range.location + type.length + 1)];
 
