@@ -1215,6 +1215,7 @@
 	{
 		NSInteger added = 0;
 		NSInteger removed = 0;
+        NSInteger changed = 0;
 
 		// First, run through the contents of 'foundLibs' to see if there is a 1:1 match with
 		// the lists of known local librariess; if not, mark that the project has changed
@@ -1242,8 +1243,9 @@
 
                         NSString *fromVersion = match.length > 0 ? [@"version " stringByAppendingString:match] : @"no version number";
                         NSString *toVersion = aLib.version.length > 0 ? [@"version " stringByAppendingString:aLib.version] : @"no version number";
+                        changed++;
 
-                        [self writeWarningToLog:[NSString stringWithFormat:@"Library \"%@\" has been changed from %@ to %@.", aLib.filename, fromVersion, toVersion] :YES];
+                        [self writeWarningToLog:[NSString stringWithFormat:@"Library \"%@\" has been changed from %@ to %@ in your %@ code.", aLib.filename, fromVersion, toVersion, model.type] :YES];
                     }
                 }
             }
@@ -1269,7 +1271,8 @@
 		{
 			[self writeStringToLog:[NSString stringWithFormat:@"No local libraries added to or removed from the %@ code.", model.type] :YES];
 		}
-		else
+		
+        if (changed > 0 || removed > 0 || added > 0)
 		{
 			project.haschanged = YES;
 
@@ -1350,6 +1353,7 @@
 	{
 		NSInteger added = 0;
 		NSInteger removed = 0;
+        NSInteger changed = 0;
 
 		if (mFiles.count > 0)
 		{
@@ -1374,8 +1378,9 @@
 
                         NSString *fromVersion = match.length > 0 ? [@"version " stringByAppendingString:match] : @"no version number";
                         NSString *toVersion = aFile.version.length > 0 ? [@"version " stringByAppendingString:aFile.version] : @"no version number";
+                        changed++;
 
-                        [self writeWarningToLog:[NSString stringWithFormat:@"File \"%@\" has been changed from %@ to %@.", aFile.filename, fromVersion, toVersion] :YES];
+                        [self writeWarningToLog:[NSString stringWithFormat:@"File \"%@\" has been changed from %@ to %@ in your %@ code.", aFile.filename, fromVersion, toVersion, model.type] :YES];
                     }
                 }
 			}
@@ -1401,7 +1406,8 @@
 		{
 			[self writeStringToLog:[NSString stringWithFormat:@"No local files added to or removed from the %@ code.", model.type] :YES];
 		}
-		else
+        
+		if (changed > 0 || removed > 0 || added > 0)
 		{
 			project.haschanged = YES;
 
