@@ -1069,6 +1069,19 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
 
 
+- (CGFloat)renderedHeightOfString:(NSString *)string
+{
+    NSTextField *nstf = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 172, 400)];
+    nstf.cell.wraps = YES;
+    nstf.cell.lineBreakMode = NSLineBreakByWordWrapping; //NSLineBreakByCharWrapping;
+    NSFont *font = [NSFont systemFontOfSize:11];
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
+    nstf.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attributes];
+    return [nstf.cell cellSizeForBounds:nstf.bounds].height;
+}
+
+
+
 - (void)outlineViewItemDidExpand:(NSNotification *)notification
 {
     if (panelSelector.selectedSegment == 0)
@@ -1267,17 +1280,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
 
 
-- (CGFloat)renderedHeightOfString:(NSString *)string
-{
-    NSTextField *nstf = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 172, 400)];
-    nstf.cell.wraps = YES;
-    nstf.cell.lineBreakMode = NSLineBreakByWordWrapping; //NSLineBreakByCharWrapping;
-    NSFont *font = [NSFont systemFontOfSize:11];
-    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
-    nstf.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attributes];
-    return [nstf.cell cellSizeForBounds:nstf.bounds].height;
-}
-
+#pragma mark - Utility Methods
 
 
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
