@@ -1148,4 +1148,85 @@
 }
 
 
+
+#pragma mark - NSSplitViewDelegate Methods
+
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainSplitPosition:(CGFloat)proposedPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+    // Position of split is full width (inspector hidden) or full withd - 340 (inspector visible)
+ 
+    CGFloat viewWidth = splitView.frame.size.width;
+    
+    if (isInspectorHidden)
+    {
+        // Inspector is hidden; does it want to show? If so allow it
+        if (wantsToHide == 1)
+        {
+            wantsToHide = 0;
+            isInspectorHidden = NO;
+            return viewWidth - 340;
+        }
+        
+        // Is the bar being moved? If it's to the left, allow the hide
+        if (proposedPosition < viewWidth)
+        {
+            isInspectorHidden = NO;
+            return viewWidth - 340;
+        }
+        
+        // Otherwise, disallow
+        return viewWidth;
+    }
+    
+    // Inspector is not hidden; does it want to hide? If so allow it
+    if (wantsToHide == -1)
+    {
+        wantsToHide = 0;
+        isInspectorHidden = YES;
+        return viewWidth;
+    }
+    
+    // Is the bar being moved? If it's to the right, allow the hide
+    if (proposedPosition > viewWidth - 340.0)
+    {
+        isInspectorHidden = YES;
+        return viewWidth;
+    }
+    
+    // Otherwise disallow;
+    return viewWidth - 340.0;
+    
+}
+
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+    CGFloat viewWidth = splitView.frame.size.width;
+    return viewWidth - 340.0;
+}
+
+
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMaximumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+    CGFloat viewWidth = splitView.frame.size.width;
+    return viewWidth;
+}
+
+
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldHideDividerAtIndex:(NSInteger)dividerIndex
+{
+    return !isInspectorHidden;
+}
+
+
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+{
+    return !isInspectorHidden;
+}
+
+
 @end

@@ -33,8 +33,8 @@
 		3B8B8E131E952C1D009363C8 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E121E952C1D009363C8 /* Model.m */; };
 		3B8B8E161E952E5A009363C8 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E151E952E5A009363C8 /* File.m */; };
 		3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */; };
+		3BA707602181D97200585728 /* InspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BA7075F2181D97100585728 /* InspectorViewController.m */; };
 		3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */; };
-		3BB5DCBE202B88C600FA6F7D /* InspectorWindow2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */; };
 		3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
@@ -140,10 +140,10 @@
 		3B8B8E151E952E5A009363C8 /* File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = File.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B9DF2B91ED2D4EB00B682BA /* LogStreamEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LogStreamEvent.h; path = ../../BuildAPIAccess/LogStreamEvent.h; sourceTree = "<group>"; };
 		3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = LogStreamEvent.m; path = ../../BuildAPIAccess/LogStreamEvent.m; sourceTree = "<group>"; };
+		3BA7075E2181D97100585728 /* InspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorViewController.h; sourceTree = "<group>"; };
+		3BA7075F2181D97100585728 /* InspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorViewController.m; sourceTree = "<group>"; };
 		3BB2EF031FC7215100F7B7D1 /* SelectWindowViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SelectWindowViewController.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SelectWindowViewController.m; sourceTree = "<group>"; usesTabs = 0; };
-		3BB5DCBC202B88C600FA6F7D /* InspectorWindow2ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = InspectorWindow2ViewController.h; sourceTree = "<group>"; usesTabs = 0; };
-		3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = InspectorWindow2ViewController.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = InspectorDataCellView.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = InspectorDataCellView.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = StatusLight.h; sourceTree = "<group>"; usesTabs = 0; };
@@ -308,8 +308,8 @@
 				3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */,
 				3B26B99820E5647100AC5D04 /* TreeNode.h */,
 				3B26B99920E5647100AC5D04 /* TreeNode.m */,
-				3BB5DCBC202B88C600FA6F7D /* InspectorWindow2ViewController.h */,
-				3BB5DCBD202B88C600FA6F7D /* InspectorWindow2ViewController.m */,
+				3BA7075E2181D97100585728 /* InspectorViewController.h */,
+				3BA7075F2181D97100585728 /* InspectorViewController.m */,
 				3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */,
 				3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */,
 				3B077B2F21118A5D00C17D25 /* InspectorLinkButton.h */,
@@ -530,6 +530,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BA707602181D97200585728 /* InspectorViewController.m in Sources */,
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
 				3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */,
 				3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */,
@@ -539,7 +540,6 @@
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
 				3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
-				3BB5DCBE202B88C600FA6F7D /* InspectorWindow2ViewController.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
 				3B6AF0DB197127B10083744C /* Project.m in Sources */,
 				3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */,

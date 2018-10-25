@@ -314,6 +314,7 @@
                          @"com.bps.squinter.inspectorsize",
                          @"com.bps.squinter.updatedevs",        // New in 2.0.122
                          @"com.bps.squinter.devicecolours",     // New in 2.0.123
+                         @"com.bps.squinter.inspectorshow",     // New in 2.2.12x
                          nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
@@ -363,6 +364,7 @@
                             [NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)],
                             [NSNumber numberWithBool:NO],           // New in 2.0.123
                             [[NSArray alloc] init],                 // New in 2.0.123
+                            [NSNumber numberWithBool:NO],           // New in 2.2.12x
                             nil];
 
     // Drop the arrays into the Defauts
@@ -393,21 +395,56 @@
     {
         [_window center];
     }
-
+    
     // Position Inspector
-
+    
+    wantsToHide = 0;
+    isInspectorHidden = NO;
+    
     if ([defaults boolForKey:@"com.bps.squinter.preservews"])
     {
-        NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
-        NSRect nuRect = NSRectFromString(frameString);
-        [iwvc.view.window setFrame:nuRect display:NO];
+        // NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
+        // nuRect = NSRectFromString(frameString);
+        // [iwvc.view.window setFrame:nuRect display:NO];
+        
+        // **** FROM 2.2.12x ****
+        
+        NSNumber *num = [defaults objectForKey:@"com.bps.squinter.inspectorshow"];
+        
+        if (num.boolValue)
+        {
+            // Fake a click on the show/hide inspector button
+            
+            wantsToHide = -1;
+            CGFloat proposed = splitView.frame.size.width;
+            [splitView setPosition:proposed ofDividerAtIndex:0];
+        }
+        else
+        {
+            // It's already being shown; just adjust the width
+            
+            CGFloat proposed = splitView.frame.size.width - 340.0;
+            [splitView setPosition:proposed ofDividerAtIndex:0];
+        }
     }
     else
     {
-        iwvc.mainWindowFrame = _window.frame;
-        [iwvc positionWindow];
+        // iwvc.mainWindowFrame = _window.frame;
+        // [iwvc positionWindow];
+        
+        // **** FROM 2.2.12x ****
+        
+        // Set up the Split View to show the Inspector by default
+        
+        
+        CGFloat proposed = splitView.frame.size.width - 340.0;
+        [splitView setPosition:proposed ofDividerAtIndex:0];
     }
-
+    
+    //[splitView setHoldingPriority:NSLayoutPriorityDefaultLow forSubviewAtIndex:0];
+    //[splitView setHoldingPriority:NSLayoutPriorityDragThatCannotResizeWindow forSubviewAtIndex:1];
+    
+    
     // Set the Log TextView's font
 
     NSInteger index = [[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue];
@@ -844,7 +881,11 @@
 
     [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
     [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
-    if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
+    
+    // **** FROM 2.2.12x ****
+    //if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
+    [defaults setValue:[NSNumber numberWithBool:isInspectorHidden] forKey:@"com.bps.squinter.inspectorshow"];
+    
     [defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
     // Stop watching for notifications
@@ -974,7 +1015,20 @@
     // Show the Inspector if it's closed
     // If the Inspector is obscured by the main window, or not key, bring it forward
 
-    [iwvc.view.window makeKeyAndOrderFront:self];
+    // [iwvc.view.window makeKeyAndOrderFront:self];
+    
+    if (isInspectorHidden)
+    {
+        CGFloat proposed = splitView.frame.size.width - 340.0;
+        wantsToHide = 1;
+        [splitView setPosition:proposed ofDividerAtIndex:0];
+    }
+    else
+    {
+        CGFloat proposed = splitView.frame.size.width;
+        wantsToHide = -1;
+        [splitView setPosition:proposed ofDividerAtIndex:0];
+    }
 }
 
 
@@ -984,7 +1038,9 @@
     if (currentProject != nil) iwvc.project = currentProject;
 
     [iwvc setTab:kInspectorTabProject];
-    [iwvc.view.window makeKeyAndOrderFront:self];
+    
+    if (isInspectorHidden) [self showInspector:nil];
+    //[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -994,7 +1050,9 @@
     if (selectedDevice != nil) iwvc.device = selectedDevice;
 
     [iwvc setTab:kInspectorTabDevice];
-    [iwvc.view.window makeKeyAndOrderFront:self];
+    
+    if (isInspectorHidden) [self showInspector:nil];
+    //[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 

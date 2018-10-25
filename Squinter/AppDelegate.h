@@ -25,28 +25,31 @@
 #import "PDKeychainBindings.h"
 #import "CommitWindowViewController.h"
 #import "SelectWindowViewController.h"
-#import "InspectorWindow2ViewController.h"
+#import "InspectorViewController.h"
 #import "LogView.h"
 
+
 @interface AppDelegate : NSObject <NSApplicationDelegate,
-                               NSOpenSavePanelDelegate,
-                               NSFileManagerDelegate,
-                               VDKQueueDelegate,
-                               NSToolbarDelegate,
-                               NSURLSessionDataDelegate,
-                               NSURLSessionTaskDelegate,
-                               NSTextFieldDelegate,
-                               NSTouchBarProvider>
+                                   NSOpenSavePanelDelegate,
+                                   NSFileManagerDelegate,
+                                   VDKQueueDelegate,
+                                   NSToolbarDelegate,
+                                   NSURLSessionDataDelegate,
+                                   NSURLSessionTaskDelegate,
+                                   NSTextFieldDelegate,
+                                   NSTouchBarProvider,
+                                   NSSplitViewDelegate>
 {
     #pragma mark - Main UI element outlets
 
-    IBOutlet LogView             *logTextView;
-    IBOutlet NSClipView          *logClipView;
-    IBOutlet NSScrollView        *logScrollView;
-    IBOutlet StatusLight         *saveLight;
-    IBOutlet NSProgressIndicator *connectionIndicator;
-    IBOutlet NSPopUpButton       *projectsPopUp;
-    IBOutlet NSPopUpButton       *devicesPopUp;
+    IBOutlet LogView               *logTextView;
+    IBOutlet NSClipView            *logClipView;
+    IBOutlet NSScrollView          *logScrollView;
+    IBOutlet StatusLight           *saveLight;
+    IBOutlet NSProgressIndicator   *connectionIndicator;
+    IBOutlet NSPopUpButton         *projectsPopUp;
+    IBOutlet NSPopUpButton         *devicesPopUp;
+    IBOutlet NSSplitView           *splitView;
 
     #pragma mark File Menu outlets
 
@@ -331,7 +334,7 @@
 
     #pragma mark Inspector Panel
 
-    IBOutlet InspectorWindow2ViewController *iwvc;
+    IBOutlet InspectorViewController *iwvc;
 
     #pragma mark Other Sheets
 
@@ -379,10 +382,11 @@
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
     NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
+    NSInteger wantsToHide;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL renameProjectFlag, saveAsFlag, credsFlag, switchAccountFlag, doubleSaveFlag, reconnectAfterSleepFlag;
-    BOOL isLoggingIn, isBookmarkStale;
+    BOOL isLoggingIn, isBookmarkStale, isInspectorHidden;
 }
 
 
