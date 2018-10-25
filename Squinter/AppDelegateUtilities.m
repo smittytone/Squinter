@@ -1187,26 +1187,26 @@
 }
 
 
+- (void)splitViewDidResizeSubviews:(NSNotification *)notification
+{
+    NSLog(@"L: %.1f R: %.1f P: %.1f", logTextView.frame.size.width, iwvc.view.frame.size.width, splitView.frame.size.width);
+}
+
 /*
+ 
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
 {
-    CGFloat viewWidth = splitView.frame.size.width;
- 
-    if (dividerIndex == 1)
-    {
-        if (isInspectorHidden)
- return viewWidth - 340.0 - splitView.dividerThickness;
+    return 340.0 + splitView.dividerThickness;
 }
 
 
 
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMaximumPosition ofSubviewAt:(NSInteger)dividerIndex
 {
-    CGFloat viewWidth = splitView.frame.size.width;
-    return viewWidth;
+    return splitView.frame.size.width - 340.0 - splitView.dividerThickness;
 }
-*/
 
+*/
 
 - (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
 {
@@ -1222,12 +1222,6 @@
     return !isInspectorHidden;
 }
 
-
-
-- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
-{
-    return !isInspectorHidden;
-}
 
 
 @end

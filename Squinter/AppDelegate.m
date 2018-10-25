@@ -314,7 +314,7 @@
                          @"com.bps.squinter.inspectorsize",
                          @"com.bps.squinter.updatedevs",        // New in 2.0.122
                          @"com.bps.squinter.devicecolours",     // New in 2.0.123
-                         @"com.bps.squinter.inspectorshow",     // New in 2.2.12x
+                         @"com.bps.squinter.inspectorshow",     // New in 2.2.126
                          nil];
 
     NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
@@ -361,10 +361,10 @@
                             [NSNumber numberWithFloat:0.0],         // Redundant from 2.0.123
                             [NSNumber numberWithFloat:0.6],         // Redundant from 2.0.123
                             [NSNumber numberWithBool:NO],
-                            [NSString stringWithString:NSStringFromRect(iwvc.view.window.frame)],
+                            [NSString stringWithString:NSStringFromRect(NSMakeRect(0.0, 20.0, 340.0, 520.0))],
                             [NSNumber numberWithBool:NO],           // New in 2.0.123
                             [[NSArray alloc] init],                 // New in 2.0.123
-                            [NSNumber numberWithBool:NO],           // New in 2.2.12x
+                            [NSNumber numberWithBool:NO],           // New in 2.2.126
                             nil];
 
     // Drop the arrays into the Defauts
@@ -396,54 +396,53 @@
         [_window center];
     }
     
-    // Position Inspector
+    // Position the Inspector
     
     wantsToHide = 0;
     isInspectorHidden = NO;
     
     if ([defaults boolForKey:@"com.bps.squinter.preservews"])
     {
+        // **** To 2.1.125 ****
+        
         // NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
         // nuRect = NSRectFromString(frameString);
         // [iwvc.view.window setFrame:nuRect display:NO];
         
-        // **** FROM 2.2.12x ****
+        // **** FROM 2.2.126 ****
         
         NSNumber *num = [defaults objectForKey:@"com.bps.squinter.inspectorshow"];
+        BOOL isHidden = num.boolValue;
         
-        if (num.boolValue)
+        if (isHidden)
         {
-            // Fake a click on the show/hide inspector button
+            // Fake a click on the show/hide inspector button to hide it
             
             wantsToHide = -1;
-            CGFloat proposed = splitView.frame.size.width;
-            [splitView setPosition:proposed ofDividerAtIndex:0];
+            [splitView setPosition:splitView.frame.size.width ofDividerAtIndex:0];
         }
         else
         {
             // It's already being shown; just adjust the width
             
-            CGFloat proposed = splitView.frame.size.width - 340.0;
-            [splitView setPosition:proposed ofDividerAtIndex:0];
+            wantsToHide = 1;
+            [splitView setPosition:(splitView.frame.size.width - 340.0 - splitView.dividerThickness) ofDividerAtIndex:0];
         }
     }
     else
     {
+        // **** To 2.1.125 ****
+        
         // iwvc.mainWindowFrame = _window.frame;
         // [iwvc positionWindow];
         
-        // **** FROM 2.2.12x ****
+        // **** FROM 2.2.126 ****
         
         // Set up the Split View to show the Inspector by default
         
-        
-        CGFloat proposed = splitView.frame.size.width - 340.0;
+        CGFloat proposed = splitView.frame.size.width - 340.0 - splitView.dividerThickness;
         [splitView setPosition:proposed ofDividerAtIndex:0];
     }
-    
-    //[splitView setHoldingPriority:NSLayoutPriorityDefaultLow forSubviewAtIndex:0];
-    //[splitView setHoldingPriority:NSLayoutPriorityDragThatCannotResizeWindow forSubviewAtIndex:1];
-    
     
     // Set the Log TextView's font
 
@@ -882,9 +881,14 @@
     [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
     [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
     
-    // **** FROM 2.2.12x ****
-    //if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
+    // **** TO 2.1.125 ****
+    
+    // if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
+    
+    // **** FROM 2.2.126 ****
+    
     [defaults setValue:[NSNumber numberWithBool:isInspectorHidden] forKey:@"com.bps.squinter.inspectorshow"];
+    [defaults setValue:NSStringFromRect(NSMakeRect(0.0, 20.0, 340.0, 520.0)) forKey:@"com.bps.squinter.inspectorsize"];
     
     [defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
