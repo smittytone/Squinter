@@ -1154,56 +1154,48 @@
 
 - (CGFloat)splitView:(NSSplitView *)splitView constrainSplitPosition:(CGFloat)proposedPosition ofSubviewAt:(NSInteger)dividerIndex
 {
-    // Position of split is full width (inspector hidden) or full withd - 340 (inspector visible)
+    // Position of split is full width (inspector hidden) or full width - 340 (inspector visible)
  
     CGFloat viewWidth = splitView.frame.size.width;
     
     if (isInspectorHidden)
     {
         // Inspector is hidden; does it want to show? If so allow it
-        if (wantsToHide == 1)
+        if (wantsToHide == 1 || proposedPosition < viewWidth)
         {
             wantsToHide = 0;
             isInspectorHidden = NO;
-            return viewWidth - 340;
-        }
-        
-        // Is the bar being moved? If it's to the left, allow the hide
-        if (proposedPosition < viewWidth)
-        {
-            isInspectorHidden = NO;
-            return viewWidth - 340;
+            return viewWidth - 340 - splitView.dividerThickness;
         }
         
         // Otherwise, disallow
         return viewWidth;
     }
-    
-    // Inspector is not hidden; does it want to hide? If so allow it
-    if (wantsToHide == -1)
+    else
     {
-        wantsToHide = 0;
-        isInspectorHidden = YES;
-        return viewWidth;
+        // Inspector is not hidden; does it want to hide? If so allow it
+        if (wantsToHide == -1 || proposedPosition > (viewWidth - 340.0 - splitView.dividerThickness))
+        {
+            wantsToHide = 0;
+            isInspectorHidden = YES;
+            return viewWidth;
+        }
+        
+        // Otherwise disallow;
+        return viewWidth - 340.0 - splitView.dividerThickness;
     }
-    
-    // Is the bar being moved? If it's to the right, allow the hide
-    if (proposedPosition > viewWidth - 340.0)
-    {
-        isInspectorHidden = YES;
-        return viewWidth;
-    }
-    
-    // Otherwise disallow;
-    return viewWidth - 340.0;
-    
 }
 
 
+/*
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
 {
     CGFloat viewWidth = splitView.frame.size.width;
-    return viewWidth - 340.0;
+ 
+    if (dividerIndex == 1)
+    {
+        if (isInspectorHidden)
+ return viewWidth - 340.0 - splitView.dividerThickness;
 }
 
 
@@ -1212,6 +1204,15 @@
 {
     CGFloat viewWidth = splitView.frame.size.width;
     return viewWidth;
+}
+*/
+
+
+- (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
+{
+    NSView *rightView = [splitView.subviews objectAtIndex:1];
+    if (rightView == iwvc.view) return YES;
+    return NO;
 }
 
 
