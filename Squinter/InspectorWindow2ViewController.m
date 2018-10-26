@@ -857,11 +857,11 @@
         if (item == nil) return (projectData.count > 0 ? [projectData objectAtIndex:index] : nil);
         TreeNode *node = (TreeNode *)item;
         if (node.children != nil && node.children.count > 0) return [node.children objectAtIndex:index];
-        return nil;
+        return item;
     }
 
     if (item == nil) return (deviceData.count > 0 ? [deviceData objectAtIndex:index] : nil);
-    return nil;
+    return item;
 }
 
 
