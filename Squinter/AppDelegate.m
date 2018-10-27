@@ -1208,7 +1208,7 @@
 
     if (ic == nil || [ic compare:@"AWS"] == NSOrderedSame)
     {
-        ic = @"AWS";
+        //ic = @"AWS";
         [impCloudPopup selectItemAtIndex:0];
     }
     else if ([ic compare:@"Azure"] == NSOrderedSame)
@@ -1736,7 +1736,7 @@
     // Select one of the open projects from the Projects sub-menu or the Project menu
 
     NSMenuItem *item;
-    NSUInteger itemNumber = 0;
+    //NSUInteger itemNumber = 0;
 
     // 'item' will become the open projects menu item that has been selected, either
     // directly (via 'sender') or by the projects popup's tag value
@@ -1760,7 +1760,7 @@
     if (item.representedObject != nil)
     {
         chosenProject = item.representedObject;
-        itemNumber = [openProjectsMenu indexOfItem:item];
+        //itemNumber = [openProjectsMenu indexOfItem:item];
     }
     else
     {
@@ -1772,7 +1772,7 @@
 
             if ([chosenProject.name compare:item.title] == NSOrderedSame)
             {
-                itemNumber = i;
+                //itemNumber = i;
                 break;
             }
         }
@@ -2563,6 +2563,7 @@
         return;
     }
 
+    /*
     if (project.pid != nil && project.pid.length > 0)
     {
         if (productsArray == nil)
@@ -2647,6 +2648,7 @@
 
         [self uploadProject:project];
     }
+     */
 }
 
 
@@ -3409,11 +3411,21 @@
         }
         else
         {
-            details = @{ @"name" : devicegroup.name,
-                         @"description" : devicegroup.description,
-                         @"productid" : currentProject.pid,
-                         @"type" : devicegroup.type,
-                         @"targetid" : theTarget.did };
+            if (theTarget.did != nil)
+            {
+                details = @{ @"name" : devicegroup.name,
+                             @"description" : devicegroup.description,
+                             @"productid" : currentProject.pid,
+                             @"type" : devicegroup.type,
+                             @"targetid" : theTarget.did };
+            }
+            else
+            {
+                details = @{ @"name" : devicegroup.name,
+                             @"description" : devicegroup.description,
+                             @"productid" : currentProject.pid,
+                             @"type" : devicegroup.type };
+            }
         }
 
         [ide createDevicegroup:details :dict];
@@ -6702,7 +6714,7 @@
     // Save the savingProject project. This may be a newly created project and may not currentProject
 
     BOOL success = NO;
-    BOOL nameChange = NO;
+    // BOOL nameChange = NO;
     NSString *savePath = [saveDirectory path];
 
     if (newFileName == nil)
@@ -6720,7 +6732,7 @@
             // We have no saved filename and no passed in filename, so create one
 
             newFileName = [savingProject.name stringByAppendingString:@".squirrelproj"];
-            nameChange = YES;
+            //nameChange = YES;
         }
     }
     else
@@ -6737,7 +6749,7 @@
         {
             // We have an existing filename - is the new one different?
 
-            if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
+            // if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
         }
     }
 

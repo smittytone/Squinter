@@ -55,7 +55,7 @@ static PDKeychainBindingsController *sharedInstance = nil;
 #endif
     if (status)
     {
-        if (stringLength != 0) SecKeychainItemFreeContent(NULL, stringBuffer);
+        if (stringBuffer != NULL) SecKeychainItemFreeContent(NULL, stringBuffer);
         return nil;
     }
     

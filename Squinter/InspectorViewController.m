@@ -810,14 +810,14 @@
 
     if (panelSelector.selectedSegment == 0)
     {
-        if (item == nil) return (projectData.count > 0 ? [projectData objectAtIndex:index] : nil);
+        if (item == nil) return (projectData.count > 0 ? [projectData objectAtIndex:index] : [projectData objectAtIndex:0]);
         TreeNode *node = (TreeNode *)item;
         if (node.children != nil && node.children.count > 0) return [node.children objectAtIndex:index];
-        return nil;
+        return [node.children objectAtIndex:0];
     }
 
-    if (item == nil) return (deviceData.count > 0 ? [deviceData objectAtIndex:index] : nil);
-    return nil;
+    if (item == nil) return (deviceData.count > 0 ? [deviceData objectAtIndex:index] : [deviceData objectAtIndex:0]);
+    return [deviceData objectAtIndex:0];
 }
 
 
