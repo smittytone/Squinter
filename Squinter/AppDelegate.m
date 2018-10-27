@@ -1208,7 +1208,6 @@
 
     if (ic == nil || [ic compare:@"AWS"] == NSOrderedSame)
     {
-        //ic = @"AWS";
         [impCloudPopup selectItemAtIndex:0];
     }
     else if ([ic compare:@"Azure"] == NSOrderedSame)
@@ -3411,7 +3410,7 @@
         }
         else
         {
-            if (theTarget.did != nil)
+            if (theTarget != nil)
             {
                 details = @{ @"name" : devicegroup.name,
                              @"description" : devicegroup.description,
@@ -6714,7 +6713,7 @@
     // Save the savingProject project. This may be a newly created project and may not currentProject
 
     BOOL success = NO;
-    // BOOL nameChange = NO;
+    //BOOL nameChange = NO;
     NSString *savePath = [saveDirectory path];
 
     if (newFileName == nil)
@@ -6749,7 +6748,7 @@
         {
             // We have an existing filename - is the new one different?
 
-            // if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
+            //if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
         }
     }
 
