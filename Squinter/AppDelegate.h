@@ -29,14 +29,14 @@
 #import "LogView.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
-                                   NSOpenSavePanelDelegate,
-                                   NSFileManagerDelegate,
-                                   VDKQueueDelegate,
-                                   NSToolbarDelegate,
-                                   NSURLSessionDataDelegate,
-                                   NSURLSessionTaskDelegate,
-                                   NSTextFieldDelegate,
-								   NSTouchBarProvider>
+                               NSOpenSavePanelDelegate,
+                               NSFileManagerDelegate,
+                               VDKQueueDelegate,
+                               NSToolbarDelegate,
+                               NSURLSessionDataDelegate,
+                               NSURLSessionTaskDelegate,
+                               NSTextFieldDelegate,
+                               NSTouchBarProvider>
 {
     #pragma mark - Main UI element outlets
 
@@ -85,7 +85,7 @@
     IBOutlet NSMenuItem *uploadMenuItem;
     IBOutlet NSMenuItem *uploadExtraMenuItem;
     IBOutlet NSMenuItem *setMinimumMenuItem;
-	  IBOutlet NSMenuItem *setProductionTargetMenuItem;
+    IBOutlet NSMenuItem *setProductionTargetMenuItem;
     IBOutlet NSMenuItem *removeFilesMenuItem;
     IBOutlet NSMenuItem *externalOpenMenuItem;
     IBOutlet NSMenu     *externalSourceMenu;
@@ -98,7 +98,7 @@
     IBOutlet NSMenu     *externalFilesMenu;
     IBOutlet NSMenu     *impLibrariesMenu;
     IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
-	  IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
+    IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
 
     #pragma mark Device Menu outlets
 
@@ -114,16 +114,16 @@
     IBOutlet NSMenuItem *streamLogsMenuItem;
     IBOutlet NSMenuItem *renameDeviceMenuItem;
     IBOutlet NSMenuItem *updateDeviceStatusMenuItem;
-	  IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
+    IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
     IBOutlet NSMenuItem *deleteDeviceMenuItem;
     IBOutlet NSMenu     *unassignedDevicesMenu;
 
     #pragma mark Account Menu Outlets
 
-	  IBOutlet NSMenu     *accountMenu;
+    IBOutlet NSMenu     *accountMenu;
     IBOutlet NSMenuItem *loginMenuItem;
-	  IBOutlet NSMenuItem *accountMenuItem;
-	  IBOutlet NSMenuItem *switchAccountMenuItem;
+    IBOutlet NSMenuItem *accountMenuItem;
+    IBOutlet NSMenuItem *switchAccountMenuItem;
 
     #pragma mark View Menu outlets
 
@@ -169,7 +169,7 @@
     IBOutlet SquinterToolbarItem *uploadCodeExtraItem;
     IBOutlet SquinterToolbarItem *listCommitsItem;
     IBOutlet SquinterToolbarItem *downloadProductItem;
-	  IBOutlet SquinterToolbarItem *inspectorItem;
+    IBOutlet SquinterToolbarItem *inspectorItem;
 
     // Sheets, dialogs and windows
 
@@ -181,7 +181,7 @@
     IBOutlet NSSecureTextFieldCell *passwordTextFieldCell;
     IBOutlet NSButton              *saveDetailsCheckbox;
     IBOutlet NSButton              *showPassCheckbox;
-	  IBOutlet NSPopUpButton         *impCloudPopup;
+    IBOutlet NSPopUpButton         *impCloudPopup;
 
     #pragma mark Open Panel
 
@@ -241,9 +241,9 @@
     IBOutlet NSPopUpButton *newDevicegroupTypePopup;
 
     #pragma mark Select Target Sheet
-    
-	  IBOutlet NSWindow                   *selectTargetSheet;
-	  IBOutlet SelectWindowViewController *swvc;
+
+    IBOutlet NSWindow                   *selectTargetSheet;
+    IBOutlet SelectWindowViewController *swvc;
 
     #pragma mark About Sheet
 
@@ -278,7 +278,7 @@
     IBOutlet NSPopUpButton *recentFilesCountMenu;
     IBOutlet NSPopUpButton *maxLogCountMenu;
     IBOutlet NSButton      *showInspectorCheckbox;
-	  IBOutlet NSButton      *updateDevicesCheckbox;
+    IBOutlet NSButton      *updateDevicesCheckbox;
 
     #pragma mark Assign Device Sheet
 
@@ -297,7 +297,7 @@
     IBOutlet NSTextField   *renameNameLength;
 
     #pragma mark Agent or Device Code? Sheet
-    
+
     IBOutlet NSPanel     *sourceTypeSheet;
     IBOutlet NSTextField *sourceTypeLabel;
     IBOutlet NSButton    *sourceTypeAgentButton;
@@ -329,34 +329,32 @@
     IBOutlet NSPanel *feedbackSheet;
     IBOutlet NSTextField *feedbackField;
 
-	  #pragma mark Inspector Panel
+    #pragma mark Inspector Panel
 
-	  IBOutlet InspectorWindow2ViewController *iwvc;
+    IBOutlet InspectorWindow2ViewController *iwvc;
 
     #pragma mark Other Sheets
-    
+
     // Update Tracking
 
     IBOutlet SUUpdater *sparkler;
-	
-	  // Commit Window
-	
-	  IBOutlet CommitWindowViewController *cwvc;
-	
-	  // Touch Bar
-	
-	  IBOutlet NSTouchBar *appBar;
+
+    // Commit Window
+
+    IBOutlet CommitWindowViewController *cwvc;
+
+    // Touch Bar
+
+    IBOutlet NSTouchBar *appBar;
 
     #pragma mark Main Properties
-    
+
     BuildAPIAccess *ide;
     Project *currentProject, *creatingProject, *savingProject;
     Devicegroup *currentDevicegroup, *eiDeviceGroup;
-
     VDKQueue *fileWatchQueue;
 
     NSOperatingSystemVersion sysVer;
-
     NSWorkspace *nswsw;
     NSFileManager *nsfm;
     NSNotificationCenter *nsncdc;
@@ -364,12 +362,12 @@
     NSDateFormatter *def, *inLogDef, *outLogDef;
     NSOperationQueue *extraOpQueue;
     NSMenu *dockMenu;
-	  NSTimer *refreshTimer;
-    NSTrackingArea *ta;
+    NSTimer *refreshTimer;
+    NSTimeInterval updateDevicePeriod;
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
-    NSMutableArray *deviceColourWells;
+    NSMutableArray *deviceColourWells, *eiDeviceGroupCache, *loggedDevices;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
     NSURLSessionTask *eiLibListTask, *feedbackTask;
@@ -377,14 +375,10 @@
     NSDate *eiLibListTime;
 
     NSColor *backColour, *textColour;
-
     NSFont *logFont;
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
-	
-	  NSTimeInterval updateDevicePeriod;
-	
-	  NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
+    NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL renameProjectFlag, saveAsFlag, credsFlag, switchAccountFlag, doubleSaveFlag, reconnectAfterSleepFlag;
@@ -480,6 +474,8 @@
 // Existing Device Group Methods
 
 - (void)chooseDevicegroup:(id)sender;
+- (IBAction)incrementCurrentDevicegroup:(id)sender;
+- (IBAction)decrementCurrentDevicegroup:(id)sender;
 - (IBAction)deleteDevicegroup:(id)sender;
 - (IBAction)renameDevicegroup:(id)sender;
 - (IBAction)uploadCode:(id)sender;
@@ -573,6 +569,7 @@
 - (void)renameDeviceStageTwo:(NSNotification *)note;
 - (void)deleteDeviceStageTwo:(NSNotification *)note;
 - (void)loggedIn:(NSNotification *)note;
+- (void)loggedInStageTwo;
 - (void)loginRejected:(NSNotification *)note;
 - (void)loggedOut:(NSNotification *)note;
 
@@ -605,7 +602,7 @@
 - (void)showCodeErrors:(NSNotification *)note;
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
 - (void)logCode;
-- (void)writeStreamToLog:(NSAttributedString *)string;
+//- (void)writeStreamToLog:(NSAttributedString *)string;
 - (void)displayError:(NSNotification *)note;
 
 
@@ -622,6 +619,7 @@
 - (IBAction)showProjectInFinder:(id)sender;
 - (IBAction)showModelFilesInFinder:(id)sender;
 - (void)launchLibsPage;
+- (IBAction)launchReleaseNotesPage:(id)sender;
 
 
 // UI Update Methods
@@ -698,6 +696,7 @@
 - (IBAction)checkElectricImpLibraries:(id)sender;
 - (void)checkElectricImpLibs:(Devicegroup *)devicegroup;
 - (void)compareElectricImpLibs:(Devicegroup *)devicegroup;
+- (void)gotLibraries:(NSNotification *)note;
 
 
 // Pasteboard Methods

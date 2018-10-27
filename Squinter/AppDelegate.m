@@ -51,6 +51,7 @@
     projectArray = nil;
     devicesArray = nil;
     productsArray = nil;
+    loggedDevices = nil;
     downloads = nil;
     ide = nil;
     dockMenu = nil;
@@ -632,12 +633,15 @@
                    name:@"BuildAPILoggedOut"
                  object:ide];
 
-    // **************
-
     [nsncdc addObserver:self
            selector:@selector(endLogging:)
                name:@"BuildAPILogStreamEnd"
              object:ide];
+
+    [nsncdc addObserver:self
+               selector:@selector(gotLibraries:)
+                   name:@"BuildAPIGotLibrariesList"
+                 object:ide];
 
 
 
@@ -1142,7 +1146,6 @@
 
     if (ic == nil || [ic compare:@"AWS"] == NSOrderedSame)
     {
-        ic = @"AWS";
         [impCloudPopup selectItemAtIndex:0];
     }
     else if ([ic compare:@"Azure"] == NSOrderedSame)
@@ -1217,7 +1220,7 @@
 
     // Attempt to login with the current credentials
 
-    if (loginKey != nil)
+    if (!credsFlag && loginKey != nil)
     {
         [ide loginWithKey:loginKey];
         return;
@@ -1670,7 +1673,7 @@
     // Select one of the open projects from the Projects sub-menu or the Project menu
 
     NSMenuItem *item;
-    NSUInteger itemNumber = 0;
+    //NSUInteger itemNumber = 0;
 
     // 'item' will become the open projects menu item that has been selected, either
     // directly (via 'sender') or by the projects popup's tag value
@@ -1694,7 +1697,7 @@
     if (item.representedObject != nil)
     {
         chosenProject = item.representedObject;
-        itemNumber = [openProjectsMenu indexOfItem:item];
+        //itemNumber = [openProjectsMenu indexOfItem:item];
     }
     else
     {
@@ -1706,7 +1709,7 @@
 
             if ([chosenProject.name compare:item.title] == NSOrderedSame)
             {
-                itemNumber = i;
+                //itemNumber = i;
                 break;
             }
         }
@@ -2497,6 +2500,7 @@
         return;
     }
 
+    /*
     if (project.pid != nil && project.pid.length > 0)
     {
         if (productsArray == nil)
@@ -2581,6 +2585,7 @@
 
         [self uploadProject:project];
     }
+     */
 }
 
 
@@ -3343,11 +3348,21 @@
         }
         else
         {
-            details = @{ @"name" : devicegroup.name,
-                         @"description" : devicegroup.description,
-                         @"productid" : currentProject.pid,
-                         @"type" : devicegroup.type,
-                         @"targetid" : theTarget.did };
+            if (theTarget != nil)
+            {
+                details = @{ @"name" : devicegroup.name,
+                             @"description" : devicegroup.description,
+                             @"productid" : currentProject.pid,
+                             @"type" : devicegroup.type,
+                             @"targetid" : theTarget.did };
+            }
+            else
+            {
+                details = @{ @"name" : devicegroup.name,
+                             @"description" : devicegroup.description,
+                             @"productid" : currentProject.pid,
+                             @"type" : devicegroup.type };
+            }
         }
 
         [ide createDevicegroup:details :dict];
@@ -3708,6 +3723,59 @@
     [self refreshDevicegroupMenu];
     [self refreshMainDevicegroupsMenu];
     [self setToolbar];
+}
+
+
+
+- (IBAction)incrementCurrentDevicegroup:(id)sender
+{
+    // Move to the next device group in the list by determining which
+    // one that is from the device group submenu, and sending that item
+    // to chooseDevicegroup:
+
+    if (currentProject.devicegroups.count > 1)
+    {
+        NSInteger next = currentProject.devicegroupIndex + 1;
+        if (next >= currentProject.devicegroups.count) next = 0;
+        Devicegroup *target = [currentProject.devicegroups objectAtIndex:next];
+
+        for (NSInteger i = 1 ; i < deviceGroupsMenu.itemArray.count - 1 ; ++i)
+        {
+            NSMenuItem *item = [deviceGroupsMenu.itemArray objectAtIndex:i];
+            Devicegroup *dg = item.representedObject;
+
+            if (dg == target) {
+                [self chooseDevicegroup:item];
+                return;
+            }
+        }
+    }
+}
+
+
+- (IBAction)decrementCurrentDevicegroup:(id)sender
+{
+    // Move to the previous device group in the list by determining which
+    // one that is from the device group submenu, and sending that item
+    // to chooseDevicegroup:
+
+    if (currentProject.devicegroups.count > 1)
+    {
+        NSInteger previous = currentProject.devicegroupIndex - 1;
+        if (previous < 0) previous = currentProject.devicegroups.count - 1;
+        Devicegroup *target = [currentProject.devicegroups objectAtIndex:previous];
+
+        for (NSInteger i = 1 ; i < deviceGroupsMenu.itemArray.count - 1 ; ++i)
+        {
+            NSMenuItem *item = [deviceGroupsMenu.itemArray objectAtIndex:i];
+            Devicegroup *dg = item.representedObject;
+
+            if (dg == target) {
+                [self chooseDevicegroup:item];
+                return;
+            }
+        }
+    }
 }
 
 
@@ -6501,11 +6569,19 @@
                                          if (response == NSAlertFirstButtonReturn)
                                          {
                                              // User wants to replace the existing code file
+                                             // Remove the current file from the watch queue
 
+                                             [fileWatchQueue removePath:[self getAbsolutePath:currentProject.path :[model.path stringByAppendingPathComponent:model.filename]]];
+
+                                             // Add the new file to the model
+                                             
                                              model.filename = [filePath lastPathComponent];
                                              model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
-                                             currentProject.haschanged = YES;
+
+                                            currentProject.haschanged = YES;
+
                                              [saveLight needSave:YES];
+                                             [self checkAndWatchFile:filePath];
                                          }
 
                                          // We may still have files to process, so go on to the next one
@@ -6525,6 +6601,9 @@
 
                     model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
                     model.filename = [filePath lastPathComponent];
+
+                    [self checkAndWatchFile:filePath];
+
                     break;
                 }
             }
@@ -6539,6 +6618,7 @@
             newModel.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
             newModel.filename = [filePath lastPathComponent];
             [currentDevicegroup.models addObject:newModel];
+            [self checkAndWatchFile:filePath];
         }
     }
     else
@@ -6550,6 +6630,7 @@
         newModel.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
         newModel.filename = [filePath lastPathComponent];
         [currentDevicegroup.models addObject:newModel];
+        [self checkAndWatchFile:filePath];
     }
 
     // Having added the first file on the current list, we remove it from the list
@@ -6570,7 +6651,7 @@
     // Save the savingProject project. This may be a newly created project and may not currentProject
 
     BOOL success = NO;
-    BOOL nameChange = NO;
+    //BOOL nameChange = NO;
     NSString *savePath = [saveDirectory path];
 
     if (newFileName == nil)
@@ -6588,7 +6669,7 @@
             // We have no saved filename and no passed in filename, so create one
 
             newFileName = [savingProject.name stringByAppendingString:@".squirrelproj"];
-            nameChange = YES;
+            //nameChange = YES;
         }
     }
     else
@@ -6605,7 +6686,7 @@
         {
             // We have an existing filename - is the new one different?
 
-            if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
+            //if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
         }
     }
 
@@ -6982,6 +7063,14 @@
 
                 [self getProductsFromServer:nil];
             }
+            
+            if ([action compare:@"loggedin"] == NSOrderedSame)
+            {
+                // Just re-call 'getProductsFromServer:' as the check on the BuildAPIAccess instance's
+                // 'currentAccount' property will pass, and the products list will be requested from the server
+                
+                [self loggedInStageTwo];
+            }
         }
         else
         {
@@ -7033,6 +7122,7 @@
     NSDictionary *so = [data objectForKey:@"object"];
     NSString *action = [so objectForKey:@"action"];
     NSString *sid = nil;
+    NSInteger index = 0;
 
     if (action != nil)
     {
@@ -7074,7 +7164,6 @@
                     [aProduct setObject:[product objectForKey:@"type"] forKey:@"type"];
                     [aProduct setObject:[product objectForKey:@"relationships"] forKey:@"relationships"];
                     [aProduct setObject:[NSMutableDictionary dictionaryWithDictionary:[product objectForKey:@"attributes"]] forKey:@"attributes"];
-                    [productsArray addObject:aProduct];
 
                     NSString *cid = [aProduct valueForKeyPath:@"relationships.creator.id"];
                     NSString *oid = ide.currentAccount;
@@ -7096,6 +7185,32 @@
                         [ide getAccount:cid :dict];
 
                         // Pick up the asynchronous action at **gotAnAccount:**
+                        
+                        // Add shared products to the end of the list
+                        
+                        [productsArray addObject:aProduct];
+                        
+                        // Get the index of the first shared product
+                        // 'index' will be zero until then
+                        
+                        if (index == 0) index = [productsArray indexOfObject:aProduct];
+                    }
+                    else
+                    {
+                        if (index == 0)
+                        {
+                            // No shared Products yet, so just add the owned Product to the end of the list
+                            
+                            [productsArray addObject:aProduct];
+                        }
+                        else
+                        {
+                            // There are shared Products so, insert the owned product just before the start
+                            // of the shared Products, and increment the index to grow as the array grows
+                            
+                            [productsArray insertObject:aProduct atIndex:(index - 1)];
+                            index++;
+                        }
                     }
 
                     // If we need to match against a previous 'selectedProduct' ID, do it now
@@ -7117,8 +7232,8 @@
 
                 [self writeStringToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
 
-                // If we don't have a selected product, just pick the first on the list
-
+                // Choose the first product on the list
+                
                 if (selectedProduct == nil) selectedProduct = [productsArray objectAtIndex:0];
             }
             else
@@ -8741,8 +8856,10 @@
     // BuildAPIAccess has signalled login success
 
     // First, get the user's account ID
-
-    [ide getMyAccount];
+    
+    NSDictionary *dict = @{ @"action" : @"loggedin" };
+    
+    [ide getMyAccount:dict];
 
     // Action continues asynchronously at **gotMyAccount:**
     // Meatime, save credentials if they have changed required
@@ -8821,9 +8938,9 @@
 
     // Check for any post-login actions that need to be performed
 
-    // User wants the Product lists loaded on login
+    // User may want the Product lists loaded on login
 
-    if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
+    // NOTE From 125, this check takes place in 'inloggedInStageTwo:' which indirectly requires a correct account ID
 
     // User wants to update devices' status periodically, or the Device lists loaded on login
 
@@ -8835,6 +8952,15 @@
     {
         [self updateDevicesStatus:nil];
     }
+}
+
+
+
+- (void)loggedInStageTwo
+{
+    // User wants the Product lists loaded on login
+    
+    if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
 }
 
 
@@ -9182,7 +9308,40 @@
             break;
         }
     }
-
+    
+    // Add the device to the list of logging devices
+    
+    if (loggedDevices == nil) loggedDevices = [[NSMutableArray alloc] init];
+    
+    if (loggedDevices.count < kMaxLogStreamDevices)
+    {
+        [loggedDevices addObject:dvid];
+    }
+    else
+    {
+        NSInteger index = -1;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:@"FREE"] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index != -1)
+        {
+            [loggedDevices replaceObjectAtIndex:index withObject:dvid];
+        }
+        else
+        {
+            NSLog(@"loggedDevices index error in loggingStarted:");
+        }
+    }
+    
     // Inform the user
 
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
@@ -9224,7 +9383,41 @@
             break;
         }
     }
-
+    
+    // Remove the device from the list of logging devices WITHOUT eliminating its index
+    
+    if (loggedDevices.count == 1)
+    {
+        // Only one device on the list which will now be removed,
+        // so we don't need to replace it, just empty the array
+        
+        [loggedDevices removeAllObjects];
+    }
+    else
+    {
+        NSInteger index = -1;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:dvid] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index != -1)
+        {
+            [loggedDevices replaceObjectAtIndex:index withObject:@"FREE"];
+        }
+        else
+        {
+            NSLog(@"loggedDevices index error in loggingStopped:");
+        }
+    }
+    
     // Inform the user
 
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
@@ -9291,9 +9484,24 @@
                 break;
             }
         }
-
-        NSUInteger index = [ide indexOfLoggedDevice:dvid];
-
+        
+        // Get the index of the entry's device in the loggedDevices array.
+        // We will use this to get correct logging colour
+        
+        NSUInteger index = 0;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:dvid] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        /*
         // Calculate colour table index
 
         BOOL done = NO;
@@ -9309,7 +9517,8 @@
                 done = YES;
             }
         }
-
+         */
+        
         NSRange range = [logItem rangeOfString:type];
         NSString *message = [logItem substringFromIndex:(range.location + type.length + 1)];
 
@@ -10318,7 +10527,7 @@
 }
 
 
-
+/*
 - (void)writeStreamToLog:(NSAttributedString *)string
 {
     // Write a decoded log stream event to the main window log view
@@ -10340,7 +10549,7 @@
 
     logTextView.editable = NO;
 }
-
+*/
 
 
 - (void)displayError:(NSNotification *)note;
@@ -10682,6 +10891,15 @@
     // Open the Electric Imp libraries page on the Dev Center in the default Web browser
 
     [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/codelibraries/"]];
+}
+
+
+
+- (IBAction)launchReleaseNotesPage:(id)sender
+{
+    // Open the Squinter home page as the Release Notes section
+
+    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#rn"]];
 }
 
 
@@ -11096,14 +11314,32 @@
     {
         for (item in productsMenu.itemArray)
         {
-            item.state = item.representedObject == selectedProduct ? NSOnState : NSOffState;
-
             if (item.submenu != nil)
             {
+                bool shouldClear = YES;
+                
                 for (NSMenuItem *sitem in item.submenu.itemArray)
                 {
-                    sitem.state = sitem.representedObject == selectedProduct ? NSOnState : NSOffState;
+                    if (sitem.representedObject == selectedProduct)
+                    {
+                        sitem.state = NSOnState;
+                        
+                        // Highlight the submenu title so the user knows a subsdiiary Product has been selected
+                        
+                        item.state = NSMixedState;
+                        shouldClear = NO;
+                    }
+                    else
+                    {
+                        sitem.state = NSOffState;
+                    }
                 }
+                
+                if (shouldClear) item.state = NSOffState;
+            }
+            else
+            {
+                item.state = item.representedObject == selectedProduct ? NSOnState : NSOffState;
             }
         }
     }
@@ -12809,6 +13045,58 @@
     {
         if (eiLibListTime != nil)
         {
+            // NOTE 'eiLibListTime' is a proxy flag for 'have I asked for the library list'
+            
+            if (eiLibListData == nil || eiLibListData.length == 0)
+            {
+                // We haven't acquired the library list yet, so just cache the specified device group.
+                // We'll process the cached devicegroups when we have the list
+                
+                [eiDeviceGroupCache addObject:devicegroup];
+                return;
+            }
+            
+            // Is the library list still valid? We assume it is for the hour after it was
+            // acquired - after that we need to get a new list
+            
+            NSDate *now = [NSDate date];
+            NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
+            
+            if (interval >= kEILibCheckInterval)
+            {
+                // Last check was less than 1 hour earlier, so use existing list if it exists
+                // NOTE 'interval' is negative
+                
+                [self compareElectricImpLibs:devicegroup];
+                return;
+            }
+        }
+        
+        // Set the library list acquisition time
+        
+        eiLibListTime = [NSDate date];
+        
+        // Initalize or clear the devicegroup cache
+        
+        if (eiDeviceGroupCache == nil)
+        {
+            eiDeviceGroupCache = [[NSMutableArray alloc] init];
+        }
+        else
+        {
+            [eiDeviceGroupCache removeAllObjects];
+        }
+        
+        // Cache the specified device group and get the library list
+        
+        [eiDeviceGroupCache addObject:devicegroup];
+        [self writeStringToLog:@"Loading a list of supported Electric Imp libraries from the Electric Imp impCloud..." :YES];
+        [ide getLibraries];
+        return;
+        
+        /*
+         if (eiLibListTime != nil)
+        {
             NSDate *now = [NSDate date];
             NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
 
@@ -12824,8 +13112,8 @@
         // Set/reset the time of the most recent check
 
         eiLibListTime = [NSDate date];
-
-        if (connectionIndicator.hidden == YES)
+        
+         if (connectionIndicator.hidden == YES)
         {
             // Start the connection indicator
 
@@ -12845,6 +13133,7 @@
                                                          delegateQueue: nil];
         eiLibListTask = [session dataTaskWithRequest:request];
         [eiLibListTask resume];
+         */
     }
 }
 
@@ -12852,6 +13141,8 @@
 
 - (void)compareElectricImpLibs:(Devicegroup *)devicegroup
 {
+    // This is where we actually compare a devicegroup's EI libraries
+    
     NSString *parsedData;
 
     if (devicegroup != nil && devicegroup.models.count == 0) return;
@@ -12970,6 +13261,56 @@
     }
 }
 
+
+
+- (void)gotLibraries:(NSNotification *)note
+{
+    // This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
+    // This list may have been request by many methods — check the source object's 'action' key to find out
+    // which flow we need to run here
+
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSArray *libs = [data objectForKey:@"data"];
+
+    NSString *eilibs = @"";
+    NSInteger count = 0;
+
+    for (NSDictionary *lib in libs)
+    {
+        NSString *name = [lib valueForKeyPath:@"attributes.name"];
+
+        if ([name hasPrefix:@"private:"]) break;
+
+        bool supported = [lib valueForKeyPath:@"attributes.supported"];
+        NSString *latest;
+
+        if (supported)
+        {
+            NSArray *versions = [lib valueForKeyPath:@"relationships.versions"];
+            NSDictionary *version = [versions objectAtIndex:0];
+            latest = [version objectForKey:@"id"];
+            NSArray *parts = [latest componentsSeparatedByString:@":"];
+            latest = [parts objectAtIndex:1];
+        }
+        else
+        {
+            latest = @"dep";
+        }
+
+        name = [name stringByAppendingFormat:@",%@\n", latest];
+        eilibs = [eilibs stringByAppendingString:name];
+        count++;
+    }
+
+    eiLibListData = [NSMutableData dataWithData:[eilibs dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    // Check all of the cached devicegroups
+    
+    for (Devicegroup *devicegroup in eiDeviceGroupCache)
+    {
+        [self compareElectricImpLibs:devicegroup];
+    }
+}
 
 
 #pragma mark - NSURLSession Delegate Methods
