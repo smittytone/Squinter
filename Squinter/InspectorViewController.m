@@ -1048,7 +1048,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
         // Should we expand all?  Yes, if the Command Key is held down
 
-        if (NSCommandKeyMask & [NSEvent modifierFlags]) [deviceOutlineView expandItem:nil expandChildren:YES];
+        if (NSEventModifierFlagCommand & [NSEvent modifierFlags]) [deviceOutlineView expandItem:nil expandChildren:YES];
     }
 }
 
@@ -1064,7 +1064,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
         // Should we collapse all? Yes, if the Command Key is held down
 
-        if (NSCommandKeyMask & [NSEvent modifierFlags]) [deviceOutlineView collapseItem:nil collapseChildren:YES];
+        if (NSEventModifierFlagCommand & [NSEvent modifierFlags]) [deviceOutlineView collapseItem:nil collapseChildren:YES];
     }
 }
 

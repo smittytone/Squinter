@@ -51,7 +51,7 @@
 
     [theCurrentImage drawAtPoint: NSMakePoint(0.0, 0.0)
                         fromRect: NSMakeRect(0, 0, 0, 0)
-                       operation: NSCompositeSourceOver
+                       operation: NSCompositingOperationSourceOver
                         fraction: alpha];
 }
 

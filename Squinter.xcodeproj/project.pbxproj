@@ -752,7 +752,7 @@
 				GCC_PREFIX_HEADER = "Squinter/Squinter-Prefix.pch";
 				INFOPLIST_FILE = "Squinter/Squinter-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -786,7 +786,7 @@
 				GCC_PREFIX_HEADER = "Squinter/Squinter-Prefix.pch";
 				INFOPLIST_FILE = "Squinter/Squinter-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

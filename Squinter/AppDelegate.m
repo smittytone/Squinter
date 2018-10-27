@@ -904,14 +904,14 @@
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:NSBorderlessWindowMask];
+    [_window setStyleMask:NSWindowStyleMaskBorderless];
 }
 
 
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:(NSTitledWindowMask | NSMiniaturizableWindowMask | NSClosableWindowMask)];
+    [_window setStyleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskClosable)];
     [_window setTitle:@"Squinter"];
 }
 
@@ -2432,7 +2432,7 @@
             alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Account %@), or cancel the upload?", project.aid];
             [alert addButtonWithTitle:@"Cancel"];
             [alert addButtonWithTitle:@"Continue"];
-            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setAlertStyle:NSAlertStyleWarning];
             [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
                 if (returnCode == NSAlertSecondButtonReturn)
                 {
@@ -2464,7 +2464,7 @@
             alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Product %@ and Account %@), or cancel the upload?", project.pid, project.aid];
             [alert addButtonWithTitle:@"Cancel"];
             [alert addButtonWithTitle:@"Continue"];
-            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setAlertStyle:NSAlertStyleWarning];
             [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
                 if (returnCode == NSAlertSecondButtonReturn)
                 {
@@ -2977,7 +2977,7 @@
         alert.informativeText = @"Selecting ‘Yes’ will permanently delete the product, but only if its device groups have no devices assigned to any of them.";
         [alert addButtonWithTitle:@"No"];
         [alert addButtonWithTitle:@"Yes"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
             if (returnCode == NSAlertSecondButtonReturn)
             {
@@ -3230,7 +3230,7 @@
         [ays addButtonWithTitle:@"No"];
         [ays addButtonWithTitle:@"Yes"];
         [ays setMessageText:@"If you cancel, you will not add the selected file(s). Are you sure you want to proceed?"];
-        [ays setAlertStyle:NSWarningAlertStyle];
+        [ays setAlertStyle:NSAlertStyleWarning];
         [ays beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
             if (returnCode == NSAlertSecondButtonReturn)
             {
@@ -5761,7 +5761,7 @@
                         alert.informativeText = [NSString stringWithFormat:@"You can upload project \"%@\" as a new product, or you may prefer to associate it with an existing product or upload it later. If you see processing errors in the log, you should not upload this project.", currentProject.name];
                         [alert addButtonWithTitle:@"Upload Now"];
                         [alert addButtonWithTitle:@"Later"];
-                        [alert setAlertStyle:NSWarningAlertStyle];
+                        [alert setAlertStyle:NSAlertStyleWarning];
                         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
                             if (returnCode == NSAlertFirstButtonReturn) {
                                 [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to the impCloud as a product...", currentProject.name] :YES];
@@ -5786,7 +5786,7 @@
                         alert.messageText = @"You are not logged in to your account.";
                         alert.informativeText = [NSString stringWithFormat:@"You will need to upload project \"%@\" manually later, after you have logged in.", currentProject.name];
                         [alert addButtonWithTitle:@"OK"];
-                        [alert setAlertStyle:NSWarningAlertStyle];
+                        [alert setAlertStyle:NSAlertStyleWarning];
                         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) { }];
                     }
                 }
