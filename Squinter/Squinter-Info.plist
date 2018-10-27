@@ -52,7 +52,7 @@
 	<key>CFBundleSignature</key>
 	<string>BPSq</string>
 	<key>CFBundleVersion</key>
-	<string>125</string>
+	<string>126</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSItemContentTypes</key>
