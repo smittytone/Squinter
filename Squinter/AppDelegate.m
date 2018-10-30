@@ -1677,6 +1677,8 @@
     // NOTE 'addProjectMenuItem:' will have updated the sub-menus already
 
     [self refreshProjectsMenu];
+    [self refreshDevicegroupMenu];
+    [self refreshMainDevicegroupsMenu];
     [self setToolbar];
 
     iwvc.project = currentProject;
@@ -4574,7 +4576,7 @@
 
                     if (count == selectedDevices.count)
                     {
-                        list = [list substringToIndex:list.length - 2];
+                        if (list.length > 2) list = [list substringToIndex:list.length - 2];
                         list = [list stringByAppendingFormat:@" and %@", item];
                     }
                     else
@@ -7570,37 +7572,51 @@
     }
 
     // Decrement the tally of downloadable device groups to see if we've got them all yet
+    
+    // **** SHOULD THIS NOT BE PART OF THE ABOVE IF...ELSE ??
 
     --newProject.count;
 
     if (newProject.count <= 0)
     {
-        // We have now acquired all the device groups models, so we can process everything
+        // We have now acquired all the device groups models, so we can set the 
 
-        newProject.aid = ide.isLoggedIn ? ide.currentAccount : @"";
-
+        // ALREADY SET???? newProject.aid = ide.isLoggedIn ? ide.currentAccount : @"";
+        
+        // Select the device, if any, belonging to the product
+        
         if (newProject.devicegroups.count > 0)
         {
             if (devicesArray.count > 0)
             {
                 // If we have a device list, run through it and see which devices, if any,
-                // have been assigned to the current device group
+                // have been assigned to the new project's device group(s)
 
                 for (NSDictionary *device in devicesArray)
                 {
                     NSDictionary *relationships = [device objectForKey:@"relationships"];
-                    NSDictionary *devgrp = [relationships objectForKey:@"devicegroup"];
-                    NSString *deviceid = [devgrp objectForKey:@"id"];
-
+                    NSDictionary *deviceDevGrp = [relationships objectForKey:@"devicegroup"];
+                    NSString *dgid = [deviceDevGrp objectForKey:@"id"];
+                    NSString *deviceid = [device objectForKey:@"id"];
+                    
                     // Just check for a nil device group ID - to avoid unassigned devices - and
                     // then record the device ID in the device group record if it belongs there
-
-                    if (deviceid != nil && [deviceid compare:currentDevicegroup.did] == NSOrderedSame) [currentDevicegroup.devices addObject:deviceid];
+                    
+                    for (Devicegroup *dg in newProject.devicegroups)
+                    {
+                        if ([dg.did compare:dgid] == NSOrderedSame)
+                        {
+                            // This device 'belongs' to this devicegroup
+                            if (dg.devices == nil) dg.devices = [[NSMutableArray alloc] init];
+                            [dg.devices addObject:deviceid];
+                        }
+                    }
                 }
 
                 // See if the current device group has any devices, and select one
+                // NOTE But only if the project is owned by the user
 
-                [self selectDevice];
+                if ([newProject.cid compare:newProject.aid] == NSOrderedSame) [self selectDevice];
             }
         }
 
