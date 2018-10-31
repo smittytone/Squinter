@@ -20,6 +20,8 @@
     IBOutlet NSOutlineView *deviceOutlineView;
     IBOutlet NSSegmentedControl *panelSelector;
     IBOutlet NSTextField *field;
+    IBOutlet NSTextField *subfield;
+    IBOutlet NSImageView *image;
 
     NSMutableArray *projectData, *deviceData;
     NSMutableArray *deviceKeys, *deviceValues;

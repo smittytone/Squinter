@@ -44,13 +44,6 @@
     outLogDef.timeZone = [NSTimeZone localTimeZone];
 
     nswsw = NSWorkspace.sharedWorkspace;
-}
-
-
-
-- (void)viewWillAppear
-{
-    [super viewWillAppear];
 
     // Hide the tables when there's nothing to show
 
@@ -61,6 +54,17 @@
 
     panelSelector.selectedSegment = 0;
     field.stringValue = @"No Project Selected";
+    subfield.stringValue = @"Open or create a Project to view it here";
+    image.image = [NSImage imageNamed:@"sidebar_project"];
+}
+
+
+
+- (void)viewWillAppear
+{
+    [super viewWillAppear];
+
+
 }
 
 
@@ -424,6 +428,8 @@
 
             deviceOutlineView.hidden = NO;
             field.hidden = YES;
+            subfield.hidden = YES;
+            image.hidden = YES;
         }
     }
 }
@@ -659,6 +665,8 @@
             // change is nil -> device, device -> nil or device -> device
             deviceOutlineView.hidden = NO;
             field.hidden = YES;
+            subfield.hidden = YES;
+            image.hidden = YES;
         }
     }
 }
@@ -695,8 +703,12 @@
         if (project == nil || projectData.count == 0)
         {
             deviceOutlineView.hidden = YES;
-            field.stringValue = @"No project selected";
+            field.stringValue = @"No Project Selected";
+            subfield.stringValue = @"Open or create a Project to view it here";
+            image.image = [NSImage imageNamed:@"sidebar_project"];
             field.hidden = NO;
+            subfield.hidden = NO;
+            image.hidden = NO;
         }
         else
         {
@@ -721,6 +733,8 @@
 
             deviceOutlineView.hidden = NO;
             field.hidden = YES;
+            subfield.hidden = YES;
+            image.hidden = YES;
         }
     }
     else
@@ -730,8 +744,12 @@
         if (device == nil || deviceData.count == 0)
         {
             deviceOutlineView.hidden = YES;
-            field.stringValue = @"No device selected";
+            field.stringValue = @"No Device Selected";
+            subfield.stringValue = @"Log into your Electric Imp account\nto see devices here";
+            image.image = [NSImage imageNamed:@"sidebar_device"];
             field.hidden = NO;
+            subfield.hidden = NO;
+            image.hidden = NO;
         }
         else
         {
@@ -740,6 +758,8 @@
 
             deviceOutlineView.hidden = NO;
             field.hidden = YES;
+            subfield.hidden = YES;
+            image.hidden = YES;
         }
     }
 }
