@@ -53,9 +53,8 @@
     // Set up the tabs
 
     panelSelector.selectedSegment = 0;
-    field.stringValue = @"No Project Selected";
-    subfield.stringValue = @"Open or create a Project to view it here";
-    image.image = [NSImage imageNamed:@"sidebar_project"];
+
+    [self setNilProject];
 }
 
 
@@ -171,7 +170,7 @@
             }
         }
 
-        // Project Accoint ID
+        // Project Account ID
 
         if (project.aid != nil && project.aid.length > 0)
         {
@@ -414,13 +413,19 @@
         if (oProject != nil && aProject != nil && deviceOutlineView.isHidden)
         {
             // Only show the NSOutlineView if it is already hidden
-            // AND both the old and new projects are not nil, ie. only if the
-            // change is nil -> project, project -> nil or project -> project
+            // AND both the old and new projects are not nil
 
             deviceOutlineView.hidden = NO;
-            field.hidden = YES;
-            subfield.hidden = YES;
-            image.hidden = YES;
+
+            [self showNilItems:NO];
+        }
+
+        if (aProject == nil)
+        {
+            deviceOutlineView.hidden = YES;
+
+            [self setNilProject];
+            [self showNilItems:YES];
         }
     }
 }
@@ -652,12 +657,22 @@
         if (oDevice != nil && aDevice != nil && deviceOutlineView.isHidden)
         {
             // Only show the NSOutlineView if it is already hidden
-            // AND both the old and new projects are not nil, ie. only if the
-            // change is nil -> device, device -> nil or device -> device
+            // AND both the old and new devices are not nil
             deviceOutlineView.hidden = NO;
             field.hidden = YES;
             subfield.hidden = YES;
             image.hidden = YES;
+        }
+
+        if (aDevice == nil)
+        {
+            deviceOutlineView.hidden = YES;
+
+            [self setNilDevice];
+
+            field.hidden = NO;
+            subfield.hidden = NO;
+            image.hidden = NO;
         }
     }
 }
@@ -694,12 +709,9 @@
         if (project == nil || projectData.count == 0)
         {
             deviceOutlineView.hidden = YES;
-            field.stringValue = @"No Project Selected";
-            subfield.stringValue = @"Open or create a Project to view it here";
-            image.image = [NSImage imageNamed:@"sidebar_project"];
-            field.hidden = NO;
-            subfield.hidden = NO;
-            image.hidden = NO;
+
+            [self setNilProject];
+            [self showNilItems:YES];
         }
         else
         {
@@ -723,24 +735,20 @@
             }
 
             deviceOutlineView.hidden = NO;
-            field.hidden = YES;
-            subfield.hidden = YES;
-            image.hidden = YES;
+
+            [self showNilItems:NO];
         }
     }
     else
     {
-        // This is the project panel. If it is empty, just show the message
+        // This is the device panel. If it is empty, just show the message
 
         if (device == nil || deviceData.count == 0)
         {
             deviceOutlineView.hidden = YES;
-            field.stringValue = @"No Device Selected";
-            subfield.stringValue = @"Log into your Electric Imp account\nto see devices here";
-            image.image = [NSImage imageNamed:@"sidebar_device"];
-            field.hidden = NO;
-            subfield.hidden = NO;
-            image.hidden = NO;
+
+            [self setNilDevice];
+            [self showNilItems:YES];
         }
         else
         {
@@ -748,9 +756,8 @@
             [deviceOutlineView setNeedsDisplay];
 
             deviceOutlineView.hidden = NO;
-            field.hidden = YES;
-            subfield.hidden = YES;
-            image.hidden = YES;
+
+            [self showNilItems:NO];
         }
     }
 }
@@ -1265,6 +1272,38 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     if (!back) return @"Unknown";
     return @"development_devicegroup";
 }
+
+
+
+- (void)setNilProject
+{
+    // Set the 'no project open' imagery
+
+    field.stringValue = @"No Project Selected";
+    subfield.stringValue = @"Open or create a Project to view it here";
+    image.image = [NSImage imageNamed:@"sidebar_project"];
+}
+
+
+
+- (void)setNilDevice
+{
+    // Set the 'no device selected' imagery
+
+    field.stringValue = @"No Device Selected";
+    subfield.stringValue = @"Log into your Electric Imp account\nto see devices here";
+    image.image = [NSImage imageNamed:@"sidebar_device"];
+}
+
+
+
+- (void)showNilItems:(BOOL)shouldShow
+{
+    field.hidden = !shouldShow;
+    subfield.hidden = !shouldShow;
+    image.hidden = !shouldShow;
+}
+
 
 
 @end

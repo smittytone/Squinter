@@ -47,6 +47,10 @@
 - (CGFloat)renderedHeightOfString:(NSString *)string;
 - (IBAction)switchTable:(id)sender;
 
+- (void)setNilProject;
+- (void)setNilDevice;
+- (void)showNilItems:(BOOL)shouldShow;
+
 
 @property (nonatomic, strong, setter=setProject:) Project *project;
 @property (nonatomic, strong, setter=setDevice:) NSMutableDictionary *device;
