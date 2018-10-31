@@ -1189,7 +1189,9 @@
 
 - (void)splitViewDidResizeSubviews:(NSNotification *)notification
 {
+#ifdef DEBUG
     NSLog(@"L: %.1f R: %.1f P: %.1f", logTextView.frame.size.width, iwvc.view.frame.size.width, splitView.frame.size.width);
+#endif
 }
 
 /*

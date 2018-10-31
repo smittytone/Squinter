@@ -1167,31 +1167,14 @@
                                         </constraints>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="sidebar_project" id="NkC-Di-Vd1"/>
                                     </imageView>
-                                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ImM-f7-XOA">
-                                        <rect key="frame" x="98" y="504" width="145" height="21"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="141" id="2eT-wG-l5f"/>
-                                            <constraint firstAttribute="height" constant="18" id="iHZ-fq-CU8"/>
-                                        </constraints>
-                                        <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="rounded" trackingMode="selectOne" id="6hk-Ju-hwv">
-                                            <font key="font" metaFont="smallSystem"/>
-                                            <segments>
-                                                <segment label="Project" width="69" selected="YES"/>
-                                                <segment label="Device" width="69" tag="1"/>
-                                            </segments>
-                                        </segmentedCell>
-                                        <connections>
-                                            <action selector="switchTable:" target="Jc5-83-wpp" id="Ujp-Je-tAv"/>
-                                        </connections>
-                                    </segmentedControl>
                                     <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CFE-aH-nlJ">
-                                        <rect key="frame" x="0.0" y="0.0" width="340" height="498"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
                                         <clipView key="contentView" drawsBackground="NO" id="EfT-Sg-QuC">
-                                            <rect key="frame" x="0.0" y="0.0" width="340" height="498"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="14" outlineTableColumn="hFO-tg-8AA" id="h7b-hJ-8PD">
-                                                    <rect key="frame" x="0.0" y="0.0" width="340" height="498"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <color key="backgroundColor" red="1" green="0.5409764051" blue="0.84731429820000004" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <color key="gridColor" red="1" green="0.1857388616" blue="0.57339501380000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1305,20 +1288,37 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
+                                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ImM-f7-XOA">
+                                        <rect key="frame" x="-2" y="520" width="344" height="25"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="22" id="4HM-18-ido"/>
+                                        </constraints>
+                                        <segmentedCell key="cell" lineBreakMode="truncatingHead" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="rounded" trackingMode="selectOne" id="6hk-Ju-hwv">
+                                            <font key="font" metaFont="system"/>
+                                            <segments>
+                                                <segment alignment="natural" image="panel_button_project" width="169" selected="YES"/>
+                                                <segment image="panel_button_device" width="168" tag="1"/>
+                                            </segments>
+                                        </segmentedCell>
+                                        <connections>
+                                            <action selector="switchTable:" target="Jc5-83-wpp" id="Ujp-Je-tAv"/>
+                                        </connections>
+                                    </segmentedControl>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="ImM-f7-XOA" firstAttribute="centerX" secondItem="KOd-gQ-Qif" secondAttribute="centerX" id="4Dn-Cd-27R"/>
                                     <constraint firstItem="8ps-uE-OUu" firstAttribute="centerX" secondItem="KOd-gQ-Qif" secondAttribute="centerX" id="7c9-qe-qFA"/>
                                     <constraint firstItem="3qx-c1-Zhr" firstAttribute="centerX" secondItem="KOd-gQ-Qif" secondAttribute="centerX" id="8m6-we-l57"/>
                                     <constraint firstItem="ccj-w8-2a0" firstAttribute="centerX" secondItem="KOd-gQ-Qif" secondAttribute="centerX" id="DNA-GW-8Z2"/>
                                     <constraint firstItem="ccj-w8-2a0" firstAttribute="top" secondItem="8ps-uE-OUu" secondAttribute="bottom" constant="10" id="Dl2-hv-K8D"/>
                                     <constraint firstAttribute="trailing" secondItem="CFE-aH-nlJ" secondAttribute="trailing" id="IFu-6D-1ze"/>
                                     <constraint firstItem="3qx-c1-Zhr" firstAttribute="centerX" secondItem="KOd-gQ-Qif" secondAttribute="centerX" id="KQC-pB-ZKG"/>
+                                    <constraint firstItem="CFE-aH-nlJ" firstAttribute="top" secondItem="ImM-f7-XOA" secondAttribute="bottom" constant="8" id="KdL-l2-8Ox"/>
+                                    <constraint firstItem="ImM-f7-XOA" firstAttribute="leading" secondItem="KOd-gQ-Qif" secondAttribute="leading" id="OGk-7N-qwn"/>
+                                    <constraint firstAttribute="trailing" secondItem="ImM-f7-XOA" secondAttribute="trailing" id="Qra-hS-PTd"/>
                                     <constraint firstAttribute="bottom" secondItem="CFE-aH-nlJ" secondAttribute="bottom" id="Xkl-qI-IrJ"/>
-                                    <constraint firstItem="ImM-f7-XOA" firstAttribute="top" secondItem="KOd-gQ-Qif" secondAttribute="top" constant="20" id="chM-aY-B6e"/>
-                                    <constraint firstItem="CFE-aH-nlJ" firstAttribute="top" secondItem="ImM-f7-XOA" secondAttribute="bottom" constant="8" id="eQv-DZ-dBD"/>
                                     <constraint firstItem="8ps-uE-OUu" firstAttribute="centerY" secondItem="KOd-gQ-Qif" secondAttribute="centerY" id="h43-5h-dn2"/>
                                     <constraint firstItem="8ps-uE-OUu" firstAttribute="top" secondItem="3qx-c1-Zhr" secondAttribute="bottom" constant="10" id="jQY-ES-rRl"/>
+                                    <constraint firstItem="ImM-f7-XOA" firstAttribute="top" secondItem="KOd-gQ-Qif" secondAttribute="top" id="qQD-TY-PXL"/>
                                     <constraint firstItem="CFE-aH-nlJ" firstAttribute="leading" secondItem="KOd-gQ-Qif" secondAttribute="leading" id="uuc-7q-qAA"/>
                                 </constraints>
                             </customView>
@@ -4553,6 +4553,8 @@ Gw
         <image name="inspect" width="32" height="32"/>
         <image name="login" width="32" height="32"/>
         <image name="open" width="32" height="32"/>
+        <image name="panel_button_device" width="17" height="17"/>
+        <image name="panel_button_project" width="17" height="17"/>
         <image name="plus" width="32" height="32"/>
         <image name="print" width="32" height="32"/>
         <image name="refresh" width="32" height="32"/>

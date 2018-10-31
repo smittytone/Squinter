@@ -60,15 +60,6 @@
 
 
 
-- (void)viewWillAppear
-{
-    [super viewWillAppear];
-
-
-}
-
-
-
 #pragma mark - Button Action Methods
 
 
