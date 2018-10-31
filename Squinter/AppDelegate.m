@@ -1998,6 +1998,7 @@
         fileWatchQueue = nil;
         currentProject = nil;
         currentDevicegroup = nil;
+        iwvc.project = nil;
 
         // Fade the status light
 
@@ -2041,6 +2042,8 @@
         }
 
         [saveLight needSave:currentProject.haschanged];
+
+        iwvc.project = currentProject;
     }
 
     // Update the UI whether we've closed one of x projects, or the last one
@@ -2050,8 +2053,6 @@
     [self refreshMainDevicegroupsMenu];
     [self refreshDevicegroupMenu];
     [self setToolbar];
-
-    iwvc.project = currentProject;
 }
 
 
