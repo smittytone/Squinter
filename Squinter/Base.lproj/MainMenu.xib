@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaDFRPlugin" version="14215.3"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaDFRPlugin" version="14460.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="the Touch Bar" minToolsVersion="8.1" minSystemVersion="10.12.2" requiredIntegratedClassName="NSTouchBar"/>
     </dependencies>
@@ -1724,22 +1724,8 @@ DQ
                 <rect key="frame" x="0.0" y="0.0" width="612" height="436"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="572" translatesAutoresizingMaskIntoConstraints="NO" id="mBl-eh-TLj">
-                        <rect key="frame" x="18" y="313" width="576" height="68"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="68" id="OX4-1D-d3w"/>
-                        </constraints>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="Y9c-Nq-iYL">
-                            <font key="font" metaFont="system"/>
-                            <string key="title">Utility for integrating libraries and files into Squirrel code for the Electric Imp Platform
-
-Developed by Tony Smith © 2014-18</string>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CaW-Ui-WAP">
-                        <rect key="frame" x="18" y="308" width="576" height="22"/>
+                        <rect key="frame" x="18" y="305" width="576" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="aGF-79-cTu"/>
                         </constraints>
@@ -1828,14 +1814,28 @@ DQ
                             <action selector="showFeedbackSheet:" target="Voe-Tx-rLC" id="8Wd-in-K29"/>
                         </connections>
                     </button>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="572" translatesAutoresizingMaskIntoConstraints="NO" id="mBl-eh-TLj">
+                        <rect key="frame" x="18" y="313" width="576" height="68"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="68" id="OX4-1D-d3w"/>
+                        </constraints>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="Y9c-Nq-iYL">
+                            <font key="font" metaFont="system"/>
+                            <string key="title">Utility for integrating libraries and files into Squirrel code for the Electric Imp Platform
+
+Developed by Tony Smith (@smittytone) © 2014-18</string>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="ulh-Od-gNt" secondAttribute="trailing" constant="20" id="4SM-65-nlO"/>
                     <constraint firstItem="mBl-eh-TLj" firstAttribute="leading" secondItem="CaW-Ui-WAP" secondAttribute="leading" id="CgL-xj-Bgg"/>
                     <constraint firstItem="CaW-Ui-WAP" firstAttribute="leading" secondItem="D0u-hz-bfS" secondAttribute="leading" constant="20" id="Ifm-JX-3sR"/>
-                    <constraint firstItem="mBl-eh-TLj" firstAttribute="baseline" secondItem="CaW-Ui-WAP" secondAttribute="firstBaseline" id="IhK-Jk-RQE"/>
+                    <constraint firstItem="mBl-eh-TLj" firstAttribute="baseline" secondItem="CaW-Ui-WAP" secondAttribute="firstBaseline" constant="-3" id="IhK-Jk-RQE"/>
                     <constraint firstItem="mBl-eh-TLj" firstAttribute="top" secondItem="gjo-EI-uBE" secondAttribute="bottom" constant="8" id="QA7-Vn-5c6"/>
-                    <constraint firstItem="MfY-2A-0SC" firstAttribute="top" secondItem="CaW-Ui-WAP" secondAttribute="bottom" constant="8" id="SJU-x1-RXg"/>
+                    <constraint firstItem="MfY-2A-0SC" firstAttribute="top" secondItem="CaW-Ui-WAP" secondAttribute="bottom" constant="5" id="SJU-x1-RXg"/>
                     <constraint firstAttribute="trailing" secondItem="gjo-EI-uBE" secondAttribute="trailing" constant="20" id="Y8X-s1-Dgi"/>
                     <constraint firstItem="MfY-2A-0SC" firstAttribute="centerX" secondItem="D0u-hz-bfS" secondAttribute="centerX" id="bXB-Pd-EVL"/>
                     <constraint firstItem="Bse-4S-cvc" firstAttribute="top" secondItem="ulh-Od-gNt" secondAttribute="bottom" constant="8" id="dZx-Lw-fPX"/>
