@@ -238,7 +238,7 @@
 
     inspectorItem.activeImageName = @"inspect";
     inspectorItem.inactiveImageName = @"inspect_grey";
-    inspectorItem.toolTip = @"Show the project and device inspector";
+    inspectorItem.toolTip = @"Show or hide the project and device inspector";
 
     projectsPopUp.toolTip = @"Select an open project";
     devicesPopUp.toolTip = @"Select a development device";
