@@ -325,16 +325,22 @@
 
     #pragma mark Set Minimum Deployment Sheet
 
-    IBOutlet NSWindow *commitSheet;
+    IBOutlet NSWindow    *commitSheet;
 
     #pragma mark Report a Problem Sheet
 
-    IBOutlet NSPanel *feedbackSheet;
+    IBOutlet NSPanel     *feedbackSheet;
     IBOutlet NSTextField *feedbackField;
 
     #pragma mark Inspector Panel
 
     IBOutlet InspectorViewController *iwvc;
+    
+    #pragma mark Multi-device Warning Panel
+    
+    IBOutlet NSPanel     *multiDeviceSheet;
+    IBOutlet NSButton    *multiDeviceShowAgainButton;
+    IBOutlet NSTextField *multiDeviceLabel;
 
     #pragma mark Other Sheets
 

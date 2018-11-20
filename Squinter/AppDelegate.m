@@ -4584,12 +4584,13 @@
 
                     if (count == selectedDevices.count)
                     {
-                        if (list.length > 2) list = [list substringToIndex:list.length - 2];
-                        list = [list stringByAppendingFormat:@" and %@", item];
+                        //if (list.length > 2) list = [list substringToIndex:list.length - 2];
+                        //list = [list stringByAppendingFormat:@" and %@", item];
+                        list = [list stringByAppendingFormat:@"  • %@\n", item];
                     }
                     else
                     {
-                        list = [list stringByAppendingFormat:@"%@, ", item];
+                        list = [list stringByAppendingFormat:@"  • %@\n", item];
                     }
                 }
 
@@ -4601,26 +4602,41 @@
                 [self setDevicesMenusTicks];
                 [self refreshDeviceMenu];
                 
-                // NOTE As of 2.1.125, 'com.bps.squinter.autoselectdevice' is not exposed, so
+                // NOTE TO 2.1.125, 'com.bps.squinter.autoselectdevice' is not exposed, so
                 //      we can add this here without breaking anything (fingers crossed...)
                 //      We use it to block the multi-device warning sheet
                 
-                NSNumber *n = [defaults objectForKey:@"com.bps.squinter.autoselectdevice"];
-                BOOL doSelect = n.boolValue;
-                
+                BOOL doSelect = [defaults boolForKey:@"com.bps.squinter.autoselectdevice"];
                 if (!doSelect) return;
                 
-                // TODO Convert to a sheet so we can add a 'do not show again' checkbox
-                //      Have to add a 'reset warnings' item to Prefs/somewhere too
+                // TODO Have to add a 'reset warnings' item to Prefs/somewhere too
+                
+                multiDeviceLabel.stringValue = [NSString stringWithFormat:@"This device group has mulitple assigned devices:\n\n%@\nThe first device, %@, will be selected initially.", list, first];
+                
+                [_window beginSheet:multiDeviceSheet completionHandler:nil];
+                
+                /*
                 
                 NSAlert *alert = [[NSAlert alloc] init];
                 alert.messageText = [NSString stringWithFormat:@"This device group has mulitple assigned devices: %@. The first device, %@, will be selected initially.", list, first];
                 [alert addButtonWithTitle:@"OK"];
                 [alert beginSheetModalForWindow:_window
                               completionHandler:nil];
+                 */
             }
         }
     }
+}
+
+
+- (IBAction)endMultiDeviceSheet:(id)sender
+{
+    if (multiDeviceShowAgainButton.state == NSOffState)
+    {
+        //[defaults setBool:NO forKey:@"com.bps.squinter.autoselectdevice"];
+    }
+    
+    [_window endSheet:multiDeviceSheet];
 }
 
 

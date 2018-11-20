@@ -109,6 +109,9 @@
                 <outlet property="loginMenuItem" destination="yZG-eW-Kuh" id="JVj-at-FE8"/>
                 <outlet property="loginSheet" destination="N7Z-aG-iXH" id="JOL-Qi-vbz"/>
                 <outlet property="maxLogCountMenu" destination="NGx-Z2-dEs" id="mUQ-G5-ETx"/>
+                <outlet property="multiDeviceLabel" destination="NOG-mb-JZ2" id="0QO-bI-IJQ"/>
+                <outlet property="multiDeviceSheet" destination="eZF-tf-NQT" id="cyI-5n-odk"/>
+                <outlet property="multiDeviceShowAgainButton" destination="Tmv-IH-K7H" id="m5g-AX-Fqb"/>
                 <outlet property="newDevicegroupCheckbox" destination="vHb-2J-W3L" id="JY9-H8-Xhq"/>
                 <outlet property="newDevicegroupDescCountField" destination="Jhn-eD-Iyl" id="5SI-F7-Thn"/>
                 <outlet property="newDevicegroupDescTextField" destination="jVS-FX-XRr" id="ULO-t7-fdr"/>
@@ -1002,7 +1005,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="1024" height="582"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="1024" height="582"/>
             <value key="minFullScreenContentSize" type="size" width="1024" height="582"/>
             <view key="contentView" id="EiT-Mj-1SZ">
@@ -1100,7 +1103,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="683" height="544"/>
                                         <clipView key="contentView" id="DPZ-Ai-vv0">
                                             <rect key="frame" x="0.0" y="0.0" width="683" height="544"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7" customClass="LogView">
                                                     <rect key="frame" x="0.0" y="-1" width="683" height="544"/>
@@ -1171,7 +1174,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
                                         <clipView key="contentView" drawsBackground="NO" id="EfT-Sg-QuC">
                                             <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="14" outlineTableColumn="hFO-tg-8AA" id="h7b-hJ-8PD">
                                                     <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
@@ -1503,7 +1506,7 @@
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="612" height="359"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="359"/>
             <value key="maxSize" type="size" width="612" height="359"/>
             <view key="contentView" id="nog-1L-n3G">
@@ -1717,7 +1720,7 @@ DQ
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="612" height="436"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="436"/>
             <value key="maxSize" type="size" width="612" height="436"/>
             <view key="contentView" id="D0u-hz-bfS">
@@ -1859,7 +1862,7 @@ Developed by Tony Smith (@smittytone) © 2014-18</string>
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="612" height="100"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="100"/>
             <view key="contentView" id="5zF-NP-iig">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="100"/>
@@ -1940,7 +1943,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="459"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="459"/>
             <value key="maxSize" type="size" width="612" height="459"/>
             <value key="minFullScreenContentSize" type="size" width="612" height="459"/>
@@ -2479,7 +2482,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="612" height="206"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="206"/>
             <value key="maxSize" type="size" width="612" height="206"/>
             <view key="contentView" id="4Uw-Cu-gD6">
@@ -2617,7 +2620,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="276"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="276"/>
             <view key="contentView" id="iMu-Ht-Fna">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="276"/>
@@ -2786,7 +2789,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="158" width="612" height="362"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="362"/>
             <view key="contentView" id="Uci-OE-MtE">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="362"/>
@@ -2944,7 +2947,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="158" width="612" height="356"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="356"/>
             <value key="maxSize" type="size" width="612" height="356"/>
             <view key="contentView" id="Ptw-bb-wdB">
@@ -3152,7 +3155,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="350"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="350"/>
             <value key="maxSize" type="size" width="612" height="350"/>
             <value key="minFullScreenContentSize" type="size" width="612" height="350"/>
@@ -3381,7 +3384,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="480" height="124"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" id="zAt-fq-n0x">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="124"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -3439,7 +3442,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="205"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="205"/>
             <value key="maxSize" type="size" width="612" height="205"/>
             <view key="contentView" id="qDJ-C0-kV2">
@@ -3541,7 +3544,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="548" height="106"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="548" height="106"/>
             <view key="contentView" id="S6Y-2S-Xcv">
                 <rect key="frame" x="0.0" y="0.0" width="548" height="106"/>
@@ -3623,7 +3626,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="352"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="352"/>
             <view key="contentView" id="bVS-tJ-OiH">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="352"/>
@@ -3867,7 +3870,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="612" height="315"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="315"/>
             <value key="maxSize" type="size" width="612" height="315"/>
             <view key="contentView" id="i9v-DV-zkI">
@@ -3937,12 +3940,12 @@ Gw
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Code Origin" identifier="2" id="5ki-C9-tof">
-                                <view key="view" id="ok2-Yk-oIg">
+                                <view key="view" misplaced="YES" id="ok2-Yk-oIg">
                                     <rect key="frame" x="10" y="33" width="566" height="167"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uxU-s9-svC">
-                                            <rect key="frame" x="15" y="147" width="536" height="17"/>
+                                            <rect key="frame" x="15" y="59" width="536" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="17" id="Rf8-7e-ZMA"/>
                                             </constraints>
@@ -3953,7 +3956,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5hF-vJ-xSK">
-                                            <rect key="frame" x="17" y="29" width="532" height="110"/>
+                                            <rect key="frame" x="17" y="29" width="532" height="22"/>
                                             <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Optional code origin (255 characters max)" drawsBackground="YES" id="LYy-0R-4ga">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -4127,7 +4130,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="612" height="324"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="324"/>
             <view key="contentView" id="SfP-J6-928">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="324"/>
@@ -4419,7 +4422,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="340" height="520"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="340" height="520"/>
             <value key="maxSize" type="size" width="340" height="1980"/>
             <view key="contentView" id="hqI-37-Q16">
@@ -4432,7 +4435,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="158" width="612" height="378"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="378"/>
             <value key="maxSize" type="size" width="612" height="378"/>
             <view key="contentView" id="SS7-xL-4q1">
@@ -4539,6 +4542,78 @@ Gw
                 </constraints>
             </view>
             <point key="canvasLocation" x="486" y="-90"/>
+        </window>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="eZF-tf-NQT" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="272" y="172" width="520" height="158"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <value key="minSize" type="size" width="520" height="158"/>
+            <value key="maxSize" type="size" width="520" height="520"/>
+            <view key="contentView" id="5WV-hN-bg4">
+                <rect key="frame" x="0.0" y="0.0" width="520" height="120"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tey-Te-i5Z">
+                        <rect key="frame" x="20" y="52" width="48" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="48" id="0zk-r9-2pO"/>
+                            <constraint firstAttribute="height" constant="48" id="9uZ-Uj-FLh"/>
+                        </constraints>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="about_icon" id="fyI-xa-eyq"/>
+                    </imageView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="514" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NOG-mb-JZ2">
+                        <rect key="frame" x="76" y="83" width="426" height="17"/>
+                        <textFieldCell key="cell" allowsUndo="NO" alignment="left" title="Label" id="8ig-Ht-9MM">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tmv-IH-K7H">
+                        <rect key="frame" x="76" y="59" width="426" height="18"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="14" id="52b-V9-miJ"/>
+                            <constraint firstAttribute="width" constant="422" id="dFV-Wr-70p"/>
+                        </constraints>
+                        <buttonCell key="cell" type="check" title="Do not show this message again" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="OUs-Oz-TH2">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0ez-bR-TsV">
+                        <rect key="frame" x="425" y="13" width="81" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="KXs-vF-E3T"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="69" id="qxz-VK-f8L"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jPD-bK-Cqp">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="endMultiDeviceSheet:" target="Voe-Tx-rLC" id="9nk-Fr-5kB"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="0ez-bR-TsV" secondAttribute="bottom" constant="20" id="3s9-o5-qoq"/>
+                    <constraint firstItem="0ez-bR-TsV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="5WV-hN-bg4" secondAttribute="leading" constant="20" symbolic="YES" id="H8d-eN-OxZ"/>
+                    <constraint firstItem="tey-Te-i5Z" firstAttribute="top" secondItem="5WV-hN-bg4" secondAttribute="top" constant="20" id="NFn-uh-nyH"/>
+                    <constraint firstAttribute="trailing" secondItem="0ez-bR-TsV" secondAttribute="trailing" constant="20" id="Ue5-ka-mVk"/>
+                    <constraint firstItem="0ez-bR-TsV" firstAttribute="top" secondItem="Tmv-IH-K7H" secondAttribute="bottom" constant="20" id="huz-6d-OSB"/>
+                    <constraint firstItem="NOG-mb-JZ2" firstAttribute="leading" secondItem="tey-Te-i5Z" secondAttribute="trailing" constant="10" id="j4l-GL-B0g"/>
+                    <constraint firstItem="Tmv-IH-K7H" firstAttribute="top" secondItem="NOG-mb-JZ2" secondAttribute="bottom" constant="8" id="kRs-3V-yDF"/>
+                    <constraint firstItem="tey-Te-i5Z" firstAttribute="leading" secondItem="5WV-hN-bg4" secondAttribute="leading" constant="20" id="pao-WV-g8w"/>
+                    <constraint firstAttribute="trailing" secondItem="NOG-mb-JZ2" secondAttribute="trailing" constant="20" id="rch-ea-6r5"/>
+                    <constraint firstAttribute="trailing" secondItem="Tmv-IH-K7H" secondAttribute="trailing" constant="20" id="s1e-h5-9fQ"/>
+                    <constraint firstItem="NOG-mb-JZ2" firstAttribute="top" secondItem="5WV-hN-bg4" secondAttribute="top" constant="20" id="udK-Fp-oeg"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="-792" y="166"/>
         </window>
     </objects>
     <resources>
