@@ -496,7 +496,7 @@
 
 // Existing Device Methods
 
-- (void)selectDevice;
+- (void)selectFirstDevice;
 - (IBAction)updateDevicesStatus:(id)sender;
 - (IBAction)keepDevicesStatusUpdated:(id)sender;
 - (void)deviceStatusCheck;

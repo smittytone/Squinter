@@ -403,7 +403,7 @@
     
     if ([defaults boolForKey:@"com.bps.squinter.preservews"])
     {
-        // **** To 2.1.125 ****
+        // **** TO 2.1.125 ****
         
         // NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
         // nuRect = NSRectFromString(frameString);
@@ -1737,7 +1737,6 @@
     // Select one of the open projects from the Projects sub-menu or the Project menu
 
     NSMenuItem *item;
-    //NSUInteger itemNumber = 0;
 
     // 'item' will become the open projects menu item that has been selected, either
     // directly (via 'sender') or by the projects popup's tag value
@@ -1750,10 +1749,17 @@
     }
     else
     {
-        // 'sender' is 'projectsPopUp',
+        // 'sender' is 'projectsPopUp', so use the item's represented object to
+        // get the 'openProjectsMenu' item that references the same project
 
-        NSInteger tag = projectsPopUp.selectedItem.tag;
-        item = [openProjectsMenu itemAtIndex:tag];
+        for (NSMenuItem *anItem in openProjectsMenu.itemArray)
+        {
+            if (anItem.representedObject == projectsPopUp.selectedItem.representedObject)
+            {
+                item = anItem;
+                break;
+            }
+        }
     }
 
     Project *chosenProject = nil;
@@ -1761,7 +1767,6 @@
     if (item.representedObject != nil)
     {
         chosenProject = item.representedObject;
-        //itemNumber = [openProjectsMenu indexOfItem:item];
     }
     else
     {
@@ -1771,11 +1776,7 @@
         {
             chosenProject = [projectArray objectAtIndex:i];
 
-            if ([chosenProject.name compare:item.title] == NSOrderedSame)
-            {
-                //itemNumber = i;
-                break;
-            }
+            if ([chosenProject.name compare:item.title] == NSOrderedSame) break;
         }
     }
 
@@ -1792,7 +1793,7 @@
 
     if (currentDevicegroup != nil)
     {
-        [self selectDevice];
+        [self selectFirstDevice];
     }
     else
     {
@@ -1804,7 +1805,7 @@
             currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
             currentProject.devicegroupIndex = 0;
 
-            [self selectDevice];
+            [self selectFirstDevice];
         }
     }
 
@@ -3729,7 +3730,7 @@
 {
     // User has selected a device group
     // So we need to set 'currentDevicegroup' to the chosen device group
-    // And, depending on prefs, select the first device, if there is one
+    // And select the first device, if there is one
     // then update the UI
 
     BOOL devicegroupChanged = NO;
@@ -3753,6 +3754,8 @@
 
             if (dgitem.submenu != nil)
             {
+                // Turn off any submenu items (ie. devices) too
+                
                 for (NSMenuItem *sitem in dgitem.submenu.itemArray)
                 {
                     sitem.state = NSOffState;
@@ -3770,11 +3773,15 @@
             {
                 // Only change the device if it's in a different devicegroup than before
 
-                NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
-
-                // Select the device using 'chooseDevice:' as this manages 'selectedDevice'
-
-                [self chooseDevice:sitem];
+                // TO 2.1.125 - The following lines select the device group's first
+                //              device manually
+                
+                // NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
+                // [self chooseDevice:sitem];
+                
+                // FROM 2.2.126 - Use the dedicated first-device selection function
+                //                as this pops up the multi-device dialog if required
+                [self selectFirstDevice];
             }
         }
     }
@@ -4503,7 +4510,7 @@
 #pragma mark - Existing Device Methods
 
 
-- (void)selectDevice
+- (void)selectFirstDevice
 {
     // Select the first device in the current device group, if we have a list of devices
     // and we actualy have a current device group. Called to select a device after a
@@ -4523,7 +4530,7 @@
             {
                 // 'currentDevicegroup.devices' only stores device IDs, so we need to find the
                 // referenced device first
-
+                
                 NSString *devId = [currentDevicegroup.devices firstObject];
 
                 for (NSMutableDictionary *device in devicesArray)
@@ -4593,7 +4600,19 @@
                 [self setUnassignedDevicesMenuTick];
                 [self setDevicesMenusTicks];
                 [self refreshDeviceMenu];
-
+                
+                // NOTE As of 2.1.125, 'com.bps.squinter.autoselectdevice' is not exposed, so
+                //      we can add this here without breaking anything (fingers crossed...)
+                //      We use it to block the multi-device warning sheet
+                
+                NSNumber *n = [defaults objectForKey:@"com.bps.squinter.autoselectdevice"];
+                BOOL doSelect = n.boolValue;
+                
+                if (!doSelect) return;
+                
+                // TODO Convert to a sheet so we can add a 'do not show again' checkbox
+                //      Have to add a 'reset warnings' item to Prefs/somewhere too
+                
                 NSAlert *alert = [[NSAlert alloc] init];
                 alert.messageText = [NSString stringWithFormat:@"This device group has mulitple assigned devices: %@. The first device, %@, will be selected initially.", list, first];
                 [alert addButtonWithTitle:@"OK"];
@@ -5160,7 +5179,7 @@
     }
     else
     {
-        // We may be here from eiter the 'Unassigned Devices' or the 'Project's Device Groups' submenu
+        // We may be here from either the 'Unassigned Devices' menu or a 'Project's Device Groups' submenu
 
         item = (NSMenuItem *)sender;
         isUnassigned = item.menu == unassignedDevicesMenu ? YES : NO;
@@ -5174,8 +5193,8 @@
     {
         // Run through the Device Groups submenus to see if the selected device is not assigned to the
         // currently selected device group (because we'll now need to select that group)
-        // NOTE But only if we DIDN'T select from the popup or an unassgined device, ie. these controls
-        //      do not force a devicegroup switch
+        // NOTE But only if we DIDN'T select from the popup or an unassgined device,
+        //      ie. these controls do NOT force a devicegroup switch
 
         for (NSMenuItem *menuitem in deviceGroupsMenu.itemArray)
         {
@@ -6158,7 +6177,7 @@
             // Select the first device assigned to this project's first device group
             // NOTE This will update the UI ticks
 
-            [self selectDevice];
+            [self selectFirstDevice];
 
             // Update the Menus and the Toolbar
 
@@ -7617,7 +7636,7 @@
                 // See if the current device group has any devices, and select one
                 // NOTE But only if the project is owned by the user
 
-                if ([newProject.cid compare:newProject.aid] == NSOrderedSame) [self selectDevice];
+                if ([newProject.cid compare:newProject.aid] == NSOrderedSame) [self selectFirstDevice];
             }
         }
 
@@ -8340,7 +8359,7 @@
                 // Pick up the action at updateDevice:
             }
 
-            // Sort the devices list by device name (inside the 'attributes' dictionary
+            // Sort the devices list by device name (inside the 'attributes' dictionary)
 
             NSComparator compareNames = ^(id dev1, id dev2)
             {
@@ -8373,15 +8392,20 @@
 
                         for (NSDictionary *device in devicesArray)
                         {
+                            // Get the ID of the device's host device group
+                            
                             NSDictionary *relationships = [device objectForKey:@"relationships"];
                             NSDictionary *devgrp = [relationships objectForKey:@"devicegroup"];
-                            NSString *deviceid = [devgrp objectForKey:@"id"];
+                            NSString *devgrpid = [devgrp objectForKey:@"id"];
 
                             // Just check for a nil device group ID - to avoid unassigned devices
 
-                            if (deviceid != nil)
+                            if (devgrpid != nil)
                             {
-                                if ([deviceid compare:devicegroup.did] == NSOrderedSame) [devicegroup.devices addObject:deviceid];
+                                // If the ID of the device's host device group matches that of the iterated device group ('devicegroup')
+                                // then add the device's own ID to 'devicegroup's list of devices
+                                
+                                if ([devgrpid compare:devicegroup.did] == NSOrderedSame) [devicegroup.devices addObject:[device objectForKey:@"id"]];
                             }
                         }
                     }
@@ -11098,7 +11122,7 @@
 
             [projectsPopUp addItemWithTitle:name];
             NSMenuItem *subitem = [projectsPopUp itemWithTitle:project.name];
-            subitem.tag = [openProjectsMenu indexOfItem:item];
+            subitem.representedObject = project;
         }
 
         if (currentProject != nil)
@@ -11203,7 +11227,7 @@
 
     [projectsPopUp addItemWithTitle:menuItemTitle];
     NSMenuItem *pitem = [projectsPopUp itemWithTitle:menuItemTitle];
-    pitem.tag = [openProjectsMenu indexOfItem:item];
+    pitem.representedObject = aProject;
     projectsPopUp.enabled = YES;
     [projectsPopUp selectItem:pitem];
 
@@ -11541,7 +11565,7 @@
         }
 
         item = [projectsPopUp selectedItem];
-        Project *pr = [projectArray objectAtIndex:item.tag];
+        Project *pr = item.representedObject;
         item.title = [NSString stringWithFormat:@"%@/%@", pr.name, currentDevicegroup.name];
     }
 
@@ -12320,7 +12344,6 @@
             [devicesPopUp addItemWithTitle:dvName];
 
             NSMenuItem *item = [devicesPopUp itemWithTitle:dvName];
-            item.tag = i;
             item.representedObject = device;
             item.image = [self menuImage:device];
         }
