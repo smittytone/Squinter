@@ -8442,7 +8442,9 @@
 
         // Update the Inspector
 
-        // iwvc.devices = devicesArray;
+        if (loggedDevices == nil) loggedDevices = [[NSMutableArray alloc] init];
+        iwvc.loggingDevices = loggedDevices;
+        iwvc.device = selectedDevice;
     }
     else
     {
@@ -9477,6 +9479,11 @@
     [streamLogsItem validate];
     [self refreshDevicesMenus];
     [self refreshDevicesPopup];
+    
+    // Update the Inspector
+    
+    iwvc.loggingDevices = loggedDevices;
+    iwvc.device = selectedDevice;
 }
 
 
@@ -9553,6 +9560,11 @@
     [streamLogsItem validate];
     [self refreshDevicesMenus];
     [self refreshDevicesPopup];
+    
+    // Update the Inspector
+    
+    iwvc.loggingDevices = loggedDevices;
+    iwvc.device = selectedDevice;
 }
 
 

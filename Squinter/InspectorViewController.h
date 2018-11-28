@@ -55,6 +55,7 @@
 @property (nonatomic, strong, setter=setProject:) Project *project;
 @property (nonatomic, strong, setter=setDevice:) NSMutableDictionary *device;
 @property (nonatomic, strong) NSMutableArray *products;
+@property (nonatomic, strong) NSMutableArray *loggingDevices;
 @property (nonatomic, readwrite) NSUInteger tabIndex;
 
 

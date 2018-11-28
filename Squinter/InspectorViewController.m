@@ -12,7 +12,7 @@
 
 @implementation InspectorViewController
 
-@synthesize project, device, products, tabIndex;
+@synthesize project, device, products, tabIndex, loggingDevices;
 
 
 #pragma mark - ViewController Methods
@@ -643,6 +643,45 @@
             if (!got) dnode.value = dgid;
         }
 
+        [deviceData addObject:dnode];
+        
+        // Logging Information Header
+        
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Logging Information";
+        [deviceData addObject:dnode];
+        
+        // Device Group Name or ID
+        
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"State";
+        dnode.value = @"Not logging";
+        
+        if (loggingDevices != nil)
+        {
+            BOOL got = NO;
+            
+            if (loggingDevices.count > 0)
+            {
+                NSString *devID = [device objectForKey: @"id"];
+                
+                for (NSString *aDevID in loggingDevices)
+                {
+                    if ([aDevID compare:devID] == NSOrderedSame)
+                    {
+                        got = YES;
+                        break;
+                    }
+                }
+            }
+            
+            dnode.value = got ? @"Logging" : @"Not logging";
+        }
+        else
+        {
+            dnode.value = @"Unknown";
+        }
+        
         [deviceData addObject:dnode];
     }
 
