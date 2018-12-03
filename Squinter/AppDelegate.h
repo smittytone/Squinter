@@ -280,7 +280,6 @@
     IBOutlet NSPopUpButton *locationMenu;
     IBOutlet NSPopUpButton *recentFilesCountMenu;
     IBOutlet NSPopUpButton *maxLogCountMenu;
-    IBOutlet NSButton      *showInspectorCheckbox;
     IBOutlet NSButton      *updateDevicesCheckbox;
 
     #pragma mark Assign Device Sheet

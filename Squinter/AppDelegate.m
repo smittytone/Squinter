@@ -374,6 +374,9 @@
 
     // Prepare the main window
 
+    wantsToHide = 0;
+    isInspectorHidden = NO;
+
     if ([defaults boolForKey:@"com.bps.squinter.preservews"])
     {
         NSString *frameString = [defaults stringForKey:@"com.bps.squinter.windowsize"];
@@ -390,56 +393,46 @@
             squinterToolbar.visible = NO;
             showHideToolbarMenuItem.title = @"Show Toolbar";
         }
-    }
-    else
-    {
-        [_window center];
-    }
-    
-    // Position the Inspector
-    
-    wantsToHide = 0;
-    isInspectorHidden = NO;
-    
-    if ([defaults boolForKey:@"com.bps.squinter.preservews"])
-    {
+
         // **** TO 2.1.125 ****
-        
+
         // NSString *frameString = [defaults stringForKey:@"com.bps.squinter.inspectorsize"];
         // nuRect = NSRectFromString(frameString);
         // [iwvc.view.window setFrame:nuRect display:NO];
-        
+
         // **** FROM 2.2.126 ****
-        
+
         NSNumber *num = [defaults objectForKey:@"com.bps.squinter.inspectorshow"];
-        BOOL isHidden = num.boolValue;
-        
-        if (isHidden)
+        isInspectorHidden = num.boolValue;
+
+        if (isInspectorHidden)
         {
             // Fake a click on the show/hide inspector button to hide it
-            
+
             wantsToHide = -1;
             [splitView setPosition:splitView.frame.size.width ofDividerAtIndex:0];
         }
         else
         {
             // It's already being shown; just adjust the width
-            
+
             wantsToHide = 1;
             [splitView setPosition:(splitView.frame.size.width - 340.0 - splitView.dividerThickness) ofDividerAtIndex:0];
         }
     }
     else
     {
+        [_window center];
+
         // **** To 2.1.125 ****
-        
+
         // iwvc.mainWindowFrame = _window.frame;
         // [iwvc positionWindow];
-        
+
         // **** FROM 2.2.126 ****
-        
+
         // Set up the Split View to show the Inspector by default
-        
+
         CGFloat proposed = splitView.frame.size.width - 340.0 - splitView.dividerThickness;
         [splitView setPosition:proposed ofDividerAtIndex:0];
     }
@@ -772,7 +765,7 @@
 	[self setToolbar];
     [_window makeKeyAndOrderFront:self];
 
-    if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:self];
+    // if ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) [iwvc.view.window makeKeyAndOrderFront:self];
 
     // Check for updates if that is requested
 
@@ -12787,7 +12780,7 @@
     autoUpdateCheckCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) ? NSOnState : NSOffState;
     boldTestCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.showboldtext"]) ? NSOnState : NSOffState;
     loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
-    showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
+    //showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
     updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
 
     // Set location menu
@@ -12843,7 +12836,7 @@
     [defaults setBool:(loadDevicesCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoloaddevlists"];
     [defaults setBool:(autoUpdateCheckCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autocheckupdates"];
     [defaults setBool:(loadModelsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoload"];
-    [defaults setBool:(showInspectorCheckbox.state == NSOnState) forKey:@"com.bps.squinter.show.inspector"];
+    //[defaults setBool:(showInspectorCheckbox.state == NSOnState) forKey:@"com.bps.squinter.show.inspector"];
 
     float r = (float)textColour.redComponent;
     float b = (float)textColour.blueComponent;
