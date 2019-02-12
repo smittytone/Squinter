@@ -120,31 +120,6 @@
 			return cell;
 		}
 	}
-	else if ([tableColumn.identifier compare:@"commitcolumnnum"] == NSOrderedSame)
-	{
-		NSTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcellnum" owner:nil];
-
-		if (cell != nil)
-		{
-			if (commits.count < 100)
-			{
-				cell.textField.stringValue = [NSString stringWithFormat:@"%02li", (long)(commits.count - row)];
-			}
-			else if (commits.count < 1000)
-			{
-				cell.textField.stringValue = [NSString stringWithFormat:@"%03li", (long)(commits.count - row)];
-			}
-			else
-			{
-				cell.textField.stringValue = [NSString stringWithFormat:@"%05li", (long)(commits.count - row)];
-			}
-
-			cell.textField.enabled = NO;
-			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.labelColor;
-		}
-
-		return cell;
-	}
 	else
 	{
 		NSTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcelltext" owner:nil];
@@ -152,14 +127,18 @@
 		if (cell != nil)
 		{
 			NSDictionary *deployment = [commits objectAtIndex:row];
-			NSString *sha = [deployment valueForKeyPath:@"attributes.updated_at"];
-			if (sha == nil) sha = [deployment valueForKeyPath:@"attributes.created_at"];
-			sha = [def stringFromDate:[commitDef dateFromString:sha]];
-			sha = [sha stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
-			sha = [sha stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-			sha = [sha stringByReplacingOccurrencesOfString:@"T" withString:@" "];
-
-			cell.textField.stringValue = [NSString stringWithFormat:@"Committed at %@", sha];
+			NSString *date = [deployment valueForKeyPath:@"attributes.updated_at"];
+			if (date == nil) date = [deployment valueForKeyPath:@"attributes.created_at"];
+			date = [def stringFromDate:[commitDef dateFromString:date]];
+			date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+			date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+			date = [date stringByReplacingOccurrencesOfString:@"T" withString:@" "];
+            
+            NSString *sha = [deployment valueForKeyPath:@"attributes.sha"];
+            if (sha == nil) sha = @"Unknown SHA";
+            if (sha.length > 36) sha = [[sha substringToIndex:37] stringByAppendingString:@"..."];
+            
+			cell.textField.stringValue = [NSString stringWithFormat:@"%@ (%@)", date, sha];
 			cell.textField.enabled = NO;
 			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.labelColor;
 		}
