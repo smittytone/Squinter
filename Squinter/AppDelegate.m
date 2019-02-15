@@ -1674,6 +1674,8 @@
     [self refreshMainDevicegroupsMenu];
     [self setToolbar];
 
+    // Set the inspector
+
     iwvc.project = currentProject;
     [iwvc setTab:0];
 
@@ -2225,6 +2227,7 @@
             {
                 currentProject.name = newName;
                 currentProject.haschanged = YES;
+                iwvc.project = currentProject;
 
                 // Update the UI only if the name has changed
 
@@ -2324,6 +2327,7 @@
             {
                 currentDevicegroup.name = newName;
                 currentProject.haschanged = YES;
+                iwvc.project = currentProject;
 
                 // Update the UI; in the above code the UI will be updated
                 // in response to notification from the server
@@ -2337,6 +2341,8 @@
             {
                 currentDevicegroup.description = newDesc;
                 currentProject.haschanged = YES;
+                iwvc.project = currentProject;
+
                 [self refreshOpenProjectsMenu];
             }
 
@@ -2437,7 +2443,12 @@
 
                     project.aid = ide.currentAccount;
                     project.haschanged = YES;
-                    if (project == currentProject) [saveLight needSave:YES];
+
+                    if (project == currentProject)
+                    {
+                        iwvc.project = currentProject;
+                        [saveLight needSave:YES];
+                    }
 
                     // Re-call this method now we have changed the Account ID
 
@@ -2470,7 +2481,12 @@
                     project.aid = ide.currentAccount;
                     project.pid = @"";
                     project.haschanged = YES;
-                    if (project == currentProject) [saveLight needSave:YES];
+
+                    if (project == currentProject)
+                    {
+                        iwvc.project = currentProject;
+                        [saveLight needSave:YES];
+                    }
 
                     // Re-call this method now we have changed the Account ID and Product ID
 
@@ -3139,6 +3155,7 @@
         currentProject.pid = pid;
         currentProject.aid = ide.currentAccount;
         currentProject.haschanged = YES;
+        iwvc.project = currentProject;
 
         [self refreshOpenProjectsMenu];
         [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
@@ -3457,12 +3474,14 @@
         [self setToolbar];
 
         currentProject.haschanged = YES;
+        iwvc.project = currentProject;
+
         [saveLight needSave:YES];
         [self refreshOpenProjectsMenu];
 
         // Update the inspector, if required
 
-        if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
+        // if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
 
         // Create the new device group's files as requested
 
@@ -3939,6 +3958,7 @@
                  currentDevicegroup = currentProject.devicegroups.count > 0 ? [currentProject.devicegroups objectAtIndex:0] : nil;
                  currentProject.devicegroupIndex = currentDevicegroup != nil ? [currentProject.devicegroups indexOfObject:currentDevicegroup] : -1;
                  currentProject.haschanged = YES;
+                 iwvc.project = currentProject;
 
                  [saveLight needSave:YES];
                  [self refreshOpenProjectsMenu];
@@ -4261,6 +4281,8 @@
          {
              if (currentDevicegroup.models.count > 0) [currentDevicegroup.models removeAllObjects];
              currentProject.haschanged = YES;
+             iwvc.project = currentProject;
+
              [saveLight needSave:YES];
              // [self refreshOpenProjectsMenu];
              [self refreshLibraryMenus];
@@ -6277,6 +6299,7 @@
                 [self writeStringToLog:[NSString stringWithFormat:@"Updating stored %@ \"%@/%@\" - source or project file has moved.", type, [self getPrintPath:currentProject.path :file.path], file.filename] :YES];
 
                 currentProject.haschanged = YES;
+                iwvc.project = currentProject;
 
 #ifdef DEBUG
     NSLog(@"N: %@", file.path);
@@ -6502,6 +6525,8 @@
             saveUrls = nil;
 
             currentProject.haschanged = YES;
+            iwvc.project = currentProject;
+
             [saveLight needSave:YES];
         }
 
@@ -6672,6 +6697,7 @@
                                              model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
 
                                             currentProject.haschanged = YES;
+                                            iwvc.project = currentProject;
 
                                              [saveLight needSave:YES];
                                              [self checkAndWatchFile:filePath];
@@ -7556,7 +7582,12 @@
 
                     Project *project = [self getParentProject:newDevicegroup];
                     project.haschanged = YES;
-                    [saveLight needSave:YES];
+
+                    if (project == currentProject)
+                    {
+                        iwvc.project = currentProject;
+                        [saveLight needSave:YES];
+                    }
                 }
             }
         }
@@ -7814,7 +7845,12 @@
             {
                 project.pid = @"";
                 project.haschanged = YES;
-                if (project == currentProject) [saveLight needSave:YES];
+
+                if (project == currentProject)
+                {
+                    iwvc.project = currentProject;
+                    [saveLight needSave:YES];
+                }
 
                 // NOTE Project Inspector will be updated later, in 'deleteProductStageThree:'
             }
@@ -7962,7 +7998,12 @@
         if (project != nil)
         {
             project.haschanged = YES;
-            [saveLight needSave:YES];
+
+            if (project == currentProject)
+            {
+                iwvc.project = currentProject;
+                [saveLight needSave:YES];
+            }
 
             // Update the UI
 
@@ -8045,7 +8086,12 @@
         {
             project.haschanged = YES;
 
-            [saveLight needSave:YES];
+            if (project == currentProject)
+            {
+                iwvc.project = currentProject;
+                [saveLight needSave:YES];
+            }
+
             [self refreshMainDevicegroupsMenu];
             [self refreshDevicegroupMenu];
         }
@@ -8098,7 +8144,12 @@
 
                 project.haschanged = YES;
 
-                [saveLight setFull:NO];
+                if (project == currentProject)
+                {
+                    iwvc.project = currentProject;
+                    [saveLight needSave:YES];
+                }
+
                 [self refreshDevicegroupMenu];
                 [self refreshMainDevicegroupsMenu];
             }
@@ -8627,7 +8678,8 @@
 
                 // Update the inspector, if required
 
-                if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
+                // if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
+                iwvc.project = currentProject;
             }
 
             // Now we can produce the source code file, as the user requested
@@ -8894,13 +8946,15 @@
     Project *project = [self getParentProject:devicegroup];
     project.haschanged = YES;
 
+    if (project == currentProject)
+    {
+        iwvc.project = currentProject;
+        [saveLight needSave:YES];
+    }
+
     // Mark the devicegroup as uploaded
 
     devicegroup.squinted = devicegroup.squinted | 0x08;
-
-    // Update the UI
-
-    [saveLight needSave:YES];
 
     if (action != nil)
     {
