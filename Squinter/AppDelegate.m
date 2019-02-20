@@ -8678,8 +8678,7 @@
 
                 // Update the inspector, if required
 
-                // if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
-                iwvc.project = currentProject;
+                if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
             }
 
             // Now we can produce the source code file, as the user requested
