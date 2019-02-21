@@ -339,7 +339,6 @@
     #pragma mark Multi-device Warning Panel
     
     IBOutlet NSPanel     *multiDeviceSheet;
-    //IBOutlet NSButton    *multiDeviceShowAgainButton;
     IBOutlet NSTextField *multiDeviceLabel;
 
     #pragma mark Other Sheets

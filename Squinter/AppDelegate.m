@@ -4629,15 +4629,6 @@
                 multiDeviceLabel.stringValue = [NSString stringWithFormat:@"This device group has mulitple assigned devices:\n\n%@\nThe first device, %@, will be selected initially.\nThis warning can be disabled in Preferences.", list, first];
                 
                 [_window beginSheet:multiDeviceSheet completionHandler:nil];
-                
-                /*
-                
-                NSAlert *alert = [[NSAlert alloc] init];
-                alert.messageText = [NSString stringWithFormat:@"This device group has mulitple assigned devices: %@. The first device, %@, will be selected initially.", list, first];
-                [alert addButtonWithTitle:@"OK"];
-                [alert beginSheetModalForWindow:_window
-                              completionHandler:nil];
-                 */
             }
         }
     }
@@ -4646,8 +4637,6 @@
 
 - (IBAction)endMultiDeviceSheet:(id)sender
 {
-    //bool doShow = multiDeviceShowAgainButton.state == NSOnState ? YES : NO;
-    //[defaults setBool:doShow forKey:@"com.bps.squinter.autoselectdevice"];
     [_window endSheet:multiDeviceSheet];
 }
 
