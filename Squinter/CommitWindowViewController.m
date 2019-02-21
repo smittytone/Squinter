@@ -122,29 +122,48 @@
 	}
 	else
 	{
-		NSTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcelltext" owner:nil];
+        NSTableCellView *cell = [tableView makeViewWithIdentifier:@"commitcelltext" owner:nil];
 
-		if (cell != nil)
-		{
-			NSDictionary *deployment = [commits objectAtIndex:row];
-			NSString *date = [deployment valueForKeyPath:@"attributes.updated_at"];
-			if (date == nil) date = [deployment valueForKeyPath:@"attributes.created_at"];
-			date = [def stringFromDate:[commitDef dateFromString:date]];
-			date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
-			date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-			date = [date stringByReplacingOccurrencesOfString:@"T" withString:@" "];
-            
-            NSString *sha = [deployment valueForKeyPath:@"attributes.sha"];
-            if (sha == nil) sha = @"Unknown SHA";
-            if (sha.length > 36) sha = [[sha substringToIndex:37] stringByAppendingString:@"..."];
-            
-			cell.textField.stringValue = [NSString stringWithFormat:@"%@ (%@)", date, sha];
-			cell.textField.enabled = NO;
-			cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.labelColor;
-		}
+        if (cell != nil)
+        {
+            NSDictionary *deployment = [commits objectAtIndex:row];
+            NSString *date = [deployment valueForKeyPath:@"attributes.updated_at"];
+            if (date == nil) date = [deployment valueForKeyPath:@"attributes.created_at"];
 
-		return cell;
-	}
+            date = [def stringFromDate:[commitDef dateFromString:date]];
+            date = [date stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+            date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+            date = [date stringByReplacingOccurrencesOfString:@"T" withString:@" "];
+
+            NSArray *parts = [date componentsSeparatedByString:@" "];
+            NSString *cellText = nil;
+
+            if ([tableColumn.identifier compare:@"commitcolumndate"] == NSOrderedSame)
+            {
+                cellText = [parts objectAtIndex:0];
+            }
+            else if ([tableColumn.identifier compare:@"commitcolumntime"] == NSOrderedSame)
+            {
+                cellText = [parts objectAtIndex:1];
+            }
+            else if ([tableColumn.identifier compare:@"commitcolumnzone"] == NSOrderedSame)
+            {
+                cellText = [parts objectAtIndex:2];
+            }
+            else
+            {
+                cellText = [deployment valueForKeyPath:@"attributes.sha"];
+                if (cellText == nil) cellText = @"Unknown SHA";
+                if (cellText.length > 40) cellText = [[cellText substringToIndex:40] stringByAppendingString:@"..."];
+            }
+
+            cell.textField.stringValue = cellText;
+            cell.textField.enabled = NO;
+            cell.textField.textColor = row > minIndex ? NSColor.grayColor : NSColor.labelColor;
+
+            return cell;
+        }
+    }
 
 	return nil;
 }
