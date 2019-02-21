@@ -4621,12 +4621,12 @@
                 //      we can add this here without breaking anything (fingers crossed...)
                 //      We use it to block the multi-device warning sheet
                 
-                BOOL doSelect = [defaults boolForKey:@"com.bps.squinter.autoselectdevice"];
-                if (!doSelect) return;
+                BOOL doShow = [defaults boolForKey:@"com.bps.squinter.autoselectdevice"];
+                if (!doShow) return;
                 
                 // TODO Have to add a 'reset warnings' item to Prefs/somewhere too
-                
-                multiDeviceLabel.stringValue = [NSString stringWithFormat:@"This device group has mulitple assigned devices:\n\n%@\nThe first device, %@, will be selected initially.", list, first];
+
+                multiDeviceLabel.stringValue = [NSString stringWithFormat:@"This device group has mulitple assigned devices:\n\n%@\nThe first device, %@, will be selected initially.\nThis warning can be disabled in Preferences.", list, first];
                 
                 [_window beginSheet:multiDeviceSheet completionHandler:nil];
                 
@@ -4646,11 +4646,8 @@
 
 - (IBAction)endMultiDeviceSheet:(id)sender
 {
-    if (multiDeviceShowAgainButton.state == NSOffState)
-    {
-        //[defaults setBool:NO forKey:@"com.bps.squinter.autoselectdevice"];
-    }
-    
+    //bool doShow = multiDeviceShowAgainButton.state == NSOnState ? YES : NO;
+    //[defaults setBool:doShow forKey:@"com.bps.squinter.autoselectdevice"];
     [_window endSheet:multiDeviceSheet];
 }
 
@@ -12835,6 +12832,7 @@
     loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
     //showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
     updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
+    showDeviceWarnigCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"]) ? NSOnState : NSOffState;
 
     // Set location menu
 
@@ -13031,6 +13029,7 @@
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
     [defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
+    [defaults setBool:(showDeviceWarnigCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoselectdevice"];
 
     // Set recent files count
 

@@ -281,6 +281,7 @@
     IBOutlet NSPopUpButton *recentFilesCountMenu;
     IBOutlet NSPopUpButton *maxLogCountMenu;
     IBOutlet NSButton      *updateDevicesCheckbox;
+    IBOutlet NSButton      *showDeviceWarnigCheckbox;
 
     #pragma mark Assign Device Sheet
 
@@ -338,7 +339,7 @@
     #pragma mark Multi-device Warning Panel
     
     IBOutlet NSPanel     *multiDeviceSheet;
-    IBOutlet NSButton    *multiDeviceShowAgainButton;
+    //IBOutlet NSButton    *multiDeviceShowAgainButton;
     IBOutlet NSTextField *multiDeviceLabel;
 
     #pragma mark Other Sheets
