@@ -3,226 +3,244 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		7DC4CB8008EA5E0E617F5CCF32EFDCD3 /* Sparkle */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = D1A68E4CE81A46C8AF01D112BF4DE216 /* Build configuration list for PBXAggregateTarget "Sparkle" */;
+			buildPhases = (
+			);
+			dependencies = (
+			);
+			name = Sparkle;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
-		02E5F53A451AED88E04C5B92796A011A /* PDKeychainBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = 89BB68341BB26B0ACF1259AF2EE5FEA3 /* PDKeychainBindings.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		0E7A391F53FB96FF70299057AA48D760 /* PDKeychainBindingsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 474539C8EBF96276BC9D53E2D38BA452 /* PDKeychainBindingsController.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		2C0C0F30194A4A4441EEF5B1385E7643 /* Pods-Squinter-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = F1F85FFC4043741178099BFB03FE0D2D /* Pods-Squinter-dummy.m */; };
-		AB3701CEEAB6AC8A7DEDD79EB4486851 /* PDKeychainBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = 17065C62607723E573886F7CC9143C40 /* PDKeychainBindings.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
-		B7D2C59084AEED7A37B072A07AF5621E /* PDKeychainBindingsController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 16A1093E68E33988325929195C280F9F /* PDKeychainBindingsController-dummy.m */; };
-		CFE2555664C18DA3D625E33482E0511D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28B924366A65E6218D08AE35A9FB835F /* Security.framework */; };
-		DEC8F96225EE0F295E9DED15EDF081D9 /* PDKeychainBindingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = C46F4DCBF47B1280BCBCC006FD0DC3F4 /* PDKeychainBindingsController.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		6211155D49542C001E8A2B2781CD7D71 /* PDKeychainBindingsController.h in Headers */ = {isa = PBXBuildFile; fileRef = D743E632F538071A66445EDE2F3B618C /* PDKeychainBindingsController.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		88DA5FC173B90086E59B31B0AB1AB800 /* PDKeychainBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = 772D52C81AC504AE1A2B6C45DF8989F1 /* PDKeychainBindings.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		96E4AD22C12C7D97D41EF9A67EFE8CA7 /* PDKeychainBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7A1EC960A7A71CD995B0DF6EBF804 /* PDKeychainBindings.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		9C03292AAA543A0B8E3F75A2B338C02D /* PDKeychainBindingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92870B3570E775033AF31C284AF47B8F /* PDKeychainBindingsController.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		B2D69A44B9C961373D6917AD972B4CE0 /* Pods-Squinter-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED0FDD5420B63343DDE9C5CD9E7A5E4 /* Pods-Squinter-dummy.m */; };
+		E18E173EA8E0914964CFECD0C5FBF81A /* PDKeychainBindingsController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CB72E8DF544238DE4AE360F23E96AF8 /* PDKeychainBindingsController-dummy.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		C447A2A60E02CDBDD5C12B185EDE7702 /* PBXContainerItemProxy */ = {
+		952EC349640FCD5B9BD9F7BB7F94E848 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 90BC0B4EA2F7FDA0E5E56FF67FB011DA;
+			remoteGlobalIDString = 3E16F7AAA4A355D417CE678B1356AE47;
 			remoteInfo = PDKeychainBindingsController;
+		};
+		DE83062CE078FF52809EA413C16994EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7DC4CB8008EA5E0E617F5CCF32EFDCD3;
+			remoteInfo = Sparkle;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0D02341A2D0E85B6CBDFF82506E0E5CC /* SPUDownloader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloader.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloader.h; sourceTree = "<group>"; };
-		0F3DB665151038C5C8F033C998784E4D /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
-		10AA20D6381341AB068301EAC934D0CC /* SUVersionComparisonProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionComparisonProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionComparisonProtocol.h; sourceTree = "<group>"; };
-		16A1093E68E33988325929195C280F9F /* PDKeychainBindingsController-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PDKeychainBindingsController-dummy.m"; sourceTree = "<group>"; };
-		17065C62607723E573886F7CC9143C40 /* PDKeychainBindings.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindings.m; path = PDKeychainBindingsController/PDKeychainBindings.m; sourceTree = "<group>"; };
-		1EB51E4D5256C447B16433743E857D0E /* SUCodeSigningVerifier.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUCodeSigningVerifier.h; path = Sparkle.framework/Versions/A/Headers/SUCodeSigningVerifier.h; sourceTree = "<group>"; };
-		28B924366A65E6218D08AE35A9FB835F /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
-		344FD2AD871E71821C8BC71EF2A63B2A /* PDKeychainBindingsController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PDKeychainBindingsController-prefix.pch"; sourceTree = "<group>"; };
-		3831C46FEF864F190D43B97FE252807A /* SPUDownloaderProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderProtocol.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderProtocol.h; sourceTree = "<group>"; };
-		3B27A65E59E135C6268B3D7C30BE3C4D /* Pods-Squinter-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-frameworks.sh"; sourceTree = "<group>"; };
-		41708E096192AF8FC16686A16C7BE7FC /* Sparkle.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Sparkle.h; path = Sparkle.framework/Versions/A/Headers/Sparkle.h; sourceTree = "<group>"; };
-		457E0242F0AAF8F9B3697C22CFF8F4DC /* PDKeychainBindingsController.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PDKeychainBindingsController.xcconfig; sourceTree = "<group>"; };
-		474539C8EBF96276BC9D53E2D38BA452 /* PDKeychainBindingsController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindingsController.h; path = PDKeychainBindingsController/PDKeychainBindingsController.h; sourceTree = "<group>"; };
-		52405E184B1DCB82AE96EDC46531DD3B /* SUAppcastItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcastItem.h; path = Sparkle.framework/Versions/A/Headers/SUAppcastItem.h; sourceTree = "<group>"; };
-		5E215323AA286323CEAF528BDAB28B4D /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5EFFFBB95A23C7FBF7A469B29E4B7D02 /* SPUDownloaderDeprecated.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDeprecated.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDeprecated.h; sourceTree = "<group>"; };
-		6C744BC71AA85B4E3BE0118F1AB09201 /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
-		6E31EA8DF0660C908EEF84BD9B1B27EC /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdaterDelegate.h; path = Sparkle.framework/Versions/A/Headers/SUUpdaterDelegate.h; sourceTree = "<group>"; };
-		711E4ACFE02C80CC066E1B07BF2274A0 /* SPUDownloadData.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloadData.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloadData.h; sourceTree = "<group>"; };
-		73BC54EAE7D710D168B0F29583071191 /* SUStandardVersionComparator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUStandardVersionComparator.h; path = Sparkle.framework/Versions/A/Headers/SUStandardVersionComparator.h; sourceTree = "<group>"; };
-		778EEAE69D981D3B7F8EC73107D33F08 /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDelegate.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDelegate.h; sourceTree = "<group>"; };
-		80C69DCBF80DAA9FDC5BD66A2D3176C1 /* SUUpdater.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdater.h; path = Sparkle.framework/Versions/A/Headers/SUUpdater.h; sourceTree = "<group>"; };
-		85542DF10D139373E443EA53A7046838 /* Pods-Squinter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Squinter-acknowledgements.plist"; sourceTree = "<group>"; };
-		89BB68341BB26B0ACF1259AF2EE5FEA3 /* PDKeychainBindings.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindings.h; path = PDKeychainBindingsController/PDKeychainBindings.h; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		9C267CF6718BE6C5C829FA0744635FD7 /* Pods-Squinter-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-resources.sh"; sourceTree = "<group>"; };
-		BB380AC2AB669A1DD89260ABF3A9F201 /* SUExport.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUExport.h; path = Sparkle.framework/Versions/A/Headers/SUExport.h; sourceTree = "<group>"; };
-		C2F59278DC245CB9F5FA6EC95B21749C /* Pods-Squinter-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Squinter-acknowledgements.markdown"; sourceTree = "<group>"; };
-		C46F4DCBF47B1280BCBCC006FD0DC3F4 /* PDKeychainBindingsController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindingsController.m; path = PDKeychainBindingsController/PDKeychainBindingsController.m; sourceTree = "<group>"; };
-		CD428214D18A3429A3F10283863DD4FC /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
-		CDCB7261448FD8D11E4DC78042761B7B /* SUAppcast.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcast.h; path = Sparkle.framework/Versions/A/Headers/SUAppcast.h; sourceTree = "<group>"; };
-		D729B1A9DC2BC52D819E8966F2B30054 /* libPDKeychainBindingsController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPDKeychainBindingsController.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		D77CC62691AFBE6244CF241E5465F9DB /* SUErrors.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUErrors.h; path = Sparkle.framework/Versions/A/Headers/SUErrors.h; sourceTree = "<group>"; };
-		DC9EB561906F89594ABB38DE5AC7B791 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionDisplayProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
-		DDEABBF360EAAF25EB7EEE0BD9949684 /* SPUURLRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUURLRequest.h; path = Sparkle.framework/Versions/A/Headers/SPUURLRequest.h; sourceTree = "<group>"; };
-		E8437F79B195ADC0F7DD072D4EEF1F5C /* SPUDownloaderSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderSession.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderSession.h; sourceTree = "<group>"; };
-		F1F85FFC4043741178099BFB03FE0D2D /* Pods-Squinter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Squinter-dummy.m"; sourceTree = "<group>"; };
+		010740C49996378D667351646F57EE00 /* SPUDownloaderDeprecated.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDeprecated.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDeprecated.h; sourceTree = "<group>"; };
+		0AF7A1EC960A7A71CD995B0DF6EBF804 /* PDKeychainBindings.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindings.m; path = PDKeychainBindingsController/PDKeychainBindings.m; sourceTree = "<group>"; };
+		0D316683B4536741B383D5CD9B64C8DF /* PDKeychainBindingsController.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PDKeychainBindingsController.xcconfig; sourceTree = "<group>"; };
+		1953B87DD32C43A80BCE3C44285D9569 /* SUCodeSigningVerifier.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUCodeSigningVerifier.h; path = Sparkle.framework/Versions/A/Headers/SUCodeSigningVerifier.h; sourceTree = "<group>"; };
+		1A909A165CA4CB2C076E23E221DB8ED6 /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
+		1BB206D676CDE55F99F2848CBA71A5A3 /* SUAppcast.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcast.h; path = Sparkle.framework/Versions/A/Headers/SUAppcast.h; sourceTree = "<group>"; };
+		1CB72E8DF544238DE4AE360F23E96AF8 /* PDKeychainBindingsController-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PDKeychainBindingsController-dummy.m"; sourceTree = "<group>"; };
+		2ED0FDD5420B63343DDE9C5CD9E7A5E4 /* Pods-Squinter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Squinter-dummy.m"; sourceTree = "<group>"; };
+		45C7C18F1DA2B3773826C9D68373EE9D /* SUUpdater.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdater.h; path = Sparkle.framework/Versions/A/Headers/SUUpdater.h; sourceTree = "<group>"; };
+		5511D8113DEC8CE3FD3BD73BC68EA7E0 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		552BF26F097240105828DF717F95AB2D /* Pods-Squinter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Squinter-acknowledgements.plist"; sourceTree = "<group>"; };
+		590239F17F3C126CEB7E3588A00AE842 /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdaterDelegate.h; path = Sparkle.framework/Versions/A/Headers/SUUpdaterDelegate.h; sourceTree = "<group>"; };
+		62F1560517BFED2C1A5BF31B1B9E5871 /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
+		66293BC5F36C40F9C1E209975BC0E1AC /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionDisplayProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
+		682D83AB690DF004ACE0B76B3CA26F33 /* Pods-Squinter-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-frameworks.sh"; sourceTree = "<group>"; };
+		6873D4F59573F74DEA52D96F5ACA4A44 /* SUVersionComparisonProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionComparisonProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionComparisonProtocol.h; sourceTree = "<group>"; };
+		6CCA979B49D3FDD328058DF1F29DB8C0 /* SPUDownloadData.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloadData.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloadData.h; sourceTree = "<group>"; };
+		6F40A506434F88774DA4D603A3BC4357 /* libPDKeychainBindingsController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libPDKeychainBindingsController.a; path = libPDKeychainBindingsController.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		73BC27DD7A112F0678DC62AE7670FEF0 /* PDKeychainBindingsController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PDKeychainBindingsController-prefix.pch"; sourceTree = "<group>"; };
+		772D52C81AC504AE1A2B6C45DF8989F1 /* PDKeychainBindings.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindings.h; path = PDKeychainBindingsController/PDKeychainBindings.h; sourceTree = "<group>"; };
+		797C41C8D0416BF18C989A41FB8201E0 /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-Squinter.a"; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7FB8C7A2C94D95210ECCE5750893B63C /* Sparkle.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Sparkle.xcconfig; sourceTree = "<group>"; };
+		88A29132CFB73C9D19667ACCB3AF3F36 /* SPUDownloaderProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderProtocol.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderProtocol.h; sourceTree = "<group>"; };
+		8A6FEE715CB4233F1A578863DBFF5B78 /* SUExport.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUExport.h; path = Sparkle.framework/Versions/A/Headers/SUExport.h; sourceTree = "<group>"; };
+		92870B3570E775033AF31C284AF47B8F /* PDKeychainBindingsController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindingsController.m; path = PDKeychainBindingsController/PDKeychainBindingsController.m; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9FEBC1AD93A507AD9B85E70B3B1B7956 /* SUAppcastItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcastItem.h; path = Sparkle.framework/Versions/A/Headers/SUAppcastItem.h; sourceTree = "<group>"; };
+		B579DECA6FFA35219BF7C575AFB1FE97 /* SUErrors.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUErrors.h; path = Sparkle.framework/Versions/A/Headers/SUErrors.h; sourceTree = "<group>"; };
+		B8372D7D4F8007E04EAA3DA6B99986C2 /* SPUURLRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUURLRequest.h; path = Sparkle.framework/Versions/A/Headers/SPUURLRequest.h; sourceTree = "<group>"; };
+		BC4B313980AEFDE4B94CF222DEF592C9 /* Sparkle.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Sparkle.h; path = Sparkle.framework/Versions/A/Headers/Sparkle.h; sourceTree = "<group>"; };
+		D743E632F538071A66445EDE2F3B618C /* PDKeychainBindingsController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindingsController.h; path = PDKeychainBindingsController/PDKeychainBindingsController.h; sourceTree = "<group>"; };
+		D8FA50CB6B5E131000154C3F3285B313 /* SUStandardVersionComparator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUStandardVersionComparator.h; path = Sparkle.framework/Versions/A/Headers/SUStandardVersionComparator.h; sourceTree = "<group>"; };
+		DB0D5775AEB11017F8DAC14CBCAE288F /* SPUDownloader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloader.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloader.h; sourceTree = "<group>"; };
+		E7EB9B4A4AEB0CF6EAAFA1BAE64999A3 /* SPUDownloaderSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderSession.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderSession.h; sourceTree = "<group>"; };
+		EC5B60A400105B75374EDE4DB7041A2D /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDelegate.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDelegate.h; sourceTree = "<group>"; };
+		F90F3BCA72C227475F7CC7EA807076B0 /* Pods-Squinter-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Squinter-acknowledgements.markdown"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		737D2B25687384F0FA7383C1E8F670F8 /* Frameworks */ = {
+		2975491EC3D266EE0B027DE04287DD23 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9D6884818883909347ACAD17306ED092 /* Frameworks */ = {
+		BE9C65A8AB9473781900E3DB66D9CE74 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CFE2555664C18DA3D625E33482E0511D /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		04230453B0F69292DA7C1370A17CA86B /* Pods */ = {
+		0A59C2A8B4905C8D8BB0030476534EB2 /* PDKeychainBindingsController */ = {
 			isa = PBXGroup;
 			children = (
-				CA3DABD470A2072D848AF9D3C32B2064 /* PDKeychainBindingsController */,
-				BCBA6F4160D76FDC8905D1F2EC658FC3 /* Sparkle */,
+				772D52C81AC504AE1A2B6C45DF8989F1 /* PDKeychainBindings.h */,
+				0AF7A1EC960A7A71CD995B0DF6EBF804 /* PDKeychainBindings.m */,
+				D743E632F538071A66445EDE2F3B618C /* PDKeychainBindingsController.h */,
+				92870B3570E775033AF31C284AF47B8F /* PDKeychainBindingsController.m */,
+				DA668BFA4269B2317CDB42AF5CD6FFB2 /* Support Files */,
 			);
-			name = Pods;
+			name = PDKeychainBindingsController;
+			path = PDKeychainBindingsController;
 			sourceTree = "<group>";
 		};
-		39E9EE8210D861DFD82346C1F5EB7218 /* Frameworks */ = {
+		10DEEAD2E501D185BCE93A528833E1D2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				FF9BDDA518B0CC1ED04B1F0B84D2C094 /* OS X */,
+				5511D8113DEC8CE3FD3BD73BC68EA7E0 /* Sparkle.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		65EB315F4C34701C397DF67A247DEB60 /* Pods-Squinter */ = {
+		2A508BAB14FAA5B6275B5353CE88FCE3 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				C2F59278DC245CB9F5FA6EC95B21749C /* Pods-Squinter-acknowledgements.markdown */,
-				85542DF10D139373E443EA53A7046838 /* Pods-Squinter-acknowledgements.plist */,
-				F1F85FFC4043741178099BFB03FE0D2D /* Pods-Squinter-dummy.m */,
-				3B27A65E59E135C6268B3D7C30BE3C4D /* Pods-Squinter-frameworks.sh */,
-				9C267CF6718BE6C5C829FA0744635FD7 /* Pods-Squinter-resources.sh */,
-				6C744BC71AA85B4E3BE0118F1AB09201 /* Pods-Squinter.debug.xcconfig */,
-				CD428214D18A3429A3F10283863DD4FC /* Pods-Squinter.release.xcconfig */,
+				7FB8C7A2C94D95210ECCE5750893B63C /* Sparkle.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Sparkle";
+			sourceTree = "<group>";
+		};
+		46E7E004967F73AC430013983D8ADC4B /* Pods-Squinter */ = {
+			isa = PBXGroup;
+			children = (
+				F90F3BCA72C227475F7CC7EA807076B0 /* Pods-Squinter-acknowledgements.markdown */,
+				552BF26F097240105828DF717F95AB2D /* Pods-Squinter-acknowledgements.plist */,
+				2ED0FDD5420B63343DDE9C5CD9E7A5E4 /* Pods-Squinter-dummy.m */,
+				682D83AB690DF004ACE0B76B3CA26F33 /* Pods-Squinter-frameworks.sh */,
+				62F1560517BFED2C1A5BF31B1B9E5871 /* Pods-Squinter.debug.xcconfig */,
+				1A909A165CA4CB2C076E23E221DB8ED6 /* Pods-Squinter.release.xcconfig */,
 			);
 			name = "Pods-Squinter";
 			path = "Target Support Files/Pods-Squinter";
 			sourceTree = "<group>";
 		};
-		74B80DDBE50E38D6832BDEC3EB3C685C /* Support Files */ = {
+		5F588252DA49613F03C2660EE691DB89 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				457E0242F0AAF8F9B3697C22CFF8F4DC /* PDKeychainBindingsController.xcconfig */,
-				16A1093E68E33988325929195C280F9F /* PDKeychainBindingsController-dummy.m */,
-				344FD2AD871E71821C8BC71EF2A63B2A /* PDKeychainBindingsController-prefix.pch */,
+				0A59C2A8B4905C8D8BB0030476534EB2 /* PDKeychainBindingsController */,
+				C6BF3D9C02E28DF233EDB5C030B83C5C /* Sparkle */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		713AB20E7275F720F35A1D89EDFE8D40 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6F40A506434F88774DA4D603A3BC4357 /* libPDKeychainBindingsController.a */,
+				797C41C8D0416BF18C989A41FB8201E0 /* libPods-Squinter.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		722D335400C47C723F6289C45BF0D2B6 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				46E7E004967F73AC430013983D8ADC4B /* Pods-Squinter */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		C6BF3D9C02E28DF233EDB5C030B83C5C /* Sparkle */ = {
+			isa = PBXGroup;
+			children = (
+				BC4B313980AEFDE4B94CF222DEF592C9 /* Sparkle.h */,
+				6CCA979B49D3FDD328058DF1F29DB8C0 /* SPUDownloadData.h */,
+				DB0D5775AEB11017F8DAC14CBCAE288F /* SPUDownloader.h */,
+				EC5B60A400105B75374EDE4DB7041A2D /* SPUDownloaderDelegate.h */,
+				010740C49996378D667351646F57EE00 /* SPUDownloaderDeprecated.h */,
+				88A29132CFB73C9D19667ACCB3AF3F36 /* SPUDownloaderProtocol.h */,
+				E7EB9B4A4AEB0CF6EAAFA1BAE64999A3 /* SPUDownloaderSession.h */,
+				B8372D7D4F8007E04EAA3DA6B99986C2 /* SPUURLRequest.h */,
+				1BB206D676CDE55F99F2848CBA71A5A3 /* SUAppcast.h */,
+				9FEBC1AD93A507AD9B85E70B3B1B7956 /* SUAppcastItem.h */,
+				1953B87DD32C43A80BCE3C44285D9569 /* SUCodeSigningVerifier.h */,
+				B579DECA6FFA35219BF7C575AFB1FE97 /* SUErrors.h */,
+				8A6FEE715CB4233F1A578863DBFF5B78 /* SUExport.h */,
+				D8FA50CB6B5E131000154C3F3285B313 /* SUStandardVersionComparator.h */,
+				45C7C18F1DA2B3773826C9D68373EE9D /* SUUpdater.h */,
+				590239F17F3C126CEB7E3588A00AE842 /* SUUpdaterDelegate.h */,
+				6873D4F59573F74DEA52D96F5ACA4A44 /* SUVersionComparisonProtocol.h */,
+				66293BC5F36C40F9C1E209975BC0E1AC /* SUVersionDisplayProtocol.h */,
+				10DEEAD2E501D185BCE93A528833E1D2 /* Frameworks */,
+				2A508BAB14FAA5B6275B5353CE88FCE3 /* Support Files */,
+			);
+			name = Sparkle;
+			path = Sparkle;
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				D89477F20FB1DE18A04690586D7808C4 /* Frameworks */,
+				5F588252DA49613F03C2660EE691DB89 /* Pods */,
+				713AB20E7275F720F35A1D89EDFE8D40 /* Products */,
+				722D335400C47C723F6289C45BF0D2B6 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D89477F20FB1DE18A04690586D7808C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DA668BFA4269B2317CDB42AF5CD6FFB2 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				0D316683B4536741B383D5CD9B64C8DF /* PDKeychainBindingsController.xcconfig */,
+				1CB72E8DF544238DE4AE360F23E96AF8 /* PDKeychainBindingsController-dummy.m */,
+				73BC27DD7A112F0678DC62AE7670FEF0 /* PDKeychainBindingsController-prefix.pch */,
 			);
 			name = "Support Files";
 			path = "../Target Support Files/PDKeychainBindingsController";
 			sourceTree = "<group>";
 		};
-		78F69EC23267D3837BA4BB20011F90FF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D729B1A9DC2BC52D819E8966F2B30054 /* libPDKeychainBindingsController.a */,
-				5E215323AA286323CEAF528BDAB28B4D /* libPods-Squinter.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		7DB346D0F39D3F0E887471402A8071AB = {
-			isa = PBXGroup;
-			children = (
-				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
-				39E9EE8210D861DFD82346C1F5EB7218 /* Frameworks */,
-				04230453B0F69292DA7C1370A17CA86B /* Pods */,
-				78F69EC23267D3837BA4BB20011F90FF /* Products */,
-				AFA4C2392FBCE9D1FD8B879D39F6AD39 /* Targets Support Files */,
-			);
-			sourceTree = "<group>";
-		};
-		AD35A43BFC9006C85D62EE96C1B2B07C /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				0F3DB665151038C5C8F033C998784E4D /* Sparkle.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		AFA4C2392FBCE9D1FD8B879D39F6AD39 /* Targets Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				65EB315F4C34701C397DF67A247DEB60 /* Pods-Squinter */,
-			);
-			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		BCBA6F4160D76FDC8905D1F2EC658FC3 /* Sparkle */ = {
-			isa = PBXGroup;
-			children = (
-				41708E096192AF8FC16686A16C7BE7FC /* Sparkle.h */,
-				711E4ACFE02C80CC066E1B07BF2274A0 /* SPUDownloadData.h */,
-				0D02341A2D0E85B6CBDFF82506E0E5CC /* SPUDownloader.h */,
-				778EEAE69D981D3B7F8EC73107D33F08 /* SPUDownloaderDelegate.h */,
-				5EFFFBB95A23C7FBF7A469B29E4B7D02 /* SPUDownloaderDeprecated.h */,
-				3831C46FEF864F190D43B97FE252807A /* SPUDownloaderProtocol.h */,
-				E8437F79B195ADC0F7DD072D4EEF1F5C /* SPUDownloaderSession.h */,
-				DDEABBF360EAAF25EB7EEE0BD9949684 /* SPUURLRequest.h */,
-				CDCB7261448FD8D11E4DC78042761B7B /* SUAppcast.h */,
-				52405E184B1DCB82AE96EDC46531DD3B /* SUAppcastItem.h */,
-				1EB51E4D5256C447B16433743E857D0E /* SUCodeSigningVerifier.h */,
-				D77CC62691AFBE6244CF241E5465F9DB /* SUErrors.h */,
-				BB380AC2AB669A1DD89260ABF3A9F201 /* SUExport.h */,
-				73BC54EAE7D710D168B0F29583071191 /* SUStandardVersionComparator.h */,
-				80C69DCBF80DAA9FDC5BD66A2D3176C1 /* SUUpdater.h */,
-				6E31EA8DF0660C908EEF84BD9B1B27EC /* SUUpdaterDelegate.h */,
-				10AA20D6381341AB068301EAC934D0CC /* SUVersionComparisonProtocol.h */,
-				DC9EB561906F89594ABB38DE5AC7B791 /* SUVersionDisplayProtocol.h */,
-				AD35A43BFC9006C85D62EE96C1B2B07C /* Frameworks */,
-			);
-			path = Sparkle;
-			sourceTree = "<group>";
-		};
-		CA3DABD470A2072D848AF9D3C32B2064 /* PDKeychainBindingsController */ = {
-			isa = PBXGroup;
-			children = (
-				89BB68341BB26B0ACF1259AF2EE5FEA3 /* PDKeychainBindings.h */,
-				17065C62607723E573886F7CC9143C40 /* PDKeychainBindings.m */,
-				474539C8EBF96276BC9D53E2D38BA452 /* PDKeychainBindingsController.h */,
-				C46F4DCBF47B1280BCBCC006FD0DC3F4 /* PDKeychainBindingsController.m */,
-				74B80DDBE50E38D6832BDEC3EB3C685C /* Support Files */,
-			);
-			path = PDKeychainBindingsController;
-			sourceTree = "<group>";
-		};
-		FF9BDDA518B0CC1ED04B1F0B84D2C094 /* OS X */ = {
-			isa = PBXGroup;
-			children = (
-				28B924366A65E6218D08AE35A9FB835F /* Security.framework */,
-			);
-			name = "OS X";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		1E8ED1886B0D67A67DCC9DE4E5CA0DA3 /* Headers */ = {
+		1767ED353285F715449423967B443ABE /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02E5F53A451AED88E04C5B92796A011A /* PDKeychainBindings.h in Headers */,
-				0E7A391F53FB96FF70299057AA48D760 /* PDKeychainBindingsController.h in Headers */,
+				88DA5FC173B90086E59B31B0AB1AB800 /* PDKeychainBindings.h in Headers */,
+				6211155D49542C001E8A2B2781CD7D71 /* PDKeychainBindingsController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		99DF2A3930F8336A75F1F4E3B242CB18 /* Headers */ = {
+		E19C5C051FF20B2C8295C48D7FBFF9A1 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,13 +250,13 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		90BC0B4EA2F7FDA0E5E56FF67FB011DA /* PDKeychainBindingsController */ = {
+		3E16F7AAA4A355D417CE678B1356AE47 /* PDKeychainBindingsController */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B155C12C124C9EA3CFCEDF7F78C65F25 /* Build configuration list for PBXNativeTarget "PDKeychainBindingsController" */;
+			buildConfigurationList = 2548CE80F6992FD9538D8B7E400F32E1 /* Build configuration list for PBXNativeTarget "PDKeychainBindingsController" */;
 			buildPhases = (
-				1E8ED1886B0D67A67DCC9DE4E5CA0DA3 /* Headers */,
-				162A16FEB64FC797A887ACE9F20DA594 /* Sources */,
-				9D6884818883909347ACAD17306ED092 /* Frameworks */,
+				1767ED353285F715449423967B443ABE /* Headers */,
+				E06FBF8C3761ACDE4EBA5AD8B10E18C4 /* Sources */,
+				2975491EC3D266EE0B027DE04287DD23 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -246,89 +264,112 @@
 			);
 			name = PDKeychainBindingsController;
 			productName = PDKeychainBindingsController;
-			productReference = D729B1A9DC2BC52D819E8966F2B30054 /* libPDKeychainBindingsController.a */;
+			productReference = 6F40A506434F88774DA4D603A3BC4357 /* libPDKeychainBindingsController.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		F58F1568EAFD87A9F907B804E87A6499 /* Pods-Squinter */ = {
+		B4AF8D792700040A2FB29572FD2FDE08 /* Pods-Squinter */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6CFF7193B74ECF8C06BE24396B06FEEA /* Build configuration list for PBXNativeTarget "Pods-Squinter" */;
+			buildConfigurationList = BA90B610F97B4CA54EB863ACC2858F06 /* Build configuration list for PBXNativeTarget "Pods-Squinter" */;
 			buildPhases = (
-				99DF2A3930F8336A75F1F4E3B242CB18 /* Headers */,
-				9A1DA9388CFC6CF3C221DB1269F233E6 /* Sources */,
-				737D2B25687384F0FA7383C1E8F670F8 /* Frameworks */,
+				E19C5C051FF20B2C8295C48D7FBFF9A1 /* Headers */,
+				FEF2123904076C3135D58EF8B83E728A /* Sources */,
+				BE9C65A8AB9473781900E3DB66D9CE74 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				D7A6DB46A73793BBC6EDC0342AD1B737 /* PBXTargetDependency */,
+				7A2557F16DD60D575C067172B94CC6A5 /* PBXTargetDependency */,
+				AC92442C73E2E1C2268511DEBAE151E8 /* PBXTargetDependency */,
 			);
 			name = "Pods-Squinter";
 			productName = "Pods-Squinter";
-			productReference = 5E215323AA286323CEAF528BDAB28B4D /* libPods-Squinter.a */;
+			productReference = 797C41C8D0416BF18C989A41FB8201E0 /* libPods-Squinter.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0930;
 				LastUpgradeCheck = 0930;
 			};
-			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
-			productRefGroup = 78F69EC23267D3837BA4BB20011F90FF /* Products */;
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			productRefGroup = 713AB20E7275F720F35A1D89EDFE8D40 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				90BC0B4EA2F7FDA0E5E56FF67FB011DA /* PDKeychainBindingsController */,
-				F58F1568EAFD87A9F907B804E87A6499 /* Pods-Squinter */,
+				3E16F7AAA4A355D417CE678B1356AE47 /* PDKeychainBindingsController */,
+				B4AF8D792700040A2FB29572FD2FDE08 /* Pods-Squinter */,
+				7DC4CB8008EA5E0E617F5CCF32EFDCD3 /* Sparkle */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		162A16FEB64FC797A887ACE9F20DA594 /* Sources */ = {
+		E06FBF8C3761ACDE4EBA5AD8B10E18C4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AB3701CEEAB6AC8A7DEDD79EB4486851 /* PDKeychainBindings.m in Sources */,
-				B7D2C59084AEED7A37B072A07AF5621E /* PDKeychainBindingsController-dummy.m in Sources */,
-				DEC8F96225EE0F295E9DED15EDF081D9 /* PDKeychainBindingsController.m in Sources */,
+				96E4AD22C12C7D97D41EF9A67EFE8CA7 /* PDKeychainBindings.m in Sources */,
+				E18E173EA8E0914964CFECD0C5FBF81A /* PDKeychainBindingsController-dummy.m in Sources */,
+				9C03292AAA543A0B8E3F75A2B338C02D /* PDKeychainBindingsController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9A1DA9388CFC6CF3C221DB1269F233E6 /* Sources */ = {
+		FEF2123904076C3135D58EF8B83E728A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C0C0F30194A4A4441EEF5B1385E7643 /* Pods-Squinter-dummy.m in Sources */,
+				B2D69A44B9C961373D6917AD972B4CE0 /* Pods-Squinter-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		D7A6DB46A73793BBC6EDC0342AD1B737 /* PBXTargetDependency */ = {
+		7A2557F16DD60D575C067172B94CC6A5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = PDKeychainBindingsController;
-			target = 90BC0B4EA2F7FDA0E5E56FF67FB011DA /* PDKeychainBindingsController */;
-			targetProxy = C447A2A60E02CDBDD5C12B185EDE7702 /* PBXContainerItemProxy */;
+			target = 3E16F7AAA4A355D417CE678B1356AE47 /* PDKeychainBindingsController */;
+			targetProxy = 952EC349640FCD5B9BD9F7BB7F94E848 /* PBXContainerItemProxy */;
+		};
+		AC92442C73E2E1C2268511DEBAE151E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Sparkle;
+			target = 7DC4CB8008EA5E0E617F5CCF32EFDCD3 /* Sparkle */;
+			targetProxy = DE83062CE078FF52809EA413C16994EB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		583C9F68A2EBCFD6DD4C60CBE1111095 /* Debug */ = {
+		28BCE6BAF0764B6C7DEAD7FA227D3AEE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 457E0242F0AAF8F9B3697C22CFF8F4DC /* PDKeychainBindingsController.xcconfig */;
+			baseConfigurationReference = 7FB8C7A2C94D95210ECCE5750893B63C /* Sparkle.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3A2F5544972013FA3FE222F75E78C757 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0D316683B4536741B383D5CD9B64C8DF /* PDKeychainBindingsController.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -349,11 +390,12 @@
 			};
 			name = Debug;
 		};
-		63AD4E0887E4DFA7C800C0C4ED4CABFE /* Debug */ = {
+		6BC42CEC40773C208D38654C51D5E716 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6C744BC71AA85B4E3BE0118F1AB09201 /* Pods-Squinter.debug.xcconfig */;
+			baseConfigurationReference = 1A909A165CA4CB2C076E23E221DB8ED6 /* Pods-Squinter.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -369,33 +411,9 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
-			name = Debug;
-		};
-		821AED8D5196DCA3D0D25EF6EB62BBF1 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 457E0242F0AAF8F9B3697C22CFF8F4DC /* PDKeychainBindingsController.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				EXECUTABLE_PREFIX = lib;
-				GCC_PREFIX_HEADER = "Target Support Files/PDKeychainBindingsController/PDKeychainBindingsController-prefix.pch";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = PDKeychainBindingsController;
-				PRODUCT_NAME = PDKeychainBindingsController;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-			};
 			name = Release;
 		};
-		CD62773D394C5354AFBE474AB939F69A /* Debug */ = {
+		7AEF910A53385514FB037088386E649D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -427,8 +445,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -448,18 +464,43 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				SYMROOT = "${SRCROOT}/../build";
 			};
 			name = Debug;
 		};
-		CE426DE8F6860F79D2B45C2829F9D5A8 /* Release */ = {
+		80749823E97713BAAA84B87AF37D4262 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 62F1560517BFED2C1A5BF31B1B9E5871 /* Pods-Squinter.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				EXECUTABLE_PREFIX = lib;
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		AB39E9DAA3FB7A60D3F76D07BB1684A5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -491,8 +532,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -509,68 +548,97 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 4.2;
 				SYMROOT = "${SRCROOT}/../build";
 			};
 			name = Release;
 		};
-		E9E33AD3C6F76FD49E7DEDF00447C9BE /* Release */ = {
+		BDB40108E61EB583B42195B12B054343 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CD428214D18A3429A3F10283863DD4FC /* Pods-Squinter.release.xcconfig */;
+			baseConfigurationReference = 7FB8C7A2C94D95210ECCE5750893B63C /* Sparkle.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E250BD340E82C8711E576DCA504AB3B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0D316683B4536741B383D5CD9B64C8DF /* PDKeychainBindingsController.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				EXECUTABLE_PREFIX = lib;
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				GCC_PREFIX_HEADER = "Target Support Files/PDKeychainBindingsController/PDKeychainBindingsController-prefix.pch";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = PDKeychainBindingsController;
+				PRODUCT_NAME = PDKeychainBindingsController;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
+		2548CE80F6992FD9538D8B7E400F32E1 /* Build configuration list for PBXNativeTarget "PDKeychainBindingsController" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CD62773D394C5354AFBE474AB939F69A /* Debug */,
-				CE426DE8F6860F79D2B45C2829F9D5A8 /* Release */,
+				3A2F5544972013FA3FE222F75E78C757 /* Debug */,
+				E250BD340E82C8711E576DCA504AB3B6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6CFF7193B74ECF8C06BE24396B06FEEA /* Build configuration list for PBXNativeTarget "Pods-Squinter" */ = {
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				63AD4E0887E4DFA7C800C0C4ED4CABFE /* Debug */,
-				E9E33AD3C6F76FD49E7DEDF00447C9BE /* Release */,
+				7AEF910A53385514FB037088386E649D /* Debug */,
+				AB39E9DAA3FB7A60D3F76D07BB1684A5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B155C12C124C9EA3CFCEDF7F78C65F25 /* Build configuration list for PBXNativeTarget "PDKeychainBindingsController" */ = {
+		BA90B610F97B4CA54EB863ACC2858F06 /* Build configuration list for PBXNativeTarget "Pods-Squinter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				583C9F68A2EBCFD6DD4C60CBE1111095 /* Debug */,
-				821AED8D5196DCA3D0D25EF6EB62BBF1 /* Release */,
+				80749823E97713BAAA84B87AF37D4262 /* Debug */,
+				6BC42CEC40773C208D38654C51D5E716 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1A68E4CE81A46C8AF01D112BF4DE216 /* Build configuration list for PBXAggregateTarget "Sparkle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28BCE6BAF0764B6C7DEAD7FA227D3AEE /* Debug */,
+				BDB40108E61EB583B42195B12B054343 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 }
