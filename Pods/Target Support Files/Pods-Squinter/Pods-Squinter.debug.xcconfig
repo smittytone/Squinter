@@ -1,9 +1,8 @@
 FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Sparkle"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/PDKeychainBindingsController" "${PODS_ROOT}/Headers/Public/Sparkle"
-LD_RUNPATH_SEARCH_PATHS = @loader_path/../Frameworks $(inherited) '@executable_path/../Frameworks' '@loader_path/Frameworks'
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/PDKeychainBindingsController"
+LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/../Frameworks' '@loader_path/Frameworks' @loader_path/../Frameworks
 LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/PDKeychainBindingsController"
-OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/PDKeychainBindingsController" -isystem "${PODS_ROOT}/Headers/Public/Sparkle"
 OTHER_LDFLAGS = $(inherited) -ObjC -l"PDKeychainBindingsController" -framework "Security" -framework "Sparkle"
 PODS_BUILD_DIR = ${BUILD_DIR}
 PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
