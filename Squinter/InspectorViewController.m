@@ -523,7 +523,7 @@
         if ((NSNull *)mac == [NSNull null]) mac = nil;
         dnode = [[TreeNode alloc] init];
         dnode.key = @"MAC";
-        dnode.value = man != nil ? [mac stringByReplacingOccurrencesOfString:@":" withString:@""] : @"Unknown";
+        dnode.value = mac != nil ? [mac stringByReplacingOccurrencesOfString:@":" withString:@""] : @"Unknown";
         [deviceData addObject:dnode];
 
         // Device Status
