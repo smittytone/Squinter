@@ -459,9 +459,11 @@
 
         // Device Name
 
+        NSString *name = [device valueForKeyPath:@"attributes.name"];
+        if ((NSNull *)name == [NSNull null]) name = nil;
         dnode = [[TreeNode alloc] init];
         dnode.key = @"Name";
-        dnode.value = [device valueForKeyPath:@"attributes.name"];
+        dnode.value = name != nil ? name : @"Not set";
         [deviceData addObject:dnode];
 
         // Device ID
@@ -475,13 +477,10 @@
 
         NSString *type = [device valueForKeyPath:@"attributes.imp_type"];
         if ((NSNull *)type == [NSNull null]) type = nil;
-        if (type != nil)
-        {
-            dnode = [[TreeNode alloc] init];
-            dnode.key = @"Type";
-            dnode.value = type;
-            [deviceData addObject:dnode];
-        }
+        dnode = [[TreeNode alloc] init];
+        dnode.key = @"Type";
+        dnode.value = type != nil ? type : @"Unknown";
+        [deviceData addObject:dnode];
 
         // Device impOS Version
 
@@ -520,18 +519,20 @@
 
         // Device MAC Address
 
+        NSString *mac = [device valueForKeyPath:@"attributes.mac_address"];
+        if ((NSNull *)mac == [NSNull null]) mac = nil;
         dnode = [[TreeNode alloc] init];
         dnode.key = @"MAC";
-        NSString *mac = [device valueForKeyPath:@"attributes.mac_address"];
-        dnode.value = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
+        dnode.value = man != nil ? [mac stringByReplacingOccurrencesOfString:@":" withString:@""] : @"Unknown";
         [deviceData addObject:dnode];
 
         // Device Status
 
         NSNumber *num = [device valueForKeyPath:@"attributes.device_online"];
+        if ((NSNull *)num == [NSNull null]) num = nil;
         dnode = [[TreeNode alloc] init];
         dnode.key = @"Status";
-        NSString *string = num.boolValue ? @"Online" : @"Offline";
+        NSString *string = num != nil && num.boolValue ? @"Online" : @"Offline";
         dnode.value = string;
         [deviceData addObject:dnode];
 
@@ -572,9 +573,10 @@
         // Agent Status
 
         num = [device valueForKeyPath:@"attributes.agent_running"];
+        if ((NSNull *)num == [NSNull null]) num = nil;
         dnode = [[TreeNode alloc] init];
         dnode.key = @"Status";
-        dnode.value = num.boolValue ? @"Online" : @"Offline";;
+        dnode.value = num != nil && num.boolValue ? @"Online" : @"Offline";
         [deviceData addObject:dnode];
 
         // Agent URL
