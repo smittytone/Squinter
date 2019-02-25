@@ -13128,32 +13128,37 @@
 
     if (feedback.length == 0) return;
 
+    if (connectionIndicator.hidden == YES)
+    {
+        // Start the connection indicator
+        
+        connectionIndicator.hidden = NO;
+        [connectionIndicator startAnimation:self];
+    }
+    
     // Send the string etc.
 
     NSError *error = nil;
-
+    
     NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
     NSString *userAgent = [NSString stringWithFormat:@"%@/%@.%@ (macOS %li.%li.%li)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleExecutable"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
                  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], (long)sysVer.majorVersion, (long)sysVer.minorVersion, (long)sysVer.patchVersion];
 
-    NSDictionary *dict = @{ @"comment" : feedback,
-                            @"useragent" : userAgent };
+    // UP TO 2.2.126
+    // NSDictionary *dict = @{ @"comment" : feedback, @"useragent" : userAgent };
 
+    // FROM 2.2.127
+    NSDate *date = [NSDate date];
+    NSDictionary *dict = @{ @"text" : [NSString stringWithFormat:@"*FEEDBACK REPORT*\n*DATE* %@\n*USER AGENT* %@\n*FEEDBACK* %@", [def stringFromDate:date], userAgent, feedback],
+              @"mrkdwn" : @YES };
 
-    if (connectionIndicator.hidden == YES)
-    {
-        // Start the connection indicator
-
-        connectionIndicator.hidden = NO;
-        [connectionIndicator startAnimation:self];
-    }
-
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kSquinterFeedbackAddress]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[kSquinterFeedbackAddressA stringByAppendingString:kSquinterFeedbackAddressB]]];
     request.HTTPMethod = @"POST";
     request.HTTPBody = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
 
     [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:kSquinterFeedbackUUID forHTTPHeaderField:@"X-Squinter-ID"];
+    //[request setValue:kSquinterFeedbackUUID forHTTPHeaderField:@"X-Squinter-ID"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-type"];
 
     if (error != nil || request == nil)
     {
