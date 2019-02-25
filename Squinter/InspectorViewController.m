@@ -12,7 +12,7 @@
 
 @implementation InspectorViewController
 
-@synthesize project, device, products, tabIndex, loggingDevices;
+@synthesize project, device, products, tabIndex, loggingDevices, projectArray;
 
 
 #pragma mark - ViewController Methods
@@ -164,8 +164,14 @@
                 {
                     node = [[TreeNode alloc] init];
                     node.key = @"Product Name";
-                    node.value = [product valueForKeyPath:@"attributes.name"];
-                    [projectData addObject:node];
+                    
+                    NSString *name = [product valueForKeyPath:@"attributes.name"];
+                    if ((NSNull *)name == [NSNull null]) name = nil;
+                    if (name != nil)
+                    {
+                        node.value = name;
+                        [projectData addObject:node];
+                    }
                 }
             }
         }
@@ -626,19 +632,28 @@
         dnode.value = @"Unassigned";
         NSDictionary *dg = [device valueForKeyPath:@"relationships.devicegroup"];
         if ((NSNull *)dg == [NSNull null]) dg = nil;
+        
         if (dg != nil)
         {
             NSString *dgid = [dg objectForKey:@"id"];
             BOOL got = NO;
-
-            for (Devicegroup *devicegroup in project.devicegroups)
+            
+            if (projectArray.count > 0)
             {
-                if ([devicegroup.did compare:dgid] == NSOrderedSame)
+                for (Project *project in projectArray)
                 {
-                    dnode.key = @"Name";
-                    dnode.value = devicegroup.name;
-                    got = YES;
-                    break;
+                    for (Devicegroup *devicegroup in project.devicegroups)
+                    {
+                        if ([devicegroup.did compare:dgid] == NSOrderedSame)
+                        {
+                            dnode.key = @"Name";
+                            dnode.value = devicegroup.name;
+                            got = YES;
+                            break;
+                        }
+                    }
+                    
+                    if (got) break;
                 }
             }
 

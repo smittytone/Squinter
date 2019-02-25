@@ -704,6 +704,7 @@
     // or from the Dock Tile's menu
 
     if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
+    iwvc.projectArray = projectArray;
 }
 
 
