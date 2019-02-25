@@ -22,7 +22,7 @@
     [commitTable reloadData];
 
     commitIndicator.hidden = NO;
-    commitLabel.stringValue = @"Downloading commits...";
+    commitLabel.stringValue = @"Downloading list of commits...";
     commitTable.needsDisplay = YES;
 
     if (commitDef == nil)
