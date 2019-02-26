@@ -681,6 +681,7 @@
 // Help Menu Methods
 
 - (IBAction)showAuthor:(id)sender;
+- (IBAction)showWebHelp:(id)sender;
 
 
 // Preferences Sheet Methods

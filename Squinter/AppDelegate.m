@@ -12706,6 +12706,12 @@
 
 
 
+- (IBAction)showWebHelp:(id)sender
+{
+    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#account"]];
+}
+
+
 #pragma mark - Preferences Sheet Methods
 
 
