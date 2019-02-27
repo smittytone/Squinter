@@ -334,6 +334,7 @@
     IBOutlet NSPanel     *feedbackSheet;
     IBOutlet NSTextField *feedbackField;
 
+    // ADDED IN 2.2.127
     #pragma mark Find Device Sheet
 
     IBOutlet NSPanel     *findDeviceSheet;
@@ -357,7 +358,7 @@
 
     IBOutlet CommitWindowViewController *cwvc;
 
-    // Device Lookup
+    // Device Lookup ADDED IN 2.2.127
 
     IBOutlet DeviceLookupWindowViewController *dlvc;
 
@@ -477,7 +478,7 @@
 - (IBAction)linkProjectToProduct:(id)sender;
 
 
-// New Device Group Mehods
+// New Device Group Methods
 
 - (IBAction)newDevicegroup:(id)sender;
 - (IBAction)newDevicegroupSheetCancel:(id)sender;
@@ -528,6 +529,7 @@
 - (IBAction)deleteDevice:(id)sender;
 - (IBAction)getLogs:(id)sender;
 - (IBAction)streamLogs:(id)sender;
+// ADDED IN 2.2.127
 - (IBAction)findDevice:(id)sender;
 - (IBAction)cancelFindDeviceSheet:(id)sender;
 - (IBAction)useFindDeviceSheet:(id)sender;

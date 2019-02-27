@@ -6,13 +6,13 @@
 
 #import "DeviceLookupWindowViewController.h"
 
+// ADDED IN 2.2.127
 @interface DeviceLookupWindowViewController ()
 
 @end
 
 @implementation DeviceLookupWindowViewController
 @synthesize deviceArray, selectedDeviceID;
-
 
 - (IBAction)checkDevice:(id)sender
 {

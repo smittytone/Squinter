@@ -7,9 +7,10 @@
 #import <Cocoa/Cocoa.h>
 #import "CommitTableCellView.h"
 
-
 NS_ASSUME_NONNULL_BEGIN
 
+
+// ADDED IN 2.2.127
 @interface DeviceLookupWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate>
 
 {

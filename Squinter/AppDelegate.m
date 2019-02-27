@@ -5406,7 +5406,7 @@
 }
 
 
-
+// ADDED IN 2.2.127
 - (IBAction)findDevice:(id)sender
 {
     if (!ide.isLoggedIn)
@@ -5430,14 +5430,14 @@
 }
 
 
-
+// ADDED IN 2.2.127
 - (IBAction)cancelFindDeviceSheet:(id)sender
 {
     [_window endSheet:findDeviceSheet];
 }
 
 
-
+// ADDED IN 2.2.127
 - (IBAction)useFindDeviceSheet:(id)sender
 {
     [_window endSheet:findDeviceSheet];
