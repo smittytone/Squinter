@@ -937,25 +937,33 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
             // If data is a URL or a file link, make sure there's an active button at the end of the row
 
             cv.goToButton.target = self;
-            cv.path = node.value;
-            
-            if (panelSelector.selectedSegment == 1)
-            {
-                // Button setup for the Device Inspector
 
-                cv.goToButton.action = @selector(goToURL:);
-                cv.goToButton.toolTip = @"Click this icon to open the displayed URL in a browser";
+            if ([node.value compare:@"No agent"] == NSOrderedSame)
+            {
+                cv.goToButton.hidden = YES;
             }
             else
             {
-                // Button setup for the Project Inspector
+                cv.path = node.value;
 
-                cv.goToButton.action = @selector(link:);
-                cv.goToButton.toolTip = @"Click this icon to open the displayed file in your editor";
-                cv.row = (node.flag && [node.value hasSuffix:@"squirrelproj"]) ? 0 : 99;
+                if (panelSelector.selectedSegment == 1)
+                {
+                    // Button setup for the Device Inspector
+
+                    cv.goToButton.action = @selector(goToURL:);
+                    cv.goToButton.toolTip = @"Click this icon to open the displayed URL in a browser";
+                }
+                else
+                {
+                    // Button setup for the Project Inspector
+
+                    cv.goToButton.action = @selector(link:);
+                    cv.goToButton.toolTip = @"Click this icon to open the displayed file in your editor";
+                    cv.row = (node.flag && [node.value hasSuffix:@"squirrelproj"]) ? 0 : 99;
+                }
+
+                cv.goToButton.hidden = NO;
             }
-
-            cv.goToButton.hidden = NO;
         }
         else
         {
