@@ -635,13 +635,12 @@
 {
     // Computer is about to sleep, so quickly
     
-    [self writeStringToLog:@"Device sleeping - closing connections..." :YES];
-
     if (ide.isLoggedIn)
     {
         // We're logged in when the device is about to sleep, so kill all connections
         // but remain logged in — we will reconnect on wake
 
+        [self writeStringToLog:@"Mac sleeping - closing connections..." :YES];
         [ide killAllConnections];
 
         reconnectAfterSleepFlag = YES;
@@ -652,7 +651,7 @@
 
 - (void)receiveWakeNote:(NSNotification *)note
 {
-    [self writeStringToLog:@"Device woken" :YES];
+    [self writeStringToLog:@"Mac woken" :YES];
 
     if (reconnectAfterSleepFlag)
     {
