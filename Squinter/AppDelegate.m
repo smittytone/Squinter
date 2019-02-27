@@ -5172,9 +5172,9 @@
 - (IBAction)chooseDevice:(id)sender
 {
     // The user has selected a device from one of three places:
-    //   The Device PopUp
-    //   The 'Device' menu's 'Unassigned Devices' submenu
-    //   The 'Device Groups' menu's 'Project's Device Groups' submenu
+    // - The Device PopUp
+    // - The 'Device' menu's 'Unassigned Devices' submenu
+    // - The 'Device Groups' menu's 'Project's Device Groups' submenu
 
     NSMenuItem *item;
     BOOL isUnassigned = NO;
@@ -5403,6 +5403,64 @@
     [squinterToolbar validateVisibleItems];
     [self refreshDevicesPopup];
     [self refreshDevicegroupMenu];
+}
+
+
+
+- (IBAction)findDevice:(id)sender
+{
+    if (!ide.isLoggedIn)
+    {
+        [self loginAlert:@"find a device using its ID"];
+        return;
+    }
+
+    if (devicesArray == nil || devicesArray.count == 0)
+    {
+        // We have no device(s) to assign
+
+        [self writeErrorToLog:@"[ERROR] You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
+        return;
+    }
+
+    dlvc.deviceArray = devicesArray;
+
+    [dlvc prepSheet];
+    [_window beginSheet:findDeviceSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)cancelFindDeviceSheet:(id)sender
+{
+    [_window endSheet:findDeviceSheet];
+}
+
+
+
+- (IBAction)useFindDeviceSheet:(id)sender
+{
+    [_window endSheet:findDeviceSheet];
+
+    if (dlvc.selectedDeviceID != nil)
+    {
+        for (NSMenuItem *item in devicesPopUp.itemArray)
+        {
+            NSDictionary *device = item.representedObject;
+            NSString *did = [device objectForKey:@"id"];
+
+            if ([did compare:dlvc.selectedDeviceID] == NSOrderedSame)
+            {
+                if (item != devicesPopUp.selectedItem)
+                {
+                    [devicesPopUp selectItem:item];
+                    [self chooseDevice:devicesPopUp];
+                }
+
+                break;
+            }
+        }
+    }
 }
 
 
@@ -12379,6 +12437,7 @@
     unassignDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
     renameDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
     assignDeviceMenuItem.enabled = devicesArray.count > 0 && projectArray.count > 0 ? YES : NO;
+    findDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
 }
 
 

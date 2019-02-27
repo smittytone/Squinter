@@ -27,6 +27,7 @@
 #import "SelectWindowViewController.h"
 #import "InspectorViewController.h"
 #import "LogView.h"
+#import "DeviceLookupWindowViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -120,6 +121,7 @@
     IBOutlet NSMenuItem *checkDeviceStatusMenuItem;
     IBOutlet NSMenuItem *deleteDeviceMenuItem;
     IBOutlet NSMenu     *unassignedDevicesMenu;
+    IBOutlet NSMenuItem *findDeviceMenuItem;
 
     #pragma mark Account Menu Outlets
 
@@ -332,6 +334,10 @@
     IBOutlet NSPanel     *feedbackSheet;
     IBOutlet NSTextField *feedbackField;
 
+    #pragma mark Find Device Sheet
+
+    IBOutlet NSPanel     *findDeviceSheet;
+
     #pragma mark Inspector Panel
 
     IBOutlet InspectorViewController *iwvc;
@@ -350,6 +356,10 @@
     // Commit Window
 
     IBOutlet CommitWindowViewController *cwvc;
+
+    // Device Lookup
+
+    IBOutlet DeviceLookupWindowViewController *dlvc;
 
     // Touch Bar
 
@@ -518,6 +528,9 @@
 - (IBAction)deleteDevice:(id)sender;
 - (IBAction)getLogs:(id)sender;
 - (IBAction)streamLogs:(id)sender;
+- (IBAction)findDevice:(id)sender;
+- (IBAction)cancelFindDeviceSheet:(id)sender;
+- (IBAction)useFindDeviceSheet:(id)sender;
 
 
 // File Location and Opening Methods

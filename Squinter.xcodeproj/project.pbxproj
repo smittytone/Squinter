@@ -36,6 +36,7 @@
 		3BA707602181D97200585728 /* InspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BA7075F2181D97100585728 /* InspectorViewController.m */; };
 		3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */; };
 		3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */; };
+		3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BD74E461D423D6A00565B0E /* SourceCodePro-Regular.otf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -146,6 +147,8 @@
 		3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SelectWindowViewController.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = InspectorDataCellView.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = InspectorDataCellView.m; sourceTree = "<group>"; usesTabs = 0; };
+		3BC06B802226CF9600A57A4D /* DeviceLookupWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLookupWindowViewController.h; sourceTree = "<group>"; };
+		3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceLookupWindowViewController.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = StatusLight.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = StatusLight.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -306,6 +309,8 @@
 				3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */,
 				3B6F3AC41FC31A7700A7F5C1 /* CommitTableCellView.h */,
 				3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */,
+				3BC06B802226CF9600A57A4D /* DeviceLookupWindowViewController.h */,
+				3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */,
 				3B26B99820E5647100AC5D04 /* TreeNode.h */,
 				3B26B99920E5647100AC5D04 /* TreeNode.m */,
 				3BA7075E2181D97100585728 /* InspectorViewController.h */,
@@ -546,6 +551,7 @@
 				3B6AF0DB197127B10083744C /* Project.m in Sources */,
 				3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */,
 				3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */,
+				3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */,
 				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
 				3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */,
 				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
