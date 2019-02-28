@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/05/2015.
-//  Copyright (c) 2015-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2015-19 Tony Smith. All rights reserved.
 
 
 #import "SquinterToolbarItem.h"
@@ -46,6 +46,8 @@
 
 - (void)appWillBecomeActive
 {
+    // App is entering the background to set the toolbar item image to green
+    
     isForeground = YES;
     [self validate];
 }
@@ -54,6 +56,8 @@
 
 - (void)appWillResignActive
 {
+    // App is entering the background to set the toolbar item image to grey
+    
     isForeground = NO;
     [self validate];
 }
@@ -62,14 +66,16 @@
 
 -(void)validate
 {
-	[self setImage:[NSImage imageNamed:(isForeground ? activeImageName : inactiveImageName)]];
+	// Set the toolbar item image name according to whether the app is foregrounded or not
+    
+    [self setImage:[NSImage imageNamed:(isForeground ? activeImageName : inactiveImageName)]];
 }
 
 
 
 - (void)appWillQuit
 {
-    // Stop watching for notifications
+    // App is about to bail, so tidy up: stop watching for notifications
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }

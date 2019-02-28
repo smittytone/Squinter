@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/09/2014.
-//  Copyright (c) 2014-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2014-19 Tony Smith. All rights reserved.
 
 
 #import <Cocoa/Cocoa.h>
@@ -9,7 +9,6 @@
 
 
 @interface StatusLight : NSView
-
 {
     BOOL isLightFull, isLightOn, isForeground;
 }

@@ -1,7 +1,7 @@
 
 
-//  Created by Tony Smith on 15/05/2015.
-//  Copyright (c) 2018 Tony Smith. All rights reserved.
+//  Created by Tony Smith on 15/05/2018.
+//  Copyright (c) 2018-19 Tony Smith. All rights reserved.
 
 
 #import "LoginToolbarItem.h"
@@ -47,8 +47,32 @@
 
 
 
+- (void)appWillBecomeActive
+{
+    // App is entering the background to set the toolbar item image to green
+    
+    isForeground = YES;
+    [self validate];
+}
+
+
+
+- (void)appWillResignActive
+{
+    // App is entering the background to set the toolbar item image to grey
+    
+    isForeground = NO;
+    [self validate];
+}
+
+
+
 - (void)validate
 {
+    // Set the toolbar item image name according to whether the app is foregrounded or not,
+    // and whether the user is currently logged in ('Login') or not ('Logout') and update
+    // the item's label while we're at it
+    
     if (isForeground)
     {
         // App in foreground, so draw in green
@@ -83,25 +107,9 @@
 
 
 
-- (void)appWillBecomeActive
-{
-    isForeground = YES;
-    [self validate];
-}
-
-
-
-- (void)appWillResignActive
-{
-    isForeground = NO;
-    [self validate];
-}
-
-
-
 - (void)appWillQuit
 {
-    // Stop watching for notifications
+    // App is about to bail, so tidy up: stop watching for notifications
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
