@@ -13,6 +13,11 @@
 }
 
 
+- (void)appWillBecomeActive;
+- (void)appWillResignActive;
+- (void)appWillQuit;
+
+
 // Properties are used to set the names of the image files used to represent
 // the toolbar item's user-logged-in state ('login' or 'logout'), and for the
 // toolbar item state itself: 'isLoggedIn'. There's a set of each of these
@@ -22,11 +27,6 @@
 @property (nonatomic, strong) NSString *inactiveLogoutImageName;
 @property (nonatomic, strong) NSString *inactiveLoginImageName;
 @property (nonatomic, assign) BOOL isLoggedIn;
-
-
-- (void)appWillBecomeActive;
-- (void)appWillResignActive;
-- (void)appWillQuit;
 
 
 @end

@@ -9,7 +9,6 @@
 
 
 @interface CommitWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
-
 {
     IBOutlet NSTableView *commitTable;
     IBOutlet NSTextField *commitLabel;

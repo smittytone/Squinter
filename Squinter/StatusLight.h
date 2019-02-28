@@ -14,9 +14,6 @@
 }
 
 
-@property (nonatomic, strong) NSImage *theCurrentImage;
-
-
 - (void)show;
 - (void)hide;
 - (void)setLight:(BOOL)onOrOff;
@@ -27,6 +24,9 @@
 - (void)appWillBecomeActive;
 - (void)appWillResignActive;
 - (void)appWillQuit;
+
+
+@property (nonatomic, strong) NSImage *theCurrentImage;
 
 
 @end

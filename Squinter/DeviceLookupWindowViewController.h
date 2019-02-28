@@ -12,18 +12,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 // ADDED IN 2.2.127
 @interface DeviceLookupWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate>
-
 {
     IBOutlet NSTableView *deviceTable;
     IBOutlet NSTextField *entryField;
 
     NSMutableArray *listedDevices;
 
-    bool useId;
+    bool searchOnDeviceId;
 }
 
 
-- (IBAction)checkDevice:(id)sender;
 - (void)prepSheet;
 
 

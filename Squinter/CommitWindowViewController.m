@@ -16,6 +16,13 @@
 
 - (void)prepSheet
 {
+    // Prepare the sheet's contents ahead of it being displayed
+    // ie. this should always be called before
+    // [window beginSheet:this_sheet]
+    
+    // Clear any previously held commit entries, update the table,
+    // start the activity indicator and set the dialog title string
+    
     if (commits != nil) commits = nil;
 
     [commitIndicator startAnimation:nil];
@@ -24,7 +31,9 @@
     commitIndicator.hidden = NO;
     commitLabel.stringValue = @"Downloading list of commits...";
     commitTable.needsDisplay = YES;
-
+    
+    // Configure the input and output data formatters
+    
     if (commitDef == nil)
     {
         commitDef = [[NSDateFormatter alloc] init];
@@ -44,8 +53,13 @@
 
 - (void)setCommits:(NSArray *)input
 {
+    // This method is called when the 'commits' property is set
+    // after the list of deployments has been downloaded
+    
     commits = input;
 	minIndex = input.count;
+    
+    // Find the minimum deployment among the list of deployments (commits)
 
 	for (NSUInteger i = 0 ; i < commits.count ; ++i)
 	{
@@ -54,7 +68,9 @@
 
 		if (devicegroup.mdid != nil && [devicegroup.mdid compare:depid] == NSOrderedSame) minIndex = i;
 	}
-
+    
+    // Clear the UI: stop the activity viewer and update the table
+    
     [commitIndicator stopAnimation:nil];
     [commitTable reloadData];
 
@@ -67,10 +83,10 @@
 
 - (IBAction)checkMinimum:(id)sender
 {
+    // A deployment/commit's checkbox has been clicked, so unclick all the others
+    // and record which one is to be marked as the selectee
+    
     NSButton *aSender = (NSButton *)sender;
-
-    // Turn off all the other checkboxes by iterating through the list of table rows
-    // and seeing which rows don't match the sender
 
     for (NSUInteger i = 0 ; i < commitTable.numberOfRows ; ++i)
     {
@@ -78,10 +94,14 @@
 
         if (aSender != cellView.minimumCheckbox)
         {
+            // Uncheck the checkbox
+            
             cellView.minimumCheckbox.state = NSOffState;
         }
         else
         {
+            // Record the selected deployment/commit
+            
             minimumDeployment = [commits objectAtIndex:i];
         }
     }
@@ -90,6 +110,7 @@
 
 
 #pragma mark - NSTableView Delegate and DataSource Methods
+
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {

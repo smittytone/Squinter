@@ -15,6 +15,11 @@
 }
 
 
+- (void)appWillBecomeActive;
+- (void)appWillResignActive;
+- (void)appWillQuit;
+
+
 // Properties are used to set the names of the image files used to represent
 // the toolbar item's logging state (on, off or changing, aka 'mid'), and for the
 // toolbar item state itself. There's a set of each of these for when the app is
@@ -26,11 +31,6 @@
 @property (nonatomic, strong) NSString *midImageName;
 @property (nonatomic, strong) NSString *midImageNameGrey;
 @property (nonatomic, assign) NSInteger state;
-
-
-- (void)appWillBecomeActive;
-- (void)appWillResignActive;
-- (void)appWillQuit;
 
 
 @end

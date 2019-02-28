@@ -13,15 +13,15 @@
 }
 
 
+- (void)appWillBecomeActive;
+- (void)appWillResignActive;
+- (void)appWillQuit;
+
+
 // Properties are used to set the names of the image files used to represent
 // the toolbar item's state: active (ie. foregrounded) or inactive
 @property (nonatomic, strong) NSString *activeImageName;
 @property (nonatomic, strong) NSString *inactiveImageName;
-
-
-- (void)appWillBecomeActive;
-- (void)appWillResignActive;
-- (void)appWillQuit;
 
 
 @end

@@ -19,15 +19,15 @@
 }
 
 
+- (IBAction)check:(id)sender;
+- (IBAction)checkGroup:(id)sender;
+- (void)setProject:(Project *)aProject;
+
+
 @property (nonatomic, strong, setter=setProject:) Project *project;
 @property (nonatomic, strong) Devicegroup *theNewDevicegroup;
 @property (nonatomic, strong) Devicegroup *theTarget;
 @property (nonatomic, readwrite) BOOL makeNewFiles;
-
-
-- (IBAction)check:(id)sender;
-- (IBAction)checkGroup:(id)sender;
-- (void)setProject:(Project *)aProject;
 
 
 @end

@@ -15,7 +15,6 @@
 
 @interface InspectorViewController : NSViewController <NSOutlineViewDelegate,
                                                        NSOutlineViewDataSource>
-
 {
     IBOutlet NSOutlineView *deviceOutlineView;
     IBOutlet NSSegmentedControl *panelSelector;
