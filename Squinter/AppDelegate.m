@@ -3383,8 +3383,8 @@
         if (count == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a factory %@ device group", (newType == 1 ? @"test" : @"")];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a production %@ device group as its target, and you have no such device group in this project.", (newType == 1 ? @"test" : @"")];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", (newType == 1 ? @"test" : @"")];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@ production device group as its target, and you have no such device group in this project.", (newType == 1 ? @"test" : @"")];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
@@ -11692,8 +11692,10 @@
         [self refreshDevicegroupByType:@"development_devicegroup"];
         [self refreshDevicegroupByType:@"pre_production_devicegroup"];
         [self refreshDevicegroupByType:@"pre_factoryfixture_devicegroup"];
+        //[self refreshDevicegroupByType:@"pre_dut_devicegroup"];
         [self refreshDevicegroupByType:@"production_devicegroup"];
         [self refreshDevicegroupByType:@"factoryfixture_devicegroup"];
+        //[self refreshDevicegroupByType:@"dut_devicegroup"];
 
         // Add the 'fixed' menu entries
 

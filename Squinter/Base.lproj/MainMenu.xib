@@ -3108,8 +3108,8 @@ Gw
                             <menu key="menu" id="wLO-oy-Okz">
                                 <items>
                                     <menuItem title="Development" state="on" id="zm7-6X-v8r"/>
-                                    <menuItem title="Factory Test" id="EoL-dl-Uqh"/>
-                                    <menuItem title="Production Test" id="WSJ-Sr-rQb">
+                                    <menuItem title="Test Factory" id="EoL-dl-Uqh"/>
+                                    <menuItem title="Test Production" id="WSJ-Sr-rQb">
                                         <modifierMask key="keyEquivalentModifierMask"/>
                                     </menuItem>
                                     <menuItem title="Factory" id="iwf-N1-RPa">

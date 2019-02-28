@@ -817,9 +817,10 @@
     // Exchange device group names Squinter <-> API
     // if 'back' is YES, we return the API name, otherwise the Squinter name
     
-    NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup",
-                          @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
-    NSArray *dgnames = @[ @"Production", @"Factory Fixture", @"Development", @"Factory Test", @"Production Test"];
+    NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"dut_devicegroup", @"development_devicegroup",
+                          @"pre_production_devicegroup", @"pre_factoryfixture_devicegroup", @"pre_dut_devicegroup"];
+    NSArray *dgnames = @[ @"Production", @"Fixture", @"DUT", @"Development",
+                          @"Test Production", @"Test Fixture", @"Test DUT"];
 
     for (NSUInteger i = 0 ; i < dgtypes.count ; ++i)
     {
