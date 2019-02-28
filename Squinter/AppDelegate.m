@@ -10265,50 +10265,81 @@
     NSMutableArray *lines = [[NSMutableArray alloc] init];
 
     [lines addObject:@"Device Information"];
-    [lines addObject:[NSString stringWithFormat:@"     Name: %@", [self getValueFrom:selectedDevice withKey:@"name"]]];
+    
+    NSString *item = [selectedDevice valueForKeyPath:@"attributes.name"];
+    if ((NSNull *)item == [NSNull null]) item = [selectedDevice objectForKey:@"id"];
+    [lines addObject:[NSString stringWithFormat:@"     Name: %@", item]];
+
     [lines addObject:[NSString stringWithFormat:@"       ID: %@", [selectedDevice objectForKey:@"id"]]];
-    [lines addObject:[NSString stringWithFormat:@"     Type: %@", [self getValueFrom:selectedDevice withKey:@"imp_type"]]];
+    
+    item = [selectedDevice valueForKeyPath:@"attributes.imp_type"];
+    if ((NSNull *)item == [NSNull null]) item = @"Unknown";
+    [lines addObject:[NSString stringWithFormat:@"     Type: %@", item]];
 
-    NSString *version = [self getValueFrom:selectedDevice withKey:@"swversion"];
-    NSArray *parts = [version componentsSeparatedByString:@" - "];
-    parts = [[parts objectAtIndex:1] componentsSeparatedByString:@"-"];
-    if (version != nil ) [lines addObject:[NSString stringWithFormat:@"    impOS: %@", [parts objectAtIndex:1]]];
+    NSString *version = [selectedDevice valueForKeyPath:@"attributes.swversion"];
+    if ((NSNull *)version == [NSNull null]) version = nil;
+    if (version != nil)
+    {
+        NSArray *parts = [version componentsSeparatedByString:@" - "];
+        parts = [[parts objectAtIndex:1] componentsSeparatedByString:@"-"];
+        [lines addObject:[NSString stringWithFormat:@"    impOS: %@", [parts objectAtIndex:1]]];
+    }
 
-    NSNumber *number = [self getValueFrom:selectedDevice withKey:@"free_memory"];
+    NSNumber *number = [selectedDevice valueForKeyPath:@"attributes.free_memory"];
+    if ((NSNull *)number == [NSNull null]) number = nil;
     if (number != nil) [lines addObject:[NSString stringWithFormat:@" Free RAM: %@KB", number]];
 
     [lines addObject:@"\nNetwork Information"];
-    NSString *mac = [self getValueFrom:selectedDevice withKey:@"mac_address"];
-    mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
-    [lines addObject:[NSString stringWithFormat:@"      MAC: %@", mac]];
+    NSString *mac = [selectedDevice valueForKeyPath:@"attributes.mac_address"];
+    if ((NSNull *)mac == [NSNull null]) mac = nil;
+    if (mac != nil) mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
+    [lines addObject:[NSString stringWithFormat:@"      MAC: %@", (mac != nil ? mac : @"Unknown")]];
 
-    NSNumber *boolean = [self getValueFrom:selectedDevice withKey:@"device_online"];
-    NSString *string = (boolean.boolValue) ? @"online" : @"offline";
+    NSNumber *boolean = [selectedDevice valueForKeyPath:@"attributes.device_online"];
+    if ((NSNull *)boolean == [NSNull null]) boolean = [NSNumber numberWithBool:NO];
+    NSString *string = boolean.boolValue ? @"Online" : @"Offline";
 
-    if ([string compare:@"online"] == NSOrderedSame) [lines addObject:[NSString stringWithFormat:@"       IP: %@", [self getValueFrom:selectedDevice withKey:@"ip_address"]]];
-
+    if ([string compare:@"Online"] == NSOrderedSame)
+    {
+        NSNumber *ip = [selectedDevice valueForKeyPath:@"attributes.ip_address"];
+        if ((NSNull *)ip == [NSNull null]) ip = nil;
+        NSString *sip = ip != nil ? [NSString stringWithFormat:@"%@", ip] : @"Unknown";
+        [lines addObject:[NSString stringWithFormat:@"       IP: %@", sip]];
+    }
+    else
+    {
+        [lines addObject:@"       IP: Unknown"];
+    }
+    
     [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
 
     [lines addObject:@"\nAgent Information"];
 
-    boolean = [self getValueFrom:selectedDevice withKey:@"agent_running"];
-    string = (boolean.boolValue) ? @"online" : @"offline";
+    boolean = [selectedDevice valueForKeyPath:@"attributes.agent_running"];
+    if ((NSNull *)boolean == [NSNull null]) boolean = [NSNumber numberWithBool:NO];
+    string = boolean.boolValue ? @"Online" : @"Offline";
     [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
 
     if (boolean.boolValue)
     {
-        [lines addObject:[NSString stringWithFormat:@"      URL: https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]]];
+        string = [selectedDevice valueForKeyPath:@"attributes.agent_id"];
+        if ((NSNull *)string == [NSNull null]) string = nil;
+        [lines addObject:(string != nil ? [NSString stringWithFormat:@"      URL: https://agent.electricimp.com/%@", string] : @"Unknown")];
     }
 
     [lines addObject:@"\nBlinkUp Information"];
-    NSString *date = [self getValueFrom:selectedDevice withKey:@"last_enrolled_at"];
+    NSString *date = [selectedDevice valueForKeyPath:@"attributes.last_enrolled_at"];
+    if ((NSNull *)date == [NSNull null]) date = nil;
     [lines addObject:[NSString stringWithFormat:@" Enrolled: %@", (date != nil ? date : @"Unknown")]];
-    NSString *plan = [self getValueFrom:selectedDevice withKey:@"plan_id"];
+    
+    NSString *plan = [selectedDevice valueForKeyPath:@"attributes.plan_id"];
+    if ((NSNull *)plan == [NSNull null]) plan = nil;
     if (plan != nil) [lines addObject:[NSString stringWithFormat:@"  Plan ID: %@", plan]];
 
     [lines addObject:@"\nDevice Group Information"];
     NSString *dgid = [selectedDevice valueForKeyPath:@"relationships.devicegroup.id"];
-
+    if ((NSNull *)dgid == [NSNull null]) dgid = nil;
+    
     if (dgid != nil)
     {
         Devicegroup *adg = nil;
