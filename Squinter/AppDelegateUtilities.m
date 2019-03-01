@@ -640,7 +640,7 @@
         // We're logged in when the device is about to sleep, so kill all connections
         // but remain logged in — we will reconnect on wake
 
-        [self writeStringToLog:@"Mac sleeping - closing connections..." :YES];
+        [self writeStringToLog:@"Mac sleeping - closing active connections..." :YES];
         [ide killAllConnections];
 
         reconnectAfterSleepFlag = YES;
