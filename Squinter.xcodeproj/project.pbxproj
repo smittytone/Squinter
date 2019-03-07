@@ -269,8 +269,8 @@
 			isa = PBXGroup;
 			children = (
 				3B7ACF7E1CFEEBEA0080C3DB /* Core Classes */,
-				3B3015471CFE05C900596CF2 /* BuildAPIAccess */,
 				3B7ACF7D1CFEEBC10080C3DB /* UI Classes */,
+				3B3015471CFE05C900596CF2 /* BuildAPIAccess */,
 				3B3015481CFE05E400596CF2 /* Third-Party */,
 				3B7ACF821CFF0B7B0080C3DB /* Bundled Entities */,
 				3B36D1C11970A0990029CEC0 /* Frameworks */,
