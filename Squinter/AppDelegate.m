@@ -3391,10 +3391,15 @@
             return;
         }
 
+        // Go to the next stage: choose the target production device group
+
         [self showSelectTarget:newdg :makeNewFiles];
     }
     else
     {
+        // For all device groups other than (test) factory device groups,
+        // go an create the device group
+
         [self newDevicegroupSheetCreateStageTwo:newdg :makeNewFiles :nil];
     }
 }
