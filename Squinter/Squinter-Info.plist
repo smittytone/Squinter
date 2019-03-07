@@ -79,6 +79,8 @@
 	<string>https://smittytone.github.io/files/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>SUPublicEDKey</key>
+	<string>DOJKoHLyVRSXQ509W9M2WvLg1dOzQyANk0Rgq9RQqbY=</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SourceCodePro-Regular.otf</string>
