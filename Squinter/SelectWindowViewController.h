@@ -5,6 +5,7 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import "Constants.h"
 #import "CommitTableCellView.h"
 #import "Devicegroup.h"
 #import "Project.h"
@@ -14,7 +15,7 @@
 {
 	IBOutlet NSTableView *selectTable;
 	IBOutlet NSTextField *selectLabel;
-
+    
 	NSMutableArray *groups;
 }
 
@@ -27,7 +28,9 @@
 @property (nonatomic, strong, setter=setProject:) Project *project;
 @property (nonatomic, strong) Devicegroup *theNewDevicegroup;
 @property (nonatomic, strong) Devicegroup *theTarget;
+@property (nonatomic, strong) NSMutableArray *theTargets;
 @property (nonatomic, readwrite) BOOL makeNewFiles;
+@property (nonatomic, readwrite) NSInteger targetType;
 
 
 @end

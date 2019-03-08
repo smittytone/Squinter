@@ -80,4 +80,11 @@
 #define kInspectorTabProject                0
 #define kInspectorTabDevice                 1
 
+// ADDED 2.3.127
+// Target Device Group types
+
+#define kTargetDeviceGroupTypeNone          0
+#define kTargetDeviceGroupTypeProd          1
+#define kTargetDeviceGroupTypeDUT           2
+
 #endif

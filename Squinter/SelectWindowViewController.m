@@ -7,24 +7,48 @@
 #import "SelectWindowViewController.h"
 
 @interface SelectWindowViewController ()
-
 @end
 
+
 @implementation SelectWindowViewController
-@synthesize project, theNewDevicegroup, theTarget, makeNewFiles;
+@synthesize project, theNewDevicegroup, theTargets, theTarget, makeNewFiles, targetType;
+
 
 
 - (void)setProject:(Project *)aProject
 {
 	project = aProject;
+    
+    if (theTargets == nil) theTargets = [[NSMutableArray alloc] init];
 
-	if (project != nil)
+    NSString *groupType = [theNewDevicegroup.type hasPrefix:@"pre_"] ? @"Test" : @"";
+    
+    // Get the target group type’s Squinter name from its API type
+    NSString *target;
+    NSString *targetName = @"ERROR";
+    
+    if (targetType == kTargetDeviceGroupTypeProd)
+    {
+        targetName = @"Production";
+        target = groupType.length > 0 ? @"pre_production_devicegroup" : @"production_devicegroup" ;
+    }
+    
+    if (targetType == kTargetDeviceGroupTypeDUT)
+    {
+        targetName = @"DUT";
+        target = groupType.length > 0 ? @"pre_dut_devicegroup" : @"dut_devicegroup" ;
+    }
+    
+    if (project != nil)
 	{
-		if (groups == nil) groups = [[NSMutableArray alloc] init];
-
-		[groups removeAllObjects];
-
-		NSString *target = [theNewDevicegroup.type compare:@"pre_factoryfixture_devicegroup"] == NSOrderedSame ? @"pre_production_devicegroup" : @"production_devicegroup";
+        if (groups == nil)
+        {
+            groups = [[NSMutableArray alloc] init];
+        }
+        else
+        {
+            [groups removeAllObjects];
+        }
 
 		if (project.devicegroups != nil && project.devicegroups.count > 0)
 		{
@@ -35,14 +59,14 @@
 		}
 	}
 
-	NSString *addition = [theNewDevicegroup.type compare:@"pre_factoryfixture_devicegroup"] == NSOrderedSame ? @"test" : @"";
-	selectLabel.stringValue = [NSString stringWithFormat:@"Select the %@ factory device group’s target:", addition];
+	selectLabel.stringValue = [NSString stringWithFormat:@"Select the %@ Fixture Device Group’s %@ %@ Device Group target:", groupType, groupType, targetName];
 
 	[selectTable reloadData];
 
 	selectTable.needsDisplay = YES;
-	theTarget = nil;
+    theTarget = nil;
 }
+
 
 
 - (IBAction)check:(id)sender
@@ -51,13 +75,16 @@
 }
 
 
+
 - (IBAction)checkGroup:(id)sender
 {
 	NSButton *aSender = (NSButton *)sender;
 
 	// Turn off all the other checkboxes by iterating through the list of table rows
 	// and seeing which rows don't match the sender
-
+    
+    NSUInteger count = 0;
+    
 	for (NSUInteger i = 0 ; i < selectTable.numberOfRows ; ++i)
 	{
 		CommitTableCellView *cellView = [selectTable viewAtColumn:0 row:i makeIfNecessary:NO];
@@ -65,17 +92,23 @@
 		if (aSender != cellView.minimumCheckbox)
 		{
 			cellView.minimumCheckbox.state = NSOffState;
+            count++;
 		}
 		else
 		{
 			theTarget = [groups objectAtIndex:i];
 		}
 	}
+    
+    // Nothing selected at all? Zap the stored target
+    
+    if (count == selectTable.numberOfRows) theTarget = nil;
 }
 
 
 
 #pragma mark - NSTableView Delegate and DataSource Methods
+
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {

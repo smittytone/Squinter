@@ -398,7 +398,7 @@
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
     NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
-    NSInteger wantsToHide;
+    NSInteger wantsToHide, theTargetType;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
     BOOL renameProjectFlag, saveAsFlag, credsFlag, switchAccountFlag, doubleSaveFlag, reconnectAfterSleepFlag;
@@ -485,8 +485,8 @@
 - (IBAction)newDevicegroupSheetCreate:(id)sender;
 - (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype;
 - (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action;
-- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(Devicegroup *)theTarget;
-- (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles;
+- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(NSMutableArray *)anyTargets;
+- (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles :(NSInteger)targetType;
 - (IBAction)cancelSelectTarget:(id)sender;
 - (IBAction)selectTarget:(id)sender;
 

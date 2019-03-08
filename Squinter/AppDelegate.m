@@ -74,6 +74,7 @@
     doubleSaveFlag = NO;
     reconnectAfterSleepFlag = NO;
 
+    theTargetType = kTargetDeviceGroupTypeNone;
     syncItemCount = 0;
     logPaddingLength = 0;
     deviceCheckCount = -1;
@@ -3398,8 +3399,10 @@
             if (newType == 6 && [dg.type compare:@"dut_devicegroup"] == NSOrderedSame) ++dutCount;
         }
 
+        /*
+        
         NSString *typeString = newType == 2 ? @"test" : @"";
-
+        
         if (prodCount == 0 && dutCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
@@ -3432,10 +3435,11 @@
 
             return;
         }
-
+         */
         // Go to the next stage: choose the target production device group
-
-        [self showSelectTarget:newdg :makeNewFiles];
+        
+        theTargetType = kTargetDeviceGroupTypeProd;
+        [self showSelectTarget:newdg :makeNewFiles :kTargetDeviceGroupTypeProd];
     }
     else
     {
@@ -3448,7 +3452,7 @@
 
 
 
-- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(Devicegroup *)theTarget
+- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(NSMutableArray *)anyTargets
 {
     if (currentProject.pid != nil && currentProject.pid.length > 0)
     {
@@ -3472,13 +3476,24 @@
         }
         else
         {
-            if (theTarget != nil)
+            if (anyTargets != nil)
             {
+                Devicegroup *dg1 = [anyTargets firstObject];
+                Devicegroup *dg2 = [anyTargets lastObject];
+                
+                if (dg1 == dg2)
+                {
+                    // ERROR
+                    NSLog(@"Target device groups match");
+                    return;
+                }
+                
                 details = @{ @"name" : devicegroup.name,
                              @"description" : devicegroup.description,
                              @"productid" : currentProject.pid,
                              @"type" : devicegroup.type,
-                             @"targetid" : theTarget.did };
+                             @"targetid" : dg1.did,
+                             @"dutid": dg2.did };
             }
             else
             {
@@ -3539,14 +3554,19 @@
 
 
 
-- (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles
+- (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles :(NSInteger)targetType
 {
     // Show a sheet listing suitable fixture device group targets
 
+    // ADDED 2.3.128 Pass across the type of device group that needs to be chosen as a target
+    // NOTE .targetType has be set BEFORE .project is set
+    
+    swvc.targetType = targetType;
+    
     swvc.theNewDevicegroup = devicegroup;
     swvc.makeNewFiles = andMakeNewFiles;
     swvc.project = currentProject;
-
+    
     [_window beginSheet:selectTargetSheet completionHandler:nil];
 }
 
@@ -3557,6 +3577,7 @@
     [_window endSheet:selectTargetSheet];
 
     resetTargetFlag = NO;
+    theTargetType = kTargetDeviceGroupTypeNone;
 }
 
 
@@ -3567,24 +3588,58 @@
 
     // If no target was selected, bail
 
-    if (swvc.theTarget == nil) return;
-
+    if (swvc.theTarget == nil)
+    {
+        resetTargetFlag = NO;
+        theTargetType = kTargetDeviceGroupTypeNone;
+        return;
+    }
+    
     // If we are not (re)setting a target for an existing device,
     // continue with the creation of a new devicegroup
 
     if (!resetTargetFlag)
     {
-        [self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.makeNewFiles :swvc.theTarget];
+        // ADDED IN 2.3.128 Branch back to re-show the select group for the subsequent targets
+        
+        if (theTargetType == kTargetDeviceGroupTypeProd)
+        {
+            // We have just got the (Test) Production Device Group target,
+            // so go back and get the (Test) DUT Device Group
+            
+            theTargetType = kTargetDeviceGroupTypeDUT;
+            
+            [swvc.theTargets addObject:swvc.theTarget];
+            
+            [self showSelectTarget:swvc.theNewDevicegroup :swvc.makeNewFiles :theTargetType];
+        }
+        else if (theTargetType == kTargetDeviceGroupTypeDUT)
+        {
+            // We now have the (Test) DUT Device Group, so we're ready to create the new group
+            
+            theTargetType = kTargetDeviceGroupTypeNone;
+            
+            [swvc.theTargets addObject:swvc.theTarget];
+            
+            [self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.makeNewFiles :swvc.theTargets];
+        }
         return;
     }
 
     resetTargetFlag = NO;
 
     // Check that the selected device group is not the current one
-
+    
+    // ADDED 2.3.128 Allow the use of various '_target' attributes
+    
+    NSString *key = @"";
+    
     if (currentDevicegroup.data != nil)
     {
-        NSDictionary *tgt = [self getValueFrom:currentDevicegroup.data withKey:@"production_target"];
+        if (theTargetType == kTargetDeviceGroupTypeProd) key = @"production_target";
+        if (theTargetType == kTargetDeviceGroupTypeDUT)  key = @"dut_target";
+        
+        NSDictionary *tgt = [self getValueFrom:currentDevicegroup.data withKey:key];
 
         if (tgt != nil)
         {
@@ -3592,20 +3647,20 @@
 
             if ([tid compare:swvc.theTarget.did] == NSOrderedSame)
             {
-                [self writeWarningToLog:[NSString stringWithFormat:@"The device group you selected is already \"%@\"'s production target.", currentDevicegroup.name]  :YES];
+                [self writeWarningToLog:[NSString stringWithFormat:@"The device group you selected is already one of \"%@\"'s targets.", currentDevicegroup.name]  :YES];
                 return;
             }
         }
     }
 
     NSDictionary *dict = @{ @"action" : @"resetprodtarget",
-                           @"devicegroup" : currentDevicegroup,
-                           @"target" : swvc.theTarget };
+                            @"devicegroup" : currentDevicegroup,
+                            key : swvc.theTarget };
 
     NSDictionary *targ = @{ @"type" : swvc.theTarget.type,
                             @"id" : swvc.theTarget.did };
 
-    [ide updateDevicegroup:currentDevicegroup.did :@[@"production_target", @"type"] :@[targ, currentDevicegroup.type] :dict];
+    [ide updateDevicegroup:currentDevicegroup.did :@[key, @"type"] :@[targ, currentDevicegroup.type] :dict];
 
     // Pick up the action at ... updateDevicegroupStageTwo:
 }
@@ -4525,7 +4580,7 @@
 
     resetTargetFlag = YES;
 
-    [self showSelectTarget:currentDevicegroup :NO];
+    [self showSelectTarget:currentDevicegroup :NO :theTargetType];
 }
 
 
