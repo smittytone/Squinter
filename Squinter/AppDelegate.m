@@ -3348,43 +3348,85 @@
     newdg.description = dgdesc;
     newdg.type = @"development_devicegroup";
 
+    // FROM 2.3.128: support new DUT device groups
+    // NOTE the missing case values are for the menu separators
+    //      between Dev, Test and Prod categories
+
     switch (newType)
     {
+            // Development groups
         default:
         case 0:
             newdg.type = @"development_devicegroup";
             break;
-        case 1:
+            // Test groups
+        case 2:
             newdg.type = @"pre_factoryfixture_devicegroup";
             break;
-        case 2:
-            newdg.type = @"pre_production_devicegroup";
-            break;
         case 3:
-            newdg.type = @"factoryfixture_devicegroup";
+            newdg.type = @"pre_dut_devicegroup";
             break;
         case 4:
+            newdg.type = @"pre_production_devicegroup";
+            break;
+            // Production groups
+        case 6:
+            newdg.type = @"factoryfixture_devicegroup";
+            break;
+        case 7:
+            newdg.type = @"dut_devicegroup";
+            break;
+        case 8:
             newdg.type = @"production_devicegroup";
             break;
     }
 
-    if (newType == 1 || newType == 3)
+    if (newType == 2 || newType == 6)
     {
-        // On choosing a fixture device group, we need to eastablish a target or creation will fail
+        // On choosing a Fixture device group, we need to eastablish a target or creation will fail
+        // FROM 2.3.128: support new DUT device groups; Fixture device groups now have two targets:
+        //               one DUT group and one Production group
 
-        NSUInteger count = 0;
+        NSUInteger dutCount = 0;
+        NSUInteger prodCount = 0;
 
         for (Devicegroup *dg in currentProject.devicegroups)
         {
-            if (newType == 1 && [dg.type compare:@"pre_production_devicegroup"] == NSOrderedSame) ++count;
-            if (newType == 3 && [dg.type compare:@"production_devicegroup"] == NSOrderedSame) ++count;
+            if (newType == 2 && [dg.type compare:@"pre_production_devicegroup"] == NSOrderedSame) ++prodCount;
+            if (newType == 2 && [dg.type compare:@"pre_dut_devicegroup"] == NSOrderedSame) ++dutCount;
+            if (newType == 6 && [dg.type compare:@"production_devicegroup"] == NSOrderedSame) ++prodCount;
+            if (newType == 6 && [dg.type compare:@"dut_devicegroup"] == NSOrderedSame) ++dutCount;
         }
 
-        if (count == 0)
+        NSString *typeString = newType == 2 ? @"test" : @"";
+
+        if (prodCount == 0 && dutCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", (newType == 1 ? @"test" : @"")];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@ production device group as its target, and you have no such device group in this project.", (newType == 1 ? @"test" : @"")];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify %@ production and DUT device groups as its targets, and you have no such device group in this project.", typeString];
+
+            [alert beginSheetModalForWindow:_window completionHandler:nil];
+
+            return;
+        }
+
+        if (prodCount == 0)
+        {
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@ production device group as its target, and you have no such device group in this project.", typeString];
+
+            [alert beginSheetModalForWindow:_window completionHandler:nil];
+
+            return;
+        }
+
+        if (dutCount == 0)
+        {
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@ DUT device group as its target, and you have no such device group in this project.", typeString];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
