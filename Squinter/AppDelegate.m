@@ -2362,7 +2362,16 @@
 - (IBAction)doSync:(id)sender
 {
     // This is an start point for the UI to trigger a project sync
-    // NOTE this may yet be merged with 'syncProject:'
+
+    // We can't sync if we're not logged in
+
+    if (!ide.isLoggedIn)
+    {
+        [self loginAlert:@"upload or sync this Project"];
+        return;
+    }
+
+    // Must have a selected project to sync (this should be prevented by the UI)
 
     if (currentProject == nil)
     {
@@ -2370,7 +2379,22 @@
         return;
     }
 
-    [self uploadProject:currentProject];
+    // Does the current project have a product ID?
+
+    if (currentProject.pid == nil || currentProject.pid.length == 0)
+    {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = [NSString stringWithFormat:@"Project “%@” cannot by sync’d", currentProject.name];
+        alert.informativeText = @"The Project is not associated with a Product in the impCloud. Please use the Projects menu to link this Project to a Product.";
+
+        [alert beginSheetModalForWindow:_window completionHandler:nil];
+
+        return;
+    }
+
+    // We have a list of products, so we can continue
+
+    [self syncProject:currentProject];
 }
 
 
@@ -2569,13 +2593,18 @@
 
 - (void)syncProject:(Project *)project
 {
-    // We can't sync if we're not logged in
+    // Retrieve the device groups for this specific product ID. We will later
+    // compare this list with the local list in order to see what needs to be
+    // uploaded or downloaded
 
-    if (!ide.isLoggedIn)
-    {
-        [self loginAlert:@"upload or sync this Project"];
-        return;
-    }
+    NSDictionary *dict = @{ @"action" : @"checkproduct",
+                            @"project" : currentProject };
+
+    [ide getDevicegroupsWithFilter:@"product.id" :currentProject.pid :dict];
+
+    // At this point the we have to wait for the async call to 'productToProjectStageTwo'
+
+
 
     /*
     if (project.pid != nil && project.pid.length > 0)
@@ -2651,18 +2680,86 @@
                 // Pick up the action in 'listDevicegroups:'
             }
         }
-        else
-        {
-            // WHOOPS
-        }
     }
     else
     {
-        // Just in case...
-
         [self uploadProject:project];
     }
      */
+}
+
+
+
+- (IBAction)cancelSyncChoiceSheet:(id)sender
+{
+    // Close the sheet
+
+    [_window endSheet:syncChoiceSheet];
+}
+
+
+
+- (IBAction)closeSyncChoiceSheet:(id)sender
+{
+    // Close the sheet
+
+    [_window endSheet:syncChoiceSheet];
+
+    // If no device groups are selected, treat this as a cancel
+
+    if (sywvc.selectedGroups.count == 0) return;
+
+    // Assemble a list of device groups to download into the project
+
+    NSMutableArray *groupsToSync = [[NSMutableArray alloc] init];
+
+    for (NSUInteger i = 0 ; i < sywvc.selectedGroups.count ; ++i)
+    {
+        NSNumber *num = [sywvc.selectedGroups objectAtIndex:i];
+        [groupsToSync addObject:[sywvc.syncGroups objectAtIndex:num.integerValue]];
+    }
+
+    if (groupsToSync.count > 0)
+    {
+        // Record the number of devicegroups to download
+
+        sywvc.project.count = groupsToSync.count;
+
+        for (NSDictionary *dg in groupsToSync)
+        {
+            // Convert each of the downloadable device group dictionaries
+            // into local objects
+
+            Devicegroup *newdg = [[Devicegroup alloc] init];
+            newdg.did = [dg objectForKey:@"id"];
+            newdg.name = [self getValueFrom:dg withKey:@"name"];
+            newdg.type = [self getValueFrom:dg withKey:@"type"];
+            newdg.description = [self getValueFrom:dg withKey:@"description"];
+            newdg.data = [NSMutableDictionary dictionaryWithDictionary:dg];
+
+            if (sywvc.project.devicegroups == nil) sywvc.project.devicegroups = [[NSMutableArray alloc] init];
+            [sywvc.project.devicegroups addObject:newdg];
+
+            // Does the device group have a current deployment
+
+            NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];
+
+            if (cd != nil)
+            {
+                // The dictionary has a current deployment, so go and get it
+
+                NSDictionary *dict = @{ @"action" : @"downloadcode",
+                                        @"devicegroup" : newdg,
+                                        @"project": sywvc.project };
+
+                [ide getDeployment:[cd objectForKey:@"id"] :dict];
+
+                // At this point we have to wait for multiple async calls to **productToProjectStageThree:**
+            }
+        }
+
+        sywvc.project.haschanged = YES;
+    }
 }
 
 
@@ -3032,15 +3129,15 @@
     // has its current deployment downloaded and saved as source code files.
     // This is only possible if the user is logged in (and has a list of products)
 
-    if (selectedProduct == nil)
-    {
-        [self writeErrorToLog:@"[ERROR] You have not selected a product as the new project's source." :YES];
-        return;
-    }
-
     if (!ide.isLoggedIn)
     {
         [self loginAlert:@"download products"];
+        return;
+    }
+
+    if (selectedProduct == nil)
+    {
+        [self writeErrorToLog:@"[ERROR] You have not selected a product as the new project's source." :YES];
         return;
     }
 
@@ -3388,26 +3485,15 @@
         // FROM 2.3.128: support new DUT device groups; Fixture device groups now have two targets:
         //               one DUT group and one Production group
 
-        NSUInteger dutCount = 0;
-        NSUInteger prodCount = 0;
-
-        for (Devicegroup *dg in currentProject.devicegroups)
-        {
-            if (newType == 2 && [dg.type compare:@"pre_production_devicegroup"] == NSOrderedSame) ++prodCount;
-            if (newType == 2 && [dg.type compare:@"pre_dut_devicegroup"] == NSOrderedSame) ++dutCount;
-            if (newType == 6 && [dg.type compare:@"production_devicegroup"] == NSOrderedSame) ++prodCount;
-            if (newType == 6 && [dg.type compare:@"dut_devicegroup"] == NSOrderedSame) ++dutCount;
-        }
-
-        /*
-        
-        NSString *typeString = newType == 2 ? @"test" : @"";
+        NSUInteger dutCount = [self checkDUTTargets:newType];
+        NSUInteger prodCount = [self checkProdTargets:newType];
+        NSString *typeString = newType == 2 ? @"Test " : @"";
         
         if (prodCount == 0 && dutCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", typeString];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify %@ production and DUT device groups as its targets, and you have no such device group in this project.", typeString];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture Device Group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of Device Group, you need to specify %@Production and DUT Device Groups as its targets, and you have no such Device Groups in this Project.", typeString];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
@@ -3417,8 +3503,8 @@
         if (prodCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", typeString];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@ production device group as its target, and you have no such device group in this project.", typeString];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture Device Group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of Device Group, you need to specify a %@Production Device Group as its target, and you have no such Device Group in this Project.", typeString];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
@@ -3428,14 +3514,14 @@
         if (dutCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@ factory device group", typeString];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@ DUT device group as its target, and you have no such device group in this project.", typeString];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture Device Group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of Device Group, you need to specify a %@DUT Device Group as its target, and you have no such Device Group in this Project.", typeString];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
             return;
         }
-         */
+
         // Go to the next stage: choose the target production device group
         
         newTargetsFlag = YES;
@@ -3449,6 +3535,34 @@
 
         [self newDevicegroupSheetCreateStageTwo:newdg :makeNewFiles :nil];
     }
+}
+
+
+
+- (NSUInteger)checkDUTTargets:(NSUInteger)groupType
+{
+    return [self checkTargets:(groupType == 2 ? @"pre_d" : @"dut")];
+}
+
+
+
+- (NSUInteger)checkProdTargets:(NSUInteger)groupType
+{
+    return [self checkTargets:(groupType == 2 ? @"pre_p" : @"prod")];
+}
+
+
+
+- (NSUInteger)checkTargets:(NSString *)groupPrefix
+{
+    NSUInteger count = 0;
+
+    for (Devicegroup *dg in currentProject.devicegroups)
+    {
+        if ([dg.type hasPrefix:groupPrefix]) ++count;
+    }
+
+    return count;
 }
 
 
@@ -4612,27 +4726,44 @@
     }
     
     NSString *groupType = type == kTargetDeviceGroupTypeDUT ? @"DUT" : @"production";
-    
-    if (![currentDevicegroup.type containsString:@"factoryfixture"])
-    {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a factory fixture group so has no %@ target.", currentDevicegroup.name, groupType] :YES];
-        return;
-    }
-    
+
     if (!ide.isLoggedIn)
     {
         [self loginAlert:[NSString stringWithFormat:@"set %@ device groups as targets", groupType]];
         return;
     }
-    
+
     if (![self isCorrectAccount:currentProject])
     {
         // We are working on a project that is NOT tied to the current account
-        
+
         [self devicegroupAccountAlert:currentDevicegroup :[NSString stringWithFormat:@"set a %@ device group as a target for", groupType] :_window];
         return;
     }
-    
+
+    if (![currentDevicegroup.type containsString:@"factoryfixture"])
+    {
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a factory fixture group so has no %@ target.", currentDevicegroup.name, groupType] :YES];
+        return;
+    }
+
+    // NOTE see 'newDevicegroupSheetCreate:' for why we have 2 (pre-fixture) or 6 (fixture) here
+
+    NSUInteger code = [currentDevicegroup.type hasPrefix:@"pre"] ? 2 : 6;
+    NSString *groupPrefix = [currentDevicegroup.type hasPrefix:@"pre"] ? @"Test " : @"";
+    NSUInteger count = type == kTargetDeviceGroupTypeDUT ? [self checkDUTTargets:code] : [self checkProdTargets:code];
+
+    if (count == 0)
+    {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = [NSString stringWithFormat:@"You have no %@ %@ Device Groups in this Project", groupPrefix, groupType];
+        alert.informativeText = [NSString stringWithFormat:@"You will need to create a %@%@ Device Group in order to set it as one of the targets of %@Fixture Device Group \"%@\".", groupPrefix, groupType, groupPrefix, currentDevicegroup.name];
+
+        [alert beginSheetModalForWindow:_window completionHandler:nil];
+
+        return;
+    }
+
     [self showSelectTarget:currentDevicegroup :NO :type];
 }
 
@@ -7285,7 +7416,7 @@
         }
     }
 
-    if (filesToSave.count > 0) [self saveFiles:filesToSave];
+    if (filesToSave.count > 0) [self saveFiles:filesToSave :nil];
 
     [projectArray addObject:project];
 
@@ -7329,9 +7460,25 @@
 
 
 
-- (void)saveFiles:(NSMutableArray *)files
+- (void)saveFiles:(NSMutableArray *)files :(Project *)project
 {
-    if (files.count == 0) return;
+    if (files.count == 0)
+    {
+        // We're done, so handle any exit operations
+
+        if (project != nil && project == currentProject)
+        {
+            // Update the UI for the downloaded project
+
+            [saveLight needSave:project.haschanged];
+            [self refreshMainDevicegroupsMenu];
+            [self refreshDevicegroupMenu];
+            [self refreshDeviceMenu];
+            [self setToolbar];
+        }
+
+        return;
+    }
 
     BOOL success = NO;
     Model *file = [files firstObject];
@@ -7353,7 +7500,7 @@
     }
 
     [files removeObjectAtIndex:0];
-    [self saveFiles:files];
+    [self saveFiles:files :project];
 }
 
 
@@ -7567,6 +7714,20 @@
             [self writeStringToLog:noneString :YES];
         }
 
+        if ([action compare:@"syncproduct"] == NSOrderedSame)
+        {
+            // We are here after loading the products list before doing a sync
+
+            if (productsArray.count > 0)
+            {
+                [self syncProject:[so objectForKey:@"project"]];
+            }
+            else
+            {
+
+            }
+        }
+
         // Update the UI
 
         [self refreshProductsMenu];
@@ -7606,7 +7767,116 @@
 
     if (action != nil)
     {
-        if ([action compare:@"downloadproduct"] == NSOrderedSame)
+        if ([action compare:@"checkproduct"] == NSOrderedSame)
+        {
+            // FROM 2.3.128
+            // Compare download list of device groups to saved list of groups
+
+            Project *project = [so objectForKey:@"project"];
+            NSMutableArray *localDeleted;
+            NSMutableArray *remoteNew;
+
+            if (project.devicegroups.count > 0)
+            {
+                // Determine which, if any, local device groups are no longer
+                // present on the server. Record them in 'localDeleted'
+
+                for (Devicegroup *dg in project.devicegroups)
+                {
+                    BOOL isThere = NO;
+
+                    for (NSDictionary *adg in devicegroups)
+                    {
+                        NSString *dgid = [adg objectForKey:@"id"];
+
+                        if ([dgid compare:dg.did] == NSOrderedSame)
+                        {
+                            isThere = YES;
+                            break;
+                        }
+                    }
+
+                    if (!isThere)
+                    {
+                        if (localDeleted == nil) localDeleted = [[NSMutableArray alloc] init];
+                        [localDeleted addObject: dg];
+                    }
+                }
+
+                // Determine which, if any, remote device groups are not listed
+                // in the local project. Record them in 'remoteNew'
+
+                for (NSDictionary *adg in devicegroups)
+                {
+                    BOOL isThere = NO;
+                    NSString *dgid = [adg objectForKey:@"id"];
+
+                    for (Devicegroup *dg in project.devicegroups)
+                    {
+                        if ([dgid compare:dg.did] == NSOrderedSame)
+                        {
+                            isThere = YES;
+                            break;
+                        }
+                    }
+
+                    if (!isThere)
+                    {
+                        if (remoteNew == nil) remoteNew = [[NSMutableArray alloc] init];
+                        [remoteNew addObject: adg];
+                    }
+                }
+            }
+            else
+            {
+                if (devicegroups.count > 0) remoteNew = devicegroups;
+            }
+
+
+            /*
+            NSUInteger count = 1;
+            if (localDeleted.count > 0)
+            {
+                [self writeStringToLog:@"The following Device Groups are recorded in the Project, but are missing from the server:" :NO];
+
+                for (Devicegroup *dg in localDeleted)
+                {
+                    [self writeStringToLog:[NSString stringWithFormat:@"  %li. %@ (ID: %@)", (long)count, dg.name, dg.did] :NO];
+                    ++count;
+                }
+            }
+             */
+
+            if (remoteNew.count > 0)
+            {
+                /*
+                [self writeStringToLog:@"The following Device Groups are listed on the server, but not locally:" :NO];
+
+                count = 1;
+
+                for (NSDictionary *dg in remoteNew)
+                {
+                    [self writeStringToLog:[NSString stringWithFormat:@"  %li. %@ (ID: %@)", (long)count, [self getValueFrom:dg withKey:@"name"], [dg objectForKey:@"id"]] :NO];
+                    ++count;
+                }
+                 */
+
+                sywvc.syncGroups = remoteNew;
+                sywvc.project = project;
+
+                [sywvc prepSheet];
+                [_window beginSheet:syncChoiceSheet completionHandler:nil];
+            }
+            else
+            {
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
+                alert.informativeText = @"All of the Device Groups listed on the server are also listed in the Project.";
+
+                [alert beginSheetModalForWindow:_window completionHandler:nil];
+            }
+        }
+        else if ([action compare:@"downloadproduct"] == NSOrderedSame)
         {
             // Perform the flow for downloading a product: Iterate over the list of device groups
             // and in each case go and get its current deployment
@@ -7746,14 +8016,9 @@
     {
         if ([action compare:@"updatecode"] == NSOrderedSame)
         {
+            if (newDevicegroup.models.count == 0) return;
+
             // Compare the deployment we have with the one just downloaded
-
-            if (newDevicegroup.models.count == 0)
-            {
-                // BORKED? The target has no models, so create them using the code below
-
-                return;
-            }
 
             NSString *sha = [self getValueFrom:deployment withKey:@"sha"];
             NSString *updated = [self getValueFrom:deployment withKey:@"updated_at"];
@@ -7793,7 +8058,7 @@
         }
         else
         {
-            // We presume the 'action' is 'downloadproduct'
+            // We presume the 'action' is 'downloadproduct' (from 2.3.128 could be 'downloadcode'
             // Create two models - one device, one agent - based on the deployment
 
             if (newDevicegroup.models == nil) newDevicegroup.models = [[NSMutableArray alloc] init];
@@ -7805,7 +8070,7 @@
             {
                 model = [[Model alloc] init];
                 model.type = @"device";
-                model.squinted = YES;
+                model.squinted = NO;
                 model.code = code;
                 model.path = newProject.path;
                 model.sha = [self getValueFrom:deployment withKey:@"sha"];
@@ -7820,7 +8085,7 @@
             {
                 model = [[Model alloc] init];
                 model.type = @"agent";
-                model.squinted = YES;
+                model.squinted = NO;
                 model.code = code;
                 model.path = newProject.path;
                 model.sha = [self getValueFrom:deployment withKey:@"sha"];
@@ -7828,13 +8093,13 @@
                 if (model.updated == nil) model.updated = [self getValueFrom:deployment withKey:@"created_at"];
                 [newDevicegroup.models addObject:model];
             }
+
+            // NOTE The code files have not been saved yet
         }
     }
 
     // Decrement the tally of downloadable device groups to see if we've got them all yet
     
-    // **** SHOULD THIS NOT BE PART OF THE ABOVE IF...ELSE ??
-
     --newProject.count;
 
     if (newProject.count <= 0)
@@ -7880,10 +8145,46 @@
             }
         }
 
-        // Save the project
+        // FROM 2.3.128
+        // If action is 'downloadcode', work out which files need to be saved
 
-        [self productToProjectStageFour:newProject];
-        [self setToolbar];
+        if ([action compare:@"downloadcode"] == NSOrderedSame)
+        {
+            NSMutableArray *filesToSave = [[NSMutableArray alloc] init];
+
+            if (newProject.devicegroups.count > 0)
+            {
+                for (Devicegroup *dg in newProject.devicegroups)
+                {
+                    if (dg.models.count > 0)
+                    {
+                        for (Model *model in dg.models)
+                        {
+                            // NOTE we save a model file even if it contains no code - the user may add code later
+
+                            if (model.filename == nil || model.filename.length == 0)
+                            {
+                                model.path = newProject.path;
+                                model.filename = [dg.name stringByAppendingFormat:@".%@.nut", model.type];
+
+                                [filesToSave addObject:model];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // If we have files that need saving, save them
+
+            if (filesToSave.count > 0) [self saveFiles:filesToSave :newProject];
+        }
+        else
+        {
+            // Save the project
+
+            [self productToProjectStageFour:newProject];
+            [self setToolbar];
+        }
     }
 }
 
@@ -10151,15 +10452,15 @@
         for (NSUInteger i = 0 ; i < inset ; ++i) spaces = [spaces stringByAppendingString:@" "];
     }
 
-    [lines addObject:[NSString stringWithFormat:@"%@Device group \"%@\"", spaces, devicegroup.name]];
+    [lines addObject:[NSString stringWithFormat:@"%@Device Group \"%@\"", spaces, devicegroup.name]];
 
     if (devicegroup.did != nil && devicegroup.did.length > 0 && [devicegroup.did compare:@"old"] != NSOrderedSame)
     {
-        [lines addObject:[NSString stringWithFormat:@"%@Device group ID: %@", spaces, devicegroup.did]];
+        [lines addObject:[NSString stringWithFormat:@"%@Device Group ID: %@", spaces, devicegroup.did]];
     }
     else
     {
-        [lines addObject:[NSString stringWithFormat:@"%@Device group not uploaded to the impCloud", spaces]];
+        [lines addObject:[NSString stringWithFormat:@"%@Device Group not uploaded to the impCloud", spaces]];
     }
 
     if (devicegroup.mdid != nil || devicegroup.mdid.length > 0)
@@ -10167,10 +10468,11 @@
         [lines addObject:[NSString stringWithFormat:@"%@Minimum Supported Deployment Set (ID: %@)", spaces, devicegroup.mdid]];
     }
 
-    [lines addObject:[NSString stringWithFormat:@"%@Device group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
+    [lines addObject:[NSString stringWithFormat:@"%@Device Group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
 
-    if (devicegroup.data != nil)
+    if (devicegroup.data != nil && [devicegroup.type containsString:@"fixture"])
     {
+        NSString *prefix = [devicegroup.type hasPrefix:@"pre"] ? @"Test " : @"";
         NSDictionary *aTarget = [self getValueFrom:devicegroup.data withKey:@"production_target"];
 
         if (aTarget != nil)
@@ -10181,7 +10483,23 @@
             {
                 if ([dg.did compare:tid] == NSOrderedSame)
                 {
-                    [lines addObject:[NSString stringWithFormat:@"%@Target Device Group: %@", spaces, dg.name]];
+                    [lines addObject:[NSString stringWithFormat:@"%@Target %@Production Device Group: %@", spaces, prefix, dg.name]];
+                    break;
+                }
+            }
+        }
+
+        aTarget = [self getValueFrom:devicegroup.data withKey:@"dut_target"];
+
+        if (aTarget != nil)
+        {
+            NSString *tid = [aTarget objectForKey:@"id"];
+
+            for (Devicegroup *dg in currentProject.devicegroups)
+            {
+                if ([dg.did compare:tid] == NSOrderedSame)
+                {
+                    [lines addObject:[NSString stringWithFormat:@"%@Target %@DUT Device Group: %@", spaces, prefix, dg.name]];
                     break;
                 }
             }
@@ -10192,11 +10510,11 @@
     {
         if (devicegroup.models.count == 1)
         {
-            [lines addObject:[NSString stringWithFormat:@"\n%@This device group has 1 source code file:", spaces]];
+            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has 1 source code file:", spaces]];
         }
         else
         {
-            [lines addObject:[NSString stringWithFormat:@"\n%@This device group has %li source code files:", spaces, (long)devicegroup.models.count]];
+            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has %li source code files:", spaces, (long)devicegroup.models.count]];
         }
 
         for (NSUInteger j = 0 ; j < devicegroup.models.count ; ++j)
@@ -10214,7 +10532,7 @@
     }
     else
     {
-        [lines addObject:[NSString stringWithFormat:@"%@This device group has no source code yet.", spaces]];
+        [lines addObject:[NSString stringWithFormat:@"%@This Device Group has no source code yet.", spaces]];
     }
 
     // Get devices for this device group
@@ -10232,7 +10550,7 @@
             {
                 if (first)
                 {
-                    [lines addObject:[NSString stringWithFormat:@"\n%@The following device(s) have been assigned to this device group:", spaces]];
+                    [lines addObject:[NSString stringWithFormat:@"\n%@The following device(s) have been assigned to this Device Group:", spaces]];
                     first = NO;
                 }
 
@@ -11388,16 +11706,16 @@
         renameProductMenuItem.title = @"Edit Product...";
     }
 
-    showProjectInfoMenuItem.enabled = (currentProject != nil) ? YES : NO;
-    showProjectFinderMenuItem.enabled = (currentProject != nil) ? YES : NO;
-    renameProjectMenuItem.enabled = (currentProject != nil) ? YES : NO;
+    showProjectInfoMenuItem.enabled = currentProject != nil ? YES : NO;
+    showProjectFinderMenuItem.enabled = currentProject != nil ? YES : NO;
+    renameProjectMenuItem.enabled = currentProject != nil ? YES : NO;
 
-    downloadProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
-    linkProductMenuItem.enabled = (currentProject != nil && selectedProduct != nil) ? YES : NO;
+    downloadProductMenuItem.enabled = selectedProduct != nil ? YES : NO;
+    linkProductMenuItem.enabled = currentProject != nil && selectedProduct != nil ? YES : NO;
     deleteProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
     renameProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
 
-    syncProjectMenuItem.enabled = (currentProject != nil && currentProject.pid.length == 0) ? YES : NO;
+    syncProjectMenuItem.enabled = currentProject != nil && currentProject.pid.length > 0 ? YES : NO;
 
     // Update the File menu's one changeable item
 
@@ -11848,12 +12166,12 @@
     else
     {
         [self refreshDevicegroupByType:@"development_devicegroup"];
-        [self refreshDevicegroupByType:@"pre_production_devicegroup"];
         [self refreshDevicegroupByType:@"pre_factoryfixture_devicegroup"];
-        //[self refreshDevicegroupByType:@"pre_dut_devicegroup"];
-        [self refreshDevicegroupByType:@"production_devicegroup"];
+        [self refreshDevicegroupByType:@"pre_dut_devicegroup"];
+        [self refreshDevicegroupByType:@"pre_production_devicegroup"];
         [self refreshDevicegroupByType:@"factoryfixture_devicegroup"];
-        //[self refreshDevicegroupByType:@"dut_devicegroup"];
+        [self refreshDevicegroupByType:@"dut_devicegroup"];
+        [self refreshDevicegroupByType:@"production_devicegroup"];
 
         // Add the 'fixed' menu entries
 

@@ -28,6 +28,7 @@
 #import "InspectorViewController.h"
 #import "LogView.h"
 #import "DeviceLookupWindowViewController.h"
+#import "SyncWindowViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -234,6 +235,9 @@
     IBOutlet NSPanel             *syncProjectSheet;
     IBOutlet NSProgressIndicator *syncProjectProgress;
     IBOutlet NSTextField         *syncProjectLabel;
+
+    IBOutlet NSPanel                  *syncChoiceSheet;
+    IBOutlet SyncWindowViewController *sywvc;
 
     #pragma mark New Device Group Sheet
 
@@ -461,6 +465,8 @@
 - (IBAction)closeRenameProjectSheet:(id)sender;
 - (IBAction)saveRenameProjectSheet:(id)sender;
 - (IBAction)doSync:(id)sender;
+- (IBAction)cancelSyncChoiceSheet:(id)sender;
+- (IBAction)closeSyncChoiceSheet:(id)sender;
 - (void)uploadProject:(Project *)project;
 - (void)syncProject:(Project *)project;
 - (IBAction)cancelSync:(id)sender;
@@ -484,6 +490,9 @@
 - (IBAction)newDevicegroup:(id)sender;
 - (IBAction)newDevicegroupSheetCancel:(id)sender;
 - (IBAction)newDevicegroupSheetCreate:(id)sender;
+- (NSUInteger)checkDUTTargets:(NSUInteger)groupType;
+- (NSUInteger)checkProdTargets:(NSUInteger)groupType;
+- (NSUInteger)checkTargets:(NSString *)groupPrefix;
 - (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype;
 - (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action;
 - (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(NSMutableArray *)anyTargets;
@@ -564,7 +573,7 @@
 - (IBAction)ignoreChanges:(id)sender;
 - (IBAction)saveChanges:(id)sender;
 - (void)saveModelFiles:(Project *)project;
-- (void)saveFiles:(NSMutableArray *)files;
+- (void)saveFiles:(NSMutableArray *)files :(Project *)project;
 
 
 // Squint Methods
