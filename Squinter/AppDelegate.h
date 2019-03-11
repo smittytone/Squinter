@@ -90,6 +90,7 @@
     IBOutlet NSMenuItem *uploadExtraMenuItem;
     IBOutlet NSMenuItem *setMinimumMenuItem;
     IBOutlet NSMenuItem *setProductionTargetMenuItem;
+    IBOutlet NSMenuItem *setDUTTargetMenuItem;
     IBOutlet NSMenuItem *removeFilesMenuItem;
     IBOutlet NSMenuItem *externalOpenMenuItem;
     IBOutlet NSMenu     *externalSourceMenu;
@@ -386,7 +387,7 @@
 
     NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
-    NSMutableArray *deviceColourWells, *eiDeviceGroupCache, *loggedDevices;
+    NSMutableArray *deviceColourWells, *eiDeviceGroupCache, *loggedDevices, *fixtureTargets;
     NSMutableDictionary *selectedProduct, *selectedDevice;
 
     NSURLSessionTask *eiLibListTask, *feedbackTask;
@@ -398,9 +399,9 @@
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
     NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
-    NSInteger wantsToHide, theTargetType;
+    NSInteger wantsToHide;
 
-    BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, resetTargetFlag;
+    BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, newTargetsFlag;
     BOOL renameProjectFlag, saveAsFlag, credsFlag, switchAccountFlag, doubleSaveFlag, reconnectAfterSleepFlag;
     BOOL isLoggingIn, isBookmarkStale, isInspectorHidden;
 }
@@ -507,6 +508,8 @@
 - (IBAction)updateCode:(id)sender;
 - (IBAction)setMinimumDeployment:(id)sender;
 - (IBAction)chooseProductionTarget:(id)sender;
+- (IBAction)chooseDUTTarget:(id)sender;
+- (void)chooseTarget:(NSInteger)type;
 - (IBAction)showTestBlessedDevices:(id)sender;
 
 

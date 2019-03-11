@@ -52,6 +52,7 @@
     devicesArray = nil;
     productsArray = nil;
     loggedDevices = nil;
+    fixtureTargets = nil;
     downloads = nil;
     ide = nil;
     dockMenu = nil;
@@ -63,7 +64,7 @@
 
     newDevicegroupName = nil;
 
-    resetTargetFlag = NO;
+    newTargetsFlag = NO;
     newDevicegroupFlag = NO;
     deviceSelectFlag = NO;
     renameProjectFlag = NO;
@@ -74,7 +75,6 @@
     doubleSaveFlag = NO;
     reconnectAfterSleepFlag = NO;
 
-    theTargetType = kTargetDeviceGroupTypeNone;
     syncItemCount = 0;
     logPaddingLength = 0;
     deviceCheckCount = -1;
@@ -3438,7 +3438,8 @@
          */
         // Go to the next stage: choose the target production device group
         
-        theTargetType = kTargetDeviceGroupTypeProd;
+        newTargetsFlag = YES;
+        
         [self showSelectTarget:newdg :makeNewFiles :kTargetDeviceGroupTypeProd];
     }
     else
@@ -3476,8 +3477,12 @@
         }
         else
         {
-            if (anyTargets != nil)
+            if ([devicegroup.type containsString:@"fixture"] && anyTargets != nil)
             {
+                // Assume the device group's two targets are actually Devicegroups for now
+                // and that they are in the correct order - Production then DUT - which
+                // SHOULD be the case
+                
                 Devicegroup *dg1 = [anyTargets firstObject];
                 Devicegroup *dg2 = [anyTargets lastObject];
                 
@@ -3485,6 +3490,7 @@
                 {
                     // ERROR
                     NSLog(@"Target device groups match");
+                    [self writeErrorToLog:[NSString stringWithFormat:@"New Device Group \"%@\" has been set with the same target twice. Cannot proceed.", devicegroup.name] :YES];
                     return;
                 }
                 
@@ -3559,14 +3565,13 @@
     // Show a sheet listing suitable fixture device group targets
 
     // ADDED 2.3.128 Pass across the type of device group that needs to be chosen as a target
-    // NOTE .targetType has be set BEFORE .project is set
     
     swvc.targetType = targetType;
-    
     swvc.theNewDevicegroup = devicegroup;
     swvc.makeNewFiles = andMakeNewFiles;
     swvc.project = currentProject;
     
+    [swvc prepSheet];
     [_window beginSheet:selectTargetSheet completionHandler:nil];
 }
 
@@ -3574,59 +3579,74 @@
 
 - (IBAction)cancelSelectTarget:(id)sender
 {
+    // Close the sheet...
+    
     [_window endSheet:selectTargetSheet];
 
-    resetTargetFlag = NO;
-    theTargetType = kTargetDeviceGroupTypeNone;
+    // ... and reset any progress variables
+    
+    newTargetsFlag = NO;
 }
 
 
 
 - (IBAction)selectTarget:(id)sender
 {
-    [_window endSheet:selectTargetSheet];
-
     // If no target was selected, bail
 
-    if (swvc.theTarget == nil)
+    if (swvc.theSelectedTarget == nil)
     {
-        resetTargetFlag = NO;
-        theTargetType = kTargetDeviceGroupTypeNone;
+        // No target was selected in the dialog so treat this as a cancel
+        
+        [self cancelSelectTarget:nil];
+        
         return;
     }
     
-    // If we are not (re)setting a target for an existing device,
-    // continue with the creation of a new devicegroup
+    // Close the sheet
+    
+    [_window endSheet:selectTargetSheet];
+    
+    // If we are not changing a target for an existing device, continue with the creation of a new devicegroup
+    // ie. if 'newTargetsFlag' is true
 
-    if (!resetTargetFlag)
+    if (newTargetsFlag)
     {
         // ADDED IN 2.3.128 Branch back to re-show the select group for the subsequent targets
         
-        if (theTargetType == kTargetDeviceGroupTypeProd)
+        if (swvc.targetType == kTargetDeviceGroupTypeProd)
         {
             // We have just got the (Test) Production Device Group target,
             // so go back and get the (Test) DUT Device Group
             
-            theTargetType = kTargetDeviceGroupTypeDUT;
+            if (fixtureTargets == nil)
+            {
+                fixtureTargets = [[NSMutableArray alloc] init];
+            }
+            else
+            {
+                [fixtureTargets removeAllObjects];
+            }
             
-            [swvc.theTargets addObject:swvc.theTarget];
+            [fixtureTargets addObject:swvc.theSelectedTarget];
             
-            [self showSelectTarget:swvc.theNewDevicegroup :swvc.makeNewFiles :theTargetType];
+            [self showSelectTarget:swvc.theNewDevicegroup :swvc.makeNewFiles :kTargetDeviceGroupTypeDUT];
         }
-        else if (theTargetType == kTargetDeviceGroupTypeDUT)
+        else if (swvc.targetType == kTargetDeviceGroupTypeDUT)
         {
             // We now have the (Test) DUT Device Group, so we're ready to create the new group
             
-            theTargetType = kTargetDeviceGroupTypeNone;
+            newTargetsFlag = NO;
             
-            [swvc.theTargets addObject:swvc.theTarget];
+            swvc.targetType = kTargetDeviceGroupTypeNone;
             
-            [self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.makeNewFiles :swvc.theTargets];
+            [fixtureTargets addObject:swvc.theSelectedTarget];
+            
+            [self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.makeNewFiles :fixtureTargets];
         }
+        
         return;
     }
-
-    resetTargetFlag = NO;
 
     // Check that the selected device group is not the current one
     
@@ -3636,8 +3656,8 @@
     
     if (currentDevicegroup.data != nil)
     {
-        if (theTargetType == kTargetDeviceGroupTypeProd) key = @"production_target";
-        if (theTargetType == kTargetDeviceGroupTypeDUT)  key = @"dut_target";
+        if (swvc.targetType == kTargetDeviceGroupTypeProd) key = @"production_target";
+        if (swvc.targetType == kTargetDeviceGroupTypeDUT)  key = @"dut_target";
         
         NSDictionary *tgt = [self getValueFrom:currentDevicegroup.data withKey:key];
 
@@ -3645,20 +3665,27 @@
         {
             NSString *tid = [tgt objectForKey:@"id"];
 
-            if ([tid compare:swvc.theTarget.did] == NSOrderedSame)
+            if ([tid compare:swvc.theSelectedTarget.did] == NSOrderedSame)
             {
-                [self writeWarningToLog:[NSString stringWithFormat:@"The device group you selected is already one of \"%@\"'s targets.", currentDevicegroup.name]  :YES];
+                [self writeWarningToLog:[NSString stringWithFormat:@"The device group you selected is already one of Device Group \"%@\"'s targets.", currentDevicegroup.name]  :YES];
                 return;
             }
+        }
+        else
+        {
+            // The device group were working with has no targets
+            
+            NSLog(@"ERROR: attempting to set a target on a non-targetable device group in selectTarget:");
+            return;
         }
     }
 
     NSDictionary *dict = @{ @"action" : @"resetprodtarget",
                             @"devicegroup" : currentDevicegroup,
-                            key : swvc.theTarget };
+                            @"target" : swvc.theSelectedTarget };
 
-    NSDictionary *targ = @{ @"type" : swvc.theTarget.type,
-                            @"id" : swvc.theTarget.did };
+    NSDictionary *targ = @{ @"type" : swvc.theSelectedTarget.type,
+                            @"id" : swvc.theSelectedTarget.did };
 
     [ide updateDevicegroup:currentDevicegroup.did :@[key, @"type"] :@[targ, currentDevicegroup.type] :dict];
 
@@ -4552,35 +4579,61 @@
     // NOTE The table contained within the sheet is handled by a separate
     // SelectWindowViewController instance, 'swvc'
 
+    [self chooseTarget:kTargetDeviceGroupTypeProd];
+}
+
+
+
+- (IBAction)chooseDUTTarget:(id)sender
+{
+    // FROM 2.3.128
+    // This method allows the user with ops access to select a factory device group's DUT target
+    // The sheet presents a list of suitable device groups in a table
+    // NOTE The table contained within the sheet is handled by a separate
+    // SelectWindowViewController instance, 'swvc'
+    
+    [self chooseTarget:kTargetDeviceGroupTypeDUT];
+}
+
+
+
+- (void)chooseTarget:(NSInteger)type
+{
+    // FROM 2.3.128
+    // This method allows the user with ops access to select a factory device group's DUT target
+    // The sheet presents a list of suitable device groups in a table
+    // NOTE The table contained within the sheet is handled by a separate
+    // SelectWindowViewController instance, 'swvc'
+    
     if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
-
+    
+    NSString *groupType = type == kTargetDeviceGroupTypeDUT ? @"DUT" : @"production";
+    
     if (![currentDevicegroup.type containsString:@"factoryfixture"])
     {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a factory fixture group so has no production target.", currentDevicegroup.name] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a factory fixture group so has no %@ target.", currentDevicegroup.name, groupType] :YES];
         return;
     }
-
+    
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"set production device groups as targets"];
+        [self loginAlert:[NSString stringWithFormat:@"set %@ device groups as targets", groupType]];
         return;
     }
-
+    
     if (![self isCorrectAccount:currentProject])
     {
         // We are working on a project that is NOT tied to the current account
-
-        [self devicegroupAccountAlert:currentDevicegroup :@"set a production device group as a target for" :_window];
+        
+        [self devicegroupAccountAlert:currentDevicegroup :[NSString stringWithFormat:@"set a %@ device group as a target for", groupType] :_window];
         return;
     }
-
-    resetTargetFlag = YES;
-
-    [self showSelectTarget:currentDevicegroup :NO :theTargetType];
+    
+    [self showSelectTarget:currentDevicegroup :NO :type];
 }
 
 
@@ -4597,13 +4650,13 @@
 
     if (![currentDevicegroup.type containsString:@"pre_production"])
     {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a pre-production group so has no test blessed devices.", currentDevicegroup.name] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a pre-production group so has no test production devices.", currentDevicegroup.name] :YES];
         return;
     }
 
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"list test blessed devices"];
+        [self loginAlert:@"list test production devices"];
         return;
     }
 
@@ -4611,7 +4664,7 @@
     {
         // We are working on a project that is NOT tied to the current account
 
-        [self devicegroupAccountAlert:currentDevicegroup :@"show test blessed devices in" :_window];
+        [self devicegroupAccountAlert:currentDevicegroup :@"show test production devices in" :_window];
         return;
     }
 
@@ -8206,13 +8259,16 @@
         }
         else if ([action compare:@"resetprodtarget"] == NSOrderedSame)
         {
-            // Target changed, so report it
-
+            // See AppDelegateUtilities - reloads the core device group data from the server
+            
             [self updateDevicegroup:devicegroup];
-
+            
+            // Target changed, so report it
+            
             Devicegroup *tdg = [source objectForKey:@"target"];
+            NSString *type = [self convertDevicegroupType:tdg.type :NO];
 
-            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" now has a new target device group: \"%@\".", devicegroup.name, tdg.name] :YES];
+            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" now has a new target %@ device group: \"%@\".", devicegroup.name, type, tdg.name] :YES];
         }
     }
     else
@@ -8651,11 +8707,11 @@
 
     if (devices.count == 0)
     {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" contains no test blessed devices.", devicegroup.name] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" contains no test production devices.", devicegroup.name] :YES];
         return;
     }
 
-    __block NSString *titleString = [NSString stringWithFormat:@"Device group \"%@\" test blessed devices:", devicegroup.name];
+    __block NSString *titleString = [NSString stringWithFormat:@"Device group \"%@\" test production devices:", devicegroup.name];
     __block NSString *lineString = @"+-----------------------------------------------------------------------+";
     __block NSString *headString = @"| Device ID         |  MAC Address        |  Enrolled                   |";
     __block NSString *midString =  @"+-------------------+---------------------+-----------------------------+";
@@ -11938,22 +11994,37 @@
 
     // Enable or disable items as appropriate
 
-    showDeviceGroupInfoMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    showModelFilesFinderMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
-    restartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    conRestartDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    setMinimumMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    setProductionTargetMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"factoryfixture"]) ? YES : NO;
-    listCommitsMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    deleteDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    renameDeviceGroupMenuItem.enabled = (currentDevicegroup != nil) ? YES : NO;
-    compileMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
-    uploadMenuItem.enabled = (currentDevicegroup != nil && compiled == YES) ? YES : NO;
-    uploadExtraMenuItem.enabled = (currentDevicegroup != nil && compiled == YES) ? YES : NO;
-    checkImpLibrariesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
-    removeFilesMenuItem.enabled = (currentDevicegroup != nil && gotFiles == YES) ? YES : NO;
+    showDeviceGroupInfoMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
+    showModelFilesFinderMenuItem.enabled = currentDevicegroup != nil && gotFiles == YES ? YES : NO;
+    restartDeviceGroupMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
+    conRestartDeviceGroupMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
+    setMinimumMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
+    setProductionTargetMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"fixture"]) ? YES : NO;
+    setDUTTargetMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"fixture"]) ? YES : NO;
+    listCommitsMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
+    deleteDeviceGroupMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
+    renameDeviceGroupMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
+    compileMenuItem.enabled = currentDevicegroup != nil && gotFiles == YES ? YES : NO;
+    uploadMenuItem.enabled = currentDevicegroup != nil && compiled == YES ? YES : NO;
+    uploadExtraMenuItem.enabled = currentDevicegroup != nil && compiled == YES ? YES : NO;
+    checkImpLibrariesMenuItem.enabled = currentDevicegroup != nil && gotFiles == YES ? YES : NO;
+    removeFilesMenuItem.enabled = currentDevicegroup != nil && gotFiles == YES ? YES : NO;
     listTestBlessedDevicesMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"pre_production"]) ? YES : NO;
-
+    
+    // FROM 2.3.128
+    // Set the Set Target menu titles appropriate to test/production
+    
+    if ([currentDevicegroup.type containsString:@"pre_"])
+    {
+        setProductionTargetMenuItem.title = @"Set Target Test Production Device Group...";
+        setDUTTargetMenuItem.title = @"Set Target Test DUT Device Group...";
+    }
+    else
+    {
+        setProductionTargetMenuItem.title = @"Set Target Production Device Group...";
+        setDUTTargetMenuItem.title = @"Set Target DUT Device Group...";
+    }
+    
     // Enable or Disable the source code submenu based on whether's there's a selected device group
     // and whether that deviece group has agent and/or device code or not
 

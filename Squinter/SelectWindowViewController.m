@@ -11,32 +11,40 @@
 
 
 @implementation SelectWindowViewController
-@synthesize project, theNewDevicegroup, theTargets, theTarget, makeNewFiles, targetType;
+@synthesize project, theNewDevicegroup, theSelectedTarget, targetType, makeNewFiles;
 
 
 
-- (void)setProject:(Project *)aProject
+- (void)prepSheet
 {
-	project = aProject;
+    // Prepare the sheet UI ahead of being presented by the host app
+    // NOTE This should only be called ONCE per request for two targets
+    //      as it clears the list of stored targets
     
-    if (theTargets == nil) theTargets = [[NSMutableArray alloc] init];
-
     NSString *groupType = [theNewDevicegroup.type hasPrefix:@"pre_"] ? @"Test" : @"";
     
     // Get the target group type’s Squinter name from its API type
-    NSString *target;
-    NSString *targetName = @"ERROR";
+    
+    NSString *targetAPIType;
+    NSString *targetAPIName = @"ERROR";
+    
+    if (targetType == kTargetDeviceGroupTypeNone)
+    {
+        // This should never come up, but just in case...
+        selectLabel.stringValue = @"ERROR - Please contact the developer";
+        return;
+    }
     
     if (targetType == kTargetDeviceGroupTypeProd)
     {
-        targetName = @"Production";
-        target = groupType.length > 0 ? @"pre_production_devicegroup" : @"production_devicegroup" ;
+        targetAPIName = @"Production";
+        targetAPIType = groupType.length > 0 ? @"pre_production_devicegroup" : @"production_devicegroup" ;
     }
     
     if (targetType == kTargetDeviceGroupTypeDUT)
     {
-        targetName = @"DUT";
-        target = groupType.length > 0 ? @"pre_dut_devicegroup" : @"dut_devicegroup" ;
+        targetAPIName = @"DUT";
+        targetAPIType = groupType.length > 0 ? @"pre_dut_devicegroup" : @"dut_devicegroup" ;
     }
     
     if (project != nil)
@@ -54,24 +62,22 @@
 		{
 			for (Devicegroup *dg in project.devicegroups)
 			{
-				if ([dg.type compare:target] == NSOrderedSame) [groups addObject:dg];
+				if ([dg.type compare:targetAPIType] == NSOrderedSame) [groups addObject:dg];
 			}
 		}
 	}
+    else
+    {
+        selectLabel.stringValue = @"ERROR - Please contact the developer";
+        return;
+    }
 
-	selectLabel.stringValue = [NSString stringWithFormat:@"Select the %@ Fixture Device Group’s %@ %@ Device Group target:", groupType, groupType, targetName];
+	selectLabel.stringValue = [NSString stringWithFormat:@"Select the %@ Fixture Device Group’s %@ %@ Device Group target:", groupType, groupType, targetAPIName];
 
 	[selectTable reloadData];
 
 	selectTable.needsDisplay = YES;
-    theTarget = nil;
-}
-
-
-
-- (IBAction)check:(id)sender
-{
-	NSLog(@"Checked");
+    theSelectedTarget = nil;
 }
 
 
@@ -96,13 +102,9 @@
 		}
 		else
 		{
-			theTarget = [groups objectAtIndex:i];
+            theSelectedTarget = cellView.minimumCheckbox.state == NSOnState ? [groups objectAtIndex:i] : nil;
 		}
 	}
-    
-    // Nothing selected at all? Zap the stored target
-    
-    if (count == selectTable.numberOfRows) theTarget = nil;
 }
 
 

@@ -20,15 +20,13 @@
 }
 
 
-- (IBAction)check:(id)sender;
 - (IBAction)checkGroup:(id)sender;
-- (void)setProject:(Project *)aProject;
+- (void)prepSheet;
 
 
-@property (nonatomic, strong, setter=setProject:) Project *project;
+@property (nonatomic, strong) Project *project;
 @property (nonatomic, strong) Devicegroup *theNewDevicegroup;
-@property (nonatomic, strong) Devicegroup *theTarget;
-@property (nonatomic, strong) NSMutableArray *theTargets;
+@property (nonatomic, strong) Devicegroup *theSelectedTarget;
 @property (nonatomic, readwrite) BOOL makeNewFiles;
 @property (nonatomic, readwrite) NSInteger targetType;
 
