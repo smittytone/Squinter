@@ -293,8 +293,17 @@
 
                         node = [[TreeNode alloc] init];
                         node.key = @"Path";
-                        node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename];
-                        node.flag = YES;
+                        
+                        if ([model.filename compare:@"UNSAVED"] == NSOrderedSame)
+                        {
+                            node.value = @"Model file not yet saved";
+                        }
+                        else
+                        {
+                            node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename];
+                            node.flag = YES;
+                        }
+                        
                         [pnode.children addObject:node];
 
                         // Device Group x Model y Uploaded Date
