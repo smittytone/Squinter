@@ -2546,7 +2546,7 @@
 
                 if ([project.pid compare:pid] == NSOrderedSame)
                 {
-                    [self writeErrorToLog:@"[ERROR] This Project already exists as a Product in the impCloud." :YES];
+                    [self writeErrorToLog:@"This Project already exists as a Product in the impCloud." :YES];
                     deadpid = NO;
                     break;
                 }
@@ -3137,7 +3137,7 @@
 
     if (selectedProduct == nil)
     {
-        [self writeErrorToLog:@"[ERROR] You have not selected a product as the new project's source." :YES];
+        [self writeErrorToLog:@"You have not selected a product as the new project's source." :YES];
         return;
     }
 
@@ -3974,7 +3974,7 @@
     }
     else
     {
-        [self writeErrorToLog:@"[ERROR] The file could not be saved." :YES];
+        [self writeErrorToLog:@"The file could not be saved." :YES];
     }
 }
 
@@ -4263,13 +4263,13 @@
 
     if (currentDevicegroup.did == nil || currentDevicegroup.did.length == 0)
     {
-        [self writeErrorToLog:@"[ERROR] Cannot upload: the selected device group is not associated with a device group in the impCloud." :YES];
+        [self writeErrorToLog:@"Cannot upload: the selected device group is not associated with a device group in the impCloud." :YES];
         return;
     }
 
     if (currentDevicegroup.models.count == 0)
     {
-        [self writeErrorToLog:@"[ERROR] The selected device group contains no code to upload." :YES];
+        [self writeErrorToLog:@"The selected device group contains no code to upload." :YES];
         return;
     }
 
@@ -4308,7 +4308,7 @@
     {
         if (!model.squinted)
         {
-            [self writeErrorToLog:@"[ERROR] The selected device group contains uncompiled code. Please compile before uploading." :YES];
+            [self writeErrorToLog:@"The selected device group contains uncompiled code. Please compile before uploading." :YES];
             return;
         }
 
@@ -5147,7 +5147,7 @@
 
     if (devicegroup == nil)
     {
-        [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Device \"%@\" is already unassigned.", [self getValueFrom:selectedDevice withKey:@"name"]]:YES];
+        [self writeErrorToLog:[NSString stringWithFormat:@"Device \"%@\" is already unassigned.", [self getValueFrom:selectedDevice withKey:@"name"]]:YES];
         return;
     }
 
@@ -5176,7 +5176,7 @@
     {
         // We have no device(s) to assign
 
-        [self writeErrorToLog:@"[ERROR] You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
+        [self writeErrorToLog:@"You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
         return;
     }
 
@@ -5184,7 +5184,7 @@
     {
         // We have no projects open - so we can't assign a device to an open device group
 
-        [self writeErrorToLog:@"[ERROR] You have no projects open. You will need to open or create a project and add a device group to assign a device." :YES];
+        [self writeErrorToLog:@"You have no projects open. You will need to open or create a project and add a device group to assign a device." :YES];
         return;
     }
 
@@ -5247,7 +5247,7 @@
     {
         // We have no device groups to assign
 
-        [self writeErrorToLog:@"[ERROR] None of your open Projects have any Device Groups. You will need to create a Device Group to assign a device." :YES];
+        [self writeErrorToLog:@"None of your open Projects have any Device Groups. You will need to create a Device Group to assign a device." :YES];
         return;
     }
 
@@ -5334,7 +5334,7 @@
     {
         // We have no device to rename
 
-        [self writeErrorToLog:@"[ERROR] You have no devices listed. You need to retrieve the list from the impCloud." :YES];
+        [self writeErrorToLog:@"You have no devices listed. You need to retrieve the list from the impCloud." :YES];
         return;
     }
 
@@ -5705,7 +5705,7 @@
     {
         // We have no device(s) to assign
 
-        [self writeErrorToLog:@"[ERROR] You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
+        [self writeErrorToLog:@"You have no devices listed. You may need to retrieve the list from the impCloud." :YES];
         return;
     }
 
@@ -6569,7 +6569,7 @@
     {
         // Project didn't load for some reason so warn the user
 
-        [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Could not load project file \"%@\".", fileName] :YES];
+        [self writeErrorToLog:[NSString stringWithFormat:@"Could not load project file \"%@\".", fileName] :YES];
     }
 
     // Call the method again in case there are any URLs left to deal with
@@ -7098,7 +7098,8 @@
 
 - (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName
 {
-    // Save the savingProject project. This may be a newly created project and may not currentProject
+    // Save the 'savingProject] project. This may be a newly created project and may not
+    // necessarily be 'currentProject'
 
     BOOL success = NO;
     //BOOL nameChange = NO;
@@ -7106,7 +7107,7 @@
 
     if (newFileName == nil)
     {
-        // No filename passed in, so we have come from 'saveProject:'
+        // No filename passed in, so we must have come from 'saveProject:'
 
         if (savingProject.filename != nil)
         {
@@ -7126,7 +7127,7 @@
     {
         // We have come from 'saveProjectAs:'
 
-        // First add '.squirrelproj' to the file name if it has been removed
+        // First add '.squirrelproj' to the specified file name if it has been removed
 
         NSRange r = [newFileName rangeOfString:@".squirrelproj"];
 
@@ -7174,6 +7175,16 @@
                                      error:&error];
 
             [fileWatchQueue addPath:savePath];
+
+            // Log any error
+
+            if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not replace file %@ with %@", savePath, altPath] :YES];
+        }
+        else
+        {
+            // Log failure to save as an error
+
+            [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", altPath] :YES];
         }
     }
     else
@@ -7181,6 +7192,10 @@
         // The file doesn't already exist at this location so just write it out
 
         success = [NSKeyedArchiver archiveRootObject:savingProject toFile:savePath];
+
+        // Log any error
+
+        if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", savePath] :YES];
     }
 
     if (success == YES)
@@ -7205,17 +7220,25 @@
             saveAsFlag = NO;
         }
 
+        // If we're immediately resaving a downloaded product after saving its files
+        // (which updates the project files), then don't show the 'project saved' message,
+        // otherwise do show it
+
         if (!doubleSaveFlag) [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
     }
     else
     {
-        [self writeErrorToLog:@"[ERROR] The Project could not be saved." :YES];
+        [self writeErrorToLog:@"The Project could not be saved." :YES];
+
+        // TODO Do we bail at this point, ie. return at this point, not try and save the model files?
+        //      eg. savingProject = nil;
     }
 
     // Saved the project, but are there models to save, from a 'download product' operation?
 
     Project *sp = nil;
 
+    /*
     if (downloads.count > 0)
     {
         for (Project *ap in downloads)
@@ -7223,6 +7246,8 @@
             if (ap == savingProject) sp = ap;
         }
     }
+     */
+    if (downloads.count > 0 && savingProject != nil) sp = savingProject;
 
     // Done saving so clear 'savingProject'
 
@@ -7249,20 +7274,22 @@
 
     if (savingProject == nil)
     {
-        // Just in case...
-
         [self writeWarningToLog:@"[WARNING] You have not selected a Project to save." :YES];
         return;
     }
 
+    // Flag that we're willing to overwrite the current project
+    // NOTE This is separate from the first line, above, as we may have entered from
+    //      neither of the listed senders
+
     if (savingProject == currentProject) saveAsFlag = YES;
 
-    // Configure the NSSavePanel
+    // Configure the NSSavePanel to save the project
 
     saveProjectDialog = [NSSavePanel savePanel];
-    [saveProjectDialog setNameFieldStringValue:savingProject.filename];
-    [saveProjectDialog setCanCreateDirectories:YES];
-    [saveProjectDialog setDirectoryURL:[NSURL fileURLWithPath:workingDirectory isDirectory:YES]];
+    saveProjectDialog.nameFieldStringValue = savingProject.filename;
+    saveProjectDialog.canCreateDirectories = YES;
+    saveProjectDialog.directoryURL = [NSURL fileURLWithPath:workingDirectory isDirectory:YES];
 
     [saveProjectDialog beginSheetModalForWindow:_window
                               completionHandler:^(NSInteger result)
@@ -7273,7 +7300,11 @@
          [NSApp endSheet:saveProjectDialog];
          [saveProjectDialog orderOut:self];
 
+         // Check what button was clicked - was it 'Save'?
+
          if (result == NSFileHandlingPanelOKButton) [self savePrep:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]];
+
+         // NOTE A click on 'Cancel' just ends the dialog run loop
      }
      ];
 
@@ -7286,7 +7317,6 @@
 - (IBAction)saveProject:(id)sender
 {
     // Call this method to save the current project by overwriting the previous version
-
     // This method should only be called by menu, to save the current project, which is added to the save list
 
     if (sender == fileSaveMenuItem) savingProject = currentProject;
@@ -7297,9 +7327,11 @@
         return;
     }
 
-    // Do we need to save? If there have been no changes, then no
+    // Do we need to save the project file? If there have been no changes, then no
 
     if (!savingProject.haschanged) return;
+
+    // Do we have a place to save the project file
 
     if (savingProject.path == nil)
     {
@@ -7310,7 +7342,8 @@
         return;
     }
 
-    // Handle the save. Note 'path' does not include the filename (we add it in savePrep:)
+    // Handle the save
+    // NOTE 'path' does not include the filename (we add it in 'savePrep:')
 
     [self savePrep:[NSURL fileURLWithPath:savingProject.path] :nil];
 }
@@ -7321,15 +7354,21 @@
 - (IBAction)cancelChanges:(id)sender
 {
     // The user doesn't care about the changes so close the sheet then tell the system to shut down the app
+    // NOTE This is called via the 'you have unsaved changes' dialog
 
     [_window endSheet:saveChangesSheet];
 
     if (!closeProjectFlag)
     {
+        // If we haven't come here from the 'Close' menu option, we're here because
+        // the app is quitting, so proceed with the quit
+
         [NSApp replyToApplicationShouldTerminate:NO];
     }
     else
     {
+        // Cancel the 'close project' operation
+
         closeProjectFlag = NO;
     }
 }
@@ -7339,15 +7378,23 @@
 - (IBAction)ignoreChanges:(id)sender
 {
     // The user doesn't care about the changes so close the sheet then tell the system to shut down the app
+    // NOTE This is called via the 'you have unsaved changes' dialog
 
     [_window endSheet:saveChangesSheet];
 
     if (!closeProjectFlag)
     {
+        // If we haven't come here from the 'Close' menu option, we're here because
+        // the app is quitting, so proceed with the quit
+
         [NSApp replyToApplicationShouldTerminate:YES];
     }
     else
     {
+        // Cancel the current 'close project' operation,
+        // mark the project as not changed,
+        // and re-attempt to close it (bypasses the project changed path)
+
         closeProjectFlag = NO;
         currentProject.haschanged = NO;
         [self closeProject:nil];
@@ -7358,6 +7405,9 @@
 
 - (IBAction)saveChanges:(id)sender
 {
+    // The user wants to save a project's changes when closing that project or quitting the app
+    // NOTE This is called via the 'you have unsaved changes' dialog
+
     [_window endSheet:saveChangesSheet];
 
     if (closeProjectFlag)
@@ -7378,6 +7428,9 @@
         if (aProject.haschanged)
         {
             currentProject = aProject;
+
+            // Save the project as if we had clicked the 'Save' menu item
+
             [self saveProject:fileSaveMenuItem];
         }
     }
@@ -7393,7 +7446,12 @@
 {
     // Save all the model files from a downloaded product
 
+    // Remove the source project from the downloads list
+    // NOTE We have already saved the project itself CHECK
+
     [downloads removeObject:project];
+
+    // Make a list of files that need to be savec
 
     NSMutableArray *filesToSave = [[NSMutableArray alloc] init];
 
@@ -7416,9 +7474,15 @@
         }
     }
 
+    // If we have any files to save, save them now
+
     if (filesToSave.count > 0) [self saveFiles:filesToSave :nil];
 
+    // Add the downloaded project to the 'open projects' list
+
     [projectArray addObject:project];
+
+    // Set the Inspector's project
 
     iwvc.project = project;
     currentProject = project;
@@ -7447,13 +7511,13 @@
     [self refreshDevicegroupMenu];
     [self refreshMainDevicegroupsMenu];
 
-    // We now need to re-save the project file, which now contains the locations
-    // of the various model files. We do this programmatically rather than indicate
-    // to the user that they need to (re)save the project
+    // We need to re-save the project file because it now contains the locations
+    // of the various model files that were saved above. We do this programmatically
+    // rather than indicate to the user that they need to (re)save the project
 
     currentProject.haschanged = YES;
-    savingProject = currentProject;
-    doubleSaveFlag = YES;
+    savingProject = currentProject;     // Should check that savingProject is not in use
+    doubleSaveFlag = YES;               // Used to prevent duplicate 'file saved' messages
 
     [self saveProject:nil];
 }
@@ -7462,9 +7526,16 @@
 
 - (void)saveFiles:(NSMutableArray *)files :(Project *)project
 {
+    // This method takes an array of .nut files that need to be saved,
+    // typically because they have just been downloaded from a sync or
+    // the creation of a new project.
+
+    // Check at the outset whether there are any files left to save
+
     if (files.count == 0)
     {
-        // We're done, so handle any exit operations
+        // We're done - all the files have been saved - so handle any exit operations
+        // Currently these are only triggered by the provision of a project
 
         if (project != nil && project == currentProject)
         {
@@ -7485,22 +7556,86 @@
     NSData *data = [file.code dataUsingEncoding:NSUTF8StringEncoding];
     NSString *path = [file.path stringByAppendingFormat:@"/%@", file.filename];
 
-    if ([nsfm fileExistsAtPath:path])
+    if (![nsfm fileExistsAtPath:path])
     {
+        // The file doesn't exist already so try and write it out
+
+        success = [nsfm createFileAtPath:path contents:data attributes:nil];
+    }
+    else
+    {
+        // The file does exist - this will be dealt with in the next section
+
+        /*
         path = [path stringByAppendingString:@".new"];
         [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" exists in chosen location - renaming file \"%@.new\".", file.filename, file.filename] :YES];
+        */
     }
-
-    success = [nsfm createFileAtPath:path contents:data attributes:nil];
 
     if (success)
     {
+        // The file was saved successfully
+
         file.filename = [path lastPathComponent];
         file.path = [self getRelativeFilePath:file.path :[path stringByDeletingLastPathComponent]];
-    }
 
-    [files removeObjectAtIndex:0];
-    [self saveFiles:files :project];
+        // Removed the saved file from the list
+
+        [files removeObjectAtIndex:0];
+        [self saveFiles:files :project];
+    }
+    else
+    {
+        // Could not save the file, or it's already there, so pop up the Save Panel
+
+        [self showFileSavePanel:path :files :project];
+    }
+}
+
+
+
+- (void)showFileSavePanel:(NSString *)path :(NSMutableArray *)files :(Project *)project
+{
+    // Show the Save Panel when we're trying to save a model file and can't for some reason
+    // Typically, this will be because the file already exists
+
+    NSString *filename = [path lastPathComponent];
+
+    // Configure the NSSavePanel to save the file at the specified path
+
+    saveProjectDialog = [NSSavePanel savePanel];
+    [saveProjectDialog setNameFieldStringValue:filename];
+    [saveProjectDialog setCanCreateDirectories:YES];
+    [saveProjectDialog setDirectoryURL:[NSURL fileURLWithPath:project.path isDirectory:YES]];
+
+    [saveProjectDialog beginSheetModalForWindow:_window
+                              completionHandler:^(NSInteger result)
+     {
+         // Close sheet first to stop it hogging the event queue
+
+         [NSApp stopModal];
+         [NSApp endSheet:saveProjectDialog];
+         [saveProjectDialog orderOut:self];
+
+         if (result == NSFileHandlingPanelOKButton)
+         {
+             // Update the current file (ie. the first one in the list)
+             // with its name name/location
+
+             Model *file = [files firstObject];
+             file.path = [[saveProjectDialog directoryURL] absoluteString];
+             file.filename = [saveProjectDialog nameFieldStringValue];
+         }
+
+         // Re-call 'saveFiles:' in order to actually save the file
+         // at its new location (or the same one, if the user hit cancel)
+
+         [self saveFiles:files :project];
+     }
+     ];
+
+    [NSApp runModalForWindow:saveProjectDialog];
+    [saveProjectDialog makeKeyWindow];
 }
 
 
@@ -11016,7 +11151,7 @@
 {
     // Write 'string' to the main window log view as an error (ie. in red)
 
-    [self writeNoteToLog:string :[NSColor redColor] :addTimestamp];
+    [self writeNoteToLog:[@"[ERROR] " stringByAppendingString:string] :[NSColor redColor] :addTimestamp];
 }
 
 
@@ -11354,9 +11489,7 @@
     {
         // The error was not specifically related to log in
 
-        NSString *errString = (errorCode == kErrorNetworkError) ? @"[NETWORK ERROR] " : @"[ERROR] ";
-
-        [self writeErrorToLog:[errString stringByAppendingString:errorMessage] :YES];
+        [self writeErrorToLog:errorMessage :YES];
 
         // Just in case we are attemmpting to log stream from the current device
 
@@ -11428,7 +11561,7 @@
     {
         // We've previously recorded that the model file or its parent project file have moved, so warn the user and bail
 
-        [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Source file \"%@\" can't be found it is known location.", model.filename] :YES];
+        [self writeErrorToLog:[NSString stringWithFormat:@"Source file \"%@\" can't be found it is known location.", model.filename] :YES];
         return;
     }
 
@@ -11480,7 +11613,7 @@
 
     if (file.hasMoved)
     {
-        [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] %@ \"%@\" can't be found it is known location.", (isLibrary ? @"Library" : @"File"), file.filename] :YES];
+        [self writeErrorToLog:[NSString stringWithFormat:@"%@ \"%@\" can't be found it is known location.", (isLibrary ? @"Library" : @"File"), file.filename] :YES];
 
     }
     else
@@ -11507,7 +11640,7 @@
             {
                 if (file.hasMoved)
                 {
-                    [self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] %@ \"%@\" can't be found it is known location.", (areLibraries ? @"Library" : @"File"), model.filename] :YES];
+                    [self writeErrorToLog:[NSString stringWithFormat:@"%@ \"%@\" can't be found it is known location.", (areLibraries ? @"Library" : @"File"), model.filename] :YES];
                 }
                 else
                 {
@@ -13914,7 +14047,7 @@
     }
     else
     {
-        [self writeErrorToLog:@"[ERROR] Could not parse list of Electric Imp libraries" :YES];
+        [self writeErrorToLog:@"Could not parse list of Electric Imp libraries" :YES];
         eiLibListData = nil;
         return;
     }
@@ -14092,7 +14225,7 @@ didReceiveResponse:(NSURLResponse *)response
         }
         else
         {
-            NSString *errString =[NSString stringWithFormat:@"[ERROR] Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
+            NSString *errString =[NSString stringWithFormat:@"Could not get list of Electric Imp libraries (Code: %ld)", (long)rps.statusCode];
             [self writeErrorToLog:errString :YES];
         }
 

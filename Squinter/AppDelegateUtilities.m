@@ -895,19 +895,19 @@
     switch (index)
     {
         case kErrorMessageNoSelectedDevice:
-            return @"[ERROR] You have not selected a device. Choose one from the 'Current Device' pop-up below.";
+            return @"You have not selected a device. Choose one from the 'Current Device' pop-up below.";
 
         case kErrorMessageNoSelectedDevicegroup:
-            return @"[ERROR] You have not selected a device group. Go to 'Device Groups'  > 'Project's Device Groups' to select one.";
+            return @"You have not selected a device group. Go to 'Device Groups'  > 'Project's Device Groups' to select one.";
 
         case kErrorMessageNoSelectedProject:
-            return @"[ERROR] You have not selected a project. Go to 'Projects' > 'Open Projects' to select one.";
+            return @"You have not selected a project. Go to 'Projects' > 'Open Projects' to select one.";
 
         case kErrorMessageNoSelectedProduct:
-            return @"[ERROR] You have not selected a product. Go to 'Projects' > 'Current Products' to select one.";
+            return @"You have not selected a product. Go to 'Projects' > 'Current Products' to select one.";
 
         case kErrorMessageMalformedOperation:
-            return @"[ERROR] Malformed action request - no action specified.";
+            return @"Malformed action request - no action specified.";
     }
 
     return @"No Error";

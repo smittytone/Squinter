@@ -86,7 +86,7 @@
 			{
 				// This is a compile action, so we treat 'output == nil' as a failure
 
-				[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Compilation halted: cannot continue due to errors in %@ code", model.type] :YES];
+				[self writeErrorToLog:[NSString stringWithFormat:@"Compilation halted: cannot continue due to errors in %@ code", model.type] :YES];
 				model.squinted = NO;
 				return;
 			}
@@ -198,7 +198,7 @@
 
 	if (error)
 	{
-		[self writeErrorToLog:[NSString stringWithFormat:@"[ERROR] Unable to load source file \"%@\" - aborting compile.", codePath] :YES];
+		[self writeErrorToLog:[NSString stringWithFormat:@"Unable to load source file \"%@\" - aborting compile.", codePath] :YES];
 		return nil;
 	}
 

@@ -574,6 +574,7 @@
 - (IBAction)saveChanges:(id)sender;
 - (void)saveModelFiles:(Project *)project;
 - (void)saveFiles:(NSMutableArray *)files :(Project *)project;
+- (void)showFileSavePanel:(NSString *)path :(NSMutableArray *)files :(Project *)project;
 
 
 // Squint Methods
