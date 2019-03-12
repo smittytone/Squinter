@@ -467,6 +467,7 @@
 - (IBAction)doSync:(id)sender;
 - (IBAction)cancelSyncChoiceSheet:(id)sender;
 - (IBAction)closeSyncChoiceSheet:(id)sender;
+- (void)postSync:(Project *)project;
 - (void)uploadProject:(Project *)project;
 - (void)syncProject:(Project *)project;
 - (IBAction)cancelSync:(id)sender;
@@ -575,6 +576,7 @@
 - (void)saveModelFiles:(Project *)project;
 - (void)saveFiles:(NSMutableArray *)files :(Project *)project;
 - (void)showFileSavePanel:(NSString *)path :(NSMutableArray *)files :(Project *)project;
+- (void)doneSaving:(Project *)project;
 
 
 // Squint Methods

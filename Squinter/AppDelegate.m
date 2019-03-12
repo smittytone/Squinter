@@ -1445,6 +1445,8 @@
 
 - (IBAction)newProject:(id)sender
 {
+    // Create a new product from scratch
+    
     if (selectedProduct != nil)
     {
         // If we have a selected product, we can potentially associate it with the new project...
@@ -1903,6 +1905,8 @@
 
 - (IBAction)closeProject:(id)sender
 {
+    // The UI entry point for 'close project' operations
+    
     if (projectArray.count == 0 || currentProject == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
@@ -1913,16 +1917,16 @@
     {
         // We need to close multiple projects at once, so iterate through
         // all of them, recursively calling closeProject:, sending nil as
-        // the sender so this block is not re-run. NOTE this should exit
-        // with just one remaining project, which the rest of the method
-        // will deal with
+        // the sender so this block is not re-run.
+        // NOTE this should exit with just one remaining project,
+        //      which the rest of the method will deal with
 
         if (projectArray.count > 1)
         {
             do
             {
                 // Close the current project
-                // NOTE closeProject: sets the current project
+                // NOTE 'closeProject:' sets the current project
 
                 [self closeProject:nil];
             }
@@ -1936,9 +1940,11 @@
     {
         // The project has unsaved changes, so warn the user before closing
 
-        [saveChangesSheetLabel setStringValue:@"Project has unsaved changes."];
-        [_window beginSheet:saveChangesSheet completionHandler:nil];
+        saveChangesSheetLabel.stringValue = @"Project has unsaved changes.";
         closeProjectFlag = YES;
+        
+        [_window beginSheet:saveChangesSheet completionHandler:nil];
+        
         return;
     }
 
@@ -1993,6 +1999,7 @@
         [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no open Projects.", closedName] :YES];
         [projectArray removeAllObjects];
         [fileWatchQueue kill];
+        
         fileWatchQueue = nil;
         currentProject = nil;
         currentDevicegroup = nil;
@@ -2359,46 +2366,6 @@
 
 
 
-- (IBAction)doSync:(id)sender
-{
-    // This is an start point for the UI to trigger a project sync
-
-    // We can't sync if we're not logged in
-
-    if (!ide.isLoggedIn)
-    {
-        [self loginAlert:@"upload or sync this Project"];
-        return;
-    }
-
-    // Must have a selected project to sync (this should be prevented by the UI)
-
-    if (currentProject == nil)
-    {
-        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
-        return;
-    }
-
-    // Does the current project have a product ID?
-
-    if (currentProject.pid == nil || currentProject.pid.length == 0)
-    {
-        NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = [NSString stringWithFormat:@"Project “%@” cannot by sync’d", currentProject.name];
-        alert.informativeText = @"The Project is not associated with a Product in the impCloud. Please use the Projects menu to link this Project to a Product.";
-
-        [alert beginSheetModalForWindow:_window completionHandler:nil];
-
-        return;
-    }
-
-    // We have a list of products, so we can continue
-
-    [self syncProject:currentProject];
-}
-
-
-
 - (void)uploadProject:(Project *)project
 {
     // Uploading a project is the act of creating a new product out of a pre-existing project,
@@ -2591,108 +2558,70 @@
 
 
 
+#pragma mark Project Synchronisation
+
+
+- (IBAction)doSync:(id)sender
+{
+    // This is the start point for the UI to trigger a project sync
+    
+    // We can't sync if we're not logged in
+    
+    if (!ide.isLoggedIn)
+    {
+        [self loginAlert:@"upload or sync this Project"];
+        return;
+    }
+    
+    // Must have a selected project to sync (this should be prevented by the UI)
+    
+    if (currentProject == nil)
+    {
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        return;
+    }
+    
+    // Does the current project have a product ID?
+    
+    if (currentProject.pid == nil || currentProject.pid.length == 0)
+    {
+        // No, so warn the user and request they associate the project with a product
+        
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = [NSString stringWithFormat:@"Project “%@” cannot by sync’d", currentProject.name];
+        alert.informativeText = @"The Project is not associated with a Product in the impCloud. Please use the Projects menu to link this Project to a Product. You may eed to update Squinter’s list of Products first.";
+        
+        [alert beginSheetModalForWindow:_window completionHandler:nil];
+        
+        return;
+    }
+    
+    // Now go and perform the sync
+    
+    [self syncProject:currentProject];
+}
+
+
+
 - (void)syncProject:(Project *)project
 {
     // Retrieve the device groups for this specific product ID. We will later
     // compare this list with the local list in order to see what needs to be
     // uploaded or downloaded
 
-    NSDictionary *dict = @{ @"action" : @"checkproduct",
+    NSDictionary *dict = @{ @"action" : @"syncproject",
                             @"project" : currentProject };
 
     [ide getDevicegroupsWithFilter:@"product.id" :currentProject.pid :dict];
 
     // At this point the we have to wait for the async call to 'productToProjectStageTwo'
-
-
-
-    /*
-    if (project.pid != nil && project.pid.length > 0)
-    {
-        if (productsArray == nil)
-        {
-            // We need to get the list of products to match because we have no such list yet
-
-            [self writeStringToLog:@"Retrieving a list of your Products" :YES];
-
-            NSDictionary *dict = @{ @"action" : @"syncproject",
-                                    @"project" : project };
-
-            [ide getProducts:dict];
-
-            // Pick up the action at 'listProducts:'
-
-            return;
-        }
-
-        NSDictionary *syncProduct = nil;
-
-        for (NSDictionary *product in productsArray)
-        {
-            NSString *pid = [self getValueFrom:product withKey:@"id"];
-
-            if ([project.pid compare:pid] == NSOrderedSame)
-            {
-                syncProduct = product;
-                break;
-            }
-        }
-
-        if (syncProduct != nil)
-        {
-            NSString *updated = [self getValueFrom:syncProduct withKey:@"updated_at"];
-
-            if (updated == nil) updated = [self getValueFrom:syncProduct withKey:@"created_at"];
-
-            NSDate *pdDate = [self convertTimestring:updated];
-            NSDate *prDate = [self convertTimestring:currentProject.updated];
-
-            if ([prDate earlierDate:pdDate] == pdDate)
-            {
-                // Product is older than the project
-
-                NSDictionary *dict = @{ @"action" : @"none",
-                                        @"project" : project };
-
-                //[ide updateProduct:project.pid :@"name" :project.name :dict];
-
-                dict = @{ @"action" : @"syncproject",
-                          @"project" : project };
-
-                //[ide updateProduct:project.pid :@"description" :project.description :dict];
-
-                // Pick up the action at 'updateProductStageTwo:'
-            }
-            else
-            {
-                // Project is older than the product
-
-                project.name = [self getValueFrom:syncProduct withKey:@"name"];
-                project.description = [self getValueFrom:syncProduct withKey:@"description"];
-
-                // Now we need to compare device groups
-
-                NSDictionary *dict = @{ @"action" : @"syncproject",
-                                        @"project" : project };
-
-                [ide getDevicegroupsWithFilter:@"product.id" :[self getValueFrom:syncProduct withKey:@"id"] :dict];
-
-                // Pick up the action in 'listDevicegroups:'
-            }
-        }
-    }
-    else
-    {
-        [self uploadProject:project];
-    }
-     */
 }
 
 
 
 - (IBAction)cancelSyncChoiceSheet:(id)sender
 {
-    // Close the sheet
+    // Close the unsynced device groups sheet and end the operation
 
     [_window endSheet:syncChoiceSheet];
 }
@@ -2701,7 +2630,8 @@
 
 - (IBAction)closeSyncChoiceSheet:(id)sender
 {
-    // Close the sheet
+    // Close the unsynced device groups sheet and prepare to download
+    // the selected missing device groups, if any
 
     [_window endSheet:syncChoiceSheet];
 
@@ -2718,9 +2648,13 @@
         NSNumber *num = [sywvc.selectedGroups objectAtIndex:i];
         [groupsToSync addObject:[sywvc.syncGroups objectAtIndex:num.integerValue]];
     }
-
+    
+    // NOTE The following test should always be true
+    
     if (groupsToSync.count > 0)
     {
+        BOOL noDeployments = YES;
+        
         // Record the number of devicegroups to download
 
         sywvc.project.count = groupsToSync.count;
@@ -2728,7 +2662,7 @@
         for (NSDictionary *dg in groupsToSync)
         {
             // Convert each of the downloadable device group dictionaries
-            // into local objects
+            // into local objects for inclusion in the project
 
             Devicegroup *newdg = [[Devicegroup alloc] init];
             newdg.did = [dg objectForKey:@"id"];
@@ -2748,27 +2682,64 @@
             {
                 // The dictionary has a current deployment, so go and get it
 
-                NSDictionary *dict = @{ @"action" : @"downloadcode",
+                NSDictionary *dict = @{ @"action" : @"syncmodelcode",
                                         @"devicegroup" : newdg,
                                         @"project": sywvc.project };
 
                 [ide getDeployment:[cd objectForKey:@"id"] :dict];
 
-                // At this point we have to wait for multiple async calls to **productToProjectStageThree:**
+                // At this point we have to dela with multiple async calls to **productToProjectStageThree:**
+                
+                noDeployments = NO;
             }
         }
-
+        
+        // Mark the project as requiring a save (we've added at least one new device group
+        
         sywvc.project.haschanged = YES;
+        
+        if (noDeployments)
+        {
+            // None of the device groups have code, so we need to update the UI here
+            
+            [self postSync:sywvc.project];
+        }
     }
+}
+
+
+
+- (void)postSync:(Project *)project
+{
+    // Update the UI immediately after a sync
+    
+    [saveLight needSave:project.haschanged];
+    [self refreshMainDevicegroupsMenu];
+    [self refreshDevicegroupMenu];
+    [self refreshDeviceMenu];
+    [self setToolbar];
+    
+    if (project == currentProject) iwvc.project = project;
+    
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = [NSString stringWithFormat:@"Project “%@” synchronised", project.name];
+    alert.informativeText = @"All of the Device Groups listed on the server are now also listed in the Project. Please save the Project to write any downloaded code files to disk.";
+    
+    [alert beginSheetModalForWindow:_window completionHandler:nil];
 }
 
 
 
 - (IBAction)cancelSync:(id)sender
 {
+    // TODO Is this ever called?
+    
     [ide killAllConnections];
 }
 
+
+
+#pragma mark Recent Project List Management
 
 
 - (IBAction)openRecent:(id)sender
@@ -3151,7 +3122,7 @@
 
     newProject.pid = [self getValueFrom:selectedProduct withKey:@"id"];
     newProject.description = [self getValueFrom:selectedProduct withKey:@"description"];
-    newProject.path = workingDirectory;
+    // newProject.path = workingDirectory;
     newProject.aid = ide.currentAccount;
 
     NSString *cid = [selectedProduct valueForKeyPath:@"relationships.creator.id"];
@@ -3200,7 +3171,7 @@
                             @"project" : newProject };
 
     // Add the project to the list of current downloading products
-    // TODO Do we need this? Probably not (we can refresh list at the end
+    // TODO Do we need this? Probably not (we can refresh list at the end)
 
     if (downloads == nil) downloads = [[NSMutableArray alloc] init];
 
@@ -7096,175 +7067,6 @@
 
 
 
-- (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName
-{
-    // Save the 'savingProject] project. This may be a newly created project and may not
-    // necessarily be 'currentProject'
-
-    BOOL success = NO;
-    //BOOL nameChange = NO;
-    NSString *savePath = [saveDirectory path];
-
-    if (newFileName == nil)
-    {
-        // No filename passed in, so we must have come from 'saveProject:'
-
-        if (savingProject.filename != nil)
-        {
-            // We have an existing filename - use it
-
-            newFileName = savingProject.filename;
-        }
-        else
-        {
-            // We have no saved filename and no passed in filename, so create one
-
-            newFileName = [savingProject.name stringByAppendingString:@".squirrelproj"];
-            //nameChange = YES;
-        }
-    }
-    else
-    {
-        // We have come from 'saveProjectAs:'
-
-        // First add '.squirrelproj' to the specified file name if it has been removed
-
-        NSRange r = [newFileName rangeOfString:@".squirrelproj"];
-
-        if (r.location == NSNotFound) newFileName = [newFileName stringByAppendingString:@".squirrelproj"];
-
-        if (savingProject.filename != nil)
-        {
-            // We have an existing filename - is the new one different?
-
-            //if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
-        }
-    }
-
-    savePath = [savePath stringByAppendingString:[NSString stringWithFormat:@"/%@", newFileName]];
-
-    // Set the time of the update
-
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
-    savingProject.updated = [dateFormatter stringFromDate:[NSDate date]];
-
-    if ([nsfm fileExistsAtPath:savePath])
-    {
-        // The file already exists. We can safely overwrite it because that's what the user intended:
-        // They asked for it implicitly with a Save command, or told the Save As... dialog to replace the file
-
-        // Write the new version to a separate file
-
-        NSString *altPath = [savePath stringByAppendingString:@".new"];
-        success = [NSKeyedArchiver archiveRootObject:savingProject toFile:altPath];
-
-        if (success)
-        {
-            // We have successfully written the new file, so we can replace the old one with the new one
-
-            [fileWatchQueue removePath:savePath];
-
-            NSError *error;
-            NSURL *url;
-            success = [nsfm replaceItemAtURL:[NSURL fileURLWithPath:savePath]
-                             withItemAtURL:[NSURL fileURLWithPath:altPath]
-                            backupItemName:nil
-                                   options:NSFileManagerItemReplacementUsingNewMetadataOnly
-                          resultingItemURL:&url
-                                     error:&error];
-
-            [fileWatchQueue addPath:savePath];
-
-            // Log any error
-
-            if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not replace file %@ with %@", savePath, altPath] :YES];
-        }
-        else
-        {
-            // Log failure to save as an error
-
-            [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", altPath] :YES];
-        }
-    }
-    else
-    {
-        // The file doesn't already exist at this location so just write it out
-
-        success = [NSKeyedArchiver archiveRootObject:savingProject toFile:savePath];
-
-        // Log any error
-
-        if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", savePath] :YES];
-    }
-
-    if (success == YES)
-    {
-        // The new file was successfully written
-
-        savingProject.path = [savePath stringByDeletingLastPathComponent];
-        savingProject.filename = newFileName;
-        savingProject.haschanged = NO;
-
-        if (savingProject == currentProject)
-        {
-            // The saved project is the one on view in the UI, so update the save indicator
-
-            [saveLight needSave:NO];
-
-            // Add the project to the list
-            // Don't need to do this is just saving, only save as...
-
-            if (saveAsFlag) [self addToRecentMenu:savingProject.filename :savingProject.path];
-
-            saveAsFlag = NO;
-        }
-
-        // If we're immediately resaving a downloaded product after saving its files
-        // (which updates the project files), then don't show the 'project saved' message,
-        // otherwise do show it
-
-        if (!doubleSaveFlag) [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
-    }
-    else
-    {
-        [self writeErrorToLog:@"The Project could not be saved." :YES];
-
-        // TODO Do we bail at this point, ie. return at this point, not try and save the model files?
-        //      eg. savingProject = nil;
-    }
-
-    // Saved the project, but are there models to save, from a 'download product' operation?
-
-    Project *sp = nil;
-
-    /*
-    if (downloads.count > 0)
-    {
-        for (Project *ap in downloads)
-        {
-            if (ap == savingProject) sp = ap;
-        }
-    }
-     */
-    if (downloads.count > 0 && savingProject != nil) sp = savingProject;
-
-    // Done saving so clear 'savingProject'
-
-    savingProject = nil;
-    doubleSaveFlag = NO;
-
-    // Did we come here from a 'close project'? If so, re-run to actually close the project
-
-    if (closeProjectFlag) [self closeProject:nil];
-
-    // Save the model files if we have any
-
-    if (sp != nil) [self saveModelFiles:sp];
-}
-
-
-
 - (IBAction)saveProjectAs:(id)sender
 {
     // This method can be called by menu, to save the current project,
@@ -7318,6 +7120,8 @@
 {
     // Call this method to save the current project by overwriting the previous version
     // This method should only be called by menu, to save the current project, which is added to the save list
+    // NOTE 'savingProject' may already be set (eg. by 'saveChanges:') in which case caller should pass
+    //      in nil as the sender
 
     if (sender == fileSaveMenuItem) savingProject = currentProject;
 
@@ -7333,7 +7137,7 @@
 
     // Do we have a place to save the project file
 
-    if (savingProject.path == nil)
+    if (savingProject.path == nil || savingProject.path.length == 0)
     {
         // Current project has no saved path (ie. it hasn't yet been saved or opened)
         // so force a Save As...
@@ -7349,6 +7153,164 @@
 }
 
 
+
+- (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName
+{
+    // Save the 'savingProject] project. This may be a newly created project and may not
+    // necessarily be 'currentProject'
+    
+    BOOL success = NO;
+    NSString *savePath = [saveDirectory path];
+    
+    if (newFileName == nil)
+    {
+        // No filename passed in, so we must have come from 'saveProject:'
+        
+        if (savingProject.filename != nil)
+        {
+            // We have an existing filename - use it
+            
+            newFileName = savingProject.filename;
+        }
+        else
+        {
+            // We have no saved filename and no passed in filename, so create one
+            
+            newFileName = [savingProject.name stringByAppendingString:@".squirrelproj"];
+        }
+    }
+    else
+    {
+        // We have come from 'saveProjectAs:'
+        
+        // First add '.squirrelproj' to the specified file name if it has been removed
+        
+        NSRange r = [newFileName rangeOfString:@".squirrelproj"];
+        
+        if (r.location == NSNotFound) newFileName = [newFileName stringByAppendingString:@".squirrelproj"];
+        
+        if (savingProject.filename != nil)
+        {
+            // We have an existing filename - is the new one different?
+            
+            //if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
+        }
+    }
+    
+    savePath = [savePath stringByAppendingString:[NSString stringWithFormat:@"/%@", newFileName]];
+    
+    // Set the time of the update
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
+    savingProject.updated = [dateFormatter stringFromDate:[NSDate date]];
+    
+    if ([nsfm fileExistsAtPath:savePath])
+    {
+        // The file already exists. We can safely overwrite it because that's what the user intended:
+        // They asked for it implicitly with a Save command, or told the Save As... dialog to replace the file
+        
+        // Write the new version to a separate file
+        
+        NSString *altPath = [savePath stringByAppendingString:@".new"];
+        success = [NSKeyedArchiver archiveRootObject:savingProject toFile:altPath];
+        
+        if (success)
+        {
+            // We have successfully written the new file, so we can replace the old one with the new one
+            
+            [fileWatchQueue removePath:savePath];
+            
+            NSError *error;
+            NSURL *url;
+            success = [nsfm replaceItemAtURL:[NSURL fileURLWithPath:savePath]
+                               withItemAtURL:[NSURL fileURLWithPath:altPath]
+                              backupItemName:nil
+                                     options:NSFileManagerItemReplacementUsingNewMetadataOnly
+                            resultingItemURL:&url
+                                       error:&error];
+            
+            [fileWatchQueue addPath:savePath];
+            
+            // Log any error
+            
+            if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not replace file %@ with %@", savePath, altPath] :YES];
+        }
+        else
+        {
+            // Log failure to save as an error
+            
+            [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", altPath] :YES];
+        }
+    }
+    else
+    {
+        // The file doesn't already exist at this location so just write it out
+        
+        success = [NSKeyedArchiver archiveRootObject:savingProject toFile:savePath];
+        
+        // Log any error
+        
+        if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", savePath] :YES];
+    }
+    
+    if (success == YES)
+    {
+        // The new file was successfully written
+        
+        savingProject.path = [savePath stringByDeletingLastPathComponent];
+        savingProject.filename = newFileName;
+        savingProject.haschanged = NO;
+        
+        if (savingProject == currentProject)
+        {
+            // The saved project is the one on view in the UI, so update the save indicator
+            
+            [saveLight needSave:NO];
+            
+            // Add the project to the list
+            // Don't need to do this is just saving, only save as...
+            
+            if (saveAsFlag) [self addToRecentMenu:savingProject.filename :savingProject.path];
+            
+            saveAsFlag = NO;
+        }
+        
+        // If we're immediately resaving a downloaded product after saving its files
+        // (which updates the project files), then don't show the 'project saved' message,
+        // otherwise do show it
+        
+        if (!doubleSaveFlag) [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
+    }
+    else
+    {
+        [self writeErrorToLog:@"The Project file could not be saved." :YES];
+        
+        // TODO Do we bail at this point, ie. return at this point, not try and save the model files?
+        //      eg. savingProject = nil;
+    }
+    
+    // Saved the project, but there may be models to save, eg. from a 'download product' or 'sync product' operation
+    
+    if (!doubleSaveFlag && savingProject.devicegroups.count > 0)
+    {
+        // The project to be saved has one or more device groups, so go and check for unsaved files
+        
+        [self saveModelFiles:savingProject];
+        return;
+    }
+    
+    doubleSaveFlag = NO;
+    savingProject = nil;
+    
+    // Did we come here from a 'close project'? If so, re-run to actually close the project
+    
+    if (closeProjectFlag) [self closeProject:nil];
+}
+
+
+
+#pragma mark Unsaved Changes Sheet Handlers
 
 
 - (IBAction)cancelChanges:(id)sender
@@ -7413,14 +7375,19 @@
     if (closeProjectFlag)
     {
         // 'closeProjectFlag' is YES if this method has been called when the user
-        // wants to save a changed project before closing it or quitting the app
+        // wants to close a specific project or is closing them all
 
         savingProject = currentProject;
+        
         [self saveProject:nil];
+        
         closeProjectFlag = NO;
         return;
     }
-
+    
+    // From here on, we're planning to apply a single choice to all open projects
+    // This is in the event of an app quit, rather than a close/close all
+    
     for (Project *aProject in projectArray)
     {
         // The user wants to save unsaved changes, so run through the projects to see which have unsaved changes
@@ -7442,29 +7409,29 @@
 
 
 
+#pragma mark Save Model Files
+
+
 - (void)saveModelFiles:(Project *)project
 {
-    // Save all the model files from a downloaded product
+    // Save all the model files from a downloaded product or a syncd project
 
-    // Remove the source project from the downloads list
-    // NOTE We have already saved the project itself CHECK
-
-    [downloads removeObject:project];
-
-    // Make a list of files that need to be savec
+    // Make a list of files that need to be saved
 
     NSMutableArray *filesToSave = [[NSMutableArray alloc] init];
 
-    if (project.devicegroups.count > 0)
+    for (Devicegroup *dg in project.devicegroups)
     {
-        for (Devicegroup *dg in project.devicegroups)
+        if (dg.models.count > 0)
         {
-            if (dg.models.count > 0)
+            for (Model *model in dg.models)
             {
-                for (Model *model in dg.models)
+                // Is the model marked as unsaved?
+                
+                if ([model.filename compare:@"UNSAVED"] == NSOrderedSame)
                 {
                     // NOTE we save a model file even if it contains no code - the user may add code later
-
+                
                     model.path = project.path;
                     model.filename = [dg.name stringByAppendingFormat:@".%@.nut", model.type];
 
@@ -7476,50 +7443,18 @@
 
     // If we have any files to save, save them now
 
-    if (filesToSave.count > 0) [self saveFiles:filesToSave :nil];
-
-    // Add the downloaded project to the 'open projects' list
-
-    [projectArray addObject:project];
-
-    // Set the Inspector's project
-
-    iwvc.project = project;
-    currentProject = project;
-
-    // Set the current device group to the first on the list of the project's
-    // device groups (or zero if the project has no device groups)
-
-    if (project.devicegroups != nil && project.devicegroups.count > 0)
+    if (filesToSave.count > 0)
     {
-        currentDevicegroup = [project.devicegroups firstObject];
-        project.devicegroupIndex = 0;
+        // Begin saving the files
+        
+        [self saveFiles:filesToSave :project];
     }
     else
     {
-        currentDevicegroup = nil;
-        project.devicegroupIndex = -1;
+        // Jump straight to 'doneSaving:'
+        
+        [self doneSaving:project];
     }
-
-    // Update the UI
-
-    [saveLight show];
-    [saveLight needSave:NO];
-
-    [self refreshOpenProjectsMenu];
-    [self refreshProjectsMenu];
-    [self refreshDevicegroupMenu];
-    [self refreshMainDevicegroupsMenu];
-
-    // We need to re-save the project file because it now contains the locations
-    // of the various model files that were saved above. We do this programmatically
-    // rather than indicate to the user that they need to (re)save the project
-
-    currentProject.haschanged = YES;
-    savingProject = currentProject;     // Should check that savingProject is not in use
-    doubleSaveFlag = YES;               // Used to prevent duplicate 'file saved' messages
-
-    [self saveProject:nil];
 }
 
 
@@ -7537,17 +7472,7 @@
         // We're done - all the files have been saved - so handle any exit operations
         // Currently these are only triggered by the provision of a project
 
-        if (project != nil && project == currentProject)
-        {
-            // Update the UI for the downloaded project
-
-            [saveLight needSave:project.haschanged];
-            [self refreshMainDevicegroupsMenu];
-            [self refreshDevicegroupMenu];
-            [self refreshDeviceMenu];
-            [self setToolbar];
-        }
-
+        if (project != nil) [self doneSaving:project];
         return;
     }
 
@@ -7636,6 +7561,43 @@
 
     [NSApp runModalForWindow:saveProjectDialog];
     [saveProjectDialog makeKeyWindow];
+}
+
+
+
+- (void)doneSaving:(Project *)project
+{
+    // Clean up after saving for downloaded products or sync'd projects
+    // when there have been unsaved files
+    
+    if ([downloads indexOfObject:project] != NSNotFound)
+    {
+        // Project is in the download list, so remove it
+        
+        [downloads removeObject:project];
+    }
+    
+    // Update the UI
+    
+    [saveLight show];
+    [saveLight needSave:NO];
+    
+    [self refreshOpenProjectsMenu];
+    [self refreshProjectsMenu];
+    [self refreshDevicegroupMenu];
+    [self refreshMainDevicegroupsMenu];
+    
+    if (project == currentProject) iwvc.project = project;
+    
+    // We now need to re-save the project file, which now contains the locations
+    // of the various model files. We do this programmatically rather than indicate
+    // to the user that they need to (re)save the project
+    
+    project.haschanged = YES;
+    savingProject = project;
+    doubleSaveFlag = YES;
+    
+    [self saveProject:nil];
 }
 
 
@@ -7892,8 +7854,8 @@
 - (void)productToProjectStageTwo:(NSNotification *)note
 {
     // This method is called by BuildAPIAccess ONLY with a list of a product's device groups
-    // It may be in response to calling 'downloadProduct:' or to 'deleteProduct:', with the
-    // actions "downloadproduct" and "deleteproduct", respectively
+    // It may be in response to calling 'downloadProduct:', to 'deleteProduct:' or 'syncProject:, with the
+    // actions "downloadproduct", "deleteproduct" and "syncproject", respectively
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSMutableArray *devicegroups = [data objectForKey:@"data"];
@@ -7902,14 +7864,14 @@
 
     if (action != nil)
     {
-        if ([action compare:@"checkproduct"] == NSOrderedSame)
+        if ([action compare:@"syncproject"] == NSOrderedSame)
         {
             // FROM 2.3.128
             // Compare download list of device groups to saved list of groups
 
             Project *project = [so objectForKey:@"project"];
-            NSMutableArray *localDeleted;
-            NSMutableArray *remoteNew;
+            NSMutableArray *locals;
+            NSMutableArray *remotes;
 
             if (project.devicegroups.count > 0)
             {
@@ -7933,8 +7895,8 @@
 
                     if (!isThere)
                     {
-                        if (localDeleted == nil) localDeleted = [[NSMutableArray alloc] init];
-                        [localDeleted addObject: dg];
+                        if (locals == nil) locals = [[NSMutableArray alloc] init];
+                        [locals addObject: dg];
                     }
                 }
 
@@ -7957,46 +7919,24 @@
 
                     if (!isThere)
                     {
-                        if (remoteNew == nil) remoteNew = [[NSMutableArray alloc] init];
-                        [remoteNew addObject: adg];
+                        if (remotes == nil) remotes = [[NSMutableArray alloc] init];
+                        [remotes addObject: adg];
                     }
                 }
             }
             else
             {
-                if (devicegroups.count > 0) remoteNew = devicegroups;
+                // If there are no local device groups, then all of the retrieved ones are out of sync
+                
+                if (devicegroups.count > 0) remotes = devicegroups;
             }
 
-
-            /*
-            NSUInteger count = 1;
-            if (localDeleted.count > 0)
+            if (remotes.count > 0)
             {
-                [self writeStringToLog:@"The following Device Groups are recorded in the Project, but are missing from the server:" :NO];
-
-                for (Devicegroup *dg in localDeleted)
-                {
-                    [self writeStringToLog:[NSString stringWithFormat:@"  %li. %@ (ID: %@)", (long)count, dg.name, dg.did] :NO];
-                    ++count;
-                }
-            }
-             */
-
-            if (remoteNew.count > 0)
-            {
-                /*
-                [self writeStringToLog:@"The following Device Groups are listed on the server, but not locally:" :NO];
-
-                count = 1;
-
-                for (NSDictionary *dg in remoteNew)
-                {
-                    [self writeStringToLog:[NSString stringWithFormat:@"  %li. %@ (ID: %@)", (long)count, [self getValueFrom:dg withKey:@"name"], [dg objectForKey:@"id"]] :NO];
-                    ++count;
-                }
-                 */
-
-                sywvc.syncGroups = remoteNew;
+                // We have some device groups on the server that are not recoreded locally, so present
+                // the sync choice sheet so the user can select which ones they want to download
+                
+                sywvc.syncGroups = remotes;
                 sywvc.project = project;
 
                 [sywvc prepSheet];
@@ -8004,6 +7944,8 @@
             }
             else
             {
+                // The local project matches the remote product, so let the user know
+                
                 NSAlert *alert = [[NSAlert alloc] init];
                 alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
                 alert.informativeText = @"All of the Device Groups listed on the server are also listed in the Project.";
@@ -8193,8 +8135,9 @@
         }
         else
         {
-            // We presume the 'action' is 'downloadproduct' (from 2.3.128 could be 'downloadcode'
-            // Create two models - one device, one agent - based on the deployment
+            // We presume the 'action' is 'downloadproduct' or (from 2.3.128) 'syncmodelcode'
+            // Either way, create two models - one device, one agent - based on the deployment
+            // and add it to the target device group object
 
             if (newDevicegroup.models == nil) newDevicegroup.models = [[NSMutableArray alloc] init];
 
@@ -8208,6 +8151,7 @@
                 model.squinted = NO;
                 model.code = code;
                 model.path = newProject.path;
+                model.filename = @"UNSAVED";
                 model.sha = [self getValueFrom:deployment withKey:@"sha"];
                 model.updated = [self getValueFrom:deployment withKey:@"updated_at"];
                 if (model.updated == nil) model.updated = [self getValueFrom:deployment withKey:@"created_at"];
@@ -8223,17 +8167,19 @@
                 model.squinted = NO;
                 model.code = code;
                 model.path = newProject.path;
+                model.filename = @"UNSAVED";
                 model.sha = [self getValueFrom:deployment withKey:@"sha"];
                 model.updated = [self getValueFrom:deployment withKey:@"updated_at"];
                 if (model.updated == nil) model.updated = [self getValueFrom:deployment withKey:@"created_at"];
                 [newDevicegroup.models addObject:model];
             }
 
-            // NOTE The code files have not been saved yet
+            // NOTE The code files have not been saved yet. This should take place when the user
+            //      closes the project, quits the app or asks to save the project
         }
     }
 
-    // Decrement the tally of downloadable device groups to see if we've got them all yet
+    // Decrement the tally of downloadable device groups or deployments to see if we've got them all yet
     
     --newProject.count;
 
@@ -8243,7 +8189,7 @@
 
         // ALREADY SET???? newProject.aid = ide.isLoggedIn ? ide.currentAccount : @"";
         
-        // Select the device, if any, belonging to the product
+        // Select the devices, if any, belonging to the project's device groups
         
         if (newProject.devicegroups.count > 0)
         {
@@ -8267,6 +8213,7 @@
                         if ([dg.did compare:dgid] == NSOrderedSame)
                         {
                             // This device 'belongs' to this devicegroup
+                            
                             if (dg.devices == nil) dg.devices = [[NSMutableArray alloc] init];
                             [dg.devices addObject:deviceid];
                         }
@@ -8281,10 +8228,15 @@
         }
 
         // FROM 2.3.128
-        // If action is 'downloadcode', work out which files need to be saved
+        // If action is 'syncmodelcode', work out which files need to be saved
 
-        if ([action compare:@"downloadcode"] == NSOrderedSame)
+        if ([action compare:@"syncmodelcode"] == NSOrderedSame)
         {
+            // Update the UI for the downloaded project
+            
+            [self postSync:newProject];
+
+            /*
             NSMutableArray *filesToSave = [[NSMutableArray alloc] init];
 
             if (newProject.devicegroups.count > 0)
@@ -8312,13 +8264,13 @@
             // If we have files that need saving, save them
 
             if (filesToSave.count > 0) [self saveFiles:filesToSave :newProject];
+             */
         }
         else
         {
             // Save the project
 
             [self productToProjectStageFour:newProject];
-            [self setToolbar];
         }
     }
 }
@@ -8328,10 +8280,52 @@
 - (void)productToProjectStageFour:(Project *)project
 {
     // This method is called by productToProjectStageThree: in order to
-    // save the downloaded project
+    // clean up after downloading the product
 
     project.haschanged = YES;
+    project.filename = [project.name stringByAppendingString:@".squirrelproj"];
+    
+    // Set the downloaded project as current
+    
+    [projectArray addObject:project];
+    
+    currentProject = project;
+    iwvc.project = project;
+    
+    // Set the current device group to the first on the list of the project's
+    // device groups (or zero if the project has no device groups)
+    
+    if (project.devicegroups != nil && project.devicegroups.count > 0)
+    {
+        currentDevicegroup = [project.devicegroups firstObject];
+        project.devicegroupIndex = 0;
+    }
+    else
+    {
+        currentDevicegroup = nil;
+        project.devicegroupIndex = -1;
+    }
 
+    // Update the UI
+
+    [saveLight show];
+    [saveLight needSave:project.haschanged];
+
+    [self refreshOpenProjectsMenu];
+    [self refreshProjectsMenu];
+    [self refreshDevicegroupMenu];
+    [self refreshMainDevicegroupsMenu];
+    [self setToolbar];
+
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = [NSString stringWithFormat:@"Product “%@” downloaded", project.name];
+    alert.informativeText = @"Please save the Project to write any downloaded code files to disk.";
+    
+    [alert beginSheetModalForWindow:_window completionHandler:nil];
+    
+    // FROM 2.3.128 Don't immediately save any more
+    
+    /*
     if (savingProject != nil)
     {
         // We already have a project being saved...
@@ -8345,6 +8339,7 @@
     savingProject = project;
     savingProject.filename = [savingProject.name stringByAppendingString:@".squirrelproj"];
     [self saveProjectAs:nil];
+    */
 }
 
 
@@ -11782,7 +11777,7 @@
         showProjectInfoMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", currentProject.name];
         showProjectFinderMenuItem.title = [NSString stringWithFormat:@"Show “%@” in Finder", currentProject.name];
         renameProjectMenuItem.title = [NSString stringWithFormat:@"Edit “%@”...", currentProject.name];
-        syncProjectMenuItem.title = currentProject.pid.length > 0 ? [NSString stringWithFormat:@"Sync “%@”", currentProject.name] : [NSString stringWithFormat:@"Upload “%@”", currentProject.name];
+        syncProjectMenuItem.title = currentProject.pid.length > 0 ? [NSString stringWithFormat:@"Sync “%@”...", currentProject.name] : [NSString stringWithFormat:@"Upload “%@”", currentProject.name];
 
         if (selectedProduct != nil)
         {
