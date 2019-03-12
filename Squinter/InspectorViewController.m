@@ -294,6 +294,8 @@
                         node = [[TreeNode alloc] init];
                         node.key = @"Path";
                         
+                        // FROM 2.3.128 Check for unsaved model files
+                        
                         if ([model.filename compare:@"UNSAVED"] == NSOrderedSame)
                         {
                             node.value = @"Model file not yet saved";

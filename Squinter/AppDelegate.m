@@ -53,7 +53,7 @@
     productsArray = nil;
     loggedDevices = nil;
     fixtureTargets = nil;
-    downloads = nil;
+    //downloads = nil;
     ide = nil;
     dockMenu = nil;
     refreshTimer = nil;
@@ -3173,9 +3173,9 @@
     // Add the project to the list of current downloading products
     // TODO Do we need this? Probably not (we can refresh list at the end)
 
-    if (downloads == nil) downloads = [[NSMutableArray alloc] init];
+    //if (downloads == nil) downloads = [[NSMutableArray alloc] init];
 
-    [downloads addObject:newProject];
+    //[downloads addObject:newProject];
 
     // Now retrieve the device groups for this specific product id
 
@@ -7570,12 +7570,14 @@
     // Clean up after saving for downloaded products or sync'd projects
     // when there have been unsaved files
     
+    /*
     if ([downloads indexOfObject:project] != NSNotFound)
     {
         // Project is in the download list, so remove it
         
         [downloads removeObject:project];
     }
+    */
     
     // Update the UI
     

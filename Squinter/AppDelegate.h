@@ -389,7 +389,7 @@
     NSTimer *refreshTimer;
     NSTimeInterval updateDevicePeriod;
 
-    NSMutableArray *projectArray, *devicesArray, *productsArray, *downloads, *recentFiles;
+    NSMutableArray *projectArray, *devicesArray, *productsArray, *recentFiles; // *downloads
     NSMutableArray *foundLibs, *foundFiles, *foundEILibs, *colors, *logColors, *saveUrls;
     NSMutableArray *deviceColourWells, *eiDeviceGroupCache, *loggedDevices, *fixtureTargets;
     NSMutableDictionary *selectedProduct, *selectedDevice;
