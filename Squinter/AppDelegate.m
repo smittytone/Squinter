@@ -2366,20 +2366,44 @@
 
 
 
+#pragma mark Upload Project
+
+
+- (IBAction)doUpload:(id)sender
+{
+    // Entry point for the UI upload project operation
+
+    return;
+    
+    // We can't upload this project to a product if we're not logged in
+
+    if (!ide.isLoggedIn)
+    {
+        [self loginAlert:@"upload this Project"];
+        return;
+    }
+
+    // Must have a selected project to sync (this should be prevented by the UI)
+
+    if (currentProject == nil)
+    {
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        return;
+    }
+
+    // Start the upload operation
+
+    [self uploadCode:currentProject];
+}
+
+
+
 - (void)uploadProject:(Project *)project
 {
     // Uploading a project is the act of creating a new product out of a pre-existing project,
     // ie. a new product wasn't created when the project was created
 
-    if (!ide.isLoggedIn)
-    {
-        // We can't upload this project to a product if we're not logged in
-
-        [self loginAlert:@"upload this Project"];
-        return;
-    }
-
-    BOOL correctAccount = (project.aid == nil || project.aid.length == 0 || [ide.currentAccount compare:project.aid] == NSOrderedSame) ? YES : NO;
+    BOOL correctAccount = [ide.currentAccount compare:project.aid] == NSOrderedSame ? YES : NO;
 
     if (project.pid == nil || project.pid.length == 0)
     {
@@ -2402,10 +2426,15 @@
                         if ([name compare:project.name] == NSOrderedSame)
                         {
                             // The project's name matches an existing product name
+
                             return;
                         }
                     }
                 }
+            }
+            else
+            {
+
             }
 
             [self writeStringToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
@@ -2423,34 +2452,8 @@
         {
             // The project is associated with an account other than the one we're signed in to
 
-            NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
-            alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Account %@), or cancel the upload?", project.aid];
-            [alert addButtonWithTitle:@"Cancel"];
-            [alert addButtonWithTitle:@"Continue"];
-            [alert setAlertStyle:NSAlertStyleWarning];
-            [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-                if (returnCode == NSAlertSecondButtonReturn)
-                {
-                    // Proceed with the upload to this account
-
-                    project.aid = ide.currentAccount;
-                    project.haschanged = YES;
-
-                    if (project == currentProject)
-                    {
-                        iwvc.project = currentProject;
-                        [saveLight needSave:YES];
-                    }
-
-                    // Re-call this method now we have changed the Account ID
-
-                    [self uploadProject:project];
-                }
-            }];
+            [self reassociateProject:project];
         }
-
-        return;
     }
     else
     {
@@ -2460,33 +2463,7 @@
         {
             // The project is associated with an account other than the one we're signed in to
 
-            NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
-            alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Product %@ and Account %@), or cancel the upload?", project.pid, project.aid];
-            [alert addButtonWithTitle:@"Cancel"];
-            [alert addButtonWithTitle:@"Continue"];
-            [alert setAlertStyle:NSAlertStyleWarning];
-            [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
-                if (returnCode == NSAlertSecondButtonReturn)
-                {
-                    // Proceed with the upload to this account
-
-                    project.aid = ide.currentAccount;
-                    project.pid = @"";
-                    project.haschanged = YES;
-
-                    if (project == currentProject)
-                    {
-                        iwvc.project = currentProject;
-                        [saveLight needSave:YES];
-                    }
-
-                    // Re-call this method now we have changed the Account ID and Product ID
-
-                    [self uploadProject:project];
-                }
-            }];
-
+            [self reassociateProject:project];
             return;
         }
 
@@ -2537,10 +2514,6 @@
 
                 return;
             }
-
-            // Project PID is still valid, so do a sync
-
-            // [self syncProject:project];
         }
         else
         {
@@ -2554,6 +2527,47 @@
             // Pick up in 'createProductStageTwo:'
         }
     }
+}
+
+
+
+- (void)reassociateProject:(Project *)project
+{
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
+
+    if (project.pid == nil || project.pid.length == 0)
+    {
+        alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Account %@), or cancel the upload?", project.aid];
+    }
+    else
+    {
+        alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Product %@ and Account %@), or cancel the upload?", project.pid, project.aid];
+    }
+
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Continue"];
+    [alert setAlertStyle:NSAlertStyleWarning];
+    [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+        if (returnCode == NSAlertSecondButtonReturn)
+        {
+            // Proceed with the upload to this account
+
+            project.aid = ide.currentAccount;
+            project.pid = @"";
+            project.haschanged = YES;
+
+            if (project == currentProject)
+            {
+                iwvc.project = currentProject;
+                [saveLight needSave:YES];
+            }
+
+            // Re-call this method now we have changed the Account ID and Product ID
+
+            [self uploadProject:project];
+        }
+    }];
 }
 
 
@@ -2723,7 +2737,7 @@
     
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat:@"Project “%@” synchronised", project.name];
-    alert.informativeText = @"All of the Device Groups listed on the server are now also listed in the Project. Please save the Project to write any downloaded code files to disk.";
+    alert.informativeText = @"All of the Device Groups listed on the server are now accessible via the Project. Please save the Project to write any downloaded code files to disk.";
     
     [alert beginSheetModalForWindow:_window completionHandler:nil];
 }
@@ -7950,7 +7964,7 @@
                 
                 NSAlert *alert = [[NSAlert alloc] init];
                 alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
-                alert.informativeText = @"All of the Device Groups listed on the server are also listed in the Project.";
+                alert.informativeText = @"All of the Device Groups listed on the server are accessible via the Project.";
 
                 [alert beginSheetModalForWindow:_window completionHandler:nil];
             }

@@ -74,6 +74,7 @@
     IBOutlet NSMenuItem *linkProductMenuItem;
     IBOutlet NSMenuItem *deleteProductMenuItem;
     IBOutlet NSMenuItem *renameProductMenuItem;
+    IBOutlet NSMenuItem *uploadProjectMenuItem;
 
     #pragma mark Device Groups Menu outlets
 
@@ -468,6 +469,7 @@
 - (IBAction)cancelSyncChoiceSheet:(id)sender;
 - (IBAction)closeSyncChoiceSheet:(id)sender;
 - (void)postSync:(Project *)project;
+- (IBAction)doUpload:(id)sender;
 - (void)uploadProject:(Project *)project;
 - (void)syncProject:(Project *)project;
 - (IBAction)cancelSync:(id)sender;
