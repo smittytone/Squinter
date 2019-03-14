@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) Project *project;
 @property (nonatomic, strong) NSMutableArray *syncGroups;
 @property (nonatomic, strong) NSMutableArray *selectedGroups;
-
+@property (nonatomic, readwrite) BOOL *presentingRemotes;
 
 @end
 

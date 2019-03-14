@@ -12,7 +12,7 @@
 
 @implementation SyncWindowViewController
 
-@synthesize project, syncGroups, selectedGroups;
+@synthesize project, syncGroups, selectedGroups, presentingRemotes;
 
 
 
@@ -28,6 +28,10 @@
     {
         [selectedGroups removeAllObjects];
     }
+    
+    // Update the label
+    
+    syncLabel.stringValue = [@"The following Device Groups are listed " stringByAppendingString:(presentingRemotes ? @"on the server, but not locally:" : @"locally, but not on the server")];
 
     // NOTE 'syncTable' uses 'syncGroups' as its data source
 
