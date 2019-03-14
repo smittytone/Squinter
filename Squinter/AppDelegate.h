@@ -231,11 +231,7 @@
     IBOutlet NSButton    *renameProjectLinkCheckbox;
     IBOutlet NSTextField *renameProjectHintField;
 
-    #pragma mark Sync Project Sheet
-
-    IBOutlet NSPanel             *syncProjectSheet;
-    IBOutlet NSProgressIndicator *syncProjectProgress;
-    IBOutlet NSTextField         *syncProjectLabel;
+    #pragma mark Sync Project Choices Sheet
 
     IBOutlet NSPanel                  *syncChoiceSheet;
     IBOutlet SyncWindowViewController *sywvc;
@@ -407,7 +403,7 @@
     NSInteger wantsToHide;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, newTargetsFlag;
-    BOOL renameProjectFlag, saveAsFlag, credsFlag, switchAccountFlag, doubleSaveFlag, reconnectAfterSleepFlag;
+    BOOL renameProjectFlag, saveAsFlag, credsFlag, switchingAccount, doubleSaveFlag, reconnectAfterSleepFlag;
     BOOL isLoggingIn, isBookmarkStale, isInspectorHidden;
 }
 
@@ -465,14 +461,14 @@
 - (void)renameProject:(id)sender;
 - (IBAction)closeRenameProjectSheet:(id)sender;
 - (IBAction)saveRenameProjectSheet:(id)sender;
+- (IBAction)doUpload:(id)sender;
+- (void)uploadProject:(Project *)project;
 - (IBAction)doSync:(id)sender;
+- (void)syncProject:(Project *)project;
 - (IBAction)cancelSyncChoiceSheet:(id)sender;
 - (IBAction)closeSyncChoiceSheet:(id)sender;
 - (void)postSync:(Project *)project;
-- (IBAction)doUpload:(id)sender;
-- (void)uploadProject:(Project *)project;
-- (void)syncProject:(Project *)project;
-- (IBAction)cancelSync:(id)sender;
+- (void)syncLocalDevicegroups:(NSMutableArray *)devicegroups;
 - (IBAction)openRecent:(id)sender;
 - (void)openRecentAll;
 - (IBAction)clearRecent:(id)sender;
@@ -498,7 +494,7 @@
 - (NSUInteger)checkTargets:(NSString *)groupPrefix;
 - (void)createFilesForDevicegroup:(NSString *)filename :(NSString *)filetype;
 - (void)saveDevicegroupfiles:(NSURL *)saveDirectory :(NSString *)newFileName :(NSInteger)action;
-- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(NSMutableArray *)anyTargets;
+- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(Project *)project :(BOOL)makeNewFiles :(NSMutableArray *)anyTargets;
 - (void)showSelectTarget:(Devicegroup *)devicegroup :(BOOL)andMakeNewFiles :(NSInteger)targetType;
 - (IBAction)cancelSelectTarget:(id)sender;
 - (IBAction)selectTarget:(id)sender;

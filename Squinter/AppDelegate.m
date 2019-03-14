@@ -71,7 +71,7 @@
     saveAsFlag = YES;
     isBookmarkStale = NO;
     credsFlag = NO;
-    switchAccountFlag = NO;
+    switchingAccount = NO;
     doubleSaveFlag = NO;
     reconnectAfterSleepFlag = NO;
 
@@ -1013,17 +1013,19 @@
 {
     // Show the Inspector if it's closed
     // If the Inspector is obscured by the main window, or not key, bring it forward
-
-    // [iwvc.view.window makeKeyAndOrderFront:self];
     
     if (isInspectorHidden)
     {
+        // Inspector panel is hidden, so prepare to show it
+        
         CGFloat proposed = splitView.frame.size.width - 340.0;
         wantsToHide = 1;
         [splitView setPosition:proposed ofDividerAtIndex:0];
     }
     else
     {
+        // Inspector panel is visible, so prepare to hide it
+        
         CGFloat proposed = splitView.frame.size.width;
         wantsToHide = -1;
         [splitView setPosition:proposed ofDividerAtIndex:0];
@@ -1039,7 +1041,6 @@
     [iwvc setTab:kInspectorTabProject];
     
     if (isInspectorHidden) [self showInspector:nil];
-    //[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -1051,7 +1052,6 @@
     [iwvc setTab:kInspectorTabDevice];
     
     if (isInspectorHidden) [self showInspector:nil];
-    //[iwvc.view.window makeKeyAndOrderFront:self];
 }
 
 
@@ -1089,18 +1089,17 @@
         // We are logged in, so log the user out
 
         NSInteger cloudCode = ide.impCloudCode;
-
+        NSString *cloudName = [self getCloudName:cloudCode];
+        
         [self logout];
 
         // Update the UI and report to the user
-
+        
         accountMenuItem.title = @"Not Signed in to any Account";
         loginMenuItem.title = @"Log in to your Main Account";
-        // switchAccountMenuItem.enabled = YES;
         switchAccountMenuItem.title = @"Log in to a Different Account...";
         loginMode = kLoginModeNone;
 
-        NSString *cloudName = [self getCloudName:cloudCode];
         [self writeStringToLog:[NSString stringWithFormat:@"You are now logged out of the %@impCloud.", cloudName] :YES];
     }
 }
@@ -1151,7 +1150,7 @@
 
     if (usernameTextField.stringValue.length == 0 || passwordTextField.stringValue.length == 0)
     {
-        // We don't have a password or a username, so we'll need to show the login window
+        // We don't have a password or a username, so we'll need to show the login window anyway
 
         saveDetailsCheckbox.state = NSOnState;
 
@@ -1199,6 +1198,7 @@
 
     usernameTextField.stringValue = (un == nil) ? @"" : [ide decodeBase64String:un];
     passwordTextField.stringValue = (pw == nil) ? @"" : [ide decodeBase64String:pw];
+    
     if (lk != nil) loginKey = lk;
 
     if (ic == nil || [ic compare:@"AWS"] == NSOrderedSame)
@@ -1211,7 +1211,7 @@
     }
     else
     {
-        // Error!
+        // Error! No selected impCloud
 
         credsFlag = NO;
         usernameTextField.stringValue = @"";
@@ -1227,7 +1227,7 @@
 
     [_window endSheet:loginSheet];
 
-    if (switchAccountFlag) switchAccountFlag = NO;
+    if (switchingAccount) switchingAccount = NO;
 }
 
 
@@ -1239,7 +1239,7 @@
 
     NSButton *checkbox = (NSButton *)sender;
 
-    if (checkbox.state == NSOnState && switchAccountFlag)
+    if (checkbox.state == NSOnState && switchingAccount)
     {
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = @"Caution";
@@ -1264,7 +1264,7 @@
 
     // If we're switching accounts, log out first
 
-    if (switchAccountFlag)
+    if (switchingAccount)
     {
         [self logout];
 
@@ -1342,7 +1342,7 @@
     {
         // The user wants to log into a different account
 
-        switchAccountFlag = YES;
+        switchingAccount = YES;
 
         // Show the login sheet empty and with 'save credentials' switched off
 
@@ -1433,7 +1433,7 @@
     otpLoginToken = nil;
     isLoggingIn = NO;
 
-    if (switchAccountFlag) switchAccountFlag = NO;
+    if (switchingAccount) switchingAccount = NO;
 
     [_window endSheet:otpSheet];
 }
@@ -2373,8 +2373,6 @@
 {
     // Entry point for the UI upload project operation
 
-    return;
-    
     // We can't upload this project to a product if we're not logged in
 
     if (!ide.isLoggedIn)
@@ -2393,7 +2391,7 @@
 
     // Start the upload operation
 
-    [self uploadCode:currentProject];
+    [self uploadProject:currentProject];
 }
 
 
@@ -2601,9 +2599,11 @@
     {
         // No, so warn the user and request they associate the project with a product
         
+        // NOTE Might choose to run this as an upload instead?
+        
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = [NSString stringWithFormat:@"Project “%@” cannot by sync’d", currentProject.name];
-        alert.informativeText = @"The Project is not associated with a Product in the impCloud. Please use the Projects menu to link this Project to a Product. You may eed to update Squinter’s list of Products first.";
+        alert.informativeText = @"The Project is not associated with a Product in the impCloud. Please use the Projects menu to link this Project to a Product. You may need to update Squinter’s list of Products first.";
         
         [alert beginSheetModalForWindow:_window completionHandler:nil];
         
@@ -2628,7 +2628,7 @@
 
     [ide getDevicegroupsWithFilter:@"product.id" :currentProject.pid :dict];
 
-    // At this point the we have to wait for the async call to 'productToProjectStageTwo'
+    // At this point the we have to wait for the async call to 'productToProjectStageTwo:'
 }
 
 
@@ -2669,54 +2669,74 @@
     {
         BOOL noDeployments = YES;
         
-        // Record the number of devicegroups to download
+        // Record the number of devicegroups to download/upload
 
         sywvc.project.count = groupsToSync.count;
-
-        for (NSDictionary *dg in groupsToSync)
+        
+        if (sywvc.presentingRemotes)
         {
-            // Convert each of the downloadable device group dictionaries
-            // into local objects for inclusion in the project
-
-            Devicegroup *newdg = [[Devicegroup alloc] init];
-            newdg.did = [dg objectForKey:@"id"];
-            newdg.name = [self getValueFrom:dg withKey:@"name"];
-            newdg.type = [self getValueFrom:dg withKey:@"type"];
-            newdg.description = [self getValueFrom:dg withKey:@"description"];
-            newdg.data = [NSMutableDictionary dictionaryWithDictionary:dg];
-
-            if (sywvc.project.devicegroups == nil) sywvc.project.devicegroups = [[NSMutableArray alloc] init];
-            [sywvc.project.devicegroups addObject:newdg];
-
-            // Does the device group have a current deployment
-
-            NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];
-
-            if (cd != nil)
-            {
-                // The dictionary has a current deployment, so go and get it
-
-                NSDictionary *dict = @{ @"action" : @"syncmodelcode",
-                                        @"devicegroup" : newdg,
-                                        @"project": sywvc.project };
-
-                [ide getDeployment:[cd objectForKey:@"id"] :dict];
-
-                // At this point we have to dela with multiple async calls to **productToProjectStageThree:**
-                
-                noDeployments = NO;
-            }
-        }
-        
-        // Mark the project as requiring a save (we've added at least one new device group
-        
-        sywvc.project.haschanged = YES;
-        
-        if (noDeployments)
-        {
-            // None of the device groups have code, so we need to update the UI here
+            // Handle the device groups for downloading
             
-            [self postSync:sywvc.project];
+            for (NSDictionary *dg in groupsToSync)
+            {
+                // Convert each of the downloadable device group dictionaries
+                // into local objects for inclusion in the project
+
+                Devicegroup *newdg = [[Devicegroup alloc] init];
+                newdg.did = [dg objectForKey:@"id"];
+                newdg.name = [self getValueFrom:dg withKey:@"name"];
+                newdg.type = [self getValueFrom:dg withKey:@"type"];
+                newdg.description = [self getValueFrom:dg withKey:@"description"];
+                newdg.data = [NSMutableDictionary dictionaryWithDictionary:dg];
+
+                if (sywvc.project.devicegroups == nil) sywvc.project.devicegroups = [[NSMutableArray alloc] init];
+                [sywvc.project.devicegroups addObject:newdg];
+
+                // Does the device group have a current deployment
+
+                NSDictionary *cd = [self getValueFrom:dg withKey:@"current_deployment"];
+
+                if (cd != nil)
+                {
+                    // The dictionary has a current deployment, so go and get it
+
+                    NSDictionary *dict = @{ @"action" : @"syncmodelcode",
+                                            @"devicegroup" : newdg,
+                                            @"project": sywvc.project };
+
+                    [ide getDeployment:[cd objectForKey:@"id"] :dict];
+
+                    // At this point we have to dela with multiple async calls to 'productToProjectStageThree:'
+                    
+                    noDeployments = NO;
+                }
+            }
+            
+            // Mark the project as requiring a save (we've added at least one new device group
+            
+            sywvc.project.haschanged = YES;
+            
+            if (noDeployments)
+            {
+                // None of the device groups have code, so we need to update the UI here
+                
+                // [self postSync:sywvc.project];
+            }
+            
+            // Re-call the project sync to trap un-uploaded device groups
+            // NOTE These were detected but not actioned becuase we handled downloads
+            //      in preference to them. Going back means there are now no groups
+            //      to download, so the uploads will be handled. if there are no
+            //      groups to upload, the project is in sync and the post-sync
+            //      alert will appear
+            
+            [self syncProject:sywvc.project];
+        }
+        else
+        {
+            // Handle uploads
+            
+            [self syncLocalDevicegroups:groupsToSync];
         }
     }
 }
@@ -2725,6 +2745,8 @@
 
 - (void)postSync:(Project *)project
 {
+    // NOTE May renove this before release (see 'closeSyncChoiceSheet:')
+    
     // Update the UI immediately after a sync
     
     [saveLight needSave:project.haschanged];
@@ -2744,11 +2766,39 @@
 
 
 
-- (IBAction)cancelSync:(id)sender
+- (void)syncLocalDevicegroups:(NSMutableArray *)devicegroups
 {
-    // TODO Is this ever called?
+    // NOTE All of the devicegroups in the array will have the same
+    //      parent. We've already checked (in doSync:) that the
+    //      project is associated with a product
     
-    [ide killAllConnections];
+    Project *parent = [self getParentProject:[devicegroups firstObject]];
+    parent.count = devicegroups.count;
+
+    // Run through the list of local-only devicegroups and create a new group
+    // on the server for each.
+    
+    for (Devicegroup *dg in devicegroups) {
+        
+        NSDictionary *dict = @{ @"action" : @"syncdevicegroup",
+                                @"project" : parent,
+                                @"devicegroup" : dg };
+        
+        NSString *altName = [dg.data objectForKey:@"dgname"];
+        if (altName == nil) altName = dg.name;
+        
+        NSDictionary *newdg = @{ @"name" : altName,
+                                 @"description" : dg.description,
+                                 @"productid" : parent.pid,
+                                 @"type" : dg.type };
+        
+        [ide createDevicegroup:newdg :dict];
+        
+        // Pick up the action in 'createDevicegroupStageTwo:'
+        
+        // NOTE Creation may fail because the DG is a (pre_)fixture and requires targets
+        // TODO Fix this by calling 'newDevicegroupSheetCreateStageTwo:'
+    }
 }
 
 
@@ -2990,7 +3040,7 @@
     {
         [ide getProducts:dict];
 
-        // Pick up the action in **listProducts:**
+        // Pick up the action in 'listProducts:'
         // NOTE This will trigger updates to:
         //      The Project Inspector (sets 'products' array)
         //      Projects menu
@@ -3000,6 +3050,8 @@
     else
     {
         [ide getMyAccount:dict];
+        
+        // Pick up the action in 'gotMyAccount:'
     }
 }
 
@@ -3095,7 +3147,7 @@
 
                 [ide getDevicegroupsWithFilter:@"product.id" :[selectedProduct objectForKey:@"id"] :dict];
 
-                // Pick up the action in **productToProjectStageTwo:**
+                // Pick up the action in 'productToProjectStageTwo:'
             }
         }];
     }
@@ -3195,7 +3247,7 @@
 
     [ide getDevicegroupsWithFilter:@"product.id" :newProject.pid :dict];
 
-    // At this point the we have to wait for the async call to 'productToProjectStageTwo'
+    // At this point the we have to wait for the async call to 'productToProjectStageTwo:'
 }
 
 
@@ -3518,7 +3570,7 @@
         // For all device groups other than (test) factory device groups,
         // go an create the device group
 
-        [self newDevicegroupSheetCreateStageTwo:newdg :makeNewFiles :nil];
+        [self newDevicegroupSheetCreateStageTwo:newdg :currentProject :makeNewFiles :nil];
     }
 }
 
@@ -3552,15 +3604,15 @@
 
 
 
-- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(BOOL)makeNewFiles :(NSMutableArray *)anyTargets
+- (void)newDevicegroupSheetCreateStageTwo:(Devicegroup *)devicegroup :(Project *)project :(BOOL)makeNewFiles :(NSMutableArray *)anyTargets
 {
-    if (currentProject.pid != nil && currentProject.pid.length > 0)
+    if (project.pid != nil && project.pid.length > 0)
     {
         // The current project is associated with a product so we can create the device group on the server
 
         NSDictionary *dict = @{ @"action" : @"newdevicegroup",
                                 @"devicegroup" : devicegroup,
-                                @"project" : currentProject,
+                                @"project" : project,
                                 @"files" : [NSNumber numberWithBool:makeNewFiles] };
 
         [self writeStringToLog:[NSString stringWithFormat:@"Uploading Device Group \"%@\" to the impCloud.", devicegroup.name] :YES];
@@ -3571,7 +3623,7 @@
         {
             details = @{ @"name" : devicegroup.name,
                          @"description" : devicegroup.description,
-                         @"productid" : currentProject.pid,
+                         @"productid" : project.pid,
                          @"type" : devicegroup.type };
         }
         else
@@ -3595,7 +3647,7 @@
                 
                 details = @{ @"name" : devicegroup.name,
                              @"description" : devicegroup.description,
-                             @"productid" : currentProject.pid,
+                             @"productid" : project.pid,
                              @"type" : devicegroup.type,
                              @"targetid" : dg1.did,
                              @"dutid": dg2.did };
@@ -3604,7 +3656,7 @@
             {
                 details = @{ @"name" : devicegroup.name,
                              @"description" : devicegroup.description,
-                             @"productid" : currentProject.pid,
+                             @"productid" : project.pid,
                              @"type" : devicegroup.type };
             }
         }
@@ -3612,7 +3664,7 @@
         [ide createDevicegroup:details :dict];
 
         // We will handle the addition of the device group and UI updates later - it will call
-        // the following code separately in **createDevicegroupStageTwo:**
+        // the following code separately in 'createDevicegroupStageTwo:'
     }
     else
     {
@@ -3627,12 +3679,22 @@
         }
 
         // Select the new Device Group
-
-        if (currentDevicegroup != devicegroup)
+        
+        [project.devicegroups addObject:devicegroup];
+        
+        if (project == currentProject)
         {
-            [currentProject.devicegroups addObject:devicegroup];
-            currentDevicegroup = devicegroup;
-            currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+            if (devicegroup != currentDevicegroup)
+            {
+                currentDevicegroup = devicegroup;
+                project.devicegroupIndex = [project.devicegroups indexOfObject:currentDevicegroup];
+            }
+            
+            iwvc.project = project;
+            project.haschanged = YES;
+            
+            [saveLight needSave:YES];
+            [self refreshOpenProjectsMenu];
         }
 
         // Update the UI
@@ -3640,16 +3702,6 @@
         [self refreshDevicegroupMenu];
         [self refreshMainDevicegroupsMenu];
         [self setToolbar];
-
-        currentProject.haschanged = YES;
-        iwvc.project = currentProject;
-
-        [saveLight needSave:YES];
-        [self refreshOpenProjectsMenu];
-
-        // Update the inspector, if required
-
-        // if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
 
         // Create the new device group's files as requested
 
@@ -3741,7 +3793,7 @@
             
             [fixtureTargets addObject:swvc.theSelectedTarget];
             
-            [self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.makeNewFiles :fixtureTargets];
+            [self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.project :swvc.makeNewFiles :fixtureTargets];
         }
         
         return;
@@ -3788,7 +3840,7 @@
 
     [ide updateDevicegroup:currentDevicegroup.did :@[key, @"type"] :@[targ, currentDevicegroup.type] :dict];
 
-    // Pick up the action at ... updateDevicegroupStageTwo:
+    // Pick up the action at 'updateDevicegroupStageTwo:'
 }
 
 
@@ -4347,7 +4399,7 @@
 
     [ide createDeployment:data :dict];
 
-    // Pick up the action at uploadCodeStageTwo:
+    // Pick up the action at 'uploadCodeStageTwo:'
 }
 
 
@@ -4482,7 +4534,7 @@
 
     [ide createDeployment:data :dict];
 
-    // Pick up the action at uploadCodeStageTwo:
+    // Pick up the action at 'uploadCodeStageTwo:'
 }
 
 
@@ -4553,7 +4605,7 @@
 
     [ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
-    // Pick up the action in listCommits:
+    // Pick up the action in 'listCommits:'
 }
 
 
@@ -4574,7 +4626,7 @@
 
     [ide getDevicegroup:currentDevicegroup.did :dict];
 
-    // Pick up the action in updateCodeStageTwo:
+    // Pick up the action in 'updateCodeStageTwo:'
 }
 
 
@@ -4618,7 +4670,7 @@
 
     [ide getDeploymentsWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
-    // Pick up the action in listCommits:
+    // Pick up the action in 'listCommits:'
 }
 
 
@@ -4789,7 +4841,7 @@
 
     [ide getDevicesWithFilter:@"devicegroup.id" :currentDevicegroup.did :dict];
 
-    // Pick up the action at **listDevices:**
+    // Pick up the action at 'listDevices:'
 }
 
 
@@ -4931,7 +4983,7 @@
 
     [ide getDevices:dict];
 
-    // Pick up the action at listDevices:
+    // Pick up the action at 'listDevices:'
 }
 
 
@@ -5005,7 +5057,7 @@
 
             [ide getDevice:[device objectForKey:@"id"] :dict];
 
-            // Pick up the action at updateDevice:
+            // Pick up the action at 'updateDevice:'
         }
     }
 }
@@ -5136,7 +5188,7 @@
         return;
     }
 
-    NSDictionary *dict = @{ @"action" : @"unassign",
+    NSDictionary *dict = @{ @"action" : @"unassigndevice",
                             @"device" : selectedDevice };
 
     [ide unassignDevice:selectedDevice :dict];
@@ -5296,7 +5348,7 @@
 
     // Assign the device to the device group
 
-    NSDictionary *dict = @{ @"action" : @"assign",
+    NSDictionary *dict = @{ @"action" : @"assigndevice",
                             @"device" : device,
                             @"devicegroup" : dg };
 
@@ -5380,7 +5432,7 @@
 
     // Prep the relayed data in case we need it
 
-    NSDictionary *dict = @{ @"action" : @"rename",
+    NSDictionary *dict = @{ @"action" : @"renamedevice",
                             @"old" : dname,
                             @"new" : newName,
                             @"device" : device };
@@ -5577,7 +5629,7 @@
 
         [ide getDeviceLogs:[self getValueFrom:selectedDevice withKey:@"id"] :dict];
 
-        // Pick up the action at **listLogs:**
+        // Pick up the action at 'listLogs:'
     }
     else
     {
@@ -5586,7 +5638,7 @@
 
         [ide getDeviceHistory:[self getValueFrom:selectedDevice withKey:@"id"] :dict];
 
-        // Pick up the action at **listLogs:**
+        // Pick up the action at 'listLogs:'
     }
 }
 
@@ -6392,7 +6444,7 @@
 
                         [ide getDevicegroup:devicegroup.did :dict];
 
-                        // Action continues asynchronously at **updateCodeStageTwo:**
+                        // Action continues asynchronously at 'updateCodeStageTwo:'
 
                         // Set the devicegroup's device list
 
@@ -7758,12 +7810,12 @@
 
                         // Get the account name
 
-                        NSDictionary *dict = @{ @"product" : aProduct,
-                                                @"action" : @"getaccountid" };
+                        NSDictionary *dict = @{ @"action" : @"getaccountid",
+                                                @"product" : aProduct };
 
                         [ide getAccount:cid :dict];
 
-                        // Pick up the asynchronous action at **gotAnAccount:**
+                        // Pick up the asynchronous action at 'gotAnAccount:'
                         
                         // Add shared products to the end of the list
                         
@@ -7891,49 +7943,24 @@
 
             if (project.devicegroups.count > 0)
             {
-                // Determine which, if any, local device groups are no longer
-                // present on the server. Record them in 'localDeleted'
-
-                for (Devicegroup *dg in project.devicegroups)
-                {
-                    BOOL isThere = NO;
-
-                    for (NSDictionary *adg in devicegroups)
-                    {
-                        NSString *dgid = [adg objectForKey:@"id"];
-
-                        if ([dgid compare:dg.did] == NSOrderedSame)
-                        {
-                            isThere = YES;
-                            break;
-                        }
-                    }
-
-                    if (!isThere)
-                    {
-                        if (locals == nil) locals = [[NSMutableArray alloc] init];
-                        [locals addObject: dg];
-                    }
-                }
-
                 // Determine which, if any, remote device groups are not listed
-                // in the local project. Record them in 'remoteNew'
+                // in the local project. Record them in 'remotes'
 
                 for (NSDictionary *adg in devicegroups)
                 {
-                    BOOL isThere = NO;
+                    BOOL listedLocally = NO;
                     NSString *dgid = [adg objectForKey:@"id"];
 
                     for (Devicegroup *dg in project.devicegroups)
                     {
-                        if ([dgid compare:dg.did] == NSOrderedSame)
+                        if (dg.did != nil && [dgid compare:dg.did] == NSOrderedSame)
                         {
-                            isThere = YES;
+                            listedLocally = YES;
                             break;
                         }
                     }
 
-                    if (!isThere)
+                    if (!listedLocally)
                     {
                         if (remotes == nil) remotes = [[NSMutableArray alloc] init];
                         [remotes addObject: adg];
@@ -7947,26 +7974,117 @@
                 if (devicegroups.count > 0) remotes = devicegroups;
             }
 
-            if (remotes.count > 0)
+            if (remotes != nil && remotes.count > 0)
             {
-                // We have some device groups on the server that are not recoreded locally, so present
+                // We have some device groups on the server that are not recorded locally, so present
                 // the sync choice sheet so the user can select which ones they want to download
                 
                 sywvc.syncGroups = remotes;
                 sywvc.project = project;
-
+                sywvc.presentingRemotes = YES;
+                
                 [sywvc prepSheet];
                 [_window beginSheet:syncChoiceSheet completionHandler:nil];
+                
+                // Pick up the action at 'cancelSyncChoiceSheet:' or 'closeSyncChoiceSheet:'
+                // depending on the user's choice
+                // NOTE We will return to 'productToProjectStageTwo:' if we go to 'closeSyncChoiceSheet:'
+                //      in order to check for any devicegroups not yet uploaded
             }
             else
             {
-                // The local project matches the remote product, so let the user know
+                // There are no devicegroups on the server that are not present locally,
+                // so determine which, if any, local devicegroups are not
+                // present on the server. Record them in 'locals'
                 
-                NSAlert *alert = [[NSAlert alloc] init];
-                alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
-                alert.informativeText = @"All of the Device Groups listed on the server are accessible via the Project.";
+                for (Devicegroup *dg in project.devicegroups)
+                {
+                    BOOL onServer = NO;
+                    
+                    if (dg.did != nil && dg.did.length > 0)
+                    {
+                        // The local devicegroup has an ID - see if it matches a
+                        // devicegroup on the server
+                        
+                        for (NSDictionary *adg in devicegroups)
+                        {
+                            NSString *dgid = [adg objectForKey:@"id"];
+                            
+                            if ([dgid compare:dg.did] == NSOrderedSame)
+                            {
+                                onServer = YES;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!onServer)
+                    {
+                        if (locals == nil) locals = [[NSMutableArray alloc] init];
+                        [locals addObject: dg];
+                    }
+                }
+                
+                if (locals != nil && locals.count > 0)
+                {
+                    // We have some device groups locally that are not present on the server, so present
+                    // the sync choice sheet so the user can select which ones they want to upload
+                    
+                    // First, check uploadable names while we still have access to a list
+                    // of server devicegroups
+                    
+                    for (Devicegroup *dg in locals)
+                    {
+                        BOOL nameMatch = NO;
+                        NSUInteger count = 0;
+                        NSString *name = dg.name;
+                        
+                        do {
+                            for (NSDictionary *adg in devicegroups)
+                            {
+                                NSString *aname = [self getValueFrom:adg withKey:@"name"];
+                                
+                                if ([dg.name compare:aname] == NSOrderedSame)
+                                {
+                                    nameMatch = YES;
+                                    ++count;
+                                    name = [dg.name stringByAppendingFormat:@"%li", count];
+                                    break;
+                                }
+                            }
+                        } while (!nameMatch);
+                        
+                        if ([name compare:dg.name] != NSOrderedSame)
+                        {
+                            // Record the updated name for later
+                            
+                            if (dg.data == nil) dg.data = [[NSMutableDictionary alloc] init];
+                            [dg.data setObject:name forKey:@"dgname"];
+                        }
+                    }
+                    
+                    sywvc.syncGroups = locals;
+                    sywvc.project = project;
+                    sywvc.presentingRemotes = NO;
+                    
+                    [sywvc prepSheet];
+                    [_window beginSheet:syncChoiceSheet completionHandler:nil];
+                    
+                    // Pick up the action at 'cancelSyncChoiceSheet:' or 'closeSyncChoiceSheet:'
+                    // depending on the user's choice
+                    // NOTE We will return to 'productToProjectStageTwo:' if we go to 'closeSyncChoiceSheet:'
+                    //      in order to check for any devicegroups not yet uploaded
+                }
+                else
+                {
+                    // The local project matches the remote product, so let the user know
+                    
+                    NSAlert *alert = [[NSAlert alloc] init];
+                    alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
+                    alert.informativeText = @"All of the Device Groups listed on the server are accessible via the Project.";
 
-                [alert beginSheetModalForWindow:_window completionHandler:nil];
+                    [alert beginSheetModalForWindow:_window completionHandler:nil];
+                }
             }
         }
         else if ([action compare:@"downloadproduct"] == NSOrderedSame)
@@ -8456,7 +8574,7 @@
                 }
             }
 
-            // Pick up the action at **createDevicegroupStageTwo:**
+            // Pick up the action at 'createDevicegroupStageTwo:'
         }
     }
     else
@@ -8525,7 +8643,7 @@
             [ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
         }
 
-        // Pick up the action in **deleteDevicegroupStageTwo:**
+        // Pick up the action in 'deleteDevicegroupStageTwo:'
     }
     else
     {
@@ -8538,7 +8656,7 @@
 
         [ide deleteProduct:[product objectForKey:@"id"] :source];
 
-        // Pick this up at **deleteProductStageThree:**
+        // Pick this up at 'deleteProductStageThree:'
     }
 }
 
@@ -8568,7 +8686,7 @@
 
     [ide getProducts:dict];
 
-    // Pick up the action at **listProducts:**
+    // Pick up the action at 'listProducts:'
 }
 
 
@@ -8630,7 +8748,7 @@
 
                     [ide getDevicegroup:dg.did :dict];
 
-                    // Action continues in parallel at updateCodeStageTwo:
+                    // Action continues in parallel at 'updateCodeStageTwo:'
                 }
             }
         }
@@ -9066,7 +9184,7 @@
 
                 [ide getDevice:[newDevice objectForKey:@"id"] :dict];
 
-                // Pick up the action at updateDevice:
+                // Pick up the action at 'updateDevice:'
             }
 
             // Sort the devices list by device name (inside the 'attributes' dictionary)
@@ -9335,9 +9453,14 @@
 
             if (makeNewFiles != nil && makeNewFiles.boolValue) [self createFilesForDevicegroup:devicegroup.name :@"agent"];
         }
-        else if ([action compare:@"uploadproject"] == NSOrderedSame)
+        else if ([action compare:@"uploadproject"] == NSOrderedSame || [action compare:@"syncdevicegroup"] == NSOrderedSame)
         {
             // We're here after creating a device group as part of a project upload
+            // Once all the parts have been uploaded, we move on to upload the code
+            // via 'uploadProjectStageThree:'
+            
+            // FROM 2.3.128
+            // We also come here after a project sync devicegroup upload
 
             // Record the new device group ID
 
@@ -9349,8 +9472,13 @@
 
             if (project.count == 0)
             {
+                // FROM 2.3.128
+                // If the action is 'syncdevicegroup', attempt to sync again, so that
+                // we trigger the correct UI update
+                if ([action compare:@"syncdevicegroup"] == NSOrderedSame) [self syncProject:project];
+                
                 // We have created all the device groups we need to, so it's now time to upload code
-
+                
                 [self uploadProjectStageThree:project];
             }
         }
@@ -9411,7 +9539,7 @@
                 NSDictionary *attributes = @{ @"flagged" : @NO,
                                               @"agent_code" : agentCode,
                                               @"device_code" : deviceCode,
-                                              @"description" : [NSString stringWithFormat:@"Uploaded from Squinter 2.0 at %@", desc] };
+                                              @"description" : [NSString stringWithFormat:@"Uploaded from Squinter 2.3 at %@", desc] };
 
                 NSDictionary *deployment = @{ @"type" : @"deployment",
                                               @"attributes" : attributes,
@@ -9492,7 +9620,7 @@
 
     if (action != nil)
     {
-        if ([action compare:@"unassign"] == NSOrderedSame)
+        if ([action compare:@"unassigndevice"] == NSOrderedSame)
         {
             // We're here after a device unassign operation
             // In this case ONLY, the returned data's 'data' key will be a string
@@ -9615,13 +9743,15 @@
 
             if (project.count == 0)
             {
-                // All done!
+                // All done! Refresh the products list
 
                 NSDictionary *dict = @{ @"action" : @"getproducts" };
 
                 [ide getProducts:dict];
                 [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
                 [self writeStringToLog:@"Refreshing product list." :YES];
+                
+                // Pick up the action at 'listProducts:'
             }
         }
         else
@@ -9678,7 +9808,7 @@
     
     [ide getMyAccount:dict];
 
-    // Action continues asynchronously at **gotMyAccount:**
+    // Action continues asynchronously at 'gotMyAccount:'
     // Meatime, save credentials if they have changed required
 
     BOOL flag = NO;
@@ -9725,7 +9855,7 @@
     loginMenuItem.title = @"Log out of this Account";
     // switchAccountMenuItem.enabled = YES;
 
-    if (switchAccountFlag)
+    if (switchingAccount)
     {
         // We are switching to a secondary account, so we should change the login option
 
@@ -9746,7 +9876,7 @@
 
     isLoggingIn = NO;
     credsFlag = YES;
-    switchAccountFlag = NO;
+    switchingAccount = NO;
     otpLoginToken = nil;
 
     // Inform the user he or she is logged in - and to which cloud
@@ -9757,7 +9887,7 @@
 
     // User may want the Product lists loaded on login
 
-    // NOTE From 125, this check takes place in 'inloggedInStageTwo:' which indirectly requires a correct account ID
+    // FROM 2.0.125, this check takes place in 'inloggedInStageTwo:' which indirectly requires a correct account ID
 
     // User wants to update devices' status periodically, or the Device lists loaded on login
 
@@ -9796,7 +9926,7 @@
 
     isLoggingIn = NO;
     credsFlag = YES;
-    switchAccountFlag = NO;
+    switchingAccount = NO;
     otpLoginToken = nil;
     loginMode = kLoginModeNone;
 }
@@ -9827,7 +9957,6 @@
 
     accountMenuItem.title = @"Not Signed in to any Account";
     loginMenuItem.title = @"Log in to your Main Account";
-    //switchAccountMenuItem.enabled = YES;
     switchAccountMenuItem.title = @"Log in to a Different Account...";
     loginMode = kLoginModeNone;
 }
@@ -11518,6 +11647,7 @@
 {
     // This method is a hangover from a previous version.
     // Now it simply calls the version which replaces it.
+    // NOTE 'compile:' is in AppDelegateSquinting.m
 
     [self compile:currentDevicegroup :NO];
 }
@@ -11529,14 +11659,18 @@
 
 - (IBAction)externalOpen:(id)sender
 {
-    // Open the original source code files an external editor
-
+    // Open the original source code files an external editor - whatever the user has set to opne text files (or .nut files)
+    
+    // Only continue if a device group is selected
+    
     if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
-
+    
+    // Open the device code, if requested
+    
     if (sender == externalOpenDeviceItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewDeviceCode)
     {
         for (Model *model in currentDevicegroup.models)
@@ -11548,7 +11682,9 @@
             }
         }
     }
-
+    
+    // Open the agent code, if requested
+    
     if (sender == externalOpenAgentItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewAgentCode)
     {
         for (Model *model in currentDevicegroup.models)
@@ -11625,7 +11761,6 @@
     if (file.hasMoved)
     {
         [self writeErrorToLog:[NSString stringWithFormat:@"%@ \"%@\" can't be found it is known location.", (isLibrary ? @"Library" : @"File"), file.filename] :YES];
-
     }
     else
     {
@@ -11779,6 +11914,7 @@
 
 #pragma mark - UI Update Methods
 #pragma mark Projects Menu
+
 
 - (void)refreshProjectsMenu
 {

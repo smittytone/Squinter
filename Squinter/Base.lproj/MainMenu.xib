@@ -206,10 +206,7 @@
                 <outlet property="switchAccountMenuItem" destination="HdT-W5-cit" id="Qyg-0b-Rsq"/>
                 <outlet property="swvc" destination="RrL-ld-oJQ" id="xWP-EZ-gMr"/>
                 <outlet property="syncChoiceSheet" destination="gbO-CX-hmK" id="j2g-wc-vkM"/>
-                <outlet property="syncProjectLabel" destination="XLH-Zn-YV8" id="hXE-CB-mmy"/>
                 <outlet property="syncProjectMenuItem" destination="9ug-Tz-yPy" id="7hz-Dt-OMy"/>
-                <outlet property="syncProjectProgress" destination="x5c-3f-wXU" id="JxG-gy-NVT"/>
-                <outlet property="syncProjectSheet" destination="x6k-bd-7Eg" id="aHv-JK-Js5"/>
                 <outlet property="sywvc" destination="ZSP-It-RiE" id="eQi-jB-H5e"/>
                 <outlet property="textColorWell" destination="0Uf-yP-hej" id="AWU-fo-7k6"/>
                 <outlet property="unassignDeviceMenuItem" destination="khS-yL-jUl" id="Us1-aj-tqw"/>
@@ -3439,64 +3436,6 @@ Gw
             </view>
             <point key="canvasLocation" x="-672" y="80"/>
         </window>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="x6k-bd-7Eg" customClass="NSPanel">
-            <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="139" y="81" width="480" height="124"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <view key="contentView" id="zAt-fq-n0x">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="124"/>
-                <autoresizingMask key="autoresizingMask"/>
-                <subviews>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XLH-Zn-YV8">
-                        <rect key="frame" x="18" y="87" width="444" height="17"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="17" id="qPl-HG-lLo"/>
-                        </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Syncing..." id="mEt-H2-LP9">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <progressIndicator wantsLayer="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="x5c-3f-wXU">
-                        <rect key="frame" x="20" y="60" width="440" height="20"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="18" id="i5e-79-S4B"/>
-                        </constraints>
-                    </progressIndicator>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZoL-ps-RXH">
-                        <rect key="frame" x="384" y="13" width="82" height="32"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="21" id="RIw-0d-wDp"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="69" id="od3-4F-BS3"/>
-                        </constraints>
-                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OxP-kc-wPu">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                            <string key="keyEquivalent" base64-UTF8="YES">
-Gw
-</string>
-                        </buttonCell>
-                        <connections>
-                            <action selector="cancelSync:" target="Voe-Tx-rLC" id="vLu-EE-1Hl"/>
-                        </connections>
-                    </button>
-                </subviews>
-                <constraints>
-                    <constraint firstItem="XLH-Zn-YV8" firstAttribute="leading" secondItem="zAt-fq-n0x" secondAttribute="leading" constant="20" id="79j-8K-zMb"/>
-                    <constraint firstItem="x5c-3f-wXU" firstAttribute="leading" secondItem="zAt-fq-n0x" secondAttribute="leading" constant="20" id="8XW-HL-UIj"/>
-                    <constraint firstAttribute="bottom" secondItem="ZoL-ps-RXH" secondAttribute="bottom" constant="20" id="OcW-hA-M7y"/>
-                    <constraint firstItem="ZoL-ps-RXH" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="zAt-fq-n0x" secondAttribute="leading" constant="20" symbolic="YES" id="VNJ-UE-Fue"/>
-                    <constraint firstAttribute="trailing" secondItem="ZoL-ps-RXH" secondAttribute="trailing" constant="20" id="a96-F4-IrH"/>
-                    <constraint firstItem="XLH-Zn-YV8" firstAttribute="top" secondItem="zAt-fq-n0x" secondAttribute="top" constant="20" id="dYA-fq-seD"/>
-                    <constraint firstAttribute="trailing" secondItem="x5c-3f-wXU" secondAttribute="trailing" constant="20" id="mNq-io-Cra"/>
-                    <constraint firstAttribute="trailing" secondItem="XLH-Zn-YV8" secondAttribute="trailing" constant="20" id="pjc-am-Yc8"/>
-                    <constraint firstItem="x5c-3f-wXU" firstAttribute="top" secondItem="XLH-Zn-YV8" secondAttribute="bottom" constant="8" id="vUq-XB-x1o"/>
-                </constraints>
-            </view>
-            <point key="canvasLocation" x="-194" y="302"/>
-        </window>
         <window title="OTP" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qbF-qP-6eg" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -5054,7 +4993,7 @@ Gw
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" ambiguous="YES" id="XxK-pV-HOK">
                             <rect key="frame" x="1" y="0.0" width="570" height="253"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="fH3-sW-QsG" viewBased="YES" id="wkw-ZX-0ox">
                                     <rect key="frame" x="0.0" y="0.0" width="570" height="228"/>

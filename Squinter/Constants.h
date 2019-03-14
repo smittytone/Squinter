@@ -9,7 +9,7 @@
 #ifndef SquinterContants_h
 #define SquinterContants_h
 
-#define kSquinterCurrentVersion             @"3.2"
+#define kSquinterCurrentVersion             @"3.2"  // This is PROJECT version, not app version
 
 #define kActionNewDGBothFiles               6
 #define kActionNewDGAgentFile               5
