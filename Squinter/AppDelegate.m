@@ -11793,7 +11793,8 @@
         showProjectInfoMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", currentProject.name];
         showProjectFinderMenuItem.title = [NSString stringWithFormat:@"Show “%@” in Finder", currentProject.name];
         renameProjectMenuItem.title = [NSString stringWithFormat:@"Edit “%@”...", currentProject.name];
-        syncProjectMenuItem.title = currentProject.pid.length > 0 ? [NSString stringWithFormat:@"Sync “%@”...", currentProject.name] : [NSString stringWithFormat:@"Upload “%@”", currentProject.name];
+        syncProjectMenuItem.title = [NSString stringWithFormat:@"Sync “%@”...", currentProject.name];
+        uploadProjectMenuItem.title = [NSString stringWithFormat:@"Upload “%@”...", currentProject.name];
 
         if (selectedProduct != nil)
         {
@@ -11816,7 +11817,8 @@
         showProjectInfoMenuItem.title = @"Show Project Info";
         showProjectFinderMenuItem.title = @"Show Project in Finder";
         renameProjectMenuItem.title = @"Edit Project...";
-        syncProjectMenuItem.title = @"Upload Project";
+        syncProjectMenuItem.title = @"Sync Project...";
+        uploadProjectMenuItem.title = @"Upload Project...";
 
         if (selectedProduct != nil)
         {
@@ -11860,6 +11862,7 @@
     renameProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
 
     syncProjectMenuItem.enabled = currentProject != nil && currentProject.pid.length > 0 ? YES : NO;
+    uploadProjectMenuItem.enabled = currentProject != nil && currentProject.pid.length == 0 ? YES : NO;
 
     // Update the File menu's one changeable item
 
