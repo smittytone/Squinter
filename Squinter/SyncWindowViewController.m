@@ -132,8 +132,6 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    NSDictionary *dg = [syncGroups objectAtIndex:row];
-
     if ([tableColumn.identifier compare:@"sync_dg_check_col"] == NSOrderedSame)
     {
         CommitTableCellView *cell = [tableView makeViewWithIdentifier:@"sync_dg_check_cell" owner:nil];
@@ -152,9 +150,20 @@
 
         if (cell != nil)
         {
-            NSString *name = [dg valueForKeyPath:@"attributes.name"];
-            if ((NSNull *)name == [NSNull null]) name = [dg objectForKey:@"id"];
-
+            NSString *name;
+            
+            if (presentingRemotes)
+            {
+                NSDictionary *dg = [syncGroups objectAtIndex:row];
+                name = [dg valueForKeyPath:@"attributes.name"];
+                if ((NSNull *)name == [NSNull null]) name = [dg objectForKey:@"id"];
+            }
+            else
+            {
+                Devicegroup *dg = [syncGroups objectAtIndex:row];
+                name = dg.name;
+            }
+            
             cell.textField.stringValue = name;
             cell.textField.enabled = NO;
             return cell;
@@ -166,7 +175,21 @@
 
         if (cell != nil)
         {
-            NSString *type = [dg objectForKey:@"type"];
+            NSString *type;
+            
+            NSString *name;
+            
+            if (presentingRemotes)
+            {
+                NSDictionary *dg = [syncGroups objectAtIndex:row];
+                type = [dg objectForKey:@"type"];
+            }
+            else
+            {
+                Devicegroup *dg = [syncGroups objectAtIndex:row];
+                name = dg.type;
+            }
+            
             cell.textField.stringValue = [self convertDevicegroupType:type :NO];
             cell.textField.enabled = NO;
             return cell;
