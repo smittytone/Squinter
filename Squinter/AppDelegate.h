@@ -595,6 +595,8 @@
 - (void)deleteProductStageThree:(NSNotification *)note;
 - (void)updateProductStageTwo:(NSNotification *)note;
 - (void)createDevicegroupStageTwo:(NSNotification *)note;
+- (void)syncLocalDevicegroupsStageTwo:(Devicegroup *)devicegroup;
+- (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project;
 - (void)deleteDevicegroupStageTwo:(NSNotification *)note;
 - (void)updateDevicegroupStageTwo:(NSNotification *)note;
 - (void)uploadCodeStageTwo:(NSNotification *)note;

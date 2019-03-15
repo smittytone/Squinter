@@ -8031,28 +8031,31 @@
                     // the sync choice sheet so the user can select which ones they want to upload
                     
                     // First, check uploadable names while we still have access to a list
-                    // of server devicegroups
+                    // of server devicegroups (we have previously matched against unique IDs)
                     
                     for (Devicegroup *dg in locals)
                     {
                         BOOL nameMatch = NO;
+                        NSUInteger index = 0;
                         NSUInteger count = 0;
                         NSString *name = dg.name;
                         
                         do {
-                            for (NSDictionary *adg in devicegroups)
-                            {
-                                NSString *aname = [self getValueFrom:adg withKey:@"name"];
+                            NSDictionary *adg = [devicegroups objectAtIndex:index];
+                            NSString *aname = [self getValueFrom:adg withKey:@"name"];
                                 
-                                if ([dg.name compare:aname] == NSOrderedSame)
-                                {
-                                    nameMatch = YES;
-                                    ++count;
-                                    name = [dg.name stringByAppendingFormat:@"%li", count];
-                                    break;
-                                }
+                            if ([dg.name compare:aname] == NSOrderedSame)
+                            {
+                                nameMatch = YES;
+                                index = 0;
+                                ++count;
+                                name = [dg.name stringByAppendingFormat:@"%li", index];
                             }
-                        } while (!nameMatch);
+                            else
+                            {
+                                ++index;
+                            }
+                        } while (index < devicegroups.count);
                         
                         if ([name compare:dg.name] != NSOrderedSame)
                         {
@@ -9459,12 +9462,14 @@
             // Once all the parts have been uploaded, we move on to upload the code
             // via 'uploadProjectStageThree:'
             
-            // FROM 2.3.128
-            // We also come here after a project sync devicegroup upload
-
             // Record the new device group ID
 
             devicegroup.did = [response objectForKey:@"id"];
+            
+            // FROM 2.3.128
+            // We also come here after a project sync devicegroup upload
+            
+            if ([action compare:@"syncdevicegroup"] == NSOrderedSame) [self syncLocalDevicegroupsStageTwo:devicegroup];
 
             // Decrement the device group processing count
 
@@ -9475,7 +9480,12 @@
                 // FROM 2.3.128
                 // If the action is 'syncdevicegroup', attempt to sync again, so that
                 // we trigger the correct UI update
-                if ([action compare:@"syncdevicegroup"] == NSOrderedSame) [self syncProject:project];
+                
+                if ([action compare:@"syncdevicegroup"] == NSOrderedSame)
+                {
+                    [self syncProject:project];
+                    return;
+                }
                 
                 // We have created all the device groups we need to, so it's now time to upload code
                 
@@ -9486,6 +9496,86 @@
     else
     {
         [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
+    }
+}
+
+
+
+- (void)syncLocalDevicegroupsStageTwo:(Devicegroup *)devicegroup
+{
+    // FROM 2.3.128
+    // Upload the code for a single devicegroup
+    // We come here from 'createDevicegroupStageTwo:'
+    
+    Project *parent = [self getParentProject:devicegroup];
+    
+    [self uploadDevicegroupCode:devicegroup :parent];
+}
+
+
+
+- (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project
+{
+    // FROM 2.3.128
+    // Upload the code for a single devicegroup
+    
+    if (devicegroup.squinted == kBothCodeSquinted)
+    {
+        // Code's agent and device code is compiled
+        
+        if (devicegroup.models > 0)
+        {
+            [self writeStringToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
+            
+            NSString *agentCode = @"";
+            NSString *deviceCode = @"";
+            
+            for (Model *model in devicegroup.models)
+            {
+                if ([model.type compare:@"agent"] == NSOrderedSame)
+                {
+                    agentCode = model.code;
+                }
+                else
+                {
+                    deviceCode = model.code;
+                }
+            }
+            
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+            dateFormatter.timeStyle = NSDateFormatterNoStyle;
+            
+            NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
+            
+            NSDictionary *adg = @{ @"type" : devicegroup.type,
+                                   @"id" : devicegroup.did };
+            
+            NSDictionary *relationships = @{ @"devicegroup" : adg };
+            
+            NSDictionary *attributes = @{ @"flagged" : @NO,
+                                          @"agent_code" : agentCode,
+                                          @"device_code" : deviceCode,
+                                          @"description" : [NSString stringWithFormat:@"Uploaded from Squinter 2.3 at %@", desc] };
+            
+            NSDictionary *deployment = @{ @"type" : @"deployment",
+                                          @"attributes" : attributes,
+                                          @"relationships" : relationships };
+            
+            NSDictionary *data = @{ @"data" : deployment };
+            
+            NSDictionary *dict = @{ @"action" : @"uploadproject",
+                                    @"devicegroup" : devicegroup,
+                                    @"project" : project };
+            
+            [ide createDeployment:data :dict];
+            
+            // Pick up the action at 'uploadCodeStageTwo:'
+        }
+        else
+        {
+            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has no code to upload.", devicegroup.name] :YES];
+        }
     }
 }
 
@@ -9502,68 +9592,7 @@
 
     for (Devicegroup *devicegroup in project.devicegroups)
     {
-        if (devicegroup.squinted == kBothCodeSquinted)
-        {
-            // Code's agent and device code is compiled
-
-            if (devicegroup.models > 0)
-            {
-                [self writeStringToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
-
-                NSString *agentCode = @"";
-                NSString *deviceCode = @"";
-
-                for (Model *model in devicegroup.models)
-                {
-                    if ([model.type compare:@"agent"] == NSOrderedSame)
-                    {
-                        agentCode = model.code;
-                    }
-                    else
-                    {
-                        deviceCode = model.code;
-                    }
-                }
-
-                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-                dateFormatter.dateStyle = NSDateFormatterMediumStyle;
-                dateFormatter.timeStyle = NSDateFormatterNoStyle;
-
-                NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
-
-                NSDictionary *adg = @{ @"type" : devicegroup.type,
-                                       @"id" : devicegroup.did };
-
-                NSDictionary *relationships = @{ @"devicegroup" : adg };
-
-                NSDictionary *attributes = @{ @"flagged" : @NO,
-                                              @"agent_code" : agentCode,
-                                              @"device_code" : deviceCode,
-                                              @"description" : [NSString stringWithFormat:@"Uploaded from Squinter 2.3 at %@", desc] };
-
-                NSDictionary *deployment = @{ @"type" : @"deployment",
-                                              @"attributes" : attributes,
-                                              @"relationships" : relationships };
-
-                NSDictionary *data = @{ @"data" : deployment };
-
-                NSDictionary *dict = @{ @"action" : @"uploadproject",
-                                        @"devicegroup" : devicegroup,
-                                        @"project" : project };
-
-                [ide createDeployment:data :dict];
-
-                // Pick up the action at 'uploadCodeStageTwo:'
-            }
-            else
-            {
-                [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has no code to upload.", devicegroup.name] :YES];
-            }
-        }
-        else
-        {
-            [self writeStringToLog:[NSString stringWithFormat:@"The code for device group \"%@\" has not been compiled - it will not be uploaded.", devicegroup.name] :YES];
-        }
+        [self uploadDevicegroupCode:devicegroup :project];
     }
 }
 
