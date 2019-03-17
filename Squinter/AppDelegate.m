@@ -4990,6 +4990,10 @@
 
 - (IBAction)keepDevicesStatusUpdated:(id)sender
 {
+    // Entry point for UI to enable or disable periodic device status checks
+    // If 'sender' is nil, we've arrived from elsewhere in the code (eg. 'loggedin:')
+    // in order that this is set in response to a prefs check
+    
     if (refreshTimer != nil)
     {
         // If 'refreshTimer' is not nil, we are already auto-refreshing, so it's
@@ -9160,34 +9164,46 @@
                 // Construct a dictionary for each device derived from the fixed data returned by the server.
                 // The inner dictionary, 'attributes' is converted to a mutable dictionary
 
-                NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[device objectForKey:@"attributes"]];
-                NSString *name = [self getValueFrom:device withKey:@"name"];
-
-                if (name == nil || ((NSNull *)name == [NSNull null]))
+                NSString *dtype = [device objectForKey:@"type"];
+                
+                if ([dtype hasPrefix:@"dev"])
                 {
-                    // Name is nil or missing, so use its ID instead, replacing the empty
-                    // value (locally) with the new, ID-based name
+                    // Only list development devices
+                    
+                    NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[device objectForKey:@"attributes"]];
+                    NSString *name = [self getValueFrom:device withKey:@"name"];
+                    
 
-                    name = [self getValueFrom:device withKey:@"id"];
-                    [attributes setObject:name forKey:@"name"];
+                    if (name == nil || ((NSNull *)name == [NSNull null]))
+                    {
+                        // Name is nil or missing, so use its ID instead, replacing the empty
+                        // value (locally) with the new, ID-based name
+
+                        name = [self getValueFrom:device withKey:@"id"];
+                        [attributes setObject:name forKey:@"name"];
+                    }
+
+                    NSMutableDictionary *newDevice = [[NSMutableDictionary alloc] init];
+                    [newDevice setObject:[device objectForKey:@"id"] forKey:@"id"];
+                    [newDevice setObject:[device objectForKey:@"type"] forKey:@"type"];
+                    [newDevice setObject:attributes forKey:@"attributes"];
+                    [newDevice setObject:[device objectForKey:@"relationships"] forKey:@"relationships"];
+
+                    // Finally, add modified (or not) device to current list of devices
+
+                    [devicesArray addObject:newDevice];
+
+                    NSDictionary *dict = @{ @"action" : @"getdevice",
+                                            @"device" : newDevice };
+
+                    [ide getDevice:[newDevice objectForKey:@"id"] :dict];
+
+                    // Pick up the action at 'updateDevice:'
                 }
-
-                NSMutableDictionary *newDevice = [[NSMutableDictionary alloc] init];
-                [newDevice setObject:[device objectForKey:@"id"] forKey:@"id"];
-                [newDevice setObject:[device objectForKey:@"type"] forKey:@"type"];
-                [newDevice setObject:attributes forKey:@"attributes"];
-                [newDevice setObject:[device objectForKey:@"relationships"] forKey:@"relationships"];
-
-                // Finally, add modified (or not) device to current list of devices
-
-                [devicesArray addObject:newDevice];
-
-                NSDictionary *dict = @{ @"action" : @"getdevice",
-                                        @"device" : newDevice };
-
-                [ide getDevice:[newDevice objectForKey:@"id"] :dict];
-
-                // Pick up the action at 'updateDevice:'
+                else
+                {
+                    NSLog(@"Unknown type: %@", dtype);
+                }
             }
 
             // Sort the devices list by device name (inside the 'attributes' dictionary)
@@ -9922,10 +9938,14 @@
 
     if ([defaults boolForKey:@"com.bps.squinter.updatedevs"])
     {
+        // Set Squinter to begin the periodic device update timer
+        
         [self keepDevicesStatusUpdated:nil];
     }
     else if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"])
     {
+        // Go and get a list of the account's devices
+        
         [self updateDevicesStatus:nil];
     }
 }
