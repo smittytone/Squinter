@@ -457,6 +457,7 @@
 - (void)chooseProject:(id)sender;
 - (IBAction)openProject:(id)sender;
 - (IBAction)closeProject:(id)sender;
+- (void)closeDevicegroupFiles:(Devicegroup *)devicegroup :(Project *)parent;
 - (IBAction)renameCurrentProject:(id)sender;
 - (void)renameProject:(id)sender;
 - (IBAction)closeRenameProjectSheet:(id)sender;

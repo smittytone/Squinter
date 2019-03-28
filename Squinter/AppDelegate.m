@@ -1957,35 +1957,7 @@
     {
         for (Devicegroup *devicegroup in currentProject.devicegroups)
         {
-            if (devicegroup.models.count > 0)
-            {
-                for (Model *model in devicegroup.models)
-                {
-                    NSString *path = [model.path stringByAppendingFormat:@"/%@", model.filename];
-
-                    if (path.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:pPath :path]];
-
-                    if (model.libraries.count > 0)
-                    {
-                        for (File *file in model.libraries)
-                        {
-                            NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
-
-                            if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:pPath :fpath]];
-                        }
-                    }
-
-                    if (model.files.count > 0)
-                    {
-                        for (File *file in model.files)
-                        {
-                            NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
-
-                            if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:pPath :fpath]];
-                        }
-                    }
-                }
-            }
+            [self closeDevicegroupFiles:devicegroup :currentProject];
         }
     }
 
@@ -2058,6 +2030,45 @@
     [self refreshMainDevicegroupsMenu];
     [self refreshDevicegroupMenu];
     [self setToolbar];
+}
+
+
+
+- (void)closeDevicegroupFiles:(Devicegroup *)devicegroup :(Project *)parent
+{
+    // FROM 2.3.128
+    // This method ensure all the files relating to the specified devicegroup, ie.
+    // models, their files and their librares, are removed from the file watch list
+    
+    if (devicegroup.models.count > 0)
+    {
+        for (Model *model in devicegroup.models)
+        {
+            NSString *path = [model.path stringByAppendingFormat:@"/%@", model.filename];
+            
+            if (path.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:parent.path :path]];
+            
+            if (model.libraries.count > 0)
+            {
+                for (File *file in model.libraries)
+                {
+                    NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
+                    
+                    if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:parent.path :fpath]];
+                }
+            }
+            
+            if (model.files.count > 0)
+            {
+                for (File *file in model.files)
+                {
+                    NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
+                    
+                    if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:parent.path :fpath]];
+                }
+            }
+        }
+    }
 }
 
 
@@ -8899,6 +8910,9 @@
 
             if (project != nil)
             {
+                // FROM 2.3.128 - Unwatch the device group's files
+                [self closeDevicegroupFiles:devicegroup :project];
+                
                 [project.devicegroups removeObject:devicegroup];
 
                 if (devicegroup == currentDevicegroup)
