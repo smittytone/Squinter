@@ -1951,8 +1951,6 @@
     // Stop watching all of the current project's files: each device group's models,
     // and then each model's various local libraries and files
 
-    NSString *pPath = currentProject.path;
-
     if (currentProject.devicegroups.count > 0)
     {
         for (Devicegroup *devicegroup in currentProject.devicegroups)
@@ -11970,7 +11968,7 @@
 {
     // Open the Squinter home page as the Release Notes section
 
-    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#rn"]];
+    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/releases.html"]];
 }
 
 
