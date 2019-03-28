@@ -448,10 +448,9 @@
 			};
 			buildConfigurationList = 3B36D1BA1970A0990029CEC0 /* Build configuration list for PBXProject "Squinter" */;
 			compatibilityVersion = "Xcode 6.3";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
