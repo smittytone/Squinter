@@ -8,7 +8,7 @@
 
 @implementation TreeNode
 
-@synthesize key, value, children, flag, expanded;
+@synthesize key, value, children, flag, expanded, dg;
 
 
 - (instancetype)init
@@ -20,6 +20,7 @@
         children = nil;
         flag = NO;
         expanded = NO;
+        dg = nil;
     }
 
     return self;

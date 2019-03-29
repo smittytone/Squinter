@@ -5,6 +5,8 @@
 
 
 #import <Foundation/Foundation.h>
+#import "Devicegroup.h"
+
 
 @interface TreeNode : NSObject
 
@@ -14,6 +16,7 @@
 @property (nonatomic, strong) NSString *key;
 @property (nonatomic, strong) NSString *value;
 @property (nonatomic, strong) NSMutableArray *children;
+@property (nonatomic, strong) Devicegroup *dg;
 @property (nonatomic, assign) BOOL flag;
 @property (nonatomic, assign) BOOL expanded;
 

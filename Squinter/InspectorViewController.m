@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith
-//  Copyright (c) 2017-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2017-19 Tony Smith. All rights reserved.
 
 
 #import "InspectorViewController.h"
@@ -101,7 +101,6 @@
 
 
 #pragma mark - Data Setter Methods
-
 
 - (void)setProject:(Project *)aProject
 {
@@ -245,6 +244,8 @@
                 pnode = [[TreeNode alloc] init];
                 pnode.key = [NSString stringWithFormat:@"Device Group %li", (long)dgcount];
                 pnode.value = devicegroup.name;
+                pnode.dg = devicegroup;
+                pnode.expanded = pnode.dg.isExpanded;
                 pnode.children = [[NSMutableArray alloc] init];
                 [projectData addObject:pnode];
 
@@ -424,9 +425,25 @@
 
         [deviceOutlineView reloadData];
         [deviceOutlineView setNeedsDisplay];
-
-        if (projectData.count > 0) [deviceOutlineView expandItem:nil expandChildren:YES];
-
+        
+        if (projectData.count > 0)
+        {
+            // FROM 2.3.128 expand children based on recorded 'isExpanded' data
+            // NOTE This is not currently saved
+            
+            for (TreeNode *node in projectData)
+            {
+                if (node.expanded)
+                {
+                    if (![deviceOutlineView isItemExpanded:node]) [deviceOutlineView expandItem:node expandChildren:YES];
+                }
+                else
+                {
+                     if ([deviceOutlineView isItemExpanded:node]) [deviceOutlineView collapseItem:node collapseChildren:YES];
+                }
+            }
+        }
+        
         if (oProject != nil && aProject != nil && deviceOutlineView.isHidden)
         {
             // Only show the NSOutlineView if it is already hidden
@@ -789,15 +806,11 @@
             {
                 if (node.expanded)
                 {
-                    [deviceOutlineView expandItem:node];
-
-                    if (node.children != nil && node.children.count > 0)
-                    {
-                        for (TreeNode *cnode in node.children)
-                        {
-                            if (cnode.expanded) [deviceOutlineView expandItem:cnode];
-                        }
-                    }
+                    if (![deviceOutlineView isItemExpanded:node]) [deviceOutlineView expandItem:node expandChildren:YES];
+                }
+                else
+                {
+                    if ([deviceOutlineView isItemExpanded:node]) [deviceOutlineView collapseItem:node collapseChildren:YES];
                 }
             }
 
@@ -845,6 +858,13 @@
 #pragma mark - NSOutlineView Delegate and DataSource Methods
 
 
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldExpandItem:(id)item
+{
+    return [self outlineView:outlineView isItemExpandable:item];
+}
+
+
+
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
     // Only expand Project items
@@ -852,7 +872,7 @@
     if (panelSelector.selectedSegment == 0 && item != nil)
     {
         TreeNode *node = (TreeNode *)item;
-        if (node.children != nil && node.children.count > 0) return YES;
+        if (node.children != nil) return YES;
     }
 
     return NO;
@@ -879,7 +899,7 @@
     {
         if (item == nil) return projectData.count;
         TreeNode *node = (TreeNode *)item;
-        if (node.children != nil && node.children.count > 0) return node.children.count;
+        return (node.children != nil ? node.children.count : 0);
     }
 
     return (item == nil ? deviceData.count : 0);
@@ -983,92 +1003,6 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
         cellView = cv;
     }
-/*
-        // This is the device view
-        // Retrieve the row number encoded as an NSNumber referenced by 'item'
-
-        NSNumber *num = (NSNumber *)item;
-        NSInteger row = num.integerValue;
-        NSString *key = [deviceKeys objectAtIndex:row];
-        NSString *value = [deviceValues objectAtIndex:row];
-
-        if (value.length == 0)
-        {
-            // This is a Header row
-
-            NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
-            cv.textField.stringValue = [key uppercaseString];
-            cellView = cv;
-        }
-        else
-        {
-            // Data row
-
-            InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
-            cv.title.stringValue = key;
-            cv.data.stringValue = value;
-
-            if ([self isURLRow:row])
-            {
-                // If data is a URL, make sure there's an active button at the end of the row
-
-                cv.goToButton.target = self;
-                cv.goToButton.action = @selector(goToURL:);
-                cv.goToButton.toolTip = @"Click this icon to open the displayed URL in a browser";
-                cv.row = row;
-                cv.goToButton.hidden = NO;
-            }
-            else
-            {
-                cv.goToButton.hidden = YES;
-            }
-
-            cellView = cv;
-        }
-
-    }
-    else
-    {
-        // Display the Project node
-
-        TreeNode *node = (TreeNode *)item;
-
-        if (node.value.length == 0)
-        {
-            // This is a header row - ake text all caps if 'flag' is NO
-
-            NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
-            cv.textField.stringValue = !node.flag ? [node.key uppercaseString] : node.key;
-            cellView = cv;
-        }
-        else
-        {
-            // A data row
-
-            InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
-            cv.title.stringValue = node.key;
-            cv.data.stringValue = node.value;
-
-            if ([self isLinkRow:node])
-            {
-                // If data is a URL, make sure there's an active button at the end of the row
-
-                cv.goToButton.target = self;
-                cv.goToButton.action = @selector(link:);
-                cv.goToButton.toolTip = @"Click this icon to open the displayed file in your editor";
-                cv.path = node.value;
-                cv.row = (node.flag && [node.key compare:@"Path"] == NSOrderedSame) ? 0 : 99;
-                cv.goToButton.hidden = NO;
-            }
-            else
-            {
-                cv.goToButton.hidden = YES;
-            }
-
-            cellView = cv;
-        }
-    }
-*/
 
     return cellView;
 }
@@ -1137,7 +1071,9 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     {
         NSDictionary *ui = notification.userInfo;
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
+        
         node.expanded = YES;
+        if (node.dg != nil) node.dg.isExpanded = YES;
 
         // Should we expand all?  Yes, if the Command Key is held down
 
@@ -1153,7 +1089,9 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     {
         NSDictionary *ui = notification.userInfo;
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
+        
         node.expanded = NO;
+        if (node.dg != nil) node.dg.isExpanded = NO;
 
         // Should we collapse all? Yes, if the Command Key is held down
 

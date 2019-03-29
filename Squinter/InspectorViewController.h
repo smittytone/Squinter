@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith
-//  Copyright (c) 2017-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2017-19 Tony Smith. All rights reserved.
 
 
 #import <Cocoa/Cocoa.h>
