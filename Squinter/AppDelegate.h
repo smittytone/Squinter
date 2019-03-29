@@ -74,7 +74,6 @@
     IBOutlet NSMenuItem *linkProductMenuItem;
     IBOutlet NSMenuItem *deleteProductMenuItem;
     IBOutlet NSMenuItem *renameProductMenuItem;
-    IBOutlet NSMenuItem *uploadProjectMenuItem;
 
     #pragma mark Device Groups Menu outlets
 

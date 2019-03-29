@@ -2414,7 +2414,7 @@
 
     if (project.pid == nil || project.pid.length == 0)
     {
-        // TODO - Complete account check
+        // TODO Complete account check
 
         if (correctAccount)
         {
@@ -2433,7 +2433,8 @@
                         if ([name compare:project.name] == NSOrderedSame)
                         {
                             // The project's name matches an existing product name
-
+                            // TODO Fix an action for this rather than bailing
+                            
                             return;
                         }
                     }
@@ -2441,7 +2442,14 @@
             }
             else
             {
-
+                // Get the list of products from the server
+                
+                NSDictionary *dict = @{ @"action" : @"uploadproject",
+                                        @"project" : project };
+                
+                [ide getProducts:dict];
+                
+                // Pick up in 'listProducts:'
             }
 
             [self writeStringToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
@@ -2540,6 +2548,9 @@
 
 - (void)reassociateProject:(Project *)project
 {
+    // This method re-binds the specified project to a different product under a different account
+    // EXPERIMENTAL
+    
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
 
@@ -2566,11 +2577,13 @@
 
             if (project == currentProject)
             {
+                // Update the Inspector manually
+                
                 iwvc.project = currentProject;
                 [saveLight needSave:YES];
             }
 
-            // Re-call this method now we have changed the Account ID and Product ID
+            // Re-call 'uploadProject:' now that we have changed the Account ID and Product ID
 
             [self uploadProject:project];
         }
@@ -2607,14 +2620,24 @@
     if (currentProject.pid == nil || currentProject.pid.length == 0)
     {
         // No, so warn the user and request they associate the project with a product
-        
-        // NOTE Might choose to run this as an upload instead?
+        // or upload the project (ie. create a product for it)
         
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = [NSString stringWithFormat:@"Project “%@” cannot by sync’d", currentProject.name];
-        alert.informativeText = @"The Project is not associated with a Product in the impCloud. Please use the Projects menu to link this Project to a Product. You may need to update Squinter’s list of Products first.";
+        alert.messageText = [NSString stringWithFormat:@"Project “%@” is not linked to a product", currentProject.name];
+        alert.informativeText = @"You can associate the project it with a product (use the 'Projects' > 'Link Product' menu item) and then synchronise again. You may need to refresh the list of Products in the impCloud first. Or you can upload the project to a new product.";
         
-        [alert beginSheetModalForWindow:_window completionHandler:nil];
+        [alert addButtonWithTitle:@"Upload"];
+        [alert addButtonWithTitle:@"Associate"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert setAlertStyle:NSAlertStyleWarning];
+        [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+            if (returnCode == NSAlertFirstButtonReturn)
+            {
+                // Proceed to upload the project
+                
+                [self uploadProject:currentProject];
+            }
+        }];
         
         return;
     }
@@ -3037,11 +3060,11 @@
 
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"get a list of products from the impCloud"];
+        [self loginAlert:@"get a list of Products from the impCloud"];
         return;
     }
 
-    [self writeStringToLog:@"Getting a list of this account's products from the impCloud..." :YES];
+    [self writeStringToLog:@"Getting a list of this account's Products from the impCloud..." :YES];
 
     NSDictionary *dict = @{ @"action" : @"getproducts" };
 
@@ -3152,7 +3175,7 @@
                 NSDictionary *dict = @{ @"action" : @"deleteproduct",
                                         @"product" : productToDelete };
 
-                [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking for device droups...", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
+                [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - checking for device groups...", [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
 
                 [ide getDevicegroupsWithFilter:@"product.id" :[selectedProduct objectForKey:@"id"] :dict];
 
@@ -4014,6 +4037,10 @@
             // Update the UI
 
             [self refreshMainDevicegroupsMenu];
+            
+            Project *parent = [self getParentProject:currentDevicegroup];
+            
+            if (parent == currentProject) iwvc.project = currentProject;
         }
 
         if (!added) NSLog(@"Some files couldn't be added");
@@ -7694,6 +7721,8 @@
 
 #pragma mark - API Response Handler Methods
 
+#pragma mark Account Methods
+
 - (void)gotMyAccount:(NSNotification *)note
 {
     // This method should ONLY be called by BuildAPIAccess instance AFTER loading the account info
@@ -7727,7 +7756,7 @@
         }
         else
         {
-            [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (gotAccount:)"] :YES];
+            [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (gotMyAccount:)"] :YES];
         }
     }
 }
@@ -7764,6 +7793,198 @@
 }
 
 
+
+- (void)loggedIn:(NSNotification *)note
+{
+    // BuildAPIAccess has signalled login success
+    
+    // First, get the user's account ID
+    
+    NSDictionary *dict = @{ @"action" : @"loggedin" };
+    
+    [ide getMyAccount:dict];
+    
+    // Action continues asynchronously at 'gotMyAccount:'
+    // Meatime, save credentials if they have changed required
+    
+    BOOL flag = NO;
+    
+    if (saveDetailsCheckbox.state == NSOnState)
+    {
+        // User has indicated they want the credentials saved for next time
+        // NOTE this should not happen if we auto-log in
+        
+        PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
+        NSString *untf = usernameTextField.stringValue;
+        NSString *pwtf = passwordTextField.stringValue;
+        
+        // Compare the entered value with the existing value - only overwrite if they are different
+        
+        NSString *cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
+        
+        cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
+        
+        if ([cs compare:untf] != NSOrderedSame)
+        {
+            [pc setString:[ide encodeBase64String:untf] forKey:@"com.bps.Squinter.ak.notional.tully"];
+            flag = YES;
+        }
+        
+        cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
+        
+        cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
+        
+        if ([cs compare:pwtf] != NSOrderedSame)
+        {
+            [pc setString:[ide encodeBase64String:pwtf] forKey:@"com.bps.Squinter.ak.notional.tilly"];
+            flag = YES;
+        }
+        
+        if (flag) [self writeStringToLog:@"impCloud credentials saved in your keychain." :YES];
+    }
+    
+    // Set the 'Accounts' menu
+    
+    NSString *cloudName = [self getCloudName:ide.impCloudCode];
+    accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
+    if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
+    loginMenuItem.title = @"Log out of this Account";
+    // switchAccountMenuItem.enabled = YES;
+    
+    if (switchingAccount)
+    {
+        // We are switching to a secondary account, so we should change the login option
+        
+        switchAccountMenuItem.title = @"Log in to Your Main Account";
+        loginMode = kLoginModeAlt;
+    }
+    else
+    {
+        // We have logged into the primary account
+        
+        switchAccountMenuItem.title = @"Log in to a Different Account...";
+        loginMode = kLoginModeMain;
+    }
+    
+    [self setToolbar];
+    
+    // Register we are no longer trying to log in
+    
+    isLoggingIn = NO;
+    credsFlag = YES;
+    switchingAccount = NO;
+    otpLoginToken = nil;
+    
+    // Inform the user he or she is logged in - and to which cloud
+    
+    [self writeStringToLog:[NSString stringWithFormat:@"You now are logged in to the %@impCloud.", cloudName] :YES];
+    
+    // Check for any post-login actions that need to be performed
+    
+    // User may want the Product lists loaded on login
+    
+    // FROM 2.0.125, this check takes place in 'inloggedInStageTwo:' which indirectly requires a correct account ID
+    
+    // User wants to update devices' status periodically, or the Device lists loaded on login
+    
+    if ([defaults boolForKey:@"com.bps.squinter.updatedevs"])
+    {
+        // Set Squinter to begin the periodic device update timer
+        
+        [self keepDevicesStatusUpdated:nil];
+    }
+    else if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"])
+    {
+        // Go and get a list of the account's devices
+        
+        [self updateDevicesStatus:nil];
+    }
+}
+
+
+
+- (void)loggedInStageTwo
+{
+    // User wants the Product lists loaded on login
+    
+    if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
+}
+
+
+
+- (void)loginRejected:(NSNotification *)note
+{
+    // BuildAPIAccess has notified the host that a login attempt has been rejected
+    
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = @"Sorry, your impCentral credentials have been rejected";
+    alert.informativeText = @"Please check your account details and then try to log in again.";
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:_window completionHandler:nil];
+    
+    // Register we are no longer trying to log in
+    
+    isLoggingIn = NO;
+    credsFlag = YES;
+    switchingAccount = NO;
+    otpLoginToken = nil;
+    loginMode = kLoginModeNone;
+}
+
+
+
+- (void)loggedOut:(NSNotification *)note
+{
+    // BuildAPIAccess has notified us that we have been logged out
+    
+    loginKey = nil;
+    otpLoginToken = nil;
+    
+    // Stop auto-updating account devices' status
+    
+    [self keepDevicesStatusUpdated:nil];
+    
+    // Update the UI elements relating to these items
+    
+    [self refreshProductsMenu];
+    [self refreshProjectsMenu];
+    [self refreshDevicesMenus];
+    [self refreshDeviceMenu];
+    [self refreshDevicesPopup];
+    [self setToolbar];
+    
+    // Set the account menu UI
+    
+    accountMenuItem.title = @"Not Signed in to any Account";
+    loginMenuItem.title = @"Log in to your Main Account";
+    switchAccountMenuItem.title = @"Log in to a Different Account...";
+    loginMode = kLoginModeNone;
+}
+
+
+
+#pragma mark Project Methods
+
+- (void)uploadProjectStageThree:(Project *)project
+{
+    // NOTE We can't get here without one or more device groups
+    // and there will be one deployment per devicegroup
+    
+    [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" code...", project.name] :YES];
+    
+    // Record the total number of device group code uploads
+    
+    project.count = project.devicegroups.count;
+    
+    for (Devicegroup *devicegroup in project.devicegroups)
+    {
+        [self uploadDevicegroupCode:devicegroup :project];
+    }
+}
+
+
+
+#pragma mark Products Methods
 
 - (void)listProducts:(NSNotification *)note
 {
@@ -7807,6 +8028,8 @@
         {
             if (products.count > 0)
             {
+                // Process the product dictionaries retrieved from the server
+                
                 for (NSDictionary *product in products)
                 {
                     // Convert incoming dictionary into a mutable one and copy the data
@@ -7817,25 +8040,29 @@
                     [aProduct setObject:[product objectForKey:@"type"] forKey:@"type"];
                     [aProduct setObject:[product objectForKey:@"relationships"] forKey:@"relationships"];
                     [aProduct setObject:[NSMutableDictionary dictionaryWithDictionary:[product objectForKey:@"attributes"]] forKey:@"attributes"];
+                    
+                    // Set owner information
+                    
+                    NSString *creatorID = [aProduct valueForKeyPath:@"relationships.creator.id"];
+                    NSString *myID = ide.currentAccount;
 
-                    NSString *cid = [aProduct valueForKeyPath:@"relationships.creator.id"];
-                    NSString *oid = ide.currentAccount;
-
-                    if ([cid compare:oid] != NSOrderedSame)
+                    if ([creatorID compare:myID] != NSOrderedSame)
                     {
-                        // The Product is being shared with a collaborator
+                        // The Product is being shared with a collaborator (user ID != creator ID)
+                        // so add a 'shared' dictionary to the product dictionary, so we know later,
+                        // eg. when presenting the Projects > Products in the impCloud sub-menu
 
                         NSMutableDictionary *shared = [[NSMutableDictionary alloc] init];
                         [shared setObject:@"" forKey:@"name"];
-                        [shared setObject:cid forKey:@"id"];
+                        [shared setObject:creatorID forKey:@"id"];
                         [aProduct setObject:shared forKey:@"shared"];
 
-                        // Get the account name
+                        // Get the creator account name
 
                         NSDictionary *dict = @{ @"action" : @"getaccountid",
                                                 @"product" : aProduct };
 
-                        [ide getAccount:cid :dict];
+                        [ide getAccount:creatorID :dict];
 
                         // Pick up the asynchronous action at 'gotAnAccount:'
                         
@@ -7872,7 +8099,7 @@
 
                     // If we are here after creating a product, make sure it's the selected one
 
-                    if (selectedProduct == nil && [action compare:@"newproduct"] == NSOrderedSame)
+                    if (selectedProduct == nil && ([action compare:@"newproduct"] == NSOrderedSame || [action compare:@"uploadproject"] == NSOrderedSame))
                     {
                         NSString *pid = [so objectForKey:@"productid"];
                         NSString *apid = [product objectForKey:@"id"];
@@ -7883,7 +8110,7 @@
 
                 // Inform the user
 
-                [self writeStringToLog:@"List of products loaded: see 'Projects' > 'Current Products'." :YES];
+                [self writeStringToLog:@"List of products loaded: see 'Projects' > 'Products in the impCloud'." :YES];
 
                 // Choose the first product on the list
                 
@@ -7899,20 +8126,6 @@
             // TODO Indicate an issue???
 
             [self writeStringToLog:noneString :YES];
-        }
-
-        if ([action compare:@"syncproduct"] == NSOrderedSame)
-        {
-            // We are here after loading the products list before doing a sync
-
-            if (productsArray.count > 0)
-            {
-                [self syncProject:[so objectForKey:@"project"]];
-            }
-            else
-            {
-
-            }
         }
 
         // Update the UI
@@ -8215,7 +8428,7 @@
 
                     [ide getDevicesWithFilter:@"devicegroup.id" :[devicegroup objectForKey:@"id"] :dict];
 
-                    // Pick up the action in **listDevices:**
+                    // Pick up the action in 'listDevices:'
                 }
             }
             else
@@ -8522,27 +8735,22 @@
 
         project.pid = [data objectForKey:@"id"];
         project.cid = [data valueForKeyPath:@"relationships.creator.id"];
+        
+        [self writeStringToLog:[NSString stringWithFormat:@"Created product for project \"%@\".", project.name] :YES];
+        [self writeStringToLog:@"Refreshing your list of products..." :YES];
+        
+        selectedProduct = nil;
+        
+        NSDictionary *dict = @{ @"action" : @"newproduct",
+                                @"productid" : project.pid };
+        
+        [ide getProducts:dict];
+        
+        // -> Pick up the async outcomce in 'listProducts:'
 
         if ([action compare:@"newproject"] == NSOrderedSame)
         {
             // This is the action flow for a new project, new product
-
-            selectedProduct = nil;
-
-            [self writeStringToLog:[NSString stringWithFormat:@"Created product for project \"%@\".", project.name] :YES];
-            [self writeStringToLog:@"Refreshing your list of products..." :YES];
-
-            NSDictionary *dict = @{ @"action" : @"newproduct",
-                                    @"productid" : project.pid };
-
-            [ide getProducts:dict];
-
-            // -> Pick up the async outcomce in 'listProducts:'
-
-            // Add the new project to the project menu. We've already checked for a name clash,
-            // so we needn't care about the return value.
-
-            //BOOL result = [self addProjectMenuItem:project.name :project];
 
             // Enable project-related UI items
 
@@ -8559,7 +8767,8 @@
             [saveLight needSave:YES];
 
             // Save the new project - this gives the user the chance to re-locate it
-
+            
+            iwvc.project = currentProject;
             savingProject = currentProject;
             [self saveProjectAs:nil];
         }
@@ -8568,20 +8777,16 @@
             // This is the action flow for a project being uploaded
             // We now have to upload the device groups
 
-            NSString *createdItem = [self getValueFrom:data withKey:@"name"];
-
-            [self writeStringToLog:[NSString stringWithFormat:@"Uploaded project \"%@\" to the impCloud.", createdItem] :YES];
-
-            selectedProduct = nil;
-
-            [self writeStringToLog:@"Refreshing your list of products..." :YES];
-            [self getProductsFromServer:nil];
             [self writeStringToLog:@"Uploading the project's device groups..." :YES];
-
+            
             if (project.devicegroups.count > 0)
             {
+                // Record the number of device groups to be uploaded
+                
                 project.count = project.devicegroups.count;
-
+                
+                // Begin uploading device groups one after the other
+                
                 for (Devicegroup *devicegroup in project.devicegroups)
                 {
                     [self writeStringToLog:[NSString stringWithFormat:@"Uploading device group \"%@\"...", devicegroup.name] :YES];
@@ -8596,10 +8801,10 @@
                                                @"type" : devicegroup.type };
 
                     [ide createDevicegroup:details :dict];
+                    
+                    // Pick up the action at 'createDevicegroupStageTwo:'
                 }
             }
-
-            // Pick up the action at 'createDevicegroupStageTwo:'
         }
     }
     else
@@ -8625,24 +8830,20 @@
     // TODO should we also clear the account ID, since the link to the account is the product, and
     //      that has now gone? With no account ID, the project is free to be uploaded to a new acct
 
+    NSString *pid = [product objectForKey:@"id"];
+    
+    // Find the project, if any, linked to the deleted product
+    
+    Project *project = nil;
+    
     if (projectArray.count > 0)
     {
-        for (Project *project in projectArray)
+        for (Project *aproject in projectArray)
         {
-            NSString *pid = [self getValueFrom:product withKey:@"id"];
-
-            if ([pid compare:project.pid] == NSOrderedSame)
+            if ([pid compare:aproject.pid] == NSOrderedSame)
             {
-                project.pid = @"";
-                project.haschanged = YES;
-
-                if (project == currentProject)
-                {
-                    iwvc.project = currentProject;
-                    [saveLight needSave:YES];
-                }
-
-                // NOTE Project Inspector will be updated later, in 'deleteProductStageThree:'
+                project = aproject;
+                break;
             }
         }
     }
@@ -8661,10 +8862,15 @@
 
         for (NSDictionary *devicegroup in devicegroups)
         {
-            NSDictionary *source = @{ @"action" : @"deleteproduct",
-                                      @"devicegroup" : devicegroup,
-                                      @"product" : productToDelete };
-
+            NSDictionary *source = project != nil ?
+                @{ @"action" : @"deleteproduct",
+                   @"devicegroup" : devicegroup,
+                   @"project": project,
+                   @"product" : productToDelete } :
+                @{ @"action" : @"deleteproduct",
+                   @"devicegroup" : devicegroup,
+                   @"product" : productToDelete };
+            
             [ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
         }
 
@@ -8676,10 +8882,14 @@
 
         [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\"...", [self getValueFrom:product withKey:@"name"]] :YES];
 
-        NSDictionary *source = @{ @"action" : @"deleteproduct",
-                                  @"product" : productToDelete };
+        NSDictionary *source = project != nil ?
+            @{ @"action" : @"deleteproduct",
+               @"project": project,
+               @"product" : productToDelete } :
+            @{ @"action" : @"deleteproduct",
+               @"product" : productToDelete };
 
-        [ide deleteProduct:[product objectForKey:@"id"] :source];
+        [ide deleteProduct:pid :source];
 
         // Pick this up at 'deleteProductStageThree:'
     }
@@ -8695,7 +8905,8 @@
     NSDictionary *source = [data objectForKey:@"object"];
     NSDictionary *productToDelete = [source objectForKey:@"product"];
     NSDictionary *product = [productToDelete objectForKey:@"product"];
-
+    Project *project = [source objectForKey:@"project"];
+    
     // Clear the current product if it's still the one we're deleting
 
     if (selectedProduct == product) selectedProduct = nil;
@@ -8712,6 +8923,20 @@
     [ide getProducts:dict];
 
     // Pick up the action at 'listProducts:'
+    
+    // Meantime, update the project, if one has been recorded
+    
+    if (project != nil)
+    {
+        project.pid = @"";
+        project.haschanged = YES;
+        
+        if (project == currentProject)
+        {
+            iwvc.project = currentProject;
+            [saveLight needSave:YES];
+        }
+    }
 }
 
 
@@ -8809,6 +9034,8 @@
 }
 
 
+
+#pragma mark Device Group Methods
 
 - (void)updateDevicegroupStageTwo:(NSNotification *)note
 {
@@ -8961,6 +9188,7 @@
             // Run the delete product flow
 
             NSDictionary *devicegroup = [source objectForKey:@"devicegroup"];
+            Project *project = [source objectForKey:@"project"];
             NSMutableDictionary *productToDelete = [source objectForKey:@"product"];
             NSNumber *number = [productToDelete objectForKey:@"count"];
             NSArray *devicegroups = [productToDelete objectForKey:@"devicegroups"];
@@ -8968,6 +9196,25 @@
             NSInteger count = number.integerValue - 1;
 
             [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
+            
+            // FROM 2.3.128 If we have a project recorded, run through and fine which of its
+            // device groups matches the device group that thas just been deleted on the server
+            // and clear its ID value
+            
+            if (project != nil)
+            {
+                NSString *did = [devicegroup objectForKey:@"id"];
+                
+                for (Devicegroup *adg in project.devicegroups)
+                {
+                    if ([adg.did compare:did] == NSOrderedSame)
+                    {
+                        adg.did = @"";
+                        if (project == currentProject) iwvc.project = currentProject;
+                        break;
+                    }
+                }
+            }
 
             [productToDelete setObject:[NSNumber numberWithInteger:count] forKey:@"count"];
 
@@ -8990,6 +9237,211 @@
 }
 
 
+
+- (void)createDevicegroupStageTwo:(NSNotification *)note
+{
+    // We're back after creating the Device Group on the server
+    // so extract the persisted data to get the new device group,
+    // its project and the flag indicating whether the user wants
+    // source files creating
+    
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSDictionary *response = [data objectForKey:@"data"];
+    NSDictionary *source = [data objectForKey:@"object"];
+    NSNumber *makeNewFiles = [source objectForKey:@"files"];
+    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+    Project *project = [source objectForKey:@"project"];
+    NSString *action = [source objectForKey:@"action"];
+    
+    // Record the new device group's ID
+    
+    devicegroup.did = [response objectForKey:@"id"];
+    
+    if (action != nil)
+    {
+        if ([action compare:@"newdevicegroup"] == NSOrderedSame)
+        {
+            if (newDevicegroupFlag)
+            {
+                // We are adding a device group for newly added file, so go and process those files
+                // and proceed no further here
+                
+                [self processAddedFiles:saveUrls];
+                return;
+            }
+            
+            // Add the device group to the project
+            
+            if (project.devicegroups == nil) project.devicegroups = [[NSMutableArray alloc] init];
+            
+            [project.devicegroups addObject:devicegroup];
+            
+            // Mark the project as changed
+            
+            project.haschanged = YES;
+            
+            if (project == currentProject)
+            {
+                // Set the status light if the project is the current one
+                
+                [saveLight needSave:YES];
+                
+                // And select the device group
+                
+                currentDevicegroup = devicegroup;
+                currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
+                
+                // Update the UI
+                
+                [self setToolbar];
+                [self refreshDevicegroupMenu];
+                [self refreshMainDevicegroupsMenu];
+                
+                // Update the inspector, if required
+                
+                if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
+            }
+            
+            // Now we can produce the source code file, as the user requested
+            
+            if (makeNewFiles != nil && makeNewFiles.boolValue) [self createFilesForDevicegroup:devicegroup.name :@"agent"];
+        }
+        else if ([action compare:@"uploadproject"] == NSOrderedSame || [action compare:@"syncdevicegroup"] == NSOrderedSame)
+        {
+            // We're here after creating a device group as part of a project upload
+            // Once all the parts have been uploaded, we move on to upload the code
+            // via 'uploadProjectStageThree:'
+            
+            // Record the new device group ID
+            
+            devicegroup.did = [response objectForKey:@"id"];
+            
+            // FROM 2.3.128
+            // We also come here after a project sync devicegroup upload
+            
+            if ([action compare:@"syncdevicegroup"] == NSOrderedSame) [self syncLocalDevicegroupsStageTwo:devicegroup];
+            
+            // Decrement the device group processing count
+            
+            --project.count;
+            
+            if (project.count == 0)
+            {
+                // FROM 2.3.128
+                // If the action is 'syncdevicegroup', attempt to sync again, so that
+                // we trigger the correct UI update
+                
+                if ([action compare:@"syncdevicegroup"] == NSOrderedSame)
+                {
+                    [self syncProject:project];
+                    return;
+                }
+                
+                // We have created all the device groups we need to, so it's now time to upload code
+                
+                [self uploadProjectStageThree:project];
+            }
+        }
+    }
+    else
+    {
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
+    }
+}
+
+
+
+- (void)syncLocalDevicegroupsStageTwo:(Devicegroup *)devicegroup
+{
+    // FROM 2.3.128
+    // Upload the code for a single devicegroup
+    // We come here from 'createDevicegroupStageTwo:'
+    
+    Project *parent = [self getParentProject:devicegroup];
+    
+    [self uploadDevicegroupCode:devicegroup :parent];
+}
+
+
+
+- (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project
+{
+    // FROM 2.3.128
+    // Upload the code for a single devicegroup
+    
+    if (devicegroup.squinted == kBothCodeSquinted)
+    {
+        // Code's agent and device code is compiled
+        
+        if (devicegroup.models > 0)
+        {
+            [self writeStringToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
+            
+            NSString *agentCode = @"";
+            NSString *deviceCode = @"";
+            
+            for (Model *model in devicegroup.models)
+            {
+                if ([model.type compare:@"agent"] == NSOrderedSame)
+                {
+                    agentCode = model.code;
+                }
+                else
+                {
+                    deviceCode = model.code;
+                }
+            }
+            
+            // Set the upload time and date
+            
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+            dateFormatter.timeStyle = NSDateFormatterNoStyle;
+            
+            NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
+            
+            // Assemble the deployment record for uploading the code
+            
+            NSDictionary *adg = @{ @"type" : devicegroup.type,
+                                   @"id" : devicegroup.did };
+            
+            NSDictionary *relationships = @{ @"devicegroup" : adg };
+            
+            NSDictionary *attributes = @{ @"flagged" : @NO,
+                                          @"agent_code" : agentCode,
+                                          @"device_code" : deviceCode,
+                                          @"description" : [NSString stringWithFormat:@"Uploaded from Squinter %@ at %@", desc, kSquinterAppVersion] };
+            
+            NSDictionary *deployment = @{ @"type" : @"deployment",
+                                          @"attributes" : attributes,
+                                          @"relationships" : relationships };
+            
+            NSDictionary *data = @{ @"data" : deployment };
+            
+            NSDictionary *dict = @{ @"action" : @"uploadproject",
+                                    @"devicegroup" : devicegroup,
+                                    @"project" : project };
+            
+            [ide createDeployment:data :dict];
+            
+            // Pick up the action at 'uploadCodeStageTwo:'
+        }
+        else
+        {
+            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has no code to upload.", devicegroup.name] :YES];
+        }
+    }
+    else
+    {
+        // Device group's model code is not squinted, so don't upload at this time
+        
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\"'s code is not compiled so cannot be uploaded. Please compiile the code then upload later.", devicegroup.name] :YES];
+    }
+}
+
+
+
+#pragma mark Code Methods
 
 - (void)updateCodeStageTwo:(NSNotification *)note
 {
@@ -9043,6 +9495,80 @@
 }
 
 
+
+- (void)uploadCodeStageTwo:(NSNotification *)note
+{
+    // Called in response to a notification from BuildAPIAccess that a deployment has been created
+    
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSDictionary *response = [data objectForKey:@"data"];
+    NSDictionary *source = [data objectForKey:@"object"];
+    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+    NSString *action = [source objectForKey:@"action"];
+    
+    // Get the code SHA and updated date and add to the updated device groups's two models
+    
+    NSString *sha = [self getValueFrom:response withKey:@"sha"];
+    NSString *updated = [self getValueFrom:response withKey:@"updated_at"];
+    if (updated == nil) updated = [self getValueFrom:response withKey:@"created_at"];
+    
+    for (Model *model in devicegroup.models)
+    {
+        model.sha = sha;
+        model.updated = updated;
+    }
+    
+    // Mark the updated device group's parent product as changed
+    
+    Project *project = [self getParentProject:devicegroup];
+    project.haschanged = YES;
+    
+    if (project == currentProject)
+    {
+        iwvc.project = currentProject;
+        [saveLight needSave:YES];
+    }
+    
+    // Mark the devicegroup as uploaded
+    
+    devicegroup.squinted = devicegroup.squinted | 0x08;
+    
+    if (action != nil)
+    {
+        if ([action compare:@"uploadproject"] == NSOrderedSame)
+        {
+            // Decrement the count of uploaded deployments
+            
+            --project.count;
+            
+            if (project.count == 0)
+            {
+                // All done! Refresh the products list
+                
+                // REMOVE IN 2.3.128 (already handled in 'createProductStageTwo:')
+                // NSDictionary *dict = @{ @"action" : @"getproducts" };
+                // [ide getProducts:dict];
+                // [self writeStringToLog:@"Refreshing product list." :YES];
+                // Pick up the action at 'listProducts:'
+                
+                [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
+            }
+        }
+        else
+        {
+            [self writeStringToLog:[NSString stringWithFormat:@"Code uploaded to device group \"%@\". Restart its assigned device(s) to run the new code.", devicegroup.name] :YES];
+            [self updateDevicegroup:devicegroup];
+        }
+    }
+    else
+    {
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (uploadCodeStageTwo:)"] :YES];
+    }
+}
+
+
+
+#pragma mark Device Methods
 
 - (void)listDevices:(NSNotification *)note
 {
@@ -9425,216 +9951,6 @@
 
 
 
-- (void)createDevicegroupStageTwo:(NSNotification *)note
-{
-    // We're back after creating the Device Group on the server
-    // so extract the persisted data to get the new device group,
-    // its project and the flag indicating whether the user wants
-    // source files creating
-
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *response = [data objectForKey:@"data"];
-    NSDictionary *source = [data objectForKey:@"object"];
-    NSNumber *makeNewFiles = [source objectForKey:@"files"];
-    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-    Project *project = [source objectForKey:@"project"];
-    NSString *action = [source objectForKey:@"action"];
-
-    // Record the new device group's ID
-
-    devicegroup.did = [response objectForKey:@"id"];
-
-    if (action != nil)
-    {
-        if ([action compare:@"newdevicegroup"] == NSOrderedSame)
-        {
-            if (newDevicegroupFlag)
-            {
-                // We are adding a device group for newly added file, so go and process those files
-                // and proceed no further here
-
-                [self processAddedFiles:saveUrls];
-                return;
-            }
-
-            // Add the device group to the project
-
-            if (project.devicegroups == nil) project.devicegroups = [[NSMutableArray alloc] init];
-
-            [project.devicegroups addObject:devicegroup];
-
-            // Mark the project as changed
-
-            project.haschanged = YES;
-
-            if (project == currentProject)
-            {
-                // Set the status light if the project is the current one
-
-                [saveLight needSave:YES];
-
-                // And select the device group
-
-                currentDevicegroup = devicegroup;
-                currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
-
-                // Update the UI
-
-                [self setToolbar];
-                [self refreshDevicegroupMenu];
-                [self refreshMainDevicegroupsMenu];
-
-                // Update the inspector, if required
-
-                if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
-            }
-
-            // Now we can produce the source code file, as the user requested
-
-            if (makeNewFiles != nil && makeNewFiles.boolValue) [self createFilesForDevicegroup:devicegroup.name :@"agent"];
-        }
-        else if ([action compare:@"uploadproject"] == NSOrderedSame || [action compare:@"syncdevicegroup"] == NSOrderedSame)
-        {
-            // We're here after creating a device group as part of a project upload
-            // Once all the parts have been uploaded, we move on to upload the code
-            // via 'uploadProjectStageThree:'
-            
-            // Record the new device group ID
-
-            devicegroup.did = [response objectForKey:@"id"];
-            
-            // FROM 2.3.128
-            // We also come here after a project sync devicegroup upload
-            
-            if ([action compare:@"syncdevicegroup"] == NSOrderedSame) [self syncLocalDevicegroupsStageTwo:devicegroup];
-
-            // Decrement the device group processing count
-
-            --project.count;
-
-            if (project.count == 0)
-            {
-                // FROM 2.3.128
-                // If the action is 'syncdevicegroup', attempt to sync again, so that
-                // we trigger the correct UI update
-                
-                if ([action compare:@"syncdevicegroup"] == NSOrderedSame)
-                {
-                    [self syncProject:project];
-                    return;
-                }
-                
-                // We have created all the device groups we need to, so it's now time to upload code
-                
-                [self uploadProjectStageThree:project];
-            }
-        }
-    }
-    else
-    {
-        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (createDevicegroupStageTwo:)"] :YES];
-    }
-}
-
-
-
-- (void)syncLocalDevicegroupsStageTwo:(Devicegroup *)devicegroup
-{
-    // FROM 2.3.128
-    // Upload the code for a single devicegroup
-    // We come here from 'createDevicegroupStageTwo:'
-    
-    Project *parent = [self getParentProject:devicegroup];
-    
-    [self uploadDevicegroupCode:devicegroup :parent];
-}
-
-
-
-- (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project
-{
-    // FROM 2.3.128
-    // Upload the code for a single devicegroup
-    
-    if (devicegroup.squinted == kBothCodeSquinted)
-    {
-        // Code's agent and device code is compiled
-        
-        if (devicegroup.models > 0)
-        {
-            [self writeStringToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
-            
-            NSString *agentCode = @"";
-            NSString *deviceCode = @"";
-            
-            for (Model *model in devicegroup.models)
-            {
-                if ([model.type compare:@"agent"] == NSOrderedSame)
-                {
-                    agentCode = model.code;
-                }
-                else
-                {
-                    deviceCode = model.code;
-                }
-            }
-            
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateStyle = NSDateFormatterMediumStyle;
-            dateFormatter.timeStyle = NSDateFormatterNoStyle;
-            
-            NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
-            
-            NSDictionary *adg = @{ @"type" : devicegroup.type,
-                                   @"id" : devicegroup.did };
-            
-            NSDictionary *relationships = @{ @"devicegroup" : adg };
-            
-            NSDictionary *attributes = @{ @"flagged" : @NO,
-                                          @"agent_code" : agentCode,
-                                          @"device_code" : deviceCode,
-                                          @"description" : [NSString stringWithFormat:@"Uploaded from Squinter 2.3 at %@", desc] };
-            
-            NSDictionary *deployment = @{ @"type" : @"deployment",
-                                          @"attributes" : attributes,
-                                          @"relationships" : relationships };
-            
-            NSDictionary *data = @{ @"data" : deployment };
-            
-            NSDictionary *dict = @{ @"action" : @"uploadproject",
-                                    @"devicegroup" : devicegroup,
-                                    @"project" : project };
-            
-            [ide createDeployment:data :dict];
-            
-            // Pick up the action at 'uploadCodeStageTwo:'
-        }
-        else
-        {
-            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has no code to upload.", devicegroup.name] :YES];
-        }
-    }
-}
-
-
-
-- (void)uploadProjectStageThree:(Project *)project
-{
-    // NOTE We can't get here without one or more device groups
-    // and there will be one deployment per devicegroup
-
-    [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" code...", project.name] :YES];
-
-    project.count = project.devicegroups.count;
-
-    for (Devicegroup *devicegroup in project.devicegroups)
-    {
-        [self uploadDevicegroupCode:devicegroup :project];
-    }
-}
-
-
-
 - (void)restarted:(NSNotification *)note
 {
     // This method ONLY called in response to a notification from BuildAPIAccess that a device or devices have restarted
@@ -9762,78 +10078,6 @@
 
 
 
-- (void)uploadCodeStageTwo:(NSNotification *)note
-{
-    // Called in response to a notification from BuildAPIAccess that a deployment has been created
-
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *response = [data objectForKey:@"data"];
-    NSDictionary *source = [data objectForKey:@"object"];
-    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-    NSString *action = [source objectForKey:@"action"];
-
-    // Get the code SHA and updated date and add to the device groups's two models
-
-    NSString *sha = [self getValueFrom:response withKey:@"sha"];
-    NSString *updated = [self getValueFrom:response withKey:@"updated_at"];
-    if (updated == nil) updated = [self getValueFrom:response withKey:@"created_at"];
-
-    for (Model *model in devicegroup.models)
-    {
-        model.sha = sha;
-        model.updated = updated;
-    }
-
-    // Mark the parent product as changed
-
-    Project *project = [self getParentProject:devicegroup];
-    project.haschanged = YES;
-
-    if (project == currentProject)
-    {
-        iwvc.project = currentProject;
-        [saveLight needSave:YES];
-    }
-
-    // Mark the devicegroup as uploaded
-
-    devicegroup.squinted = devicegroup.squinted | 0x08;
-
-    if (action != nil)
-    {
-        if ([action compare:@"uploadproject"] == NSOrderedSame)
-        {
-            // Decrement the count of uploaded deployments
-
-            --project.count;
-
-            if (project.count == 0)
-            {
-                // All done! Refresh the products list
-
-                NSDictionary *dict = @{ @"action" : @"getproducts" };
-
-                [ide getProducts:dict];
-                [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
-                [self writeStringToLog:@"Refreshing product list." :YES];
-                
-                // Pick up the action at 'listProducts:'
-            }
-        }
-        else
-        {
-            [self writeStringToLog:[NSString stringWithFormat:@"Code uploaded to device group \"%@\". Restart its assigned device(s) to run the new code.", devicegroup.name] :YES];
-            [self updateDevicegroup:devicegroup];
-        }
-    }
-    else
-    {
-        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (uploadCodeStageTwo:)"] :YES];
-    }
-}
-
-
-
 - (void)setMinimumDeploymentStageTwo:(NSNotification *)note
 {
     // Called in response to a notification from BuildAPIAccess that a minimum deployment has been set
@@ -9860,175 +10104,6 @@
     {
         [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (setMinimumDeploymentStageTwo:)"] :YES];
     }
-}
-
-
-
-- (void)loggedIn:(NSNotification *)note
-{
-    // BuildAPIAccess has signalled login success
-
-    // First, get the user's account ID
-    
-    NSDictionary *dict = @{ @"action" : @"loggedin" };
-    
-    [ide getMyAccount:dict];
-
-    // Action continues asynchronously at 'gotMyAccount:'
-    // Meatime, save credentials if they have changed required
-
-    BOOL flag = NO;
-
-    if (saveDetailsCheckbox.state == NSOnState)
-    {
-        // User has indicated they want the credentials saved for next time
-        // NOTE this should not happen if we auto-log in
-
-        PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
-        NSString *untf = usernameTextField.stringValue;
-        NSString *pwtf = passwordTextField.stringValue;
-
-        // Compare the entered value with the existing value - only overwrite if they are different
-
-        NSString *cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
-
-        cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
-
-        if ([cs compare:untf] != NSOrderedSame)
-        {
-            [pc setString:[ide encodeBase64String:untf] forKey:@"com.bps.Squinter.ak.notional.tully"];
-            flag = YES;
-        }
-
-        cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
-
-        cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
-
-        if ([cs compare:pwtf] != NSOrderedSame)
-        {
-            [pc setString:[ide encodeBase64String:pwtf] forKey:@"com.bps.Squinter.ak.notional.tilly"];
-            flag = YES;
-        }
-
-        if (flag) [self writeStringToLog:@"impCloud credentials saved in your keychain." :YES];
-    }
-
-    // Set the 'Accounts' menu
-
-    NSString *cloudName = [self getCloudName:ide.impCloudCode];
-    accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
-    if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
-    loginMenuItem.title = @"Log out of this Account";
-    // switchAccountMenuItem.enabled = YES;
-
-    if (switchingAccount)
-    {
-        // We are switching to a secondary account, so we should change the login option
-
-        switchAccountMenuItem.title = @"Log in to Your Main Account";
-        loginMode = kLoginModeAlt;
-    }
-    else
-    {
-        // We have logged into the primary account
-
-        switchAccountMenuItem.title = @"Log in to a Different Account...";
-        loginMode = kLoginModeMain;
-    }
-
-    [self setToolbar];
-
-    // Register we are no longer trying to log in
-
-    isLoggingIn = NO;
-    credsFlag = YES;
-    switchingAccount = NO;
-    otpLoginToken = nil;
-
-    // Inform the user he or she is logged in - and to which cloud
-
-    [self writeStringToLog:[NSString stringWithFormat:@"You now are logged in to the %@impCloud.", cloudName] :YES];
-
-    // Check for any post-login actions that need to be performed
-
-    // User may want the Product lists loaded on login
-
-    // FROM 2.0.125, this check takes place in 'inloggedInStageTwo:' which indirectly requires a correct account ID
-
-    // User wants to update devices' status periodically, or the Device lists loaded on login
-
-    if ([defaults boolForKey:@"com.bps.squinter.updatedevs"])
-    {
-        // Set Squinter to begin the periodic device update timer
-        
-        [self keepDevicesStatusUpdated:nil];
-    }
-    else if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"])
-    {
-        // Go and get a list of the account's devices
-        
-        [self updateDevicesStatus:nil];
-    }
-}
-
-
-
-- (void)loggedInStageTwo
-{
-    // User wants the Product lists loaded on login
-    
-    if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
-}
-
-
-
-- (void)loginRejected:(NSNotification *)note
-{
-    // BuildAPIAccess has notified the host that a login attempt has been rejected
-
-    NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = @"Sorry, your impCentral credentials have been rejected";
-    alert.informativeText = @"Please check your account details and then try to log in again.";
-    [alert addButtonWithTitle:@"OK"];
-    [alert beginSheetModalForWindow:_window completionHandler:nil];
-
-    // Register we are no longer trying to log in
-
-    isLoggingIn = NO;
-    credsFlag = YES;
-    switchingAccount = NO;
-    otpLoginToken = nil;
-    loginMode = kLoginModeNone;
-}
-
-
-
-- (void)loggedOut:(NSNotification *)note
-{
-    // BuildAPIAccess has notified us that we have been logged out
-
-    loginKey = nil;
-    otpLoginToken = nil;
-
-    // Stop auto-updating account devices' status
-
-    [self keepDevicesStatusUpdated:nil];
-
-    // Update the UI elements relating to these items
-
-    [self refreshProductsMenu];
-    [self refreshProjectsMenu];
-    [self refreshDevicesMenus];
-    [self refreshDeviceMenu];
-    [self refreshDevicesPopup];
-    [self setToolbar];
-
-    // Set the account menu UI
-
-    accountMenuItem.title = @"Not Signed in to any Account";
-    loginMenuItem.title = @"Log in to your Main Account";
-    switchAccountMenuItem.title = @"Log in to a Different Account...";
-    loginMode = kLoginModeNone;
 }
 
 
@@ -12000,7 +12075,6 @@
         showProjectFinderMenuItem.title = [NSString stringWithFormat:@"Show “%@” in Finder", currentProject.name];
         renameProjectMenuItem.title = [NSString stringWithFormat:@"Edit “%@”...", currentProject.name];
         syncProjectMenuItem.title = [NSString stringWithFormat:@"Sync “%@”...", currentProject.name];
-        uploadProjectMenuItem.title = [NSString stringWithFormat:@"Upload “%@”...", currentProject.name];
 
         if (selectedProduct != nil)
         {
@@ -12024,7 +12098,6 @@
         showProjectFinderMenuItem.title = @"Show Project in Finder";
         renameProjectMenuItem.title = @"Edit Project...";
         syncProjectMenuItem.title = @"Sync Project...";
-        uploadProjectMenuItem.title = @"Upload Project...";
 
         if (selectedProduct != nil)
         {
@@ -12061,18 +12134,15 @@
     showProjectInfoMenuItem.enabled = currentProject != nil ? YES : NO;
     showProjectFinderMenuItem.enabled = currentProject != nil ? YES : NO;
     renameProjectMenuItem.enabled = currentProject != nil ? YES : NO;
-
     downloadProductMenuItem.enabled = selectedProduct != nil ? YES : NO;
     linkProductMenuItem.enabled = currentProject != nil && selectedProduct != nil ? YES : NO;
-    deleteProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
-    renameProductMenuItem.enabled = (selectedProduct != nil) ? YES : NO;
-
-    syncProjectMenuItem.enabled = currentProject != nil && currentProject.pid.length > 0 ? YES : NO;
-    uploadProjectMenuItem.enabled = currentProject != nil && currentProject.pid.length == 0 ? YES : NO;
+    deleteProductMenuItem.enabled = selectedProduct != nil ? YES : NO;
+    renameProductMenuItem.enabled = selectedProduct != nil ? YES : NO;
+    syncProjectMenuItem.enabled = currentProject != nil ? YES : NO;
 
     // Update the File menu's one changeable item
 
-    fileAddFilesMenuItem.enabled = (currentProject != nil) ? YES : NO;
+    fileAddFilesMenuItem.enabled = currentProject != nil ? YES : NO;
 }
 
 

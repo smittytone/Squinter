@@ -222,7 +222,6 @@
                 <outlet property="uploadMenuItem" destination="olM-pm-qe9" id="ZCZ-ax-7br"/>
                 <outlet property="uploadOriginCountField" destination="GCt-0w-Uz4" id="0cz-cI-rkH"/>
                 <outlet property="uploadOriginTextField" destination="5hF-vJ-xSK" id="Ahr-4o-ulv"/>
-                <outlet property="uploadProjectMenuItem" destination="scF-gb-Uzy" id="xaA-gH-ThU"/>
                 <outlet property="uploadSheet" destination="lXp-El-Lhb" id="Ecb-mu-qbu"/>
                 <outlet property="uploadTab" destination="dn6-gE-3fg" id="juP-px-usH"/>
                 <outlet property="uploadTagsCountField" destination="gEw-pk-2vQ" id="XnR-u3-2iY"/>
@@ -481,12 +480,6 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="doSync:" target="Voe-Tx-rLC" id="7HX-0i-7m4"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Upload Project" enabled="NO" alternate="YES" id="scF-gb-Uzy">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES"/>
-                                <connections>
-                                    <action selector="doUpload:" target="Voe-Tx-rLC" id="efQ-aF-nYP"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="jEp-Yk-v8v"/>
