@@ -4569,7 +4569,16 @@
      {
          if (response != NSAlertFirstButtonReturn)
          {
-             if (currentDevicegroup.models.count > 0) [currentDevicegroup.models removeAllObjects];
+             if (currentDevicegroup.models.count > 0)
+             {
+                 // FROM 2.3.128 - Unwatch the device group's files
+                 
+                 [self closeDevicegroupFiles:currentDevicegroup :currentProject];
+                 
+                 // Remove the model and file records from the device group
+                 
+                 [currentDevicegroup.models removeAllObjects];
+             }
              currentProject.haschanged = YES;
              iwvc.project = currentProject;
 
@@ -7077,8 +7086,8 @@
                                              model.filename = [filePath lastPathComponent];
                                              model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
 
-                                            currentProject.haschanged = YES;
-                                            iwvc.project = currentProject;
+                                             currentProject.haschanged = YES;
+                                             iwvc.project = currentProject;
 
                                              [saveLight needSave:YES];
                                              [self checkAndWatchFile:filePath];
