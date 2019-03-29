@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/09/2014.
-//  Copyright (c) 2014-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2014-19 Tony Smith. All rights reserved.
 
 
 #import <Foundation/Foundation.h>
@@ -34,6 +34,8 @@
                                                             //  3       Each model's code fields need saving
                                                             //          (product to project)
                                                             //  4       Model has just been uploaded successfully
+@property (nonatomic, readwrite) BOOL isExpanded;           // Used to determine if the group is expended in the
+                                                            // Inspector
 
 
 @end

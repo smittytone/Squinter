@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/09/2014.
-//  Copyright (c) 2014-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2014-19 Tony Smith. All rights reserved.
 
 
 #import "Devicegroup.h"
@@ -10,7 +10,7 @@
 @implementation Devicegroup
 
 
-@synthesize name, description, did, squinted;
+@synthesize name, description, did, squinted, isExpanded;
 @synthesize models, data, type, history, mdid, cdid;
 
 
@@ -28,6 +28,7 @@
         mdid = nil;
         cdid = nil;
         squinted = 0;
+        isExpanded = YES;
     }
 
     return self;
@@ -46,7 +47,8 @@
         models = [aDecoder decodeObjectForKey:@"dg_models"];
 
         // Set up other, unsaved properties
-
+        
+        isExpanded = YES;
         squinted = 0;
         data = nil;
         history = nil;
@@ -82,9 +84,9 @@
     dgcopy.data = [self.data mutableCopy];
     dgcopy.history = [self.history mutableCopy];
     dgcopy.squinted = self.squinted;
-    dgcopy.mdid =self.mdid;
-    dgcopy.cdid =self.cdid;
-
+    dgcopy.mdid = self.mdid;
+    dgcopy.cdid = self.cdid;
+    dgcopy.isExpanded = self.isExpanded;
     return dgcopy;
 }
 
