@@ -61,6 +61,8 @@
 - (id)checkForNull:(id)value;
 - (void)updateDevicegroup:(Devicegroup	 *)devicegroup;
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
+- (bool)checkDevicegroupName:(NSString *)name;
+- (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName;
 - (Project *)getParentProject:(Devicegroup *)devicegroup;
 - (NSDate *)convertTimestring:(NSString *)dateString;
 - (NSString *)convertDate:(NSDate *)date;

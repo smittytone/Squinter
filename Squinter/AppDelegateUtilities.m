@@ -835,6 +835,61 @@
 
 
 
+- (bool)checkDevicegroupName:(NSString *)name
+{
+    // Determine whether the supplied device group name is already taken within
+    // the current project. The API allows groups to have the same name, but saving
+    // files (ie. the OS) does not
+
+    if (currentProject != nil)
+    {
+        if (currentProject.devicegroups.count > 0)
+        {
+            for (Devicegroup *dg in currentProject.devicegroups)
+            {
+                if ([name compare:dg.name] == NSOrderedSame) return YES;
+            }
+        }
+    }
+
+    return NO;
+}
+
+
+
+- (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName
+{
+    if (currentProject.devicegroups.count > 0)
+    {
+        for (Devicegroup *adg in currentProject.devicegroups)
+        {
+            if (byDevicegroup != nil && orName == nil)
+            {
+                // Caller has passed just a project
+
+                if ([byDevicegroup.name compare:adg.name] == NSOrderedSame) return YES;
+            }
+            else if (byDevicegroup == nil && orName != nil)
+            {
+                // Caller has passed just a name string
+
+                if ([orName compare:adg.name] == NSOrderedSame) return YES;
+            }
+            else
+            {
+                // Caller has passed a project AND a name, that if the name matches
+                // on projects that are NOT the passed one
+
+                if ([orName compare:adg.name] == NSOrderedSame && byDevicegroup != adg) return YES;
+            }
+        }
+    }
+
+    return NO;
+}
+
+
+
 - (Project *)getParentProject:(Devicegroup *)devicegroup
 {
     // Iterate through the open projects and return the project to which
