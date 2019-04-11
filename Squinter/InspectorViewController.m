@@ -1272,9 +1272,11 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back
 {
-    NSArray *dgtypes = @[ @"production_devicegroup", @"factoryfixture_devicegroup", @"development_devicegroup",
-                          @"pre_factoryfixture_devicegroup", @"pre_production_devicegroup"];
-    NSArray *dgnames = @[ @"Production", @"Factory Fixture", @"Development", @"Factory Test", @"Production Test"];
+    NSArray *dgtypes = @[ @"development_devicegroup", @"dut_devicegroup", @"production_devicegroup",
+                          @"factoryfixture_devicegroup", @"pre_factoryfixture_devicegroup",
+                          @"pre_dut_devicegroup", @"pre_production_devicegroup"];
+    NSArray *dgnames = @[ @"Development", @"DUT", @"Production", @"Fixture", @"Test Fixture",
+                          @"Test DUT", @"Test Production"];
 
     for (NSUInteger i = 0 ; i < dgtypes.count ; ++i)
     {
