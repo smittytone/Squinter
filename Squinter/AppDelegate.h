@@ -554,7 +554,6 @@
 - (void)checkFiles:(File *)file :(NSString *)oldPath :(NSString *)type :(Devicegroup *)devicegroup :(BOOL)projectMoved;
 - (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
 - (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orName;
-- (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName;
 - (IBAction)selectFile:(id)sender;
 - (IBAction)newDevicegroupCheckboxHander:(id)sender;
 - (void)processAddedFiles:(NSMutableArray *)urls;
