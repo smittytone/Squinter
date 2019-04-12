@@ -2717,6 +2717,22 @@
                 Devicegroup *newdg = [[Devicegroup alloc] init];
                 newdg.did = [dg objectForKey:@"id"];
                 newdg.name = [self getValueFrom:dg withKey:@"name"];
+
+                bool got = YES;
+                NSUInteger count = 0;
+                NSString *newName = newdg.name;
+
+                do
+                {
+                    got = [self checkDevicegroupName:newName];
+
+                    if (got) {
+                        count++;
+                        newName = [newName stringByAppendingFormat:@" %00li", (long)count];
+                    }
+                }
+                while (got);
+
                 newdg.type = [self getValueFrom:dg withKey:@"type"];
                 newdg.description = [self getValueFrom:dg withKey:@"description"];
                 newdg.data = [NSMutableDictionary dictionaryWithDictionary:dg];
@@ -6796,39 +6812,6 @@
 
 
 
-- (BOOL)checkDevicegroupNames:(Devicegroup *)byDevicegroup :(NSString *)orName
-{
-    if (currentProject.devicegroups.count > 0)
-    {
-        for (Devicegroup *adg in currentProject.devicegroups)
-        {
-            if (byDevicegroup != nil && orName == nil)
-            {
-                // Caller has passed just a project
-
-                if ([byDevicegroup.name compare:adg.name] == NSOrderedSame) return YES;
-            }
-            else if (byDevicegroup == nil && orName != nil)
-            {
-                // Caller has passed just a name string
-
-                if ([orName compare:adg.name] == NSOrderedSame) return YES;
-            }
-            else
-            {
-                // Caller has passed a project AND a name, that if the name matches
-                // on projects that are NOT the passed one
-
-                if ([orName compare:adg.name] == NSOrderedSame && byDevicegroup != adg) return YES;
-            }
-        }
-    }
-
-    return NO;
-}
-
-
-
 #pragma mark Add files to Device Groups
 
 
@@ -6841,6 +6824,14 @@
     if (currentProject == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
+        return;
+    }
+
+    // FROM 2.3.128
+    // Make sure we have a path for the current project. If not, ask the user to save the project first
+    if (currentProject.path == nil || currentProject.path.length == 0)
+    {
+        [self unsavedAlert:currentProject.name :@"adding source code files to its device groups" :_window];
         return;
     }
 
@@ -7606,10 +7597,8 @@
     {
         // The file does exist - this will be dealt with in the next section
 
-        /*
         path = [path stringByAppendingString:@".new"];
         [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" exists in chosen location - renaming file \"%@.new\".", file.filename, file.filename] :YES];
-        */
     }
 
     if (success)
@@ -7665,6 +7654,13 @@
              Model *file = [files firstObject];
              file.path = [[saveProjectDialog directoryURL] absoluteString];
              file.filename = [saveProjectDialog nameFieldStringValue];
+         }
+         else
+         {
+             // Handle cancel - do we cancel all saves, or just the current one?
+             // Just the current one for now
+
+             [files removeObjectAtIndex:0];
          }
 
          // Re-call 'saveFiles:' in order to actually save the file
@@ -8354,6 +8350,8 @@
                     newDevicegroup.data = [NSMutableDictionary dictionaryWithDictionary:devicegroup];
                     [newProject.devicegroups addObject:newDevicegroup];
 
+                    // Get the ID of the group's current deployemnt
+
                     NSDictionary *cd = [self getValueFrom:devicegroup withKey:@"current_deployment"];
 
                     if (cd != nil)
@@ -8386,6 +8384,17 @@
                         // Can't proceed so decrement the tally of downloadable device groups and move on
 
                         --newProject.count;
+
+                        // FROM 2.3.182
+                        // Get all the deployments for the device group so we can grab the latest one
+
+                        NSDictionary *dict = @{ @"action" : action,
+                                                @"devicegroup" : newDevicegroup,
+                                                @"project" : newProject };
+
+                         [ide getDeploymentsWithFilter:@"devicegroup.id" :newDevicegroup.did :dict];
+
+                        // Get deployments for this device group. Pick up at 'listCommits:'
                     }
 
                     // NOTE if 'cd' or 'dpid' is nil, the device group has no current deployment
@@ -8444,6 +8453,78 @@
     {
         [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (productToProjectStageTwo:)"] :YES];
     }
+}
+
+
+
+- (void)getCurrentDeployment:(NSDictionary *)data
+{
+    NSDictionary *source = [data objectForKey:@"object"];
+    Project *project = [source objectForKey:@"project"];
+    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+    NSMutableArray *deployments = [data objectForKey:@"data"];
+
+    if (deployments != nil && deployments.count > 0)
+    {
+        NSString *newest = @"";
+        NSDictionary *currentDeployment = nil;
+
+        for (NSDictionary *deployment in deployments)
+        {
+            NSString *date = [self getValueFrom:deployment withKey:@"updated_at"];
+            if (date == nil) date = [self getValueFrom:deployment withKey:@"created_at"];
+
+            if ([date compare:newest] == NSOrderedDescending)
+            {
+                newest = date;
+                currentDeployment = deployment;
+            }
+        }
+
+        if (currentDeployment != nil)
+        {
+            // Process deployment
+
+            if (devicegroup.models == nil) devicegroup.models = [[NSMutableArray alloc] init];
+
+            Model *model;
+            NSString *code = [self getValueFrom:currentDeployment withKey:@"device_code"];
+
+            if (code != nil)
+            {
+                model = [[Model alloc] init];
+                model.type = @"device";
+                model.squinted = NO;
+                model.code = code;
+                model.path = project.path;
+                model.filename = @"UNSAVED";
+                model.sha = [self getValueFrom:currentDeployment withKey:@"sha"];
+                model.updated = [self getValueFrom:currentDeployment withKey:@"updated_at"];
+                if (model.updated == nil) model.updated = [self getValueFrom:currentDeployment withKey:@"created_at"];
+                [devicegroup.models addObject:model];
+            }
+
+            code = [self getValueFrom:currentDeployment withKey:@"agent_code"];
+
+            if (code != nil)
+            {
+                model = [[Model alloc] init];
+                model.type = @"agent";
+                model.squinted = NO;
+                model.code = code;
+                model.path = project.path;
+                model.filename = @"UNSAVED";
+                model.sha = [self getValueFrom:currentDeployment withKey:@"sha"];
+                model.updated = [self getValueFrom:currentDeployment withKey:@"updated_at"];
+                if (model.updated == nil) model.updated = [self getValueFrom:currentDeployment withKey:@"created_at"];
+                [devicegroup.models addObject:model];
+            }
+        }
+    }
+
+    --project.count;
+
+    if (project.count == 0) [self productToProjectStageFour:project];
 }
 
 
@@ -8654,6 +8735,7 @@
     // This method is called by productToProjectStageThree: in order to
     // clean up after downloading the product
 
+    project.count = 999;
     project.haschanged = YES;
     project.filename = [project.name stringByAppendingString:@".squirrelproj"];
     
@@ -9058,6 +9140,13 @@
             NSString *newName = [self getValueFrom:response withKey:@"name"];
             NSString *newDesc = [self getValueFrom:response withKey:@"description"];
 
+            // FROM 2.3.128
+            // Store retrieved type (may have been changed BuildAPIAccess
+
+            devicegroup.type = [self getValueFrom:response withKey:@"type"];
+
+            // Update name and description as required
+            
             if (newName != nil && [newName compare:devicegroup.name] != NSOrderedSame)
             {
                 // If the name has changed, report it
@@ -10123,6 +10212,12 @@
     if (action != nil && [action compare:@"getcommits"] == NSOrderedSame)
     {
         cwvc.commits = deployments;
+        return;
+    }
+
+    if (action != nil && [action compare:@"downloadproduct"] == NSOrderedSame)
+    {
+        [self getCurrentDeployment:data];
         return;
     }
 
@@ -11793,6 +11888,14 @@
     // This method is a hangover from a previous version.
     // Now it simply calls the version which replaces it.
     // NOTE 'compile:' is in AppDelegateSquinting.m
+
+    // FROM 2.3.128
+    // Make sure we have a path for the current project. If not, ask the user to save the project first
+    if (currentProject.path == nil || currentProject.path.length == 0)
+    {
+        [self unsavedAlert:currentProject.name :@"compiling device groups’ source code" :_window];
+        return;
+    }
 
     [self compile:currentDevicegroup :NO];
 }
