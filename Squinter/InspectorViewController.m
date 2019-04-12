@@ -215,7 +215,7 @@
         node = [[TreeNode alloc] init];
         node.key = @"Path";
 
-        if (project.path != nil)
+        if (project.path != nil && project.path.length > 0)
         {
             node.value = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
             node.flag = YES;
@@ -297,7 +297,7 @@
                         
                         // FROM 2.3.128 Check for unsaved model files
                         
-                        if ([model.filename compare:@"UNSAVED"] == NSOrderedSame)
+                        if ([model.filename compare:@"UNSAVED"] == NSOrderedSame || model.path.length == 0)
                         {
                             node.value = @"Model file not yet saved";
                         }
@@ -355,7 +355,16 @@
 
                                 node = [[TreeNode alloc] init];
                                 node.key = [NSString stringWithFormat:@"Library %li", (long)libcount];
-                                node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename];
+
+                                if (project.path == nil || project.path.length == 0)
+                                {
+                                    node.value = [library.path stringByAppendingFormat:@"/%@", library.filename];
+                                }
+                                else
+                                {
+                                    node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename];
+                                }
+
                                 node.flag = YES;
                                 [pnode.children addObject:node];
 
@@ -387,7 +396,17 @@
 
                                 node = [[TreeNode alloc] init];
                                 node.key = [NSString stringWithFormat:@"File %li", (long)filecount];
-                                node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename];
+
+                                if (project.path == nil || project.path.length == 0)
+                                {
+                                    node.value = [file.path stringByAppendingFormat:@"/%@", file.filename];
+                                }
+                                else
+                                {
+                                    node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename];
+                                }
+
+
                                 node.flag = YES;
                                 [pnode.children addObject:node];
 
