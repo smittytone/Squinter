@@ -1174,6 +1174,9 @@
 
 
 
+#pragma mark - Alert Methods
+
+
 - (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow
 {
     [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
@@ -1200,6 +1203,18 @@
     alert.informativeText = body;
     [alert addButtonWithTitle:@"OK"];
     [alert beginSheetModalForWindow:sheetWindow completionHandler:nil];
+}
+
+
+- (void)unsavedAlert:(NSString *)name :(NSString *)message :(NSWindow *)sheetWindow
+{
+    // FROM 2.3.128
+    // Display a warning if the project is unsaved
+    
+    NSString *head= [NSString stringWithFormat:@"Project “%@” has not been saved", name];
+    NSString *msg = [NSString stringWithFormat:@"Please save this project before %@.", message];
+    [self accountAlert:head :msg :sheetWindow];
+
 }
 
 

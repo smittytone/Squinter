@@ -76,9 +76,12 @@
 - (NSString *)getCloudName:(NSInteger)cloudCode;
 - (NSString *)recodeLogTags:(NSString *)string;
 - (BOOL)isCorrectAccount:(Project *)project;
+
+// Alert Methods
+
 - (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow;
 - (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow;
 - (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow;
-
+- (void)unsavedAlert:(NSString *)name :(NSString *)message :(NSWindow *)sheetWindow;
 
 @end
