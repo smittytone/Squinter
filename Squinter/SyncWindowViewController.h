@@ -14,6 +14,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
+// This view controller manages the panel we present to present a list of device groups
+// which have been identifide during a sync operation as missing from the server or
+// missing locally.
+
 @interface SyncWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
 {
     IBOutlet NSTableView *syncTable;

@@ -11,6 +11,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 // ADDED IN 2.2.127
+// This view controller manages the panel we show to allow users to look up
+// devices by their MAC address or ID.
+
 @interface DeviceLookupWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate>
 {
     IBOutlet NSTableView *deviceTable;

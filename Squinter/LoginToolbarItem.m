@@ -47,6 +47,46 @@
 
 
 
+- (void)validate
+{
+    // Set the toolbar item image name according to whether the app is foregrounded or not,
+    // and whether the user is currently logged in ('Login') or not ('Logout') and update
+    // the item's label while we're at it
+    
+    if (isForeground)
+    {
+        // App in foreground, so draw in green
+        
+        if (!isLoggedIn)
+        {
+            [self setImage:[NSImage imageNamed:activeLoginImageName]];
+            self.label = @"In";
+        }
+        else
+        {
+            [self setImage:[NSImage imageNamed:activeLogoutImageName]];
+            self.label = @"Out";
+        }
+    }
+    else
+    {
+        // App in background, draw in grey
+        
+        if (!isLoggedIn)
+        {
+            [self setImage:[NSImage imageNamed:inactiveLoginImageName]];
+            self.label = @"In";
+        }
+        else
+        {
+            [self setImage:[NSImage imageNamed:inactiveLogoutImageName]];
+            self.label = @"Out";
+        }
+    }
+}
+
+
+
 - (void)appWillBecomeActive
 {
     // App is entering the background to set the toolbar item image to green
@@ -63,46 +103,6 @@
     
     isForeground = NO;
     [self validate];
-}
-
-
-
-- (void)validate
-{
-    // Set the toolbar item image name according to whether the app is foregrounded or not,
-    // and whether the user is currently logged in ('Login') or not ('Logout') and update
-    // the item's label while we're at it
-    
-    if (isForeground)
-    {
-        // App in foreground, so draw in green
-
-        if (!isLoggedIn)
-        {
-            [self setImage:[NSImage imageNamed:activeLoginImageName]];
-            self.label = @"In";
-        }
-        else
-        {
-            [self setImage:[NSImage imageNamed:activeLogoutImageName]];
-            self.label = @"Out";
-        }
-    }
-    else
-    {
-        // App in background, draw in grey
-
-        if (!isLoggedIn)
-        {
-            [self setImage:[NSImage imageNamed:inactiveLoginImageName]];
-            self.label = @"In";
-        }
-        else
-        {
-            [self setImage:[NSImage imageNamed:inactiveLogoutImageName]];
-            self.label = @"Out";
-        }
-    }
 }
 
 

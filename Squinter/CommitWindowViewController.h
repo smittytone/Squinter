@@ -8,6 +8,9 @@
 #import "Devicegroup.h"
 
 
+// This view controller manages the panel we present to present a downloaded
+// list of commits made to a devicegroup (specified by property)
+
 @interface CommitWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
 {
     IBOutlet NSTableView *commitTable;
@@ -20,9 +23,9 @@
 }
 
 
-- (IBAction)checkMinimum:(id)sender;
-- (void)setCommits:(NSArray *)input;
 - (void)prepSheet;
+- (void)setCommits:(NSArray *)input;
+- (IBAction)checkMinimum:(id)sender;
 
 
 @property (nonatomic, weak, setter=setCommits:) NSArray *commits;

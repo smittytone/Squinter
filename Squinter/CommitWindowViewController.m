@@ -86,13 +86,13 @@
     // A deployment/commit's checkbox has been clicked, so unclick all the others
     // and record which one is to be marked as the selectee
     
-    NSButton *aSender = (NSButton *)sender;
+    NSButton *theSender = (NSButton *)sender;
 
     for (NSUInteger i = 0 ; i < commitTable.numberOfRows ; ++i)
     {
         CommitTableCellView *cellView = [commitTable viewAtColumn:0 row:i makeIfNecessary:NO];
 
-        if (aSender != cellView.minimumCheckbox)
+        if (theSender != cellView.minimumCheckbox)
         {
             // Uncheck the checkbox
             

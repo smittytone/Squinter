@@ -44,17 +44,17 @@
 
 - (IBAction)checkSyncTarget:(id)sender
 {
-    // When a table entry's checkbox is clicked, we come here
+    // Called when a table entry's checkbox is clicked 
     // to add (or remove) the indexed device group's indes to (or from)
     // the list of selected items ('selectedGroup')
 
-    NSButton *aSender = (NSButton *)sender;
+    NSButton *theSender = (NSButton *)sender;
 
     for (NSUInteger i = 0 ; i < syncTable.numberOfRows ; ++i)
     {
         CommitTableCellView *cellView = [syncTable viewAtColumn:0 row:i makeIfNecessary:NO];
 
-        if (aSender == cellView.minimumCheckbox)
+        if (theSender == cellView.minimumCheckbox)
         {
             if (cellView.minimumCheckbox.state == NSOnState)
             {

@@ -74,6 +74,7 @@
 }
 
 
+
 - (void)show
 {
     // Show the StatusLight, ie. a project is loaded
@@ -89,6 +90,7 @@
     
     [self setLight:NO];
 }
+
 
 
 - (void)setLight:(BOOL)onOrOff

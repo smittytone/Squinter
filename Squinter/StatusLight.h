@@ -14,11 +14,10 @@
 }
 
 
+- (void)needSave:(BOOL)yesOrNo;
 - (void)show;
 - (void)hide;
 - (void)setLight:(BOOL)onOrOff;
-
-- (void)needSave:(BOOL)yesOrNo;
 - (void)setFull:(BOOL)fullOrOutline;
 
 - (void)appWillBecomeActive;

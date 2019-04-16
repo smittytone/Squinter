@@ -44,6 +44,15 @@
 
 
 
+-(void)validate
+{
+    // Set the toolbar item image name according to whether the app is foregrounded or not
+    
+    [self setImage:[NSImage imageNamed:(isForeground ? activeImageName : inactiveImageName)]];
+}
+
+
+
 - (void)appWillBecomeActive
 {
     // App is entering the background to set the toolbar item image to green
@@ -60,15 +69,6 @@
     
     isForeground = NO;
     [self validate];
-}
-
-
-
--(void)validate
-{
-	// Set the toolbar item image name according to whether the app is foregrounded or not
-    
-    [self setImage:[NSImage imageNamed:(isForeground ? activeImageName : inactiveImageName)]];
 }
 
 

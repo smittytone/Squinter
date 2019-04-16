@@ -49,6 +49,48 @@
 
 
 
+- (void)validate
+{
+    // Set the toolbar item image name according to whether the app is foregrounded or not,
+    // and whether the current device is logging ('on'), not logging ('off') or
+    // changing logging state ('mid')
+    
+    if (isForeground)
+    {
+        switch (state)
+        {
+            case kStreamToolbarItemStateOff:
+                [self setImage:[NSImage imageNamed:offImageName]];
+                break;
+                
+            case kStreamToolbarItemStateMid:
+                [self setImage:[NSImage imageNamed:midImageName]];
+                break;
+                
+            default:
+                [self setImage:[NSImage imageNamed:onImageName]];
+        }
+    }
+    else
+    {
+        switch (state)
+        {
+            case kStreamToolbarItemStateOff:
+                [self setImage:[NSImage imageNamed:offImageNameGrey]];
+                break;
+                
+            case kStreamToolbarItemStateMid:
+                [self setImage:[NSImage imageNamed:midImageNameGrey]];
+                break;
+                
+            default:
+                [self setImage:[NSImage imageNamed:onImageNameGrey]];
+        }
+    }
+}
+
+
+
 - (void)appWillBecomeActive
 {
     // App is entering the background to set the toolbar item image to green
@@ -65,48 +107,6 @@
     
     isForeground = NO;
     [self validate];
-}
-
-
-
-- (void)validate
-{
-    // Set the toolbar item image name according to whether the app is foregrounded or not,
-    // and whether the current device is logging ('on'), not logging ('off') or
-    // changing logging state ('mid')
-    
-    if (isForeground)
-    {
-        switch (state)
-        {
-            case kStreamToolbarItemStateOff:
-                [self setImage:[NSImage imageNamed:offImageName]];
-                break;
-
-            case kStreamToolbarItemStateMid:
-                [self setImage:[NSImage imageNamed:midImageName]];
-                break;
-
-            default:
-                [self setImage:[NSImage imageNamed:onImageName]];
-        }
-    }
-    else
-    {
-        switch (state)
-        {
-            case kStreamToolbarItemStateOff:
-                [self setImage:[NSImage imageNamed:offImageNameGrey]];
-                break;
-
-            case kStreamToolbarItemStateMid:
-                [self setImage:[NSImage imageNamed:midImageNameGrey]];
-                break;
-
-            default:
-                [self setImage:[NSImage imageNamed:onImageNameGrey]];
-        }
-    }
 }
 
 

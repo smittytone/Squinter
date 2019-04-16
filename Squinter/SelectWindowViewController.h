@@ -11,6 +11,9 @@
 #import "Project.h"
 
 
+// This view controller manages the panel we present to select a device group,
+// eg. the targets of a (Test) Fixture Device Group
+
 @interface SelectWindowViewController : NSViewController <NSTableViewDelegate, NSTableViewDataSource>
 {
 	IBOutlet NSTableView *selectTable;
@@ -20,8 +23,8 @@
 }
 
 
-- (IBAction)checkGroup:(id)sender;
 - (void)prepSheet;
+- (IBAction)checkGroup:(id)sender;
 
 
 @property (nonatomic, strong) Project *project;

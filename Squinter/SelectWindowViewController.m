@@ -28,9 +28,14 @@
     NSString *targetAPIType;
     NSString *targetAPIName = @"ERROR";
     
+    // FROM 2.3.128
+    // Add 'targetType' property and code to update the UI depending on its value,
+    // which is the type of target device group being selected
+    
     if (targetType == kTargetDeviceGroupTypeNone)
     {
         // This should never come up, but just in case...
+        
         selectLabel.stringValue = @"ERROR - Please contact the developer";
         return;
     }
@@ -68,6 +73,8 @@
 	}
     else
     {
+        // This should never come up, but just in case...
+        
         selectLabel.stringValue = @"ERROR - Please contact the developer";
         return;
     }
@@ -84,7 +91,9 @@
 
 - (IBAction)checkGroup:(id)sender
 {
-	NSButton *aSender = (NSButton *)sender;
+	// Called when the user clicks on a checkbox in the table view
+    
+    NSButton *theSender = (NSButton *)sender;
 
 	// Turn off all the other checkboxes by iterating through the list of table rows
 	// and seeing which rows don't match the sender
@@ -95,7 +104,7 @@
 	{
 		CommitTableCellView *cellView = [selectTable viewAtColumn:0 row:i makeIfNecessary:NO];
 
-		if (aSender != cellView.minimumCheckbox)
+		if (theSender != cellView.minimumCheckbox)
 		{
 			cellView.minimumCheckbox.state = NSOffState;
             count++;
