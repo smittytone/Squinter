@@ -279,7 +279,7 @@
                     }
                     
                     node = [[TreeNode alloc] init];
-                    node.key = @"Prod. Target";
+                    node.key = @"Production Target";
                     targetID = [devicegroup.data valueForKeyPath:@"relationships.production_target.id"];
                     adg = [self getDevicegroupWithID:targetID];
                     
