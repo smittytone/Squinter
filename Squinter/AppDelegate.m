@@ -268,7 +268,8 @@
 
     // Set up Key and Value arrays as template for Defaults
 
-    NSArray *keyArray = [NSArray arrayWithObjects:@"com.bps.squinter.workingdirectory",
+    NSArray *keyArray = [NSArray arrayWithObjects:
+                         @"com.bps.squinter.workingdirectory",
                          @"com.bps.squinter.windowsize",
                          @"com.bps.squinter.preservews",
                          @"com.bps.squinter.autocompile",
@@ -318,7 +319,8 @@
                          @"com.bps.squinter.inspectorshow",     // New in 2.2.126
                          nil];
 
-    NSArray *objectArray = [NSArray arrayWithObjects:workingDirectory,
+    NSArray *objectArray = [NSArray arrayWithObjects:
+                            workingDirectory,
                             [NSString stringWithString:NSStringFromRect(_window.frame)],
                             [NSNumber numberWithBool:NO],
                             [NSNumber numberWithBool:NO],
@@ -706,6 +708,13 @@
 
     if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
     iwvc.projectArray = projectArray;
+    
+    // FROM 2.3.128
+    // Pass the path display mode to the Inspector
+    
+    NSNumber *num = [defaults objectForKey:@"com.bps.squinter.displaypath"];
+    iwvc.pathType = num.integerValue;
+    
 }
 
 
@@ -13939,7 +13948,7 @@
     updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
     showDeviceWarnigCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"]) ? NSOnState : NSOffState;
 
-    // Set location menu
+    // Set file location display mode menu
 
     [locationMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue]];
 
@@ -14135,6 +14144,11 @@
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
     [defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
     [defaults setBool:(showDeviceWarnigCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoselectdevice"];
+    
+    // FROM 2.3.128
+    
+    iwvc.pathType = locationMenu.indexOfSelectedItem;
+    if (currentProject != nil) iwvc.project = currentProject;
 
     // Set recent files count
 

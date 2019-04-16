@@ -12,7 +12,7 @@
 
 @implementation InspectorViewController
 
-@synthesize project, device, products, tabIndex, loggingDevices, projectArray;
+@synthesize project, device, products, tabIndex, loggingDevices, projectArray, pathType;
 
 
 #pragma mark - ViewController Methods
@@ -297,13 +297,13 @@
                         
                         // FROM 2.3.128 Check for unsaved model files
                         
-                        if ([model.filename compare:@"UNSAVED"] == NSOrderedSame || model.path.length == 0)
+                        if ([model.filename compare:@"UNSAVED"] == NSOrderedSame)
                         {
                             node.value = @"Model file not yet saved";
                         }
                         else
                         {
-                            node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :model.path], model.filename];
+                            node.value = [NSString stringWithFormat:@"%@/%@", [self getDisplayPath:model.path], model.filename];
                             node.flag = YES;
                         }
                         
@@ -362,7 +362,7 @@
                                 }
                                 else
                                 {
-                                    node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :library.path], library.filename];
+                                    node.value = [NSString stringWithFormat:@"%@/%@", [self getDisplayPath:library.path], library.filename];
                                 }
 
                                 node.flag = YES;
@@ -403,7 +403,7 @@
                                 }
                                 else
                                 {
-                                    node.value = [NSString stringWithFormat:@"%@/%@", [self getAbsolutePath:project.path :file.path], file.filename];
+                                    node.value = [NSString stringWithFormat:@"%@/%@", [self getDisplayPath:file.path], file.filename];
                                 }
 
 
@@ -1121,6 +1121,24 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
 
 #pragma mark - Path Manipulation Methods
+
+
+- (NSString *)getDisplayPath:(NSString *)path
+{
+    // ADDED IN 2.3.128
+    // Convert a path string to the format required by the user's preference
+    
+    if (pathType == 0) path = [self getAbsolutePath:project.path :path];
+    
+    if (pathType == 2)
+    {
+        path = [self getAbsolutePath:project.path :path];
+        path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[path stringByDeletingLastPathComponent]];
+    }
+    
+    return path;
+}
+
 
 
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath

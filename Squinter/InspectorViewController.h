@@ -39,6 +39,7 @@
 
 - (BOOL)isLinkRow:(TreeNode *)node;
 
+- (NSString *)getDisplayPath:(NSString *)path;
 - (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
@@ -57,6 +58,7 @@
 @property (nonatomic, strong) NSMutableArray *projectArray;
 @property (nonatomic, strong) NSMutableArray *loggingDevices;
 @property (nonatomic, readwrite) NSUInteger tabIndex;
+@property (nonatomic, readwrite) NSUInteger pathType;
 
 
 @end
