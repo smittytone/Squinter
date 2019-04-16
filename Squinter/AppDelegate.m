@@ -13278,8 +13278,20 @@
     // Sets a device's menu and/or popup icon according to the device's connection status
 
     NSString *imageNameString = @"";
-    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
     NSString *dvid = [self getValueFrom:device withKey:@"id"];
+    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
+    
+    // FROM 2.3.128
+    // Check 'boolean' isn't null, which it can be at certain times
+    // In this case, assume offline
+    
+    if ((NSNull *)boolean == [NSNull null])
+    {
+        boolean = [NSNumber numberWithBool:NO];
+#ifdef DEBUG
+    NSLog(@"Device %@ has no 'device_online' value", dvid);
+#endif
+    }
 
     imageNameString = boolean.boolValue ? @"online" : @"offline";
     if ([ide isDeviceLogging:dvid]) imageNameString = [imageNameString stringByAppendingString:@"_logging"];
