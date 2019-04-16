@@ -1797,7 +1797,7 @@
     currentProject = chosenProject;
     currentDevicegroup = (currentProject.devicegroupIndex != -1) ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
 
-    // If we have a current device group, select its device if it has one
+    // If we have a current device group, select its first device if it has one
 
     if (currentDevicegroup != nil)
     {
@@ -3772,7 +3772,8 @@
 {
     // Show a sheet listing suitable fixture device group targets
 
-    // ADDED 2.3.128 Pass across the type of device group that needs to be chosen as a target
+    // ADDED IN 2.3.128
+    // Pass across the type of device group that needs to be chosen as a target
     
     swvc.targetType = targetType;
     swvc.theNewDevicegroup = devicegroup;
