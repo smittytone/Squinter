@@ -6514,7 +6514,8 @@
                         // Update the device group data in case it has changed since the user last logged in
 
                         NSDictionary *dict = @{ @"action" : @"updatedevicegroup",
-                                                @"devicegroup" : devicegroup };
+                                                @"devicegroup" : devicegroup,
+                                                @"project": currentProject };
 
                         [ide getDevicegroup:devicegroup.did :dict];
 
@@ -9558,11 +9559,17 @@
 
             Devicegroup *dg = [source objectForKey:@"devicegroup"];
             dg.data = [NSMutableDictionary dictionaryWithDictionary:devicegroup];
-
+            
             NSDictionary *dict = [self getValueFrom:dg.data withKey:@"min_supported_deployment"];
             dg.mdid = [dict objectForKey:@"id"];
             dict = [self getValueFrom:dg.data withKey:@"current_deployment"];
             dg.cdid = [dict objectForKey:@"id"];
+            
+            // FROM 2.3.128
+            // Auto-update the Inspector with retrieved data
+            
+            Project *parent = [source objectForKey:@"project"];
+            if (parent == currentProject) iwvc.project = currentProject;
         }
         else if ([action compare:@"updatecode"] == NSOrderedSame)
         {

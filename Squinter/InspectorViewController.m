@@ -262,6 +262,33 @@
                 node.key = @"Type";
                 node.value = [self convertDevicegroupType:devicegroup.type :NO];
                 [pnode.children addObject:node];
+                
+                // Device Group x Targets, if relevant
+                
+                if (devicegroup.data != nil && [node.value containsString:@"ixture"])
+                {
+                    node = [[TreeNode alloc] init];
+                    node.key = @"DUT Target";
+                    NSString *targetID = [devicegroup.data valueForKeyPath:@"relationships.dut_target.id"];
+                    Devicegroup *adg = [self getDevicegroupWithID:targetID];
+                    
+                    if (adg != nil)
+                    {
+                        node.value = adg.name;
+                        [pnode.children addObject:node];
+                    }
+                    
+                    node = [[TreeNode alloc] init];
+                    node.key = @"Prod. Target";
+                    targetID = [devicegroup.data valueForKeyPath:@"relationships.production_target.id"];
+                    adg = [self getDevicegroupWithID:targetID];
+                    
+                    if (adg != nil)
+                    {
+                        node.value = adg.name;
+                        [pnode.children addObject:node];
+                    }
+                }
 
                 // Device Group x Description
 
@@ -1136,6 +1163,8 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
         path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[path stringByDeletingLastPathComponent]];
     }
     
+    // Path to be shown relative to project ('pathType' is 1) is just the stored path
+    
     return path;
 }
 
@@ -1305,6 +1334,24 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
 
 #pragma mark - Utility Methods
+
+
+- (Devicegroup *)getDevicegroupWithID:(NSString *)dgID
+{
+    // FROM 2.3.128
+    // Return the project's device group with the supplied ID
+    
+    if (project.devicegroups.count > 0)
+    {
+        for (Devicegroup *adg in project.devicegroups)
+        {
+            if ([adg.did compare:dgID] == NSOrderedSame) return adg;
+        }
+    }
+    
+    return nil;
+}
+
 
 
 - (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back

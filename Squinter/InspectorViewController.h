@@ -44,12 +44,15 @@
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
 - (NSInteger)numberOfFoldersInPath:(NSString *)path;
-- (CGFloat)renderedHeightOfString:(NSString *)string;
-- (IBAction)switchTable:(id)sender;
 
+- (Devicegroup *)getDevicegroupWithID:(NSString *)dgID;
+- (NSString *)convertDevicegroupType:(NSString *)type :(BOOL)back;
 - (void)setNilProject;
 - (void)setNilDevice;
 - (void)showNilItems:(BOOL)shouldShow;
+
+- (CGFloat)renderedHeightOfString:(NSString *)string;
+- (IBAction)switchTable:(id)sender;
 
 
 @property (nonatomic, strong, setter=setProject:) Project *project;
