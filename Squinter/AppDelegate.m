@@ -9135,7 +9135,7 @@
     // This method should ONLY be called by the BuildAPIAccess object instance AFTER updating a device group
 
     NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *response = [data objectForKey:@"data"];
+    NSDictionary *rawGroupData = [data objectForKey:@"data"];
     NSDictionary *source = [data objectForKey:@"object"];
     NSString *action = [source objectForKey:@"action"];
     Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
@@ -9148,13 +9148,14 @@
     {
         if ([action compare:@"devicegroupchanged"] == NSOrderedSame)
         {
-            NSString *newName = [self getValueFrom:response withKey:@"name"];
-            NSString *newDesc = [self getValueFrom:response withKey:@"description"];
-
+            NSString *newName = [self getValueFrom:rawGroupData withKey:@"name"];
+            NSString *newDesc = [self getValueFrom:rawGroupData withKey:@"description"];
+            devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawGroupData];
+            
             // FROM 2.3.128
             // Store retrieved type (may have been changed BuildAPIAccess
 
-            devicegroup.type = [self getValueFrom:response withKey:@"type"];
+            devicegroup.type = [self getValueFrom:rawGroupData withKey:@"type"];
 
             // Update name and description as required
             
@@ -9346,24 +9347,25 @@
     // source files creating
     
     NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *response = [data objectForKey:@"data"];
+    NSDictionary *rawGroupData = [data objectForKey:@"data"];
     NSDictionary *source = [data objectForKey:@"object"];
     NSNumber *makeNewFiles = [source objectForKey:@"files"];
     Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
     Project *project = [source objectForKey:@"project"];
     NSString *action = [source objectForKey:@"action"];
     
-    // Record the new device group's ID
-    
-    devicegroup.did = [response objectForKey:@"id"];
-    
     if (action != nil)
     {
+        // Record the new device group's ID and its API record
+        
+        devicegroup.did = [rawGroupData objectForKey:@"id"];
+        devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawGroupData];
+        
         if ([action compare:@"newdevicegroup"] == NSOrderedSame)
         {
             if (newDevicegroupFlag)
             {
-                // We are adding a device group for newly added file, so go and process those files
+                // We are adding a device group for newly added files, so go and process those files
                 // and proceed no further here
                 
                 [self processAddedFiles:saveUrls];
@@ -9411,10 +9413,6 @@
             // We're here after creating a device group as part of a project upload
             // Once all the parts have been uploaded, we move on to upload the code
             // via 'uploadProjectStageThree:'
-            
-            // Record the new device group ID
-            
-            devicegroup.did = [response objectForKey:@"id"];
             
             // FROM 2.3.128
             // We also come here after a project sync devicegroup upload
@@ -10226,115 +10224,129 @@
     __block Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
     __block NSMutableArray *deployments = [data objectForKey:@"data"];
 
-    if (action != nil && [action compare:@"getcommits"] == NSOrderedSame)
+    if (action != nil)
     {
-        cwvc.commits = deployments;
-        return;
-    }
+        if ([action compare:@"getcommits"] == NSOrderedSame)
+        {
+            cwvc.commits = deployments;
+            return;
+        }
 
-    if (action != nil && [action compare:@"downloadproduct"] == NSOrderedSame)
-    {
-        [self getCurrentDeployment:data];
-        return;
-    }
 
-    devicegroup.history = deployments;
+        if ([action compare:@"downloadproduct"] == NSOrderedSame)
+        {
+            [self getCurrentDeployment:data];
+            return;
+        }
+        
+        // Assume from this point, action is "listcommits"
+        
+        devicegroup.history = deployments;
 
-    if (deployments.count > 0)
-    {
-        [extraOpQueue addOperationWithBlock:^(void){
+        if (deployments.count > 0)
+        {
+            [extraOpQueue addOperationWithBlock:^(void){
 
-            /* NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
-
-            [self performSelectorOnMainThread:@selector(logLogs:)
-                                   withObject:lineString
-                                waitUntilDone:NO];
-             */
-
-            NSString *headString = [NSString stringWithFormat:@"Most recent commits to Device Group \"%@\":", devicegroup.name];
-
-            [self performSelectorOnMainThread:@selector(logLogs:)
-                                   withObject:headString
-                                waitUntilDone:NO];
-
-            NSDictionary *min = [self getValueFrom:devicegroup.data withKey:@"min_supported_deployment"];
-            NSString *mid = min != nil ? [min objectForKey:@"id"] : @"";
-
-            NSDictionary *cur = [self getValueFrom:devicegroup.data withKey:@"current_deployment"];
-            NSString *cid = cur != nil ? [cur objectForKey:@"id"] : @"";
-
-            for (NSUInteger i = deployments.count ; i > 0 ; --i)
-            {
-                NSDictionary *deployment = [deployments objectAtIndex:(i - 1)];
-                NSString *sha = [self getValueFrom:deployment withKey:@"sha"];
-                NSString *message = [self getValueFrom:deployment withKey:@"description"];
-                NSString *timestamp = [self formatTimestamp:[self getValueFrom:deployment withKey:@"created_at"]];
-                NSString *origin = [self getValueFrom:deployment withKey:@"origin"];
-                NSArray *tags = [self getValueFrom:deployment withKey:@"tags"];
-                NSString *tagString = @"";
-
-                if (tags != nil && tags.count > 0)
-                {
-                    // List tags out separted by commas
-
-                    for (NSString *tag in tags) tagString = [tagString stringByAppendingFormat:@"%@, ", tag];
-                    tagString = [tagString substringToIndex:tagString.length - 2];
-                }
-
-                NSString *ns = [NSString stringWithFormat:@"%03lu. ", (deployments.count - i + 1)];
-                NSString *ss = [@"                               " substringToIndex:ns.length + 2];
-                NSString *cs;
-
-                if (message != nil && message.length > 0)
-                {
-                    cs = [NSString stringWithFormat:@"%@%@\n%@When: %@", ns, message, ss, timestamp];
-                }
-                else
-                {
-                    cs = [NSString stringWithFormat:@"%@When: %@", ns, timestamp];
-                }
-
-                if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
-                if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
-                if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
-
-                // Record whether the current entry is the min. supported deployment or the current
-
-                bool flag = NO;
-
-                if (mid.length > 0 || cid.length > 0)
-                {
-                    NSString *did = [deployment objectForKey:@"id"];
-                    if ([did compare:mid] == NSOrderedSame)
-                    {
-                        cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
-                        flag = YES;
-                    }
-
-                    if ([did compare:cid] == NSOrderedSame)
-                    {
-                        cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
-                        flag = YES;
-                    }
-                }
-
-                cs = [cs stringByAppendingString:@"\n"];
-
-                // Add a prefix to indicate min. supported deployment and/or current deployment
-
-                cs = flag ? [@"* " stringByAppendingString:cs] : [@"  " stringByAppendingString:cs];
+                /* NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
 
                 [self performSelectorOnMainThread:@selector(logLogs:)
-                                       withObject:cs
+                                       withObject:lineString
                                     waitUntilDone:NO];
-            }
+                 */
 
-            /*
-            [self performSelectorOnMainThread:@selector(logLogs:)
-                                   withObject:lineString
-                                waitUntilDone:NO];
-             */
-        }];
+                NSString *headString = [NSString stringWithFormat:@"Most recent commits to Device Group \"%@\":", devicegroup.name];
+
+                [self performSelectorOnMainThread:@selector(logLogs:)
+                                       withObject:headString
+                                    waitUntilDone:NO];
+
+                NSDictionary *min = [self getValueFrom:devicegroup.data withKey:@"min_supported_deployment"];
+                NSString *mid = min != nil ? [min objectForKey:@"id"] : @"";
+
+                NSDictionary *cur = [self getValueFrom:devicegroup.data withKey:@"current_deployment"];
+                NSString *cid = cur != nil ? [cur objectForKey:@"id"] : @"";
+
+                for (NSUInteger i = deployments.count ; i > 0 ; --i)
+                {
+                    NSDictionary *deployment = [deployments objectAtIndex:(i - 1)];
+                    NSString *sha = [self getValueFrom:deployment withKey:@"sha"];
+                    NSString *message = [self getValueFrom:deployment withKey:@"description"];
+                    NSString *timestamp = [self formatTimestamp:[self getValueFrom:deployment withKey:@"created_at"]];
+                    NSString *origin = [self getValueFrom:deployment withKey:@"origin"];
+                    NSArray *tags = [self getValueFrom:deployment withKey:@"tags"];
+                    NSString *tagString = @"";
+
+                    if (tags != nil && tags.count > 0)
+                    {
+                        // List tags out separted by commas
+
+                        for (NSString *tag in tags) tagString = [tagString stringByAppendingFormat:@"%@, ", tag];
+                        tagString = [tagString substringToIndex:tagString.length - 2];
+                    }
+
+                    NSString *ns = [NSString stringWithFormat:@"%03lu. ", (deployments.count - i + 1)];
+                    NSString *ss = [@"                               " substringToIndex:ns.length + 2];
+                    NSString *cs;
+
+                    if (message != nil && message.length > 0)
+                    {
+                        cs = [NSString stringWithFormat:@"%@%@\n%@When: %@", ns, message, ss, timestamp];
+                    }
+                    else
+                    {
+                        cs = [NSString stringWithFormat:@"%@When: %@", ns, timestamp];
+                    }
+
+                    if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
+                    if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
+                    if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
+
+                    // Record whether the current entry is the min. supported deployment or the current
+
+                    bool flag = NO;
+
+                    if (mid.length > 0 || cid.length > 0)
+                    {
+                        NSString *did = [deployment objectForKey:@"id"];
+                        if ([did compare:mid] == NSOrderedSame)
+                        {
+                            cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
+                            flag = YES;
+                        }
+
+                        if ([did compare:cid] == NSOrderedSame)
+                        {
+                            cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
+                            flag = YES;
+                        }
+                    }
+
+                    cs = [cs stringByAppendingString:@"\n"];
+
+                    // Add a prefix to indicate min. supported deployment and/or current deployment
+
+                    cs = flag ? [@"* " stringByAppendingString:cs] : [@"  " stringByAppendingString:cs];
+
+                    [self performSelectorOnMainThread:@selector(logLogs:)
+                                           withObject:cs
+                                        waitUntilDone:NO];
+                }
+
+                /*
+                [self performSelectorOnMainThread:@selector(logLogs:)
+                                       withObject:lineString
+                                    waitUntilDone:NO];
+                 */
+            }];
+        }
+        else
+        {
+            [self writeWarningToLog:[NSString stringWithFormat:@"No commits have yet been made to device group \"%@\".", devicegroup.name] :YES];
+        }
+    }
+    else
+    {
+        [self writeErrorToLog:[[self getErrorMessage:kErrorMessageMalformedOperation] stringByAppendingString:@" (listCommits:)"] :YES];
     }
 }
 
@@ -10524,7 +10536,7 @@
     {
         NSInteger index = -1;
         
-        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        for (NSInteger i = 0 ; i < loggedDevices.count ; ++i)
         {
             NSString *advid = [loggedDevices objectAtIndex:i];
             
