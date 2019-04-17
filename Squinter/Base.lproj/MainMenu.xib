@@ -828,7 +828,7 @@
                                     <action selector="renameDevice:" target="Voe-Tx-rLC" id="3OC-58-Pv0"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Look up a Device by ID/MAC..." keyEquivalent="F" id="we0-CG-fO9">
+                            <menuItem title="Find a Device..." keyEquivalent="F" id="we0-CG-fO9">
                                 <connections>
                                     <action selector="findDevice:" target="Voe-Tx-rLC" id="K95-7F-b5q"/>
                                 </connections>
@@ -4206,7 +4206,7 @@ Gw
                         <rect key="frame" x="20" y="61" width="572" height="218"/>
                         <clipView key="contentView" id="NWZ-vh-YNt">
                             <rect key="frame" x="1" y="1" width="570" height="216"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="20" viewBased="YES" floatsGroupRows="NO" id="bLn-Rm-uCb">
                                     <rect key="frame" x="0.0" y="0.0" width="570" height="216"/>
@@ -4730,13 +4730,13 @@ DQ
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" headerView="Ppk-wb-okh" viewBased="YES" floatsGroupRows="NO" id="mvc-Z9-FCn">
-                                    <rect key="frame" x="0.0" y="0.0" width="570" height="216"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="572" height="216"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn identifier="devicelookup_column_name" width="220" minWidth="220" maxWidth="220" id="rbH-yS-Tqb">
+                                        <tableColumn identifier="devicelookup_column_name" width="150" minWidth="150" maxWidth="150" id="rbH-yS-Tqb">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Device Name">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -4750,11 +4750,11 @@ DQ
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <prototypeCellViews>
                                                 <tableCellView identifier="devicelookup_cell_name" id="LsY-9R-SbN">
-                                                    <rect key="frame" x="1" y="1" width="220" height="17"/>
+                                                    <rect key="frame" x="1" y="1" width="150" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sed-ZC-PVh">
-                                                            <rect key="frame" x="0.0" y="0.0" width="220" height="17"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="150" height="17"/>
                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Table View Cell" usesSingleLineMode="YES" id="RKL-sL-K63">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -4773,7 +4773,7 @@ DQ
                                                 </tableCellView>
                                             </prototypeCellViews>
                                         </tableColumn>
-                                        <tableColumn identifier="devicelookup_column_id" width="170" minWidth="170" maxWidth="170" id="kTu-wo-zV3">
+                                        <tableColumn identifier="devicelookup_column_id" width="140" minWidth="140" maxWidth="140" id="kTu-wo-zV3">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Device ID">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -4787,11 +4787,11 @@ DQ
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <prototypeCellViews>
                                                 <tableCellView identifier="devicelookup_cell_id" id="hEb-SR-pA8">
-                                                    <rect key="frame" x="224" y="1" width="170" height="17"/>
+                                                    <rect key="frame" x="154" y="1" width="140" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gDO-zY-8JJ">
-                                                            <rect key="frame" x="0.0" y="0.0" width="170" height="17"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="140" height="17"/>
                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Table View Cell" usesSingleLineMode="YES" id="obO-Mt-Gvm">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -4810,7 +4810,7 @@ DQ
                                                 </tableCellView>
                                             </prototypeCellViews>
                                         </tableColumn>
-                                        <tableColumn identifier="devicelookup_column_mac" width="150" minWidth="150" maxWidth="3.4028234663852886e+38" id="nPt-GJ-JL4">
+                                        <tableColumn identifier="devicelookup_column_mac" width="140" minWidth="140" maxWidth="140" id="nPt-GJ-JL4">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Device MAC">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -4824,11 +4824,11 @@ DQ
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <prototypeCellViews>
                                                 <tableCellView identifier="devicelookup_cell_mac" id="twP-H9-cpi">
-                                                    <rect key="frame" x="397" y="1" width="150" height="17"/>
+                                                    <rect key="frame" x="297" y="1" width="140" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aYg-7B-yI2">
-                                                            <rect key="frame" x="0.0" y="0.0" width="150" height="17"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="140" height="17"/>
                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Table View Cell" usesSingleLineMode="YES" id="EXO-Vf-gYY">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -4847,6 +4847,39 @@ DQ
                                                 </tableCellView>
                                             </prototypeCellViews>
                                         </tableColumn>
+                                        <tableColumn width="130" minWidth="130" maxWidth="3.4028234663852886e+38" id="RT9-Ej-POf">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Agent ID">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="TE4-A8-O6t">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <prototypeCellViews>
+                                                <tableCellView identifier="devicelookup_cell_aid" id="KIR-aJ-tQ9">
+                                                    <rect key="frame" x="440" y="1" width="130" height="17"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <subviews>
+                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VhB-9K-YsC">
+                                                            <rect key="frame" x="0.0" y="0.0" width="130" height="17"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="1pp-tN-bDA">
+                                                                <font key="font" metaFont="system"/>
+                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </subviews>
+                                                    <connections>
+                                                        <outlet property="textField" destination="VhB-9K-YsC" id="ydm-eN-yJI"/>
+                                                    </connections>
+                                                </tableCellView>
+                                            </prototypeCellViews>
+                                        </tableColumn>
                                     </tableColumns>
                                     <connections>
                                         <outlet property="dataSource" destination="aH1-l0-Y8P" id="MhU-gR-08u"/>
@@ -4858,7 +4891,7 @@ DQ
                         <constraints>
                             <constraint firstAttribute="height" constant="242" id="lWY-We-kQe"/>
                         </constraints>
-                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="2EK-Ac-Lq7">
+                        <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="2EK-Ac-Lq7">
                             <rect key="frame" x="1" y="225" width="570" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -4867,7 +4900,7 @@ DQ
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="Ppk-wb-okh">
-                            <rect key="frame" x="0.0" y="0.0" width="570" height="25"/>
+                            <rect key="frame" x="0.0" y="0.0" width="572" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -4893,7 +4926,7 @@ Gw
                         <constraints>
                             <constraint firstAttribute="height" constant="17" id="TJ1-sc-Hhe"/>
                         </constraints>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="To find a named device, enter its ID or MAC address (without colons):" id="oRs-ii-gFb">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="To find a named device, enter its ID, MAC address (without colons) or agent ID:" id="oRs-ii-gFb">
                             <font key="font" usesAppearanceFont="YES"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -4917,7 +4950,7 @@ Gw
                     <constraint firstItem="wm9-Da-wui" firstAttribute="leading" secondItem="Xxo-rz-IWc" secondAttribute="leading" constant="20" id="x80-5C-j7N"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="-1085" y="-1"/>
+            <point key="canvasLocation" x="-1230" y="-12"/>
         </window>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="gbO-CX-hmK" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
@@ -4986,7 +5019,7 @@ Gw
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" ambiguous="YES" id="XxK-pV-HOK">
                             <rect key="frame" x="1" y="0.0" width="570" height="253"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="fH3-sW-QsG" viewBased="YES" id="wkw-ZX-0ox">
                                     <rect key="frame" x="0.0" y="0.0" width="570" height="228"/>
