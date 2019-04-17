@@ -71,71 +71,68 @@
 
         if (keyed.length > 0)
         {
-            NSString *prefix = [keyed substringToIndex:1];
-            searchOnDeviceId = [prefix compare:@"0"] == NSOrderedSame ? NO : YES;
-        }
+            // Run through the device list to look for a match against each
+            // device's MAC or ID
+            
+            for (NSDictionary *device in deviceArray) {
 
-        // Run through the device list to look for a match against each
-        // device's MAC or ID
-        
-        for (NSDictionary *device in deviceArray) {
-
-            // NOTE Check for NULL entries
-            
-            NSString *did = [device objectForKey:@"id"];
-            NSString *sdid = [device objectForKey:@"id"];
-            did = [did substringToIndex:(keyed.length <= did.length ? keyed.length : did.length)];
-            
-            NSString *mac = [device valueForKeyPath:@"attributes.mac_address"];
-            NSString *smac = @"";
-            if ((NSNull *)mac == [NSNull null])
-            {
-                mac = nil;
-            }
-            else
-            {
-                smac = [mac copy];
-                mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
-                [mac substringToIndex:(keyed.length <= mac.length ? keyed.length : mac.length)];
-            }
-            
-            NSString *aid = [device valueForKeyPath:@"attributes.agent_id"];
-            NSString *said = @"No Agent";
-            if ((NSNull *)aid == [NSNull null])
-            {
-                aid = nil;
-            }
-            else
-            {
-                said = [aid copy];
-                aid = [aid substringToIndex:(keyed.length <= aid.length ? keyed.length : aid.length)];
-            }
-            
-            /*
-            NSString *sdid = searchOnDeviceId
-                ? [did substringToIndex:(keyed.length <= did.length ? keyed.length : did.length)]
-            : [mac substringToIndex:(keyed.length <= mac.length ? keyed.length : mac.length)];
-            */
-            
-            bool matched = NO;
-            
-            if ([keyed.lowercaseString compare:did] == NSOrderedSame) matched = YES;
-            if (mac != nil && [keyed.lowercaseString compare:mac] == NSOrderedSame) matched = YES;
-            if (aid != nil && [keyed compare:aid] == NSOrderedSame) matched = YES;
-            
-            if (matched)
-            {
-                // Devices that match are added to 'listedDevices' which
-                // is then read by the table as a data source
+                // NOTE Check for NULL entries
                 
-                NSString *name = [device valueForKeyPath:@"attributes.name"];
-                if ((NSNull *)name == [NSNull null]) name = sdid;
+                NSString *did = [device objectForKey:@"id"];
+                NSString *sdid = [device objectForKey:@"id"];
+                did = [did substringToIndex:(keyed.length <= did.length ? keyed.length : did.length)];
+                
+                NSString *mac = [device valueForKeyPath:@"attributes.mac_address"];
+                NSString *smac = @"";
+                if ((NSNull *)mac == [NSNull null])
+                {
+                    mac = nil;
+                }
+                else
+                {
+                    mac = [mac stringByReplacingOccurrencesOfString:@":" withString:@""];
+                    smac = [mac copy];
+                    mac = [mac substringToIndex:(keyed.length <= mac.length ? keyed.length : mac.length)];
+                }
+                
+                NSString *aid = [device valueForKeyPath:@"attributes.agent_id"];
+                NSString *said = @"No Agent";
+                if ((NSNull *)aid == [NSNull null])
+                {
+                    aid = nil;
+                }
+                else
+                {
+                    said = [aid copy];
+                    aid = [aid substringToIndex:(keyed.length <= aid.length ? keyed.length : aid.length)];
+                }
+                
+                /*
+                NSString *sdid = searchOnDeviceId
+                    ? [did substringToIndex:(keyed.length <= did.length ? keyed.length : did.length)]
+                : [mac substringToIndex:(keyed.length <= mac.length ? keyed.length : mac.length)];
+                */
+                
+                bool matched = NO;
+                
+                if ([keyed.lowercaseString compare:did] == NSOrderedSame) matched = YES;
+                if (mac != nil && [keyed.lowercaseString compare:mac] == NSOrderedSame) matched = YES;
+                if (aid != nil && [keyed compare:aid] == NSOrderedSame) matched = YES;
+                
+                if (matched)
+                {
+                    // Devices that match are added to 'listedDevices' which
+                    // is then read by the table as a data source
+                    
+                    NSString *name = [device valueForKeyPath:@"attributes.name"];
+                    if ((NSNull *)name == [NSNull null]) name = sdid;
 
-                NSDictionary *d = @{ @"name" : name,
-                                     @"id"   : sdid,
-                                     @"mac"  : smac,
-                                     @"aid"  : said };
-                [listedDevices addObject:d];
+                    NSDictionary *d = @{ @"name" : name,
+                                         @"id"   : sdid,
+                                         @"mac"  : smac,
+                                         @"aid"  : said };
+                    [listedDevices addObject:d];
+                }
             }
         }
         
