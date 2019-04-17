@@ -460,8 +460,7 @@
 
 - (void)parseLog
 {
-    // Scan the log view text for certain entities,
-    // primarily agent URLs
+    // Scan the log view text for certain entities, primarily agent URLs
     
     logTextView.editable = YES;
     [logTextView checkTextInDocument:nil];

@@ -9706,7 +9706,7 @@
     NSDictionary *data = (NSDictionary *)note.object;
     NSArray *devices = [data objectForKey:@"data"];
     NSDictionary *source = [data objectForKey:@"object"];
-    NSString *action = [so objectForKey:@"action"];
+    NSString *action = [source objectForKey:@"action"];
 
     if (action != nil)
     {
@@ -10211,6 +10211,7 @@
 - (void)setMinimumDeploymentStageTwo:(NSNotification *)note
 {
     // Called in response to a notification from BuildAPIAccess that a minimum deployment has been set
+    // 'note' contains a deployment record at the key 'data', but we don't use it here
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
@@ -10243,6 +10244,9 @@
 
 - (void)listCommits:(NSNotification *)note
 {
+    // Called in response to a notification from BuildAPIAccess with a list of deployments made to a device group
+    // The commits are in 'note.data' under the key 'data'
+
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
     NSString *action = [source objectForKey:@"action"];
@@ -10254,13 +10258,19 @@
     {
         if ([action compare:@"getcommits"] == NSOrderedSame)
         {
+            // This is the result of a request to get commits so they can be presented
+            // in the Commit Panel (cwvc)
+
             cwvc.commits = deployments;
             return;
         }
 
-
         if ([action compare:@"downloadproduct"] == NSOrderedSame)
         {
+            // This is the result of a request to get commits so that the most recent one
+            // can be extracted to get the code for a newly downloaded device group that
+            // has no 'current_deployment' key its record
+
             [self getCurrentDeployment:data];
             return;
         }
@@ -10415,7 +10425,6 @@
                     NSString *owner = [entry objectForKey:@"owner_id"];
                     NSString *actor = [entry objectForKey:@"actor_id"];
                     NSString *doer = ([owner compare:actor] == NSOrderedSame) ? @"you." : @"someone else.";
-
                     NSString *lString = [NSString stringWithFormat:@"%@ Device %@ by %@", timestamp, event, doer];
 
                     [lines addObject:lString];
@@ -10530,10 +10539,10 @@
 
 - (void)loggingStarted:(NSNotification *)note
 {
-    // We come here via a notification from BuildAPIAccess that a device has been added to the log stream
+    // Called in response to a notification from BuildAPIAccess that a device has been added to the log stream
 
     NSDictionary *data = (NSDictionary *)note.object;
-    NSString *dvid = [data objectForKey:@"device"];
+    NSString *deviceID = [data objectForKey:@"device"];
     NSDictionary *device;
 
     // The returned data includes the device's ID,
@@ -10541,9 +10550,9 @@
 
     for (NSDictionary *aDevice in devicesArray)
     {
-        NSString *advid = [aDevice objectForKey:@"id"];
+        NSString *aDeviceID = [aDevice objectForKey:@"id"];
 
-        if ([advid compare:dvid] == NSOrderedSame)
+        if ([aDeviceID compare:deviceID] == NSOrderedSame)
         {
             device = aDevice;
             break;
@@ -10556,7 +10565,7 @@
     
     if (loggedDevices.count < kMaxLogStreamDevices)
     {
-        [loggedDevices addObject:dvid];
+        [loggedDevices addObject:deviceID];
     }
     else
     {
@@ -10564,9 +10573,9 @@
         
         for (NSInteger i = 0 ; i < loggedDevices.count ; ++i)
         {
-            NSString *advid = [loggedDevices objectAtIndex:i];
+            NSString *aDeviceID = [loggedDevices objectAtIndex:i];
             
-            if ([advid compare:@"FREE"] == NSOrderedSame)
+            if ([aDeviceID compare:@"FREE"] == NSOrderedSame)
             {
                 index = i;
                 break;
@@ -10575,7 +10584,7 @@
         
         if (index != -1)
         {
-            [loggedDevices replaceObjectAtIndex:index withObject:dvid];
+            [loggedDevices replaceObjectAtIndex:index withObject:deviceID];
         }
         else
         {
@@ -10588,29 +10597,30 @@
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
 
     // Update the UI: add logging marks to menus, colour to the toolbar item,
-    // and set the menu item's text and state
+    // and set the menu item's text and state; set the Inspector
+
+    iwvc.loggingDevices = loggedDevices;
 
     if (device == selectedDevice)
     {
         streamLogsItem.state = kStreamToolbarItemStateOn;
         streamLogsMenuItem.title = @"Stop Log Streaming";
+        iwvc.device = selectedDevice;
     }
 
     [streamLogsItem validate];
+
+    // Update menus
+
     [self refreshDevicesMenus];
     [self refreshDevicesPopup];
-    
-    // Update the Inspector
-    
-    iwvc.loggingDevices = loggedDevices;
-    iwvc.device = selectedDevice;
 }
 
 
 
 - (void)loggingStopped:(NSNotification *)note
 {
-    // We come here via a notification from BuildAPIAccess that a device has been removed from the log stream
+    // Called in response to a notification from BuildAPIAccess that a device has been removed from the log stream
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSString *dvid = [data objectForKey:@"device"];
@@ -10752,24 +10762,6 @@
             }
         }
         
-        /*
-        // Calculate colour table index
-
-        BOOL done = NO;
-
-        while (done == NO)
-        {
-            if (index > colors.count - 1)
-            {
-                index = index - colors.count;
-            }
-            else
-            {
-                done = YES;
-            }
-        }
-         */
-        
         NSRange range = [logItem rangeOfString:type];
         NSString *message = [logItem substringFromIndex:(range.location + type.length + 1)];
 
@@ -10777,20 +10769,14 @@
         {
             NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
             log = [NSString stringWithFormat:@"\"%@\"%@: %@ %@%@", device, subspacer, stype, spacer, message];
-            //values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
         else
         {
             log = [NSString stringWithFormat:@"\"%@\": %@ %@%@", device, stype, spacer, message];
-            //values = [NSArray arrayWithObjects:[colors objectAtIndex:index], logFont, nil];
         }
 
         log = [timestamp stringByAppendingFormat:@" %@", log];
         logColour = [colors objectAtIndex:index];
-
-        //NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, NSFontAttributeName, nil];
-        //NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-        //NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:log attributes:attributes];
 
         [self writeNoteToLog:log :logColour :NO];
     }
@@ -11548,27 +11534,7 @@
     // them with a line of dashes that is caclulated to be as long as the longest
     // line in the list passed into 'lines'
 
-    // Determine the number of characters in the longest line...
-
-    // NSInteger dashCount = 0;
-
-    // for (NSString *string in lines) dashCount = string.length > dashCount ? string.length : dashCount;
-
-    // ...then build a string of dashes that long
-
-    // NSString *dashes = [@"" stringByPaddingToLength:dashCount withString:@"-" startingAtIndex:0];
-
-    // Write out the dashes
-
-    // [self writeNoteToLog:dashes :textColour :NO];
-
-    // Write out the lines themselves
-
     for (NSString *string in lines) [self writeNoteToLog:string :textColour :NO];
-
-    // Write out the dashes
-
-    // [self writeNoteToLog:dashes :textColour :NO];
 }
 
 
