@@ -806,7 +806,7 @@
 
 		[ide getDevicegroup:devicegroup.did :dict];
 
-		// Pick up the action at **updateCodeStageTwo:**
+		// Pick up the action at 'updateCodeStageTwo:'
 	}
 }
 

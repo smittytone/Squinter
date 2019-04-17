@@ -8327,7 +8327,6 @@
                     NSAlert *alert = [[NSAlert alloc] init];
                     alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
                     alert.informativeText = @"All of the Device Groups listed on the server are accessible via the Project.";
-
                     [alert beginSheetModalForWindow:_window completionHandler:nil];
                 }
             }
@@ -8381,7 +8380,7 @@
 
                             [ide getDeployment:dpid :dict];
 
-                            // At this point we have to wait for multiple async calls to **productToProjectStageThree:**
+                            // At this point we have to wait for multiple async calls to 'productToProjectStageThree:'
                         }
                         else
                         {
@@ -8468,78 +8467,6 @@
 
 
 
-- (void)getCurrentDeployment:(NSDictionary *)data
-{
-    NSDictionary *source = [data objectForKey:@"object"];
-    Project *project = [source objectForKey:@"project"];
-    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-    NSMutableArray *deployments = [data objectForKey:@"data"];
-
-    if (deployments != nil && deployments.count > 0)
-    {
-        NSString *newest = @"";
-        NSDictionary *currentDeployment = nil;
-
-        for (NSDictionary *deployment in deployments)
-        {
-            NSString *date = [self getValueFrom:deployment withKey:@"updated_at"];
-            if (date == nil) date = [self getValueFrom:deployment withKey:@"created_at"];
-
-            if ([date compare:newest] == NSOrderedDescending)
-            {
-                newest = date;
-                currentDeployment = deployment;
-            }
-        }
-
-        if (currentDeployment != nil)
-        {
-            // Process deployment
-
-            if (devicegroup.models == nil) devicegroup.models = [[NSMutableArray alloc] init];
-
-            Model *model;
-            NSString *code = [self getValueFrom:currentDeployment withKey:@"device_code"];
-
-            if (code != nil)
-            {
-                model = [[Model alloc] init];
-                model.type = @"device";
-                model.squinted = NO;
-                model.code = code;
-                model.path = project.path;
-                model.filename = @"UNSAVED";
-                model.sha = [self getValueFrom:currentDeployment withKey:@"sha"];
-                model.updated = [self getValueFrom:currentDeployment withKey:@"updated_at"];
-                if (model.updated == nil) model.updated = [self getValueFrom:currentDeployment withKey:@"created_at"];
-                [devicegroup.models addObject:model];
-            }
-
-            code = [self getValueFrom:currentDeployment withKey:@"agent_code"];
-
-            if (code != nil)
-            {
-                model = [[Model alloc] init];
-                model.type = @"agent";
-                model.squinted = NO;
-                model.code = code;
-                model.path = project.path;
-                model.filename = @"UNSAVED";
-                model.sha = [self getValueFrom:currentDeployment withKey:@"sha"];
-                model.updated = [self getValueFrom:currentDeployment withKey:@"updated_at"];
-                if (model.updated == nil) model.updated = [self getValueFrom:currentDeployment withKey:@"created_at"];
-                [devicegroup.models addObject:model];
-            }
-        }
-    }
-
-    --project.count;
-
-    if (project.count == 0) [self productToProjectStageFour:project];
-}
-
-
-
 - (void)productToProjectStageThree:(NSNotification *)note
 {
     // This method is called by the BuildAPIAccess instance in response to
@@ -8548,11 +8475,13 @@
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *deployment = [data objectForKey:@"data"];
     NSDictionary *so = [data objectForKey:@"object"];
-
     NSString *action = [so objectForKey:@"action"];
     Project *newProject = [so objectForKey:@"project"];
     Devicegroup *newDevicegroup = [so objectForKey:@"devicegroup"];
-
+    
+    // NOTE No check for no action value here as it will have been checked by
+    //      all calling methods
+    
     if (deployment != nil)
     {
         if ([action compare:@"updatecode"] == NSOrderedSame)
@@ -8809,6 +8738,82 @@
 
 
 
+- (void)getCurrentDeployment:(NSDictionary *)data
+{
+    // This method is called by BuildAPIAccess ONLY with a list of a product's device groups
+    // It may be in response to calling 'downloadProduct:', to 'deleteProduct:' or 'syncProject:, with the
+    // actions "downloadproduct", "deleteproduct" and "syncproject", respectively
+    
+    NSDictionary *source = [data objectForKey:@"object"];
+    Project *project = [source objectForKey:@"project"];
+    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+    NSMutableArray *deployments = [data objectForKey:@"data"];
+    
+    if (deployments != nil && deployments.count > 0)
+    {
+        NSString *newest = @"";
+        NSDictionary *currentDeployment = nil;
+        
+        for (NSDictionary *deployment in deployments)
+        {
+            NSString *date = [self getValueFrom:deployment withKey:@"updated_at"];
+            if (date == nil) date = [self getValueFrom:deployment withKey:@"created_at"];
+            
+            if ([date compare:newest] == NSOrderedDescending)
+            {
+                newest = date;
+                currentDeployment = deployment;
+            }
+        }
+        
+        if (currentDeployment != nil)
+        {
+            // Process deployment
+            
+            if (devicegroup.models == nil) devicegroup.models = [[NSMutableArray alloc] init];
+            
+            Model *model;
+            NSString *code = [self getValueFrom:currentDeployment withKey:@"device_code"];
+            
+            if (code != nil)
+            {
+                model = [[Model alloc] init];
+                model.type = @"device";
+                model.squinted = NO;
+                model.code = code;
+                model.path = project.path;
+                model.filename = @"UNSAVED";
+                model.sha = [self getValueFrom:currentDeployment withKey:@"sha"];
+                model.updated = [self getValueFrom:currentDeployment withKey:@"updated_at"];
+                if (model.updated == nil) model.updated = [self getValueFrom:currentDeployment withKey:@"created_at"];
+                [devicegroup.models addObject:model];
+            }
+            
+            code = [self getValueFrom:currentDeployment withKey:@"agent_code"];
+            
+            if (code != nil)
+            {
+                model = [[Model alloc] init];
+                model.type = @"agent";
+                model.squinted = NO;
+                model.code = code;
+                model.path = project.path;
+                model.filename = @"UNSAVED";
+                model.sha = [self getValueFrom:currentDeployment withKey:@"sha"];
+                model.updated = [self getValueFrom:currentDeployment withKey:@"updated_at"];
+                if (model.updated == nil) model.updated = [self getValueFrom:currentDeployment withKey:@"created_at"];
+                [devicegroup.models addObject:model];
+            }
+        }
+    }
+    
+    --project.count;
+    
+    if (project.count == 0) [self productToProjectStageFour:project];
+}
+
+
+
 - (void)createProductStageTwo:(NSNotification *)note
 {
     // This is called by the BuildAPIAccess instance in response to a new product being created
@@ -8863,6 +8868,7 @@
             
             iwvc.project = currentProject;
             savingProject = currentProject;
+            
             [self saveProjectAs:nil];
         }
         else if ([action compare:@"uploadproject"] == NSOrderedSame)
@@ -8884,7 +8890,7 @@
                 {
                     [self writeStringToLog:[NSString stringWithFormat:@"Uploading device group \"%@\"...", devicegroup.name] :YES];
 
-                    NSDictionary *dict = @{ @"action" : @"uploadproject",
+                    NSDictionary *dict = @{ @"action" : action,
                                             @"project" : project,
                                             @"devicegroup" : devicegroup };
 
@@ -8933,7 +8939,7 @@
     {
         for (Project *aproject in projectArray)
         {
-            if ([pid compare:aproject.pid] == NSOrderedSame)
+            if ([aproject.pid compare:pid] == NSOrderedSame)
             {
                 project = aproject;
                 break;
@@ -9146,11 +9152,21 @@
 
     if (action != nil)
     {
+        // FROM 2.3.128
+        // Perform operations common to both actions
+        
+        devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawGroupData];
+        NSDictionary *dict = [self getValueFrom:rawGroupData withKey:@"min_supported_deployment"];
+        devicegroup.mdid = [dict objectForKey:@"id"];
+        dict = [self getValueFrom:rawGroupData withKey:@"current_deployment"];
+        devicegroup.cdid = [dict objectForKey:@"id"];
+        
+        // Process the actions
+        
         if ([action compare:@"devicegroupchanged"] == NSOrderedSame)
         {
             NSString *newName = [self getValueFrom:rawGroupData withKey:@"name"];
             NSString *newDesc = [self getValueFrom:rawGroupData withKey:@"description"];
-            devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawGroupData];
             
             // FROM 2.3.128
             // Store retrieved type (may have been changed BuildAPIAccess
@@ -9177,16 +9193,19 @@
         }
         else if ([action compare:@"resetprodtarget"] == NSOrderedSame)
         {
+            // FROM 2.3.128
+            // Use the data we have already just retrieved (rather than get it again)
             // See AppDelegateUtilities - reloads the core device group data from the server
-            
-            [self updateDevicegroup:devicegroup];
+            // [self updateDevicegroup:devicegroup];
             
             // Target changed, so report it
             
-            Devicegroup *tdg = [source objectForKey:@"target"];
-            NSString *type = [self convertDevicegroupType:tdg.type :NO];
+            Devicegroup *targetDevicegroup = [source objectForKey:@"target"];
+            NSString *type = [self convertDevicegroupType:targetDevicegroup.type :NO];
 
-            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" now has a new target %@ device group: \"%@\".", devicegroup.name, type, tdg.name] :YES];
+            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" now has a new target %@ device group: \"%@\".", devicegroup.name, type, targetDevicegroup.name] :YES];
+            
+            updated = YES;
         }
     }
     else
@@ -9199,7 +9218,7 @@
         // Mark the device group's parent project as changed, but only if it has
         // NOTE we check for nil, but this is very unlikely (project closed before server responded)
 
-        [self updateDevicegroup:devicegroup];
+        //[self updateDevicegroup:devicegroup];
 
         Project *project = [self getParentProject:devicegroup];
 
@@ -9237,15 +9256,19 @@
 
     if (action != nil)
     {
+        // FROM 2.3.128
+        // Perform operations common to all actions
+        
+        
         if ([action compare:@"deletedevicegroup"] == NSOrderedSame)
         {
             Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
-
             Project *project = [self getParentProject:devicegroup];
 
             if (project != nil)
             {
                 // FROM 2.3.128 - Unwatch the device group's files
+                
                 [self closeDevicegroupFiles:devicegroup :project];
                 
                 [project.devicegroups removeObject:devicegroup];
@@ -9281,8 +9304,6 @@
             {
                 [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Device group \"%@\" is an orphan.", devicegroup.name] :YES];
             }
-
-            return;
         }
         else
         {
@@ -9298,7 +9319,7 @@
 
             [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
             
-            // FROM 2.3.128 If we have a project recorded, run through and fine which of its
+            // FROM 2.3.128 If we have a project recorded, run through and find which of its
             // device groups matches the device group that thas just been deleted on the server
             // and clear its ID value
             
@@ -9395,13 +9416,13 @@
                 
                 // Update the UI
                 
-                [self setToolbar];
                 [self refreshDevicegroupMenu];
                 [self refreshMainDevicegroupsMenu];
+                [self setToolbar];
                 
                 // Update the inspector, if required
                 
-                if (iwvc.tabIndex == kInspectorTabProject) iwvc.project = currentProject;
+                iwvc.project = currentProject;
             }
             
             // Now we can produce the source code file, as the user requested
@@ -9465,7 +9486,8 @@
 - (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project
 {
     // FROM 2.3.128
-    // Upload the code for a single devicegroup
+    // Upload the code for a single devicegroup that has just been created on the server.
+    // We come here from 'syncLocalDevicegroupsStageTwo:'
     
     if (devicegroup.squinted == kBothCodeSquinted)
     {
@@ -9544,9 +9566,9 @@
 - (void)updateCodeStageTwo:(NSNotification *)note
 {
     // This method should ONLY be called by the BuildAPIAccess object instance AFTER uploading code
-
+    
     NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *devicegroup = [data objectForKey:@"data"];
+    NSDictionary *rawDevicegroup = [data objectForKey:@"data"];
     NSDictionary *source = [data objectForKey:@"object"];
     NSString *action = [source objectForKey:@"action"];
 
@@ -9556,13 +9578,13 @@
         {
             // We're updating the devicegroup with info from the server
 
-            Devicegroup *dg = [source objectForKey:@"devicegroup"];
-            dg.data = [NSMutableDictionary dictionaryWithDictionary:devicegroup];
+            Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+            devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawDevicegroup];
             
-            NSDictionary *dict = [self getValueFrom:dg.data withKey:@"min_supported_deployment"];
-            dg.mdid = [dict objectForKey:@"id"];
-            dict = [self getValueFrom:dg.data withKey:@"current_deployment"];
-            dg.cdid = [dict objectForKey:@"id"];
+            NSDictionary *dict = [self getValueFrom:rawDevicegroup withKey:@"min_supported_deployment"];
+            devicegroup.mdid = [dict objectForKey:@"id"];
+            dict = [self getValueFrom:rawDevicegroup withKey:@"current_deployment"];
+            devicegroup.cdid = [dict objectForKey:@"id"];
             
             // FROM 2.3.128
             // Auto-update the Inspector with retrieved data
@@ -9574,7 +9596,7 @@
         {
             // We're updating the devicegroup's code
 
-            NSDictionary *currentDeployment = [self getValueFrom:devicegroup withKey:@"current_deployment"];
+            NSDictionary *currentDeployment = [self getValueFrom:rawDevicegroup withKey:@"current_deployment"];
 
             if (currentDeployment != nil)
             {
@@ -9582,7 +9604,7 @@
 
                 [ide getDeployment:[self getValueFrom:currentDeployment withKey:@"id"] :source];
 
-                // Pick up the action at productToProjectStageThree:
+                // Pick up the action at 'productToProjectStageThree:'
             }
             else
             {
@@ -9603,6 +9625,7 @@
 - (void)uploadCodeStageTwo:(NSNotification *)note
 {
     // Called in response to a notification from BuildAPIAccess that a deployment has been created
+    // It updates the local records with post-upload data, eg. SHA
     
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *response = [data objectForKey:@"data"];
@@ -9649,7 +9672,7 @@
             {
                 // All done! Refresh the products list
                 
-                // REMOVE IN 2.3.128 (already handled in 'createProductStageTwo:')
+                // REMOVED IN 2.3.128 (already handled in 'createProductStageTwo:')
                 // NSDictionary *dict = @{ @"action" : @"getproducts" };
                 // [ide getProducts:dict];
                 // [self writeStringToLog:@"Refreshing product list." :YES];
@@ -9682,7 +9705,7 @@
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSArray *devices = [data objectForKey:@"data"];
-    NSDictionary *so = [data objectForKey:@"object"];
+    NSDictionary *source = [data objectForKey:@"object"];
     NSString *action = [so objectForKey:@"action"];
 
     if (action != nil)
@@ -9694,7 +9717,7 @@
             // can decide whether we need to halt the deletion process, ie. the presence
             // of assigned devices means the devicegroup deletion will fail
 
-            NSMutableDictionary *productToDelete = [so objectForKey:@"product"];
+            NSMutableDictionary *productToDelete = [source objectForKey:@"product"];
             NSDictionary *product = [productToDelete objectForKey:@"product"];
             NSNumber *number = [productToDelete objectForKey:@"count"];
             NSInteger count = number.integerValue;
@@ -9714,7 +9737,7 @@
 
                 [productToDelete setObject:[NSNumber numberWithInteger:kDoneChecking] forKey:@"count"];
 
-                NSDictionary *devicegroup = [so objectForKey:@"devicegroup"];
+                NSDictionary *devicegroup = [source objectForKey:@"devicegroup"];
 
                 [self writeWarningToLog:[NSString stringWithFormat:@"Product \"%@\" can't be deleted because device group \"%@\" has devices assigned. Aborting delete.", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"]] :YES];
             }
@@ -9784,7 +9807,7 @@
 
         if ([action compare:@"gettestblesseddevices"] == NSOrderedSame)
         {
-            [self listBlessedDevices:devices :[so objectForKey:@"devicegroup"]];
+            [self listBlessedDevices:devices :[source objectForKey:@"devicegroup"]];
             return;
         }
 
@@ -9823,7 +9846,6 @@
                     
                     NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[device objectForKey:@"attributes"]];
                     NSString *name = [self getValueFrom:device withKey:@"name"];
-                    
 
                     if (name == nil || ((NSNull *)name == [NSNull null]))
                     {
@@ -9853,7 +9875,7 @@
                 }
                 else
                 {
-                    NSLog(@"Unknown type: %@", dtype);
+                    NSLog(@"Non-development device type: %@", dtype);
                 }
             }
 
@@ -10023,7 +10045,7 @@
 
                 [self refreshDevicesMenus];
                 [self refreshDevicesPopup];
-                if (projectArray.count > 0) [self refreshDevicesMenus];
+                //if (projectArray.count > 0) [self refreshDevicesMenus];
 
                 if (ide.numberOfConnections < 1)
                 {
@@ -10032,11 +10054,12 @@
                     [connectionIndicator stopAnimation:self];
                     connectionIndicator.hidden = YES;
                 }
-
             }
 
             return;
         }
+        
+        // The following is only executed on action '????'
 
         NSString *version = [self getValueFrom:device withKey:@"swversion"];
         if (version != nil) [attributes setObject:version forKey:@"swversion"];
@@ -10146,11 +10169,14 @@
     NSDictionary *source = [data objectForKey:@"object"];
 
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
-
+    
+    // Make sure the device is not being listed in the Inspector and elsewhere
+    
     selectedDevice = nil;
     iwvc.device = nil;
 
-    // Now refresh the devices list
+    // Now refresh the devices list to get the new name
+    // TODO Probably just need to get this one device's info
 
     [self updateDevicesStatus:nil];
 }
