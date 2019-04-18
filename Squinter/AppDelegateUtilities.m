@@ -9,67 +9,6 @@
 @implementation AppDelegate(AppDelegateUtilities)
 
 
-#pragma mark - NSToolbarDelegate Methods
-
-
-- (void)toolbarWillAddItem:(NSNotification *)notification
-{
-    // This method is called when certain toolbar items are added to the toolbar,
-    // to ensure their state is correctly reflected at that point.
-    // log-streaming and logging, allowing the toolbar item to indicate progress.
-    // Stream items will go dark green while we are adding them to the log stream
-    // (which may require the creation of a new log stream, which takes time) and
-    // then black when streaming is taking place. We make sure we apply the correct
-    // state for the currently selected device and update as the selection changes.
-    // Login items show an indicator when the user is logged in, and hide that
-    // indicator when the user is not logged in
-    
-    id item = [notification.userInfo objectForKey:@"item"];
-
-	if ([item isKindOfClass:[LoginToolbarItem class]])
-	{
-		LoginToolbarItem *ltbi = (LoginToolbarItem *)item;
-		ltbi.isLoggedIn = ide.isLoggedIn;
-		[ltbi validate];
-		loginAndOutItem = ltbi;
-	}
-
-	if ([item isKindOfClass:[StreamToolbarItem class]])
-	{
-		StreamToolbarItem *stbi = (StreamToolbarItem *)item;
-		stbi.state = kStreamToolbarItemStateOff;
-
-		if (selectedDevice != nil)
-		{
-			NSString *did = [selectedDevice objectForKey:@"id"];
-
-			if (ide.isLoggedIn && [ide isDeviceLogging:did]) stbi.state = kStreamToolbarItemStateOn;
-		}
-
-		[stbi validate];
-		streamLogsItem = stbi;
-	}
-}
-
-
-
-- (void)toolbarDidRemoveItem:(NSNotification *)notification
-{
-	// This method is called when certain toolbar items are removed from the toolbar,
-    // to ensure their state is correctly reset at that point
-    
-    id item = [notification.userInfo objectForKey:@"item"];
-
-	if ([item isKindOfClass:[StreamToolbarItem class]])
-	{
-		StreamToolbarItem *stbi = (StreamToolbarItem *)item;
-		stbi.state = kStreamToolbarItemStateOff;
-		[stbi validate];
-		streamLogsItem = stbi;
-	}
-}
-
-
 
 #pragma mark - File Path Methods
 
@@ -329,7 +268,7 @@
 
 - (void)watchfiles:(Project *)project
 {
-    // Work throgh project's files and add them to the file watch queue
+    // Work through project's files and add them to the file watch queue
     // This is usually called only after opening an existing project
 
     NSString *aPath = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
@@ -471,7 +410,7 @@
 
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold
 {
-	// Set the log window's basic text settings based on preferences
+	// Return a suitable font for displaying entries in the log, based on user preference
 
 	NSFontManager *fontManager = [NSFontManager sharedFontManager];
 	NSFont *font;
@@ -522,32 +461,8 @@
     }
 
     /*
-
-    // Populate the 'colors' array with a set of colours for logging different devices
-
-	NSString *start = @"com.bps.squinter.dev";
-
-	if (colors.count > 0) [colors removeAllObjects];
-
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-	for (NSUInteger i = 1 ; i < 6 ; ++i)
-	{
-		NSString *key = [start stringByAppendingFormat:@"%li.red", (long)i];
-		NSNumber *red = [defaults objectForKey:key];
-		key = [start stringByAppendingFormat:@"%li.green", (long)i];
-		NSNumber *green = [defaults objectForKey:key];
-		key = [start stringByAppendingFormat:@"%li.blue", (long)i];
-		NSNumber *blue = [defaults objectForKey:key];
-
-		[colors addObject:[NSColor colorWithSRGBRed:red.floatValue
-											  green:green.floatValue
-											   blue:blue.floatValue
-											  alpha:1.0]];
-	}
-
-
-	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry (138)
+     Sample colours
+     [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.2 blue:0.6 alpha:1.0]]; // Strawberry (138)
 	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:0.8 blue:0.5 alpha:1.0]]; // Tangerine (213)
 	 [colors addObject:[NSColor colorWithSRGBRed:0.4 green:0.9 blue:0.5 alpha:1.0]]; // Flora (green) (200)
 	 [colors addObject:[NSColor colorWithSRGBRed:1.0 green:1.0 blue:1.0 alpha:1.0]]; // White (255)
@@ -565,48 +480,6 @@
 	 */
 }
 
-
-/*
-- (void)setLoggingColours
-{
-	// Pick colours from the 'colours' array that are darker/lighter than the log background
-	// as approrpriate
-
-	[logColors removeAllObjects];
-
-	NSInteger back = [self perceivedBrightness:backColour];
-	// NSInteger fore = [self perceivedBrightness:textColour];
-
-	if (back > 200)
-	{
-		// Background is light
-
-		for (NSColor *colour in colors)
-		{
-			NSInteger stock = [self perceivedBrightness:colour];
-
-			if (back - stock > 100)
-			{
-				// Colour is dark enough to use against this background
-				// But is it too close to the text colour ?
-
-				[logColors addObject:colour];
-			}
-		}
-	}
-	else
-	{
-		// Background is dark
-
-		for (NSColor *colour in colors)
-		{
-			NSInteger stock = [self perceivedBrightness:colour];
-
-			if (stock - back > 100) [logColors addObject:colour];
-		}
-	}
-}
-*/
 
 
 #pragma mark - Preferences Panel Subsidiary Methods
@@ -1178,6 +1051,8 @@
 
 - (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow
 {
+    // Warn that the project isn't in the current account
+    
     [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
                       :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
                       :sheetWindow];
@@ -1186,6 +1061,8 @@
 
 - (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow
 {
+    // Warn that the device group isn't in the current account
+    
     Project *project = [self getParentProject:devicegroup];
 
     [self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
@@ -1197,6 +1074,8 @@
 
 - (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow
 {
+    // Present a generic 'wrong account' warning
+    
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = head;
     alert.informativeText = body;
@@ -1218,6 +1097,68 @@
 
 
 
+#pragma mark - NSToolbarDelegate Methods
+
+
+- (void)toolbarWillAddItem:(NSNotification *)notification
+{
+    // This method is called when certain toolbar items are added to the toolbar,
+    // to ensure their state is correctly reflected at that point.
+    // log-streaming and logging, allowing the toolbar item to indicate progress.
+    // Stream items will go dark green while we are adding them to the log stream
+    // (which may require the creation of a new log stream, which takes time) and
+    // then black when streaming is taking place. We make sure we apply the correct
+    // state for the currently selected device and update as the selection changes.
+    // Login items show an indicator when the user is logged in, and hide that
+    // indicator when the user is not logged in
+    
+    id item = [notification.userInfo objectForKey:@"item"];
+    
+    if ([item isKindOfClass:[LoginToolbarItem class]])
+    {
+        LoginToolbarItem *ltbi = (LoginToolbarItem *)item;
+        ltbi.isLoggedIn = ide.isLoggedIn;
+        [ltbi validate];
+        loginAndOutItem = ltbi;
+    }
+    
+    if ([item isKindOfClass:[StreamToolbarItem class]])
+    {
+        StreamToolbarItem *stbi = (StreamToolbarItem *)item;
+        stbi.state = kStreamToolbarItemStateOff;
+        
+        if (selectedDevice != nil)
+        {
+            NSString *did = [selectedDevice objectForKey:@"id"];
+            
+            if (ide.isLoggedIn && [ide isDeviceLogging:did]) stbi.state = kStreamToolbarItemStateOn;
+        }
+        
+        [stbi validate];
+        streamLogsItem = stbi;
+    }
+}
+
+
+
+- (void)toolbarDidRemoveItem:(NSNotification *)notification
+{
+    // This method is called when certain toolbar items are removed from the toolbar,
+    // to ensure their state is correctly reset at that point
+    
+    id item = [notification.userInfo objectForKey:@"item"];
+    
+    if ([item isKindOfClass:[StreamToolbarItem class]])
+    {
+        StreamToolbarItem *stbi = (StreamToolbarItem *)item;
+        stbi.state = kStreamToolbarItemStateOff;
+        [stbi validate];
+        streamLogsItem = stbi;
+    }
+}
+
+
+
 #pragma mark - NSSplitViewDelegate Methods
 
 
@@ -1230,6 +1171,7 @@
     if (isInspectorHidden)
     {
         // Inspector is hidden; does it want to show? If so allow it
+        
         if (wantsToHide == 1 || proposedPosition < viewWidth)
         {
             wantsToHide = 0;
@@ -1238,11 +1180,13 @@
         }
         
         // Otherwise, disallow
+        
         return viewWidth;
     }
     else
     {
         // Inspector is not hidden; does it want to hide? If so allow it
+        
         if (wantsToHide == -1 || proposedPosition > (viewWidth - 340.0 - splitView.dividerThickness))
         {
             wantsToHide = 0;
@@ -1251,6 +1195,7 @@
         }
         
         // Otherwise disallow;
+        
         return viewWidth - 340.0 - splitView.dividerThickness;
     }
 }
