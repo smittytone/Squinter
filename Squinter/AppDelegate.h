@@ -585,44 +585,50 @@
 
 - (void)gotMyAccount:(NSNotification *)note;
 - (void)gotAnAccount:(NSNotification *)note;
-- (void)listProducts:(NSNotification *)note;
-- (void)productToProjectStageTwo:(NSNotification *)note;
-- (void)productToProjectStageThree:(NSNotification *)note;
-- (void)productToProjectStageFour:(Project *)project;
-- (void)createProductStageTwo:(NSNotification *)note;
-- (void)deleteProductStageTwo:(NSMutableDictionary *)productToDelete;
-- (void)deleteProductStageThree:(NSNotification *)note;
-- (void)updateProductStageTwo:(NSNotification *)note;
-- (void)createDevicegroupStageTwo:(NSNotification *)note;
-- (void)syncLocalDevicegroupsStageTwo:(Devicegroup *)devicegroup;
-- (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project;
-- (void)deleteDevicegroupStageTwo:(NSNotification *)note;
-- (void)updateDevicegroupStageTwo:(NSNotification *)note;
-- (void)uploadCodeStageTwo:(NSNotification *)note;
-- (void)updateCodeStageTwo:(NSNotification *)note;
-- (void)uploadProjectStageThree:(Project *)project;
-- (void)listDevices:(NSNotification *)note;
-- (void)restarted:(NSNotification *)note;
-- (void)reassigned:(NSNotification *)note;
-- (void)renameDeviceStageTwo:(NSNotification *)note;
-- (void)deleteDeviceStageTwo:(NSNotification *)note;
 - (void)loggedIn:(NSNotification *)note;
 - (void)loggedInStageTwo;
 - (void)loginRejected:(NSNotification *)note;
 - (void)loggedOut:(NSNotification *)note;
-
-
-// Log and Logging Methods
-
+- (void)uploadProjectStageThree:(Project *)project;
+- (void)listProducts:(NSNotification *)note;
+- (void)productToProjectStageTwo:(NSNotification *)note;
+- (void)productToProjectStageThree:(NSNotification *)note;
+- (void)productToProjectStageFour:(Project *)project;
+- (void)getCurrentDeployment:(NSDictionary *)data;
+- (void)createProductStageTwo:(NSNotification *)note;
+- (void)deleteProductStageTwo:(NSMutableDictionary *)productToDelete;
+- (void)deleteProductStageThree:(NSNotification *)note;
+- (void)updateProductStageTwo:(NSNotification *)note;
+- (void)updateDevicegroupStageTwo:(NSNotification *)note;
+- (void)deleteDevicegroupStageTwo:(NSNotification *)note;
+- (void)createDevicegroupStageTwo:(NSNotification *)note;
+- (void)syncLocalDevicegroupsStageTwo:(Devicegroup *)devicegroup;
+- (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project;
+- (void)updateCodeStageTwo:(NSNotification *)note;
+- (void)uploadCodeStageTwo:(NSNotification *)note;
+- (void)showCodeErrors:(NSNotification *)note;
+- (void)listDevices:(NSNotification *)note;
+- (void)listBlessedDevices:(NSArray *)devices :(Devicegroup *)devicegroup;
+- (void)updateDevice:(NSNotification *)note;
+- (void)restarted:(NSNotification *)note;
+- (void)reassigned:(NSNotification *)note;
+- (void)renameDeviceStageTwo:(NSNotification *)note;
+- (void)deleteDeviceStageTwo:(NSNotification *)note;
+- (void)setMinimumDeploymentStageTwo:(NSNotification *)note;
+- (void)displayError:(NSNotification *)note;
 - (void)listCommits:(NSNotification *)note;
 - (void)listLogs:(NSNotification *)note;
-- (void)logLogs:(NSString *)logLine;
-- (IBAction)printLog:(id)sender;
-- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo;
 - (void)loggingStarted:(NSNotification *)note;
 - (void)loggingStopped:(NSNotification *)note;
 - (void)presentLogEntry:(NSNotification *)note;
 - (void)endLogging:(NSNotification *)note;
+
+
+// Log and Logging Methods
+
+- (void)logLogs:(NSString *)logLine;
+- (IBAction)printLog:(id)sender;
+- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo;
 - (IBAction)showProjectInfo:(id)sender;
 - (IBAction)showDeviceGroupInfo:(id)sender;
 - (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines;
@@ -630,6 +636,8 @@
 - (IBAction)showDeviceInfo:(id)sender;
 - (IBAction)logDeviceCode:(id)sender;
 - (IBAction)logAgentCode:(id)sender;
+// ADDED IN 2.3.128:
+- (void)logModelCode:(NSString *)codeType;
 - (IBAction)clearLog:(id)sender;
 - (void)printInfoInLog:(NSMutableArray *)lines;
 - (void)writeStringToLog:(NSString *)string :(BOOL)addTimestamp;
@@ -637,11 +645,8 @@
 - (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeNoteToLog:(NSString *)string :(NSColor *)colour :(BOOL)addTimestamp;
 - (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp;
-- (void)showCodeErrors:(NSNotification *)note;
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
 - (void)logCode;
-//- (void)writeStreamToLog:(NSAttributedString *)string;
-- (void)displayError:(NSNotification *)note;
 
 
 // External Editor Methods
@@ -662,6 +667,7 @@
 
 // UI Update Methods
 // Projects menu
+
 - (void)refreshProjectsMenu;
 - (void)refreshOpenProjectsMenu;
 - (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
@@ -669,6 +675,7 @@
 - (void)setProductsMenuTick;
 
 // Device Groups menu
+
 - (void)refreshDevicegroupMenu;
 - (void)refreshDevicegroupByType:(NSString *)type;
 - (void)refreshMainDevicegroupsMenu;
@@ -684,6 +691,7 @@
 - (void)addItemToFileMenu:(NSString *)text :(BOOL)isActive;
 
 // Device menu
+
 - (void)refreshDeviceMenu;
 - (void)refreshDevicesPopup;
 - (void)setDevicesPopupTick;
@@ -692,11 +700,13 @@
 - (void)setUnassignedDevicesMenuTick;
 
 // View menu
+
 - (void)refreshViewMenu;
 - (void)refreshRecentFilesMenu;
 - (IBAction)showHideToolbar:(id)sender;
 
 // Toolbar
+
 - (void)setToolbar;
 
 

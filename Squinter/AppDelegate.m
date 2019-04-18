@@ -439,7 +439,7 @@
         CGFloat proposed = splitView.frame.size.width - 340.0 - splitView.dividerThickness;
         [splitView setPosition:proposed ofDividerAtIndex:0];
     }
-    
+
     // Set the Log TextView's font
 
     NSInteger index = [[defaults objectForKey:@"com.bps.squinter.fontNameIndex"] integerValue];
@@ -708,13 +708,13 @@
 
     if (projectArray == nil) projectArray = [[NSMutableArray alloc] init];
     iwvc.projectArray = projectArray;
-    
+
     // FROM 2.3.128
     // Pass the path display mode to the Inspector
-    
+
     NSNumber *num = [defaults objectForKey:@"com.bps.squinter.displaypath"];
     iwvc.pathType = num.integerValue;
-    
+
 }
 
 
@@ -884,16 +884,16 @@
 
     [defaults setValue:workingDirectory forKey:@"com.bps.squinter.workingdirectory"];
     [defaults setValue:NSStringFromRect(_window.frame) forKey:@"com.bps.squinter.windowsize"];
-    
+
     // **** TO 2.1.125 ****
-    
+
     // if (iwvc.view.window.isVisible) [defaults setValue:NSStringFromRect(iwvc.view.window.frame) forKey:@"com.bps.squinter.inspectorsize"];
-    
+
     // **** FROM 2.2.126 ****
-    
+
     [defaults setValue:[NSNumber numberWithBool:isInspectorHidden] forKey:@"com.bps.squinter.inspectorshow"];
     [defaults setValue:NSStringFromRect(NSMakeRect(0.0, 20.0, 340.0, 520.0)) forKey:@"com.bps.squinter.inspectorsize"];
-    
+
     [defaults setObject:[NSArray arrayWithArray:recentFiles] forKey:@"com.bps.squinter.recentFiles"];
 
     // Stop watching for notifications
@@ -1022,11 +1022,11 @@
 {
     // Show the Inspector if it's closed
     // If the Inspector is obscured by the main window, or not key, bring it forward
-    
+
     if (isInspectorHidden)
     {
         // Inspector panel is hidden, so prepare to show it
-        
+
         CGFloat proposed = splitView.frame.size.width - 340.0;
         wantsToHide = 1;
         [splitView setPosition:proposed ofDividerAtIndex:0];
@@ -1034,7 +1034,7 @@
     else
     {
         // Inspector panel is visible, so prepare to hide it
-        
+
         CGFloat proposed = splitView.frame.size.width;
         wantsToHide = -1;
         [splitView setPosition:proposed ofDividerAtIndex:0];
@@ -1048,7 +1048,7 @@
     if (currentProject != nil) iwvc.project = currentProject;
 
     [iwvc setTab:kInspectorTabProject];
-    
+
     if (isInspectorHidden) [self showInspector:nil];
 }
 
@@ -1059,7 +1059,7 @@
     if (selectedDevice != nil) iwvc.device = selectedDevice;
 
     [iwvc setTab:kInspectorTabDevice];
-    
+
     if (isInspectorHidden) [self showInspector:nil];
 }
 
@@ -1099,11 +1099,11 @@
 
         NSInteger cloudCode = ide.impCloudCode;
         NSString *cloudName = [self getCloudName:cloudCode];
-        
+
         [self logout];
 
         // Update the UI and report to the user
-        
+
         accountMenuItem.title = @"Not Signed in to any Account";
         loginMenuItem.title = @"Log in to your Main Account";
         switchAccountMenuItem.title = @"Log in to a Different Account...";
@@ -1207,7 +1207,7 @@
 
     usernameTextField.stringValue = (un == nil) ? @"" : [ide decodeBase64String:un];
     passwordTextField.stringValue = (pw == nil) ? @"" : [ide decodeBase64String:pw];
-    
+
     if (lk != nil) loginKey = lk;
 
     if (ic == nil || [ic compare:@"AWS"] == NSOrderedSame)
@@ -1455,7 +1455,7 @@
 - (IBAction)newProject:(id)sender
 {
     // Create a new product from scratch
-    
+
     if (selectedProduct != nil)
     {
         // If we have a selected product, we can potentially associate it with the new project...
@@ -1915,7 +1915,7 @@
 - (IBAction)closeProject:(id)sender
 {
     // The UI entry point for 'close project' operations
-    
+
     if (projectArray.count == 0 || currentProject == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
@@ -1951,9 +1951,9 @@
 
         saveChangesSheetLabel.stringValue = @"Project has unsaved changes.";
         closeProjectFlag = YES;
-        
+
         [_window beginSheet:saveChangesSheet completionHandler:nil];
-        
+
         return;
     }
 
@@ -1978,7 +1978,7 @@
         [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no open Projects.", closedName] :YES];
         [projectArray removeAllObjects];
         [fileWatchQueue kill];
-        
+
         fileWatchQueue = nil;
         currentProject = nil;
         currentDevicegroup = nil;
@@ -2046,31 +2046,31 @@
     // FROM 2.3.128
     // This method ensure all the files relating to the specified devicegroup, ie.
     // models, their files and their librares, are removed from the file watch list
-    
+
     if (devicegroup.models.count > 0)
     {
         for (Model *model in devicegroup.models)
         {
             NSString *path = [model.path stringByAppendingFormat:@"/%@", model.filename];
-            
+
             if (path.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:parent.path :path]];
-            
+
             if (model.libraries.count > 0)
             {
                 for (File *file in model.libraries)
                 {
                     NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
-                    
+
                     if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:parent.path :fpath]];
                 }
             }
-            
+
             if (model.files.count > 0)
             {
                 for (File *file in model.files)
                 {
                     NSString *fpath = [file.path stringByAppendingFormat:@"/%@", file.filename];
-                    
+
                     if (fpath.length > 0) [fileWatchQueue removePath:[self getAbsolutePath:parent.path :fpath]];
                 }
             }
@@ -2443,7 +2443,7 @@
                         {
                             // The project's name matches an existing product name
                             // TODO Fix an action for this rather than bailing
-                            
+
                             return;
                         }
                     }
@@ -2452,12 +2452,12 @@
             else
             {
                 // Get the list of products from the server
-                
+
                 NSDictionary *dict = @{ @"action" : @"uploadproject",
                                         @"project" : project };
-                
+
                 [ide getProducts:dict];
-                
+
                 // Pick up in 'listProducts:'
             }
 
@@ -2559,7 +2559,7 @@
 {
     // This method re-binds the specified project to a different product under a different account
     // EXPERIMENTAL
-    
+
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
 
@@ -2587,7 +2587,7 @@
             if (project == currentProject)
             {
                 // Update the Inspector manually
-                
+
                 iwvc.project = currentProject;
                 [saveLight needSave:YES];
             }
@@ -2607,34 +2607,34 @@
 - (IBAction)doSync:(id)sender
 {
     // This is the start point for the UI to trigger a project sync
-    
+
     // We can't sync if we're not logged in
-    
+
     if (!ide.isLoggedIn)
     {
         [self loginAlert:@"upload or sync this Project"];
         return;
     }
-    
+
     // Must have a selected project to sync (this should be prevented by the UI)
-    
+
     if (currentProject == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
         return;
     }
-    
+
     // Does the current project have a product ID?
-    
+
     if (currentProject.pid == nil || currentProject.pid.length == 0)
     {
         // No, so warn the user and request they associate the project with a product
         // or upload the project (ie. create a product for it)
-        
+
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = [NSString stringWithFormat:@"Project “%@” is not linked to a product", currentProject.name];
         alert.informativeText = @"You can associate the project it with a product (use the 'Projects' > 'Link Product' menu item) and then synchronise again. You may need to refresh the list of Products in the impCloud first. Or you can upload the project to a new product.";
-        
+
         [alert addButtonWithTitle:@"Upload"];
         [alert addButtonWithTitle:@"Associate"];
         [alert addButtonWithTitle:@"Cancel"];
@@ -2643,16 +2643,16 @@
             if (returnCode == NSAlertFirstButtonReturn)
             {
                 // Proceed to upload the project
-                
+
                 [self uploadProject:currentProject];
             }
         }];
-        
+
         return;
     }
-    
+
     // Now go and perform the sync
-    
+
     [self syncProject:currentProject];
 }
 
@@ -2703,21 +2703,21 @@
         NSNumber *num = [sywvc.selectedGroups objectAtIndex:i];
         [groupsToSync addObject:[sywvc.syncGroups objectAtIndex:num.integerValue]];
     }
-    
+
     // NOTE The following test should always be true
-    
+
     if (groupsToSync.count > 0)
     {
         BOOL noDeployments = YES;
-        
+
         // Record the number of devicegroups to download/upload
 
         sywvc.project.count = groupsToSync.count;
-        
+
         if (sywvc.presentingRemotes)
         {
             // Handle the device groups for downloading
-            
+
             for (NSDictionary *dg in groupsToSync)
             {
                 // Convert each of the downloadable device group dictionaries
@@ -2764,35 +2764,35 @@
                     [ide getDeployment:[cd objectForKey:@"id"] :dict];
 
                     // At this point we have to dela with multiple async calls to 'productToProjectStageThree:'
-                    
+
                     noDeployments = NO;
                 }
             }
-            
+
             // Mark the project as requiring a save (we've added at least one new device group
-            
+
             sywvc.project.haschanged = YES;
-            
+
             if (noDeployments)
             {
                 // None of the device groups have code, so we need to update the UI here
-                
+
                 // [self postSync:sywvc.project];
             }
-            
+
             // Re-call the project sync to trap un-uploaded device groups
             // NOTE These were detected but not actioned becuase we handled downloads
             //      in preference to them. Going back means there are now no groups
             //      to download, so the uploads will be handled. if there are no
             //      groups to upload, the project is in sync and the post-sync
             //      alert will appear
-            
+
             [self syncProject:sywvc.project];
         }
         else
         {
             // Handle uploads
-            
+
             [self syncLocalDevicegroups:groupsToSync];
         }
     }
@@ -2803,21 +2803,21 @@
 - (void)postSync:(Project *)project
 {
     // NOTE May renove this before release (see 'closeSyncChoiceSheet:')
-    
+
     // Update the UI immediately after a sync
-    
+
     [saveLight needSave:project.haschanged];
     [self refreshMainDevicegroupsMenu];
     [self refreshDevicegroupMenu];
     [self refreshDeviceMenu];
     [self setToolbar];
-    
+
     if (project == currentProject) iwvc.project = project;
-    
+
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat:@"Project “%@” synchronised", project.name];
     alert.informativeText = @"All of the Device Groups listed on the server are now accessible via the Project. Please save the Project to write any downloaded code files to disk.";
-    
+
     [alert beginSheetModalForWindow:_window completionHandler:nil];
 }
 
@@ -2828,31 +2828,31 @@
     // NOTE All of the devicegroups in the array will have the same
     //      parent. We've already checked (in doSync:) that the
     //      project is associated with a product
-    
+
     Project *parent = [self getParentProject:[devicegroups firstObject]];
     parent.count = devicegroups.count;
 
     // Run through the list of local-only devicegroups and create a new group
     // on the server for each.
-    
+
     for (Devicegroup *dg in devicegroups) {
-        
+
         NSDictionary *dict = @{ @"action" : @"syncdevicegroup",
                                 @"project" : parent,
                                 @"devicegroup" : dg };
-        
+
         NSString *altName = [dg.data objectForKey:@"dgname"];
         if (altName == nil) altName = dg.name;
-        
+
         NSDictionary *newdg = @{ @"name" : altName,
                                  @"description" : dg.description,
                                  @"productid" : parent.pid,
                                  @"type" : dg.type };
-        
+
         [ide createDevicegroup:newdg :dict];
-        
+
         // Pick up the action in 'createDevicegroupStageTwo:'
-        
+
         // NOTE Creation may fail because the DG is a (pre_)fixture and requires targets
         // TODO Fix this by calling 'newDevicegroupSheetCreateStageTwo:'
     }
@@ -3107,7 +3107,7 @@
     else
     {
         [ide getMyAccount:dict];
-        
+
         // Pick up the action in 'gotMyAccount:'
     }
 }
@@ -3582,7 +3582,7 @@
         NSUInteger dutCount = [self checkDUTTargets:newType];
         NSUInteger prodCount = [self checkProdTargets:newType];
         NSString *typeString = newType == 2 ? @"Test " : @"";
-        
+
         if (prodCount == 0 && dutCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
@@ -3617,9 +3617,9 @@
         }
 
         // Go to the next stage: choose the target production device group
-        
+
         newTargetsFlag = YES;
-        
+
         [self showSelectTarget:newdg :makeNewFiles :kTargetDeviceGroupTypeProd];
     }
     else
@@ -3690,10 +3690,10 @@
                 // Assume the device group's two targets are actually Devicegroups for now
                 // and that they are in the correct order - Production then DUT - which
                 // SHOULD be the case
-                
+
                 Devicegroup *dg1 = [anyTargets firstObject];
                 Devicegroup *dg2 = [anyTargets lastObject];
-                
+
                 if (dg1 == dg2)
                 {
                     // ERROR
@@ -3701,7 +3701,7 @@
                     [self writeErrorToLog:[NSString stringWithFormat:@"New Device Group \"%@\" has been set with the same target twice. Cannot proceed.", devicegroup.name] :YES];
                     return;
                 }
-                
+
                 details = @{ @"name" : devicegroup.name,
                              @"description" : devicegroup.description,
                              @"productid" : project.pid,
@@ -3736,9 +3736,9 @@
         }
 
         // Select the new Device Group
-        
+
         [project.devicegroups addObject:devicegroup];
-        
+
         if (project == currentProject)
         {
             if (devicegroup != currentDevicegroup)
@@ -3746,10 +3746,10 @@
                 currentDevicegroup = devicegroup;
                 project.devicegroupIndex = [project.devicegroups indexOfObject:currentDevicegroup];
             }
-            
+
             iwvc.project = project;
             project.haschanged = YES;
-            
+
             [saveLight needSave:YES];
             [self refreshOpenProjectsMenu];
         }
@@ -3774,12 +3774,12 @@
 
     // ADDED IN 2.3.128
     // Pass across the type of device group that needs to be chosen as a target
-    
+
     swvc.targetType = targetType;
     swvc.theNewDevicegroup = devicegroup;
     swvc.makeNewFiles = andMakeNewFiles;
     swvc.project = currentProject;
-    
+
     [swvc prepSheet];
     [_window beginSheet:selectTargetSheet completionHandler:nil];
 }
@@ -3789,11 +3789,11 @@
 - (IBAction)cancelSelectTarget:(id)sender
 {
     // Close the sheet...
-    
+
     [_window endSheet:selectTargetSheet];
 
     // ... and reset any progress variables
-    
+
     newTargetsFlag = NO;
 }
 
@@ -3806,28 +3806,28 @@
     if (swvc.theSelectedTarget == nil)
     {
         // No target was selected in the dialog so treat this as a cancel
-        
+
         [self cancelSelectTarget:nil];
-        
+
         return;
     }
-    
+
     // Close the sheet
-    
+
     [_window endSheet:selectTargetSheet];
-    
+
     // If we are not changing a target for an existing device, continue with the creation of a new devicegroup
     // ie. if 'newTargetsFlag' is true
 
     if (newTargetsFlag)
     {
         // ADDED IN 2.3.128 Branch back to re-show the select group for the subsequent targets
-        
+
         if (swvc.targetType == kTargetDeviceGroupTypeProd)
         {
             // We have just got the (Test) Production Device Group target,
             // so go back and get the (Test) DUT Device Group
-            
+
             if (fixtureTargets == nil)
             {
                 fixtureTargets = [[NSMutableArray alloc] init];
@@ -3836,38 +3836,38 @@
             {
                 [fixtureTargets removeAllObjects];
             }
-            
+
             [fixtureTargets addObject:swvc.theSelectedTarget];
-            
+
             [self showSelectTarget:swvc.theNewDevicegroup :swvc.makeNewFiles :kTargetDeviceGroupTypeDUT];
         }
         else if (swvc.targetType == kTargetDeviceGroupTypeDUT)
         {
             // We now have the (Test) DUT Device Group, so we're ready to create the new group
-            
+
             newTargetsFlag = NO;
-            
+
             swvc.targetType = kTargetDeviceGroupTypeNone;
-            
+
             [fixtureTargets addObject:swvc.theSelectedTarget];
-            
+
             [self newDevicegroupSheetCreateStageTwo:swvc.theNewDevicegroup :swvc.project :swvc.makeNewFiles :fixtureTargets];
         }
-        
+
         return;
     }
 
     // Check that the selected device group is not the current one
-    
+
     // ADDED 2.3.128 Allow the use of various '_target' attributes
-    
+
     NSString *key = @"";
-    
+
     if (currentDevicegroup.data != nil)
     {
         if (swvc.targetType == kTargetDeviceGroupTypeProd) key = @"production_target";
         if (swvc.targetType == kTargetDeviceGroupTypeDUT)  key = @"dut_target";
-        
+
         NSDictionary *tgt = [self getValueFrom:currentDevicegroup.data withKey:key];
 
         if (tgt != nil)
@@ -3883,7 +3883,7 @@
         else
         {
             // The device group were working with has no targets
-            
+
             NSLog(@"ERROR: attempting to set a target on a non-targetable device group in selectTarget:");
             return;
         }
@@ -4063,9 +4063,9 @@
             // Update the UI
 
             [self refreshMainDevicegroupsMenu];
-            
+
             Project *parent = [self getParentProject:currentDevicegroup];
-            
+
             if (parent == currentProject) iwvc.project = currentProject;
         }
 
@@ -4110,7 +4110,7 @@
             if (dgitem.submenu != nil)
             {
                 // Turn off any submenu items (ie. devices) too
-                
+
                 for (NSMenuItem *sitem in dgitem.submenu.itemArray)
                 {
                     sitem.state = NSOffState;
@@ -4130,10 +4130,10 @@
 
                 // TO 2.1.125 - The following lines select the device group's first
                 //              device manually
-                
+
                 // NSMenuItem *sitem = [dgitem.submenu.itemArray objectAtIndex:0];
                 // [self chooseDevice:sitem];
-                
+
                 // FROM 2.2.126 - Use the dedicated first-device selection function
                 //                as this pops up the multi-device dialog if required
                 [self selectFirstDevice];
@@ -4625,11 +4625,11 @@
              if (currentDevicegroup.models.count > 0)
              {
                  // FROM 2.3.128 - Unwatch the device group's files
-                 
+
                  [self closeDevicegroupFiles:currentDevicegroup :currentProject];
-                 
+
                  // Remove the model and file records from the device group
-                 
+
                  [currentDevicegroup.models removeAllObjects];
              }
              currentProject.haschanged = YES;
@@ -4813,7 +4813,7 @@
     // The sheet presents a list of suitable device groups in a table
     // NOTE The table contained within the sheet is handled by a separate
     // SelectWindowViewController instance, 'swvc'
-    
+
     [self chooseTarget:kTargetDeviceGroupTypeDUT];
 }
 
@@ -4826,13 +4826,13 @@
     // The sheet presents a list of suitable device groups in a table
     // NOTE The table contained within the sheet is handled by a separate
     // SelectWindowViewController instance, 'swvc'
-    
+
     if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
-    
+
     NSString *groupType = type == kTargetDeviceGroupTypeDUT ? @"DUT" : @"production";
 
     if (!ide.isLoggedIn)
@@ -4940,7 +4940,7 @@
             {
                 // 'currentDevicegroup.devices' only stores device IDs, so we need to find the
                 // referenced device first
-                
+
                 NSString *devId = [currentDevicegroup.devices firstObject];
 
                 for (NSMutableDictionary *device in devicesArray)
@@ -5011,18 +5011,18 @@
                 [self setUnassignedDevicesMenuTick];
                 [self setDevicesMenusTicks];
                 [self refreshDeviceMenu];
-                
+
                 // NOTE TO 2.1.125, 'com.bps.squinter.autoselectdevice' is not exposed, so
                 //      we can add this here without breaking anything (fingers crossed...)
                 //      We use it to block the multi-device warning sheet
-                
+
                 BOOL doShow = [defaults boolForKey:@"com.bps.squinter.autoselectdevice"];
                 if (!doShow) return;
-                
+
                 // TODO Have to add a 'reset warnings' item to Prefs/somewhere too
 
                 multiDeviceLabel.stringValue = [NSString stringWithFormat:@"This device group has mulitple assigned devices:\n\n%@\nThe first device, %@, will be selected initially.\nThis warning can be disabled in Preferences.", list, first];
-                
+
                 [_window beginSheet:multiDeviceSheet completionHandler:nil];
             }
         }
@@ -5064,7 +5064,7 @@
     // Entry point for UI to enable or disable periodic device status checks
     // If 'sender' is nil, we've arrived from elsewhere in the code (eg. 'loggedin:')
     // in order that this is set in response to a prefs check
-    
+
     if (refreshTimer != nil)
     {
         // If 'refreshTimer' is not nil, we are already auto-refreshing, so it's
@@ -7111,7 +7111,7 @@
                                              [fileWatchQueue removePath:[self getAbsolutePath:currentProject.path :[model.path stringByAppendingPathComponent:model.filename]]];
 
                                              // Add the new file to the model
-                                             
+
                                              model.filename = [filePath lastPathComponent];
                                              model.path = [self getRelativeFilePath:currentProject.path :[filePath stringByDeletingLastPathComponent]];
 
@@ -7275,69 +7275,69 @@
 {
     // Save the 'savingProject] project. This may be a newly created project and may not
     // necessarily be 'currentProject'
-    
+
     BOOL success = NO;
     NSString *savePath = [saveDirectory path];
-    
+
     if (newFileName == nil)
     {
         // No filename passed in, so we must have come from 'saveProject:'
-        
+
         if (savingProject.filename != nil)
         {
             // We have an existing filename - use it
-            
+
             newFileName = savingProject.filename;
         }
         else
         {
             // We have no saved filename and no passed in filename, so create one
-            
+
             newFileName = [savingProject.name stringByAppendingString:@".squirrelproj"];
         }
     }
     else
     {
         // We have come from 'saveProjectAs:'
-        
+
         // First add '.squirrelproj' to the specified file name if it has been removed
-        
+
         NSRange r = [newFileName rangeOfString:@".squirrelproj"];
-        
+
         if (r.location == NSNotFound) newFileName = [newFileName stringByAppendingString:@".squirrelproj"];
-        
+
         if (savingProject.filename != nil)
         {
             // We have an existing filename - is the new one different?
-            
+
             //if ([savingProject.filename compare:newFileName] != NSOrderedSame) nameChange = YES;
         }
     }
-    
+
     savePath = [savePath stringByAppendingString:[NSString stringWithFormat:@"/%@", newFileName]];
-    
+
     // Set the time of the update
-    
+
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
     savingProject.updated = [dateFormatter stringFromDate:[NSDate date]];
-    
+
     if ([nsfm fileExistsAtPath:savePath])
     {
         // The file already exists. We can safely overwrite it because that's what the user intended:
         // They asked for it implicitly with a Save command, or told the Save As... dialog to replace the file
-        
+
         // Write the new version to a separate file
-        
+
         NSString *altPath = [savePath stringByAppendingString:@".new"];
         success = [NSKeyedArchiver archiveRootObject:savingProject toFile:altPath];
-        
+
         if (success)
         {
             // We have successfully written the new file, so we can replace the old one with the new one
-            
+
             [fileWatchQueue removePath:savePath];
-            
+
             NSError *error;
             NSURL *url;
             success = [nsfm replaceItemAtURL:[NSURL fileURLWithPath:savePath]
@@ -7346,82 +7346,82 @@
                                      options:NSFileManagerItemReplacementUsingNewMetadataOnly
                             resultingItemURL:&url
                                        error:&error];
-            
+
             [fileWatchQueue addPath:savePath];
-            
+
             // Log any error
-            
+
             if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not replace file %@ with %@", savePath, altPath] :YES];
         }
         else
         {
             // Log failure to save as an error
-            
+
             [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", altPath] :YES];
         }
     }
     else
     {
         // The file doesn't already exist at this location so just write it out
-        
+
         success = [NSKeyedArchiver archiveRootObject:savingProject toFile:savePath];
-        
+
         // Log any error
-        
+
         if (!success) [self writeErrorToLog:[NSString stringWithFormat:@"Could not save file %@", savePath] :YES];
     }
-    
+
     if (success == YES)
     {
         // The new file was successfully written
-        
+
         savingProject.path = [savePath stringByDeletingLastPathComponent];
         savingProject.filename = newFileName;
         savingProject.haschanged = NO;
-        
+
         if (savingProject == currentProject)
         {
             // The saved project is the one on view in the UI, so update the save indicator
-            
+
             [saveLight needSave:NO];
-            
+
             // Add the project to the list
             // Don't need to do this is just saving, only save as...
-            
+
             if (saveAsFlag) [self addToRecentMenu:savingProject.filename :savingProject.path];
-            
+
             saveAsFlag = NO;
         }
-        
+
         // If we're immediately resaving a downloaded product after saving its files
         // (which updates the project files), then don't show the 'project saved' message,
         // otherwise do show it
-        
+
         if (!doubleSaveFlag) [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" saved at %@.", savingProject.name, [savePath stringByDeletingLastPathComponent]] :YES];
     }
     else
     {
         [self writeErrorToLog:@"The Project file could not be saved." :YES];
-        
+
         // TODO Do we bail at this point, ie. return at this point, not try and save the model files?
         //      eg. savingProject = nil;
     }
-    
+
     // Saved the project, but there may be models to save, eg. from a 'download product' or 'sync product' operation
-    
+
     if (!doubleSaveFlag && savingProject.devicegroups.count > 0)
     {
         // The project to be saved has one or more device groups, so go and check for unsaved files
-        
+
         [self saveModelFiles:savingProject];
         return;
     }
-    
+
     doubleSaveFlag = NO;
     savingProject = nil;
-    
+
     // Did we come here from a 'close project'? If so, re-run to actually close the project
-    
+
     if (closeProjectFlag) [self closeProject:nil];
 }
 
@@ -7495,16 +7495,16 @@
         // wants to close a specific project or is closing them all
 
         savingProject = currentProject;
-        
+
         [self saveProject:nil];
-        
+
         closeProjectFlag = NO;
         return;
     }
-    
+
     // From here on, we're planning to apply a single choice to all open projects
     // This is in the event of an app quit, rather than a close/close all
-    
+
     for (Project *aProject in projectArray)
     {
         // The user wants to save unsaved changes, so run through the projects to see which have unsaved changes
@@ -7544,11 +7544,11 @@
             for (Model *model in dg.models)
             {
                 // Is the model marked as unsaved?
-                
+
                 if ([model.filename compare:@"UNSAVED"] == NSOrderedSame)
                 {
                     // NOTE we save a model file even if it contains no code - the user may add code later
-                
+
                     model.path = project.path;
                     model.filename = [dg.name stringByAppendingFormat:@".%@.nut", model.type];
 
@@ -7563,13 +7563,13 @@
     if (filesToSave.count > 0)
     {
         // Begin saving the files
-        
+
         [self saveFiles:filesToSave :project];
     }
     else
     {
         // Jump straight to 'doneSaving:'
-        
+
         [self doneSaving:project];
     }
 }
@@ -7691,36 +7691,36 @@
 {
     // Clean up after saving for downloaded products or sync'd projects
     // when there have been unsaved files
-    
+
     /*
     if ([downloads indexOfObject:project] != NSNotFound)
     {
         // Project is in the download list, so remove it
-        
+
         [downloads removeObject:project];
     }
     */
-    
+
     // Update the UI
-    
+
     [saveLight show];
     [saveLight needSave:NO];
-    
+
     [self refreshOpenProjectsMenu];
     [self refreshProjectsMenu];
     [self refreshDevicegroupMenu];
     [self refreshMainDevicegroupsMenu];
-    
+
     if (project == currentProject) iwvc.project = project;
-    
+
     // We now need to re-save the project file, which now contains the locations
     // of the various model files. We do this programmatically rather than indicate
     // to the user that they need to (re)save the project
-    
+
     project.haschanged = YES;
     savingProject = project;
     doubleSaveFlag = YES;
-    
+
     [self saveProject:nil];
 }
 
@@ -7728,20 +7728,20 @@
 
 #pragma mark - API Response Handler Methods
 
-#pragma mark Account Methods
+#pragma mark API Called Account Methods
 
 - (void)gotMyAccount:(NSNotification *)note
 {
-    // This method should ONLY be called by BuildAPIAccess instance AFTER loading the account info
+    // Called by BuildAPIAccess instance AFTER loading the account info
 
     NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *so = [data objectForKey:@"object"];
-    NSString *action = [so objectForKey:@"action"];
+    NSDictionary *source = [data objectForKey:@"object"];
+    NSString *action = [source objectForKey:@"action"];
 
-    if (so != nil)
+    if (source != nil)
     {
         // Because the BuildAPIAccess instance's own attempt to get the account info will come here, we
-        // (uniquely) need to make sure that we have a passed object ('so') to work with before processing
+        // (uniquely) need to make sure that we have a passed object ('source') to work with before processing
 
         if (action != nil)
         {
@@ -7752,13 +7752,13 @@
 
                 [self getProductsFromServer:nil];
             }
-            
+
             if ([action compare:@"loggedin"] == NSOrderedSame)
             {
                 // Just re-call 'getProductsFromServer:' as the check on the BuildAPIAccess instance's
                 // 'currentAccount' property will pass, and the products list will be requested from the server
-                
-                [self loggedInStageTwo];
+
+                if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
             }
         }
         else
@@ -7772,13 +7772,13 @@
 
 - (void)gotAnAccount:(NSNotification *)note
 {
-    // This method should ONLY be called by BuildAPIAccess instance AFTER loading the account info
+    // Called by BuildAPIAccess instance AFTER loading the account info
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *account = [data objectForKey:@"account"];
-    NSDictionary *so = [data objectForKey:@"object"];
-    NSMutableDictionary *product = [so objectForKey:@"product"];
-    NSString *action = [so objectForKey:@"action"];
+    NSDictionary *source = [data objectForKey:@"object"];
+    NSMutableDictionary *product = [source objectForKey:@"product"];
+    NSString *action = [source objectForKey:@"action"];
 
     if (action != nil)
     {
@@ -7804,106 +7804,106 @@
 - (void)loggedIn:(NSNotification *)note
 {
     // BuildAPIAccess has signalled login success
-    
+
     // First, get the user's account ID
-    
+
     NSDictionary *dict = @{ @"action" : @"loggedin" };
-    
+
     [ide getMyAccount:dict];
-    
+
     // Action continues asynchronously at 'gotMyAccount:'
     // Meatime, save credentials if they have changed required
-    
+
     BOOL flag = NO;
-    
+
     if (saveDetailsCheckbox.state == NSOnState)
     {
         // User has indicated they want the credentials saved for next time
         // NOTE this should not happen if we auto-log in
-        
+
         PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
         NSString *untf = usernameTextField.stringValue;
         NSString *pwtf = passwordTextField.stringValue;
-        
+
         // Compare the entered value with the existing value - only overwrite if they are different
-        
+
         NSString *cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
-        
+
         cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
-        
+
         if ([cs compare:untf] != NSOrderedSame)
         {
             [pc setString:[ide encodeBase64String:untf] forKey:@"com.bps.Squinter.ak.notional.tully"];
             flag = YES;
         }
-        
+
         cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
-        
+
         cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
-        
+
         if ([cs compare:pwtf] != NSOrderedSame)
         {
             [pc setString:[ide encodeBase64String:pwtf] forKey:@"com.bps.Squinter.ak.notional.tilly"];
             flag = YES;
         }
-        
+
         if (flag) [self writeStringToLog:@"impCloud credentials saved in your keychain." :YES];
     }
-    
+
     // Set the 'Accounts' menu
-    
+
     NSString *cloudName = [self getCloudName:ide.impCloudCode];
     accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
     if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
     loginMenuItem.title = @"Log out of this Account";
     // switchAccountMenuItem.enabled = YES;
-    
+
     if (switchingAccount)
     {
         // We are switching to a secondary account, so we should change the login option
-        
+
         switchAccountMenuItem.title = @"Log in to Your Main Account";
         loginMode = kLoginModeAlt;
     }
     else
     {
         // We have logged into the primary account
-        
+
         switchAccountMenuItem.title = @"Log in to a Different Account...";
         loginMode = kLoginModeMain;
     }
-    
+
     [self setToolbar];
-    
+
     // Register we are no longer trying to log in
-    
+
     isLoggingIn = NO;
     credsFlag = YES;
     switchingAccount = NO;
     otpLoginToken = nil;
-    
+
     // Inform the user he or she is logged in - and to which cloud
-    
+
     [self writeStringToLog:[NSString stringWithFormat:@"You now are logged in to the %@impCloud.", cloudName] :YES];
-    
+
     // Check for any post-login actions that need to be performed
-    
+
     // User may want the Product lists loaded on login
-    
+
     // FROM 2.0.125, this check takes place in 'inloggedInStageTwo:' which indirectly requires a correct account ID
-    
+
     // User wants to update devices' status periodically, or the Device lists loaded on login
-    
+
     if ([defaults boolForKey:@"com.bps.squinter.updatedevs"])
     {
         // Set Squinter to begin the periodic device update timer
-        
+
         [self keepDevicesStatusUpdated:nil];
     }
     else if ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"])
     {
         // Go and get a list of the account's devices
-        
+
         [self updateDevicesStatus:nil];
     }
 }
@@ -7913,7 +7913,8 @@
 - (void)loggedInStageTwo
 {
     // User wants the Product lists loaded on login
-    
+    // TODO Remove this
+
     if ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) [self getProductsFromServer:nil];
 }
 
@@ -7921,16 +7922,16 @@
 
 - (void)loginRejected:(NSNotification *)note
 {
-    // BuildAPIAccess has notified the host that a login attempt has been rejected
-    
+    // Called if BuildAPIAccess has notified the host that a login attempt has been rejected
+
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = @"Sorry, your impCentral credentials have been rejected";
     alert.informativeText = @"Please check your account details and then try to log in again.";
     [alert addButtonWithTitle:@"OK"];
     [alert beginSheetModalForWindow:_window completionHandler:nil];
-    
+
     // Register we are no longer trying to log in
-    
+
     isLoggingIn = NO;
     credsFlag = YES;
     switchingAccount = NO;
@@ -7942,26 +7943,26 @@
 
 - (void)loggedOut:(NSNotification *)note
 {
-    // BuildAPIAccess has notified us that we have been logged out
-    
+    // Called if BuildAPIAccess has notified the host that we have been logged out
+
     loginKey = nil;
     otpLoginToken = nil;
-    
+
     // Stop auto-updating account devices' status
-    
+
     [self keepDevicesStatusUpdated:nil];
-    
+
     // Update the UI elements relating to these items
-    
+
     [self refreshProductsMenu];
     [self refreshProjectsMenu];
     [self refreshDevicesMenus];
     [self refreshDeviceMenu];
     [self refreshDevicesPopup];
     [self setToolbar];
-    
+
     // Set the account menu UI
-    
+
     accountMenuItem.title = @"Not Signed in to any Account";
     loginMenuItem.title = @"Log in to your Main Account";
     switchAccountMenuItem.title = @"Log in to a Different Account...";
@@ -7970,19 +7971,19 @@
 
 
 
-#pragma mark Project Methods
+#pragma mark API Called Project Methods
 
 - (void)uploadProjectStageThree:(Project *)project
 {
     // NOTE We can't get here without one or more device groups
     // and there will be one deployment per devicegroup
-    
+
     [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" code...", project.name] :YES];
-    
+
     // Record the total number of device group code uploads
-    
+
     project.count = project.devicegroups.count;
-    
+
     for (Devicegroup *devicegroup in project.devicegroups)
     {
         [self uploadDevicegroupCode:devicegroup :project];
@@ -7991,11 +7992,11 @@
 
 
 
-#pragma mark Products Methods
+#pragma mark API Called Products Methods
 
 - (void)listProducts:(NSNotification *)note
 {
-    // This method should ONLY be called by BuildAPIAccess instance AFTER loading a list of products
+    // Called by the BuildAPIAccess instance AFTER loading a list of products
     // At this point we typically need to select or re-select a product
 
     NSDictionary *data = (NSDictionary *)note.object;
@@ -8036,7 +8037,7 @@
             if (products.count > 0)
             {
                 // Process the product dictionaries retrieved from the server
-                
+
                 for (NSDictionary *product in products)
                 {
                     // Convert incoming dictionary into a mutable one and copy the data
@@ -8047,9 +8048,9 @@
                     [aProduct setObject:[product objectForKey:@"type"] forKey:@"type"];
                     [aProduct setObject:[product objectForKey:@"relationships"] forKey:@"relationships"];
                     [aProduct setObject:[NSMutableDictionary dictionaryWithDictionary:[product objectForKey:@"attributes"]] forKey:@"attributes"];
-                    
+
                     // Set owner information
-                    
+
                     NSString *creatorID = [aProduct valueForKeyPath:@"relationships.creator.id"];
                     NSString *myID = ide.currentAccount;
 
@@ -8072,14 +8073,14 @@
                         [ide getAccount:creatorID :dict];
 
                         // Pick up the asynchronous action at 'gotAnAccount:'
-                        
+
                         // Add shared products to the end of the list
-                        
+
                         [productsArray addObject:aProduct];
-                        
+
                         // Get the index of the first shared product
                         // 'index' will be zero until then
-                        
+
                         if (index == 0) index = [productsArray indexOfObject:aProduct];
                     }
                     else
@@ -8087,14 +8088,14 @@
                         if (index == 0)
                         {
                             // No shared Products yet, so just add the owned Product to the end of the list
-                            
+
                             [productsArray addObject:aProduct];
                         }
                         else
                         {
                             // There are shared Products so, insert the owned product just before the start
                             // of the shared Products, and increment the index to grow as the array grows
-                            
+
                             [productsArray insertObject:aProduct atIndex:(index - 1)];
                             index++;
                         }
@@ -8120,7 +8121,7 @@
                 [self writeStringToLog:@"List of products loaded: see 'Projects' > 'Products in the impCloud'." :YES];
 
                 // Choose the first product on the list
-                
+
                 if (selectedProduct == nil) selectedProduct = [productsArray objectAtIndex:0];
             }
             else
@@ -8212,7 +8213,7 @@
             else
             {
                 // If there are no local device groups, then all of the retrieved ones are out of sync
-                
+
                 if (devicegroups.count > 0) remotes = devicegroups;
             }
 
@@ -8220,14 +8221,14 @@
             {
                 // We have some device groups on the server that are not recorded locally, so present
                 // the sync choice sheet so the user can select which ones they want to download
-                
+
                 sywvc.syncGroups = remotes;
                 sywvc.project = project;
                 sywvc.presentingRemotes = YES;
-                
+
                 [sywvc prepSheet];
                 [_window beginSheet:syncChoiceSheet completionHandler:nil];
-                
+
                 // Pick up the action at 'cancelSyncChoiceSheet:' or 'closeSyncChoiceSheet:'
                 // depending on the user's choice
                 // NOTE We will return to 'productToProjectStageTwo:' if we go to 'closeSyncChoiceSheet:'
@@ -8238,20 +8239,20 @@
                 // There are no devicegroups on the server that are not present locally,
                 // so determine which, if any, local devicegroups are not
                 // present on the server. Record them in 'locals'
-                
+
                 for (Devicegroup *dg in project.devicegroups)
                 {
                     BOOL onServer = NO;
-                    
+
                     if (dg.did != nil && dg.did.length > 0)
                     {
                         // The local devicegroup has an ID - see if it matches a
                         // devicegroup on the server
-                        
+
                         for (NSDictionary *adg in devicegroups)
                         {
                             NSString *dgid = [adg objectForKey:@"id"];
-                            
+
                             if ([dgid compare:dg.did] == NSOrderedSame)
                             {
                                 onServer = YES;
@@ -8259,33 +8260,33 @@
                             }
                         }
                     }
-                    
+
                     if (!onServer)
                     {
                         if (locals == nil) locals = [[NSMutableArray alloc] init];
                         [locals addObject: dg];
                     }
                 }
-                
+
                 if (locals != nil && locals.count > 0)
                 {
                     // We have some device groups locally that are not present on the server, so present
                     // the sync choice sheet so the user can select which ones they want to upload
-                    
+
                     // First, check uploadable names while we still have access to a list
                     // of server devicegroups (we have previously matched against unique IDs)
-                    
+
                     for (Devicegroup *dg in locals)
                     {
                         BOOL nameMatch = NO;
                         NSUInteger index = 0;
                         NSUInteger count = 0;
                         NSString *name = dg.name;
-                        
+
                         do {
                             NSDictionary *adg = [devicegroups objectAtIndex:index];
                             NSString *aname = [self getValueFrom:adg withKey:@"name"];
-                                
+
                             if ([dg.name compare:aname] == NSOrderedSame)
                             {
                                 nameMatch = YES;
@@ -8298,23 +8299,23 @@
                                 ++index;
                             }
                         } while (index < devicegroups.count);
-                        
+
                         if ([name compare:dg.name] != NSOrderedSame)
                         {
                             // Record the updated name for later
-                            
+
                             if (dg.data == nil) dg.data = [[NSMutableDictionary alloc] init];
                             [dg.data setObject:name forKey:@"dgname"];
                         }
                     }
-                    
+
                     sywvc.syncGroups = locals;
                     sywvc.project = project;
                     sywvc.presentingRemotes = NO;
-                    
+
                     [sywvc prepSheet];
                     [_window beginSheet:syncChoiceSheet completionHandler:nil];
-                    
+
                     // Pick up the action at 'cancelSyncChoiceSheet:' or 'closeSyncChoiceSheet:'
                     // depending on the user's choice
                     // NOTE We will return to 'productToProjectStageTwo:' if we go to 'closeSyncChoiceSheet:'
@@ -8323,7 +8324,7 @@
                 else
                 {
                     // The local project matches the remote product, so let the user know
-                    
+
                     NSAlert *alert = [[NSAlert alloc] init];
                     alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
                     alert.informativeText = @"All of the Device Groups listed on the server are accessible via the Project.";
@@ -8469,7 +8470,7 @@
 
 - (void)productToProjectStageThree:(NSNotification *)note
 {
-    // This method is called by the BuildAPIAccess instance in response to
+    // Called by the BuildAPIAccess instance in response to
     // multiple requests to retrieve the current deployment for a given device group
 
     NSDictionary *data = (NSDictionary *)note.object;
@@ -8478,10 +8479,10 @@
     NSString *action = [so objectForKey:@"action"];
     Project *newProject = [so objectForKey:@"project"];
     Devicegroup *newDevicegroup = [so objectForKey:@"devicegroup"];
-    
+
     // NOTE No check for no action value here as it will have been checked by
     //      all calling methods
-    
+
     if (deployment != nil)
     {
         if ([action compare:@"updatecode"] == NSOrderedSame)
@@ -8573,17 +8574,17 @@
     }
 
     // Decrement the tally of downloadable device groups or deployments to see if we've got them all yet
-    
+
     --newProject.count;
 
     if (newProject.count <= 0)
     {
-        // We have now acquired all the device groups models, so we can set the 
+        // We have now acquired all the device groups models, so we can set the
 
         // ALREADY SET???? newProject.aid = ide.isLoggedIn ? ide.currentAccount : @"";
-        
+
         // Select the devices, if any, belonging to the project's device groups
-        
+
         if (newProject.devicegroups.count > 0)
         {
             if (devicesArray.count > 0)
@@ -8597,16 +8598,16 @@
                     NSDictionary *deviceDevGrp = [relationships objectForKey:@"devicegroup"];
                     NSString *dgid = [deviceDevGrp objectForKey:@"id"];
                     NSString *deviceid = [device objectForKey:@"id"];
-                    
+
                     // Just check for a nil device group ID - to avoid unassigned devices - and
                     // then record the device ID in the device group record if it belongs there
-                    
+
                     for (Devicegroup *dg in newProject.devicegroups)
                     {
                         if ([dg.did compare:dgid] == NSOrderedSame)
                         {
                             // This device 'belongs' to this devicegroup
-                            
+
                             if (dg.devices == nil) dg.devices = [[NSMutableArray alloc] init];
                             [dg.devices addObject:deviceid];
                         }
@@ -8626,7 +8627,7 @@
         if ([action compare:@"syncmodelcode"] == NSOrderedSame)
         {
             // Update the UI for the downloaded project
-            
+
             [self postSync:newProject];
 
             /*
@@ -8672,23 +8673,23 @@
 
 - (void)productToProjectStageFour:(Project *)project
 {
-    // This method is called by productToProjectStageThree: in order to
+    // Called by 'productToProjectStageThree:' in order to
     // clean up after downloading the product
 
     project.count = 999;
     project.haschanged = YES;
     project.filename = [project.name stringByAppendingString:@".squirrelproj"];
-    
+
     // Set the downloaded project as current
-    
+
     [projectArray addObject:project];
-    
+
     currentProject = project;
     iwvc.project = project;
-    
+
     // Set the current device group to the first on the list of the project's
     // device groups (or zero if the project has no device groups)
-    
+
     if (project.devicegroups != nil && project.devicegroups.count > 0)
     {
         currentDevicegroup = [project.devicegroups firstObject];
@@ -8714,11 +8715,11 @@
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat:@"Product “%@” downloaded", project.name];
     alert.informativeText = @"Please save the Project to write any downloaded code files to disk.";
-    
+
     [alert beginSheetModalForWindow:_window completionHandler:nil];
-    
+
     // FROM 2.3.128 Don't immediately save any more
-    
+
     /*
     if (savingProject != nil)
     {
@@ -8740,41 +8741,41 @@
 
 - (void)getCurrentDeployment:(NSDictionary *)data
 {
-    // This method is called by BuildAPIAccess ONLY with a list of a product's device groups
-    // It may be in response to calling 'downloadProduct:', to 'deleteProduct:' or 'syncProject:, with the
-    // actions "downloadproduct", "deleteproduct" and "syncproject", respectively
-    
+    // Called by BuildAPIAccess ONLY with a list of a device group's deployments,
+    // from which we extract the most recent. This is only used in rare instances where
+    // a device group has no 'current_deployment' field
+
     NSDictionary *source = [data objectForKey:@"object"];
     Project *project = [source objectForKey:@"project"];
     Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
     NSMutableArray *deployments = [data objectForKey:@"data"];
-    
+
     if (deployments != nil && deployments.count > 0)
     {
         NSString *newest = @"";
         NSDictionary *currentDeployment = nil;
-        
+
         for (NSDictionary *deployment in deployments)
         {
             NSString *date = [self getValueFrom:deployment withKey:@"updated_at"];
             if (date == nil) date = [self getValueFrom:deployment withKey:@"created_at"];
-            
+
             if ([date compare:newest] == NSOrderedDescending)
             {
                 newest = date;
                 currentDeployment = deployment;
             }
         }
-        
+
         if (currentDeployment != nil)
         {
             // Process deployment
-            
+
             if (devicegroup.models == nil) devicegroup.models = [[NSMutableArray alloc] init];
-            
+
             Model *model;
             NSString *code = [self getValueFrom:currentDeployment withKey:@"device_code"];
-            
+
             if (code != nil)
             {
                 model = [[Model alloc] init];
@@ -8788,9 +8789,9 @@
                 if (model.updated == nil) model.updated = [self getValueFrom:currentDeployment withKey:@"created_at"];
                 [devicegroup.models addObject:model];
             }
-            
+
             code = [self getValueFrom:currentDeployment withKey:@"agent_code"];
-            
+
             if (code != nil)
             {
                 model = [[Model alloc] init];
@@ -8806,9 +8807,9 @@
             }
         }
     }
-    
+
     --project.count;
-    
+
     if (project.count == 0) [self productToProjectStageFour:project];
 }
 
@@ -8816,13 +8817,13 @@
 
 - (void)createProductStageTwo:(NSNotification *)note
 {
-    // This is called by the BuildAPIAccess instance in response to a new product being created
+    // Called by the BuildAPIAccess instance in response to a new product being created
     // This is a result of the user creating a new project and asking for a product to be made too.
 
     NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *so = [data objectForKey:@"object"];
-    NSString *action = [so objectForKey:@"action"];
-    Project *project = [so objectForKey:@"project"];
+    NSDictionary *source = [data objectForKey:@"object"];
+    NSString *action = [source objectForKey:@"action"];
+    Project *project = [source objectForKey:@"project"];
     data = [data objectForKey:@"data"];
 
     // Perform appropriate action flows
@@ -8833,17 +8834,17 @@
 
         project.pid = [data objectForKey:@"id"];
         project.cid = [data valueForKeyPath:@"relationships.creator.id"];
-        
+
         [self writeStringToLog:[NSString stringWithFormat:@"Created product for project \"%@\".", project.name] :YES];
         [self writeStringToLog:@"Refreshing your list of products..." :YES];
-        
+
         selectedProduct = nil;
-        
+
         NSDictionary *dict = @{ @"action" : @"newproduct",
                                 @"productid" : project.pid };
-        
+
         [ide getProducts:dict];
-        
+
         // -> Pick up the async outcomce in 'listProducts:'
 
         if ([action compare:@"newproject"] == NSOrderedSame)
@@ -8865,10 +8866,10 @@
             [saveLight needSave:YES];
 
             // Save the new project - this gives the user the chance to re-locate it
-            
+
             iwvc.project = currentProject;
             savingProject = currentProject;
-            
+
             [self saveProjectAs:nil];
         }
         else if ([action compare:@"uploadproject"] == NSOrderedSame)
@@ -8877,15 +8878,15 @@
             // We now have to upload the device groups
 
             [self writeStringToLog:@"Uploading the project's device groups..." :YES];
-            
+
             if (project.devicegroups.count > 0)
             {
                 // Record the number of device groups to be uploaded
-                
+
                 project.count = project.devicegroups.count;
-                
+
                 // Begin uploading device groups one after the other
-                
+
                 for (Devicegroup *devicegroup in project.devicegroups)
                 {
                     [self writeStringToLog:[NSString stringWithFormat:@"Uploading device group \"%@\"...", devicegroup.name] :YES];
@@ -8900,7 +8901,7 @@
                                                @"type" : devicegroup.type };
 
                     [ide createDevicegroup:details :dict];
-                    
+
                     // Pick up the action at 'createDevicegroupStageTwo:'
                 }
             }
@@ -8916,7 +8917,7 @@
 
 - (void)deleteProductStageTwo:(NSMutableDictionary *)productToDelete
 {
-    // We come here diretctly after checking all of a product's device groups to see if they can be deleted
+    // We come here directly after checking all of a product's device groups to see if they can be deleted
     // It's here that we action the deletion of each device group
 
     NSArray *devicegroups = [productToDelete objectForKey:@"devicegroups"];
@@ -8930,11 +8931,11 @@
     //      that has now gone? With no account ID, the project is free to be uploaded to a new acct
 
     NSString *pid = [product objectForKey:@"id"];
-    
+
     // Find the project, if any, linked to the deleted product
-    
+
     Project *project = nil;
-    
+
     if (projectArray.count > 0)
     {
         for (Project *aproject in projectArray)
@@ -8969,7 +8970,7 @@
                 @{ @"action" : @"deleteproduct",
                    @"devicegroup" : devicegroup,
                    @"product" : productToDelete };
-            
+
             [ide deleteDevicegroup:[devicegroup objectForKey:@"id"] :source];
         }
 
@@ -9005,7 +9006,7 @@
     NSDictionary *productToDelete = [source objectForKey:@"product"];
     NSDictionary *product = [productToDelete objectForKey:@"product"];
     Project *project = [source objectForKey:@"project"];
-    
+
     // Clear the current product if it's still the one we're deleting
 
     if (selectedProduct == product) selectedProduct = nil;
@@ -9022,14 +9023,14 @@
     [ide getProducts:dict];
 
     // Pick up the action at 'listProducts:'
-    
+
     // Meantime, update the project, if one has been recorded
-    
+
     if (project != nil)
     {
         project.pid = @"";
         project.haschanged = YES;
-        
+
         if (project == currentProject)
         {
             iwvc.project = currentProject;
@@ -9134,7 +9135,7 @@
 
 
 
-#pragma mark Device Group Methods
+#pragma mark API Called Device Group Methods
 
 - (void)updateDevicegroupStageTwo:(NSNotification *)note
 {
@@ -9154,27 +9155,27 @@
     {
         // FROM 2.3.128
         // Perform operations common to both actions
-        
+
         devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawGroupData];
         NSDictionary *dict = [self getValueFrom:rawGroupData withKey:@"min_supported_deployment"];
         devicegroup.mdid = [dict objectForKey:@"id"];
         dict = [self getValueFrom:rawGroupData withKey:@"current_deployment"];
         devicegroup.cdid = [dict objectForKey:@"id"];
-        
+
         // Process the actions
-        
+
         if ([action compare:@"devicegroupchanged"] == NSOrderedSame)
         {
             NSString *newName = [self getValueFrom:rawGroupData withKey:@"name"];
             NSString *newDesc = [self getValueFrom:rawGroupData withKey:@"description"];
-            
+
             // FROM 2.3.128
             // Store retrieved type (may have been changed BuildAPIAccess
 
             devicegroup.type = [self getValueFrom:rawGroupData withKey:@"type"];
 
             // Update name and description as required
-            
+
             if (newName != nil && [newName compare:devicegroup.name] != NSOrderedSame)
             {
                 // If the name has changed, report it
@@ -9197,14 +9198,14 @@
             // Use the data we have already just retrieved (rather than get it again)
             // See AppDelegateUtilities - reloads the core device group data from the server
             // [self updateDevicegroup:devicegroup];
-            
+
             // Target changed, so report it
-            
+
             Devicegroup *targetDevicegroup = [source objectForKey:@"target"];
             NSString *type = [self convertDevicegroupType:targetDevicegroup.type :NO];
 
             [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" now has a new target %@ device group: \"%@\".", devicegroup.name, type, targetDevicegroup.name] :YES];
-            
+
             updated = YES;
         }
     }
@@ -9258,8 +9259,8 @@
     {
         // FROM 2.3.128
         // Perform operations common to all actions
-        
-        
+
+
         if ([action compare:@"deletedevicegroup"] == NSOrderedSame)
         {
             Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
@@ -9268,9 +9269,9 @@
             if (project != nil)
             {
                 // FROM 2.3.128 - Unwatch the device group's files
-                
+
                 [self closeDevicegroupFiles:devicegroup :project];
-                
+
                 [project.devicegroups removeObject:devicegroup];
 
                 if (devicegroup == currentDevicegroup)
@@ -9318,15 +9319,15 @@
             NSInteger count = number.integerValue - 1;
 
             [self writeStringToLog:[NSString stringWithFormat:@"Deleting product \"%@\" - device group \"%@\" deleted (%li of %li).", [self getValueFrom:product withKey:@"name"], [self getValueFrom:devicegroup withKey:@"name"], (long)(devicegroups.count - count), (long)devicegroups.count] :YES];
-            
+
             // FROM 2.3.128 If we have a project recorded, run through and find which of its
             // device groups matches the device group that thas just been deleted on the server
             // and clear its ID value
-            
+
             if (project != nil)
             {
                 NSString *did = [devicegroup objectForKey:@"id"];
-                
+
                 for (Devicegroup *adg in project.devicegroups)
                 {
                     if ([adg.did compare:did] == NSOrderedSame)
@@ -9366,7 +9367,7 @@
     // so extract the persisted data to get the new device group,
     // its project and the flag indicating whether the user wants
     // source files creating
-    
+
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *rawGroupData = [data objectForKey:@"data"];
     NSDictionary *source = [data objectForKey:@"object"];
@@ -9374,59 +9375,59 @@
     Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
     Project *project = [source objectForKey:@"project"];
     NSString *action = [source objectForKey:@"action"];
-    
+
     if (action != nil)
     {
         // Record the new device group's ID and its API record
-        
+
         devicegroup.did = [rawGroupData objectForKey:@"id"];
         devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawGroupData];
-        
+
         if ([action compare:@"newdevicegroup"] == NSOrderedSame)
         {
             if (newDevicegroupFlag)
             {
                 // We are adding a device group for newly added files, so go and process those files
                 // and proceed no further here
-                
+
                 [self processAddedFiles:saveUrls];
                 return;
             }
-            
+
             // Add the device group to the project
-            
+
             if (project.devicegroups == nil) project.devicegroups = [[NSMutableArray alloc] init];
-            
+
             [project.devicegroups addObject:devicegroup];
-            
+
             // Mark the project as changed
-            
+
             project.haschanged = YES;
-            
+
             if (project == currentProject)
             {
                 // Set the status light if the project is the current one
-                
+
                 [saveLight needSave:YES];
-                
+
                 // And select the device group
-                
+
                 currentDevicegroup = devicegroup;
                 currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
-                
+
                 // Update the UI
-                
+
                 [self refreshDevicegroupMenu];
                 [self refreshMainDevicegroupsMenu];
                 [self setToolbar];
-                
+
                 // Update the inspector, if required
-                
+
                 iwvc.project = currentProject;
             }
-            
+
             // Now we can produce the source code file, as the user requested
-            
+
             if (makeNewFiles != nil && makeNewFiles.boolValue) [self createFilesForDevicegroup:devicegroup.name :@"agent"];
         }
         else if ([action compare:@"uploadproject"] == NSOrderedSame || [action compare:@"syncdevicegroup"] == NSOrderedSame)
@@ -9434,30 +9435,30 @@
             // We're here after creating a device group as part of a project upload
             // Once all the parts have been uploaded, we move on to upload the code
             // via 'uploadProjectStageThree:'
-            
+
             // FROM 2.3.128
             // We also come here after a project sync devicegroup upload
-            
+
             if ([action compare:@"syncdevicegroup"] == NSOrderedSame) [self syncLocalDevicegroupsStageTwo:devicegroup];
-            
+
             // Decrement the device group processing count
-            
+
             --project.count;
-            
+
             if (project.count == 0)
             {
                 // FROM 2.3.128
                 // If the action is 'syncdevicegroup', attempt to sync again, so that
                 // we trigger the correct UI update
-                
+
                 if ([action compare:@"syncdevicegroup"] == NSOrderedSame)
                 {
                     [self syncProject:project];
                     return;
                 }
-                
+
                 // We have created all the device groups we need to, so it's now time to upload code
-                
+
                 [self uploadProjectStageThree:project];
             }
         }
@@ -9475,9 +9476,9 @@
     // FROM 2.3.128
     // Upload the code for a single devicegroup
     // We come here from 'createDevicegroupStageTwo:'
-    
+
     Project *parent = [self getParentProject:devicegroup];
-    
+
     [self uploadDevicegroupCode:devicegroup :parent];
 }
 
@@ -9488,18 +9489,18 @@
     // FROM 2.3.128
     // Upload the code for a single devicegroup that has just been created on the server.
     // We come here from 'syncLocalDevicegroupsStageTwo:'
-    
+
     if (devicegroup.squinted == kBothCodeSquinted)
     {
         // Code's agent and device code is compiled
-        
+
         if (devicegroup.models > 0)
         {
             [self writeStringToLog:[NSString stringWithFormat:@"Uploading code from device group \"%@\"...", devicegroup.name] :YES];
-            
+
             NSString *agentCode = @"";
             NSString *deviceCode = @"";
-            
+
             for (Model *model in devicegroup.models)
             {
                 if ([model.type compare:@"agent"] == NSOrderedSame)
@@ -9511,39 +9512,39 @@
                     deviceCode = model.code;
                 }
             }
-            
+
             // Set the upload time and date
-            
+
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateStyle = NSDateFormatterMediumStyle;
             dateFormatter.timeStyle = NSDateFormatterNoStyle;
-            
+
             NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
-            
+
             // Assemble the deployment record for uploading the code
-            
+
             NSDictionary *adg = @{ @"type" : devicegroup.type,
                                    @"id" : devicegroup.did };
-            
+
             NSDictionary *relationships = @{ @"devicegroup" : adg };
-            
+
             NSDictionary *attributes = @{ @"flagged" : @NO,
                                           @"agent_code" : agentCode,
                                           @"device_code" : deviceCode,
                                           @"description" : [NSString stringWithFormat:@"Uploaded from Squinter %@ at %@", desc, kSquinterAppVersion] };
-            
+
             NSDictionary *deployment = @{ @"type" : @"deployment",
                                           @"attributes" : attributes,
                                           @"relationships" : relationships };
-            
+
             NSDictionary *data = @{ @"data" : deployment };
-            
+
             NSDictionary *dict = @{ @"action" : @"uploadproject",
                                     @"devicegroup" : devicegroup,
                                     @"project" : project };
-            
+
             [ide createDeployment:data :dict];
-            
+
             // Pick up the action at 'uploadCodeStageTwo:'
         }
         else
@@ -9554,19 +9555,19 @@
     else
     {
         // Device group's model code is not squinted, so don't upload at this time
-        
+
         [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\"'s code is not compiled so cannot be uploaded. Please compiile the code then upload later.", devicegroup.name] :YES];
     }
 }
 
 
 
-#pragma mark Code Methods
+#pragma mark API Called Code Methods
 
 - (void)updateCodeStageTwo:(NSNotification *)note
 {
     // This method should ONLY be called by the BuildAPIAccess object instance AFTER uploading code
-    
+
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *rawDevicegroup = [data objectForKey:@"data"];
     NSDictionary *source = [data objectForKey:@"object"];
@@ -9580,15 +9581,15 @@
 
             Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
             devicegroup.data = [NSMutableDictionary dictionaryWithDictionary:rawDevicegroup];
-            
+
             NSDictionary *dict = [self getValueFrom:rawDevicegroup withKey:@"min_supported_deployment"];
             devicegroup.mdid = [dict objectForKey:@"id"];
             dict = [self getValueFrom:rawDevicegroup withKey:@"current_deployment"];
             devicegroup.cdid = [dict objectForKey:@"id"];
-            
+
             // FROM 2.3.128
             // Auto-update the Inspector with retrieved data
-            
+
             Project *parent = [source objectForKey:@"project"];
             if (parent == currentProject) iwvc.project = currentProject;
         }
@@ -9626,58 +9627,58 @@
 {
     // Called in response to a notification from BuildAPIAccess that a deployment has been created
     // It updates the local records with post-upload data, eg. SHA
-    
+
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *response = [data objectForKey:@"data"];
     NSDictionary *source = [data objectForKey:@"object"];
     Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
     NSString *action = [source objectForKey:@"action"];
-    
+
     // Get the code SHA and updated date and add to the updated device groups's two models
-    
+
     NSString *sha = [self getValueFrom:response withKey:@"sha"];
     NSString *updated = [self getValueFrom:response withKey:@"updated_at"];
     if (updated == nil) updated = [self getValueFrom:response withKey:@"created_at"];
-    
+
     for (Model *model in devicegroup.models)
     {
         model.sha = sha;
         model.updated = updated;
     }
-    
+
     // Mark the updated device group's parent product as changed
-    
+
     Project *project = [self getParentProject:devicegroup];
     project.haschanged = YES;
-    
+
     if (project == currentProject)
     {
         iwvc.project = currentProject;
         [saveLight needSave:YES];
     }
-    
+
     // Mark the devicegroup as uploaded
-    
+
     devicegroup.squinted = devicegroup.squinted | 0x08;
-    
+
     if (action != nil)
     {
         if ([action compare:@"uploadproject"] == NSOrderedSame)
         {
             // Decrement the count of uploaded deployments
-            
+
             --project.count;
-            
+
             if (project.count == 0)
             {
                 // All done! Refresh the products list
-                
+
                 // REMOVED IN 2.3.128 (already handled in 'createProductStageTwo:')
                 // NSDictionary *dict = @{ @"action" : @"getproducts" };
                 // [ide getProducts:dict];
                 // [self writeStringToLog:@"Refreshing product list." :YES];
                 // Pick up the action at 'listProducts:'
-                
+
                 [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" uploaded to impCloud. Please save your project file.", project.name] :YES];
             }
         }
@@ -9695,7 +9696,50 @@
 
 
 
-#pragma mark Device Methods
+- (void)showCodeErrors:(NSNotification *)note
+{
+    // Called in response to a notification from BuildAPIAccess signalling
+    // that there are errors in uploaded code - which this method displays
+    
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSMutableArray *errors = [data objectForKey:@"data"];
+    NSDictionary *source = [data objectForKey:@"object"];
+    Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
+    
+    if (errors.count > 0)
+    {
+        [self writeErrorToLog:@"The impCloud reported the following syntax errors in your code:" :YES];
+        [self writeErrorToLog:@" " :NO];
+        
+        // Run through each of the errors
+        
+        for (NSArray *error in errors)
+        {
+            // Extract the reported line and column number
+            // NOTE 'err' is a dictionary defined by BuildAPIAccess
+            
+            NSDictionary *err = [error objectAtIndex:0];
+            NSUInteger row = [[err objectForKey:@"row"] integerValue];
+            NSUInteger col = [[err objectForKey:@"column"] integerValue];
+            NSString *filename = [err objectForKey:@"file"];
+            NSArray *parts = [filename componentsSeparatedByString:@"_"];
+            filename = [parts objectAtIndex:0];
+            
+            [self writeErrorToLog:[NSString stringWithFormat:@"Error in %@ code: %@ (line %lu, column %lu)", filename, [err objectForKey:@"text"], (unsigned long)row, (unsigned long)col] :NO];
+            
+            // Get the line of code from the relevant model and display it
+            
+            for (Model *model in devicegroup.models)
+            {
+                if ([model.type compare:filename] == NSOrderedSame) [self listCode:model.code :row - 5 :row + 5 :row :col];
+            }
+        }
+    }
+}
+
+
+
+#pragma mark API Called Device Methods
 
 - (void)listDevices:(NSNotification *)note
 {
@@ -9839,11 +9883,11 @@
                 // The inner dictionary, 'attributes' is converted to a mutable dictionary
 
                 NSString *dtype = [device objectForKey:@"type"];
-                
+
                 if ([dtype hasPrefix:@"dev"])
                 {
                     // Only list development devices
-                    
+
                     NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[device objectForKey:@"attributes"]];
                     NSString *name = [self getValueFrom:device withKey:@"name"];
 
@@ -9913,7 +9957,7 @@
                         for (NSDictionary *device in devicesArray)
                         {
                             // Get the ID of the device's host device group
-                            
+
                             NSDictionary *relationships = [device objectForKey:@"relationships"];
                             NSDictionary *devgrp = [relationships objectForKey:@"devicegroup"];
                             NSString *devgrpid = [devgrp objectForKey:@"id"];
@@ -9924,7 +9968,7 @@
                             {
                                 // If the ID of the device's host device group matches that of the iterated device group ('devicegroup')
                                 // then add the device's own ID to 'devicegroup's list of devices
-                                
+
                                 if ([devgrpid compare:devicegroup.did] == NSOrderedSame) [devicegroup.devices addObject:[device objectForKey:@"id"]];
                             }
                         }
@@ -9961,44 +10005,44 @@
 - (void)listBlessedDevices:(NSArray *)devices :(Devicegroup *)devicegroup
 {
     // This method presents a tabulated list of the devices in a pre-production device group
-
+    
     if (devices.count == 0)
     {
         [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" contains no test production devices.", devicegroup.name] :YES];
         return;
     }
-
+    
     __block NSString *titleString = [NSString stringWithFormat:@"Device group \"%@\" test production devices:", devicegroup.name];
     __block NSString *lineString = @"+-----------------------------------------------------------------------+";
     __block NSString *headString = @"| Device ID         |  MAC Address        |  Enrolled                   |";
     __block NSString *midString =  @"+-------------------+---------------------+-----------------------------+";
-
+    
     [extraOpQueue addOperationWithBlock:^(void){
-
+        
         [self performSelectorOnMainThread:@selector(logLogs:)
                                withObject:[NSString stringWithFormat:@"\n%@\n%@\n%@\n%@", titleString, lineString, headString, midString]
                             waitUntilDone:NO];
-
+        
         for (NSDictionary *device in devices)
         {
             NSString *enrolled = @"Unknown                   ";
             NSDate *enrolDate = [self getValueFrom:device withKey:@"last_enrolled_at"];
-
+            
             if (enrolDate != nil)
             {
                 enrolled = [self convertDate:enrolDate];
                 enrolled = [enrolled stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
                 enrolled = [enrolled stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
             }
-
+            
             NSString *line = [NSString stringWithFormat:@"| %@  |  %@  |  %@ |", [self getValueFrom:device withKey:@"id"],
                               [self getValueFrom:device withKey:@"mac_address"], enrolled];
-
+            
             [self performSelectorOnMainThread:@selector(logLogs:)
                                    withObject:line
                                 waitUntilDone:NO];
         }
-
+        
         [self performSelectorOnMainThread:@selector(logLogs:)
                                withObject:lineString
                             waitUntilDone:NO];
@@ -10058,7 +10102,7 @@
 
             return;
         }
-        
+
         // The following is only executed on action '????'
 
         NSString *version = [self getValueFrom:device withKey:@"swversion"];
@@ -10080,7 +10124,7 @@
 
 - (void)restarted:(NSNotification *)note
 {
-    // This method ONLY called in response to a notification from BuildAPIAccess that a device or devices have restarted
+    // Called in response to a notification from BuildAPIAccess that a device or devices have restarted
     // It is called in response to 'restartDevice:' and 'restartDevices:'
     // The former passes in 'selectedDevice'; the latter 'currentDevicegroup'
 
@@ -10120,7 +10164,7 @@
 
 - (void)reassigned:(NSNotification *)note
 {
-    // This method should ONLY be called by the BuildAPIAccess instance
+    // Called in response to a notification from BuildAPIAccess that a device has been reassigned to a different device group
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
@@ -10163,15 +10207,15 @@
 
 - (void)renameDeviceStageTwo:(NSNotification *)note
 {
-    // Called ONLY in response to a notification from BuildAPIAccess that a device has been renamed
+    // Called in response to a notification from BuildAPIAccess that a device has been renamed
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
 
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" renamed \"%@\".", [source objectForKey:@"old"], [source objectForKey:@"new"]] :YES];
-    
+
     // Make sure the device is not being listed in the Inspector and elsewhere
-    
+
     selectedDevice = nil;
     iwvc.device = nil;
 
@@ -10185,7 +10229,7 @@
 
 - (void)deleteDeviceStageTwo:(NSNotification *)note
 {
-    // Called ONLY in response to a notification from BuildAPIAccess that a device has been deleted
+    // Called in response to a notification from BuildAPIAccess that a device has been deleted
 
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
@@ -10239,38 +10283,121 @@
 
 
 
-#pragma mark - Log and Logging Methods
+#pragma mark API Called Misc Methods
+
+- (void)displayError:(NSNotification *)note;
+{
+    // Called in response to a notification from BuildAPIAccess that an error occurred
+    
+    NSDictionary *error = (NSDictionary *)note.object;
+    NSString *errorMessage = [error objectForKey:@"message"];
+    NSNumber *code = [error objectForKey:@"code"];
+    NSInteger errorCode = [code integerValue];
+    
+    if (isLoggingIn)
+    {
+        // We are attempting to log in, so the error should relate to that action, ie.
+        // most likely a failed connection, or missing or rejected credentials
+        
+        BOOL flag = NO;
+        
+        if (saveDetailsCheckbox.state == NSOnState && errorCode == kErrorNetworkError)
+        {
+            // User has indicated they want the credentials saved for next time
+            // NOTE only save the credentials if we were unable to connect, ie. ignore rejected credentials
+            
+            PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
+            NSString *untf = usernameTextField.stringValue;
+            NSString *pwtf = passwordTextField.stringValue;
+            
+            // Compare the entered value with the existing value - only overwrite if they are different
+            
+            NSString *cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
+            
+            cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
+            
+            if ([cs compare:untf] != NSOrderedSame)
+            {
+                [pc setString:[ide encodeBase64String:untf] forKey:@"com.bps.Squinter.ak.notional.tully"];
+                flag = YES;
+            }
+            
+            cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
+            
+            cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
+            
+            if ([cs compare:pwtf] != NSOrderedSame)
+            {
+                [pc setString:[ide encodeBase64String:pwtf] forKey:@"com.bps.Squinter.ak.notional.tilly"];
+                flag = YES;
+            }
+            
+            if (flag) [self writeStringToLog:@"impCloud credentials saved in your keychain." :YES];
+        }
+        
+        // Notify the user
+        
+        if (errorCode == kErrorNetworkError)
+        {
+            [self writeErrorToLog:@"[LOGIN ERROR] Could not access the Electric Imp impCloud. Please check your network connection." :YES];
+        }
+        else if (errorCode == kErrorLoginRejectCredentials)
+        {
+            [self writeErrorToLog:@"[LOGIN ERROR] Your impCloud access credentials have been rejected. Please check your username and password." : YES];
+        }
+        else
+        {
+            [self writeErrorToLog:[NSString stringWithFormat:@"[LOGIN ERROR] %@", errorMessage] : YES];
+        }
+        
+        // Register that we are no longer trying to log in
+        
+        isLoggingIn = NO;
+    }
+    else
+    {
+        // The error was not specifically related to log in
+        
+        [self writeErrorToLog:errorMessage :YES];
+        
+        // Just in case we are attemmpting to log stream from the current device
+        
+        streamLogsItem.state = 0;
+        [squinterToolbar validateVisibleItems];
+    }
+}
+
 
 
 - (void)listCommits:(NSNotification *)note
 {
     // Called in response to a notification from BuildAPIAccess with a list of deployments made to a device group
     // The commits are in 'note.data' under the key 'data'
-
+    
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
     NSString *action = [source objectForKey:@"action"];
-
+    
     __block Devicegroup *devicegroup = [source objectForKey:@"devicegroup"];
     __block NSMutableArray *deployments = [data objectForKey:@"data"];
-
+    
     if (action != nil)
     {
         if ([action compare:@"getcommits"] == NSOrderedSame)
         {
             // This is the result of a request to get commits so they can be presented
             // in the Commit Panel (cwvc)
-
+            
             cwvc.commits = deployments;
             return;
         }
-
+        
         if ([action compare:@"downloadproduct"] == NSOrderedSame)
         {
             // This is the result of a request to get commits so that the most recent one
             // can be extracted to get the code for a newly downloaded device group that
             // has no 'current_deployment' key its record
-
+            
             [self getCurrentDeployment:data];
             return;
         }
@@ -10278,30 +10405,30 @@
         // Assume from this point, action is "listcommits"
         
         devicegroup.history = deployments;
-
+        
         if (deployments.count > 0)
         {
             [extraOpQueue addOperationWithBlock:^(void){
-
+                
                 /* NSString *lineString = [@"" stringByPaddingToLength:74 withString:@"-" startingAtIndex:0];
-
-                [self performSelectorOnMainThread:@selector(logLogs:)
-                                       withObject:lineString
-                                    waitUntilDone:NO];
+                 
+                 [self performSelectorOnMainThread:@selector(logLogs:)
+                 withObject:lineString
+                 waitUntilDone:NO];
                  */
-
+                
                 NSString *headString = [NSString stringWithFormat:@"Most recent commits to Device Group \"%@\":", devicegroup.name];
-
+                
                 [self performSelectorOnMainThread:@selector(logLogs:)
                                        withObject:headString
                                     waitUntilDone:NO];
-
+                
                 NSDictionary *min = [self getValueFrom:devicegroup.data withKey:@"min_supported_deployment"];
                 NSString *mid = min != nil ? [min objectForKey:@"id"] : @"";
-
+                
                 NSDictionary *cur = [self getValueFrom:devicegroup.data withKey:@"current_deployment"];
                 NSString *cid = cur != nil ? [cur objectForKey:@"id"] : @"";
-
+                
                 for (NSUInteger i = deployments.count ; i > 0 ; --i)
                 {
                     NSDictionary *deployment = [deployments objectAtIndex:(i - 1)];
@@ -10311,19 +10438,19 @@
                     NSString *origin = [self getValueFrom:deployment withKey:@"origin"];
                     NSArray *tags = [self getValueFrom:deployment withKey:@"tags"];
                     NSString *tagString = @"";
-
+                    
                     if (tags != nil && tags.count > 0)
                     {
                         // List tags out separted by commas
-
+                        
                         for (NSString *tag in tags) tagString = [tagString stringByAppendingFormat:@"%@, ", tag];
                         tagString = [tagString substringToIndex:tagString.length - 2];
                     }
-
+                    
                     NSString *ns = [NSString stringWithFormat:@"%03lu. ", (deployments.count - i + 1)];
                     NSString *ss = [@"                               " substringToIndex:ns.length + 2];
                     NSString *cs;
-
+                    
                     if (message != nil && message.length > 0)
                     {
                         cs = [NSString stringWithFormat:@"%@%@\n%@When: %@", ns, message, ss, timestamp];
@@ -10332,15 +10459,15 @@
                     {
                         cs = [NSString stringWithFormat:@"%@When: %@", ns, timestamp];
                     }
-
+                    
                     if (sha != nil)  cs = [cs stringByAppendingFormat:@"\n%@SHA: %@", ss, sha];
                     if (origin != nil && origin.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Origin: %@", ss, origin];
                     if (tagString.length > 0) cs = [cs stringByAppendingFormat:@"\n%@Tags: %@", ss, tagString];
-
+                    
                     // Record whether the current entry is the min. supported deployment or the current
-
+                    
                     bool flag = NO;
-
+                    
                     if (mid.length > 0 || cid.length > 0)
                     {
                         NSString *did = [deployment objectForKey:@"id"];
@@ -10349,29 +10476,29 @@
                             cs = [cs stringByAppendingFormat:@"\n%@MINIMUM SUPPORTED DEPLOYMENT", ss];
                             flag = YES;
                         }
-
+                        
                         if ([did compare:cid] == NSOrderedSame)
                         {
                             cs = [cs stringByAppendingFormat:@"\n%@CURRENT DEPLOYMENT", ss];
                             flag = YES;
                         }
                     }
-
+                    
                     cs = [cs stringByAppendingString:@"\n"];
-
+                    
                     // Add a prefix to indicate min. supported deployment and/or current deployment
-
+                    
                     cs = flag ? [@"* " stringByAppendingString:cs] : [@"  " stringByAppendingString:cs];
-
+                    
                     [self performSelectorOnMainThread:@selector(logLogs:)
                                            withObject:cs
                                         waitUntilDone:NO];
                 }
-
+                
                 /*
-                [self performSelectorOnMainThread:@selector(logLogs:)
-                                       withObject:lineString
-                                    waitUntilDone:NO];
+                 [self performSelectorOnMainThread:@selector(logLogs:)
+                 withObject:lineString
+                 waitUntilDone:NO];
                  */
             }];
         }
@@ -10393,30 +10520,30 @@
     // We come here in response to a notification from BuildAPIAccess
     // The notification contains a list of log entries or a list of device history events -
     // we sort one from the other by looking at the 'action' value
-
+    
     NSDictionary *data = (NSDictionary *)note.object;
     NSDictionary *source = [data objectForKey:@"object"];
-
+    
     __block NSDictionary *device = [source objectForKey:@"device"];
     __block NSString *action = [source objectForKey:@"action"];
     __block NSMutableArray *theLogs = [data objectForKey:@"data"];
-
+    
     // Shouldn't need to trap for failure (device == nil) as we only get the selected device
     // to acquire its name; this method wouldn't have been called if there *hadn't* been
     // a device selected
-
+    
     if (theLogs.count > 0)
     {
         [extraOpQueue addOperationWithBlock:^(void){
-
+            
             NSMutableArray *lines = [[NSMutableArray alloc] init];
-
+            
             if ([action compare:@"gethistory"] == NSOrderedSame)
             {
                 // Iterate through the history entries, rendering them as lines of text
-
+                
                 [lines addObject:[NSString stringWithFormat:@"History of device \"%@\":", [self getValueFrom:device withKey:@"name"]]];
-
+                
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
                 {
                     NSDictionary *entry = [theLogs objectAtIndex:(i - 1)];
@@ -10426,20 +10553,20 @@
                     NSString *actor = [entry objectForKey:@"actor_id"];
                     NSString *doer = ([owner compare:actor] == NSOrderedSame) ? @"you." : @"someone else.";
                     NSString *lString = [NSString stringWithFormat:@"%@ Device %@ by %@", timestamp, event, doer];
-
+                    
                     [lines addObject:lString];
                 }
             }
             else
             {
                 // Iterate through the log entries, rendering them as lines of text
-
+                
                 [lines addObject:[NSString stringWithFormat:@"Latest log entries for device \"%@\":",[self getValueFrom:device withKey:@"name"]]];
-
+                
                 // Calculate the width of the widest status message for spacing the output into columns
-
+                
                 NSUInteger width = 0;
-
+                
                 for (NSUInteger i = 0 ; i < theLogs.count ; ++i)
                 {
                     NSDictionary *aLog = [theLogs objectAtIndex:i];
@@ -10447,27 +10574,27 @@
                     type = [self recodeLogTags:[NSString stringWithFormat:@"[%@]", type]];
                     if (type.length > width) width = type.length;
                 }
-
+                
                 for (NSUInteger i = theLogs.count ; i > 0  ; --i)
                 {
                     NSDictionary *entry = [theLogs objectAtIndex:(i - 1)];
                     NSString *timestamp = [self formatTimestamp:[entry objectForKey:@"ts"]];
-
+                    
                     NSString *type = [entry objectForKey:@"type"];
                     type = [self recodeLogTags:[NSString stringWithFormat:@"[%@]", type]];
                     NSString *msg = [entry objectForKey:@"msg"];
-
+                    
                     NSString *spacer = [@"                              " substringToIndex:width + 1 - type.length];
                     NSString *lString = [NSString stringWithFormat:@"%@ %@%@%@", timestamp, type, spacer, msg];
-
+                    
                     [lines addObject:lString];
                 }
             }
-
+            
             [self performSelectorOnMainThread:@selector(printInfoInLog:) withObject:lines waitUntilDone:YES];
-
+            
             // Look for URLs etc one all the items have gone in
-
+            
             [self performSelectorOnMainThread:@selector(parseLog)
                                    withObject:nil
                                 waitUntilDone:NO];
@@ -10476,12 +10603,282 @@
     else
     {
         NSString *items = ([action compare:@"gethistory"] == NSOrderedSame) ? @"history" : @"logs";
-
+        
         [self writeStringToLog:[NSString stringWithFormat:@"There are no %@ entries for device \"%@\"", items, [self getValueFrom:device withKey:@"name"]] :YES];
     }
 }
 
 
+
+#pragma mark API Called Logging Methods
+
+- (void)loggingStarted:(NSNotification *)note
+{
+    // Called in response to a notification from BuildAPIAccess that a device has been added to the log stream
+    
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSString *deviceID = [data objectForKey:@"device"];
+    NSDictionary *device;
+    
+    // The returned data includes the device's ID,
+    // so use that to find the device in the device array
+    
+    for (NSDictionary *aDevice in devicesArray)
+    {
+        NSString *aDeviceID = [aDevice objectForKey:@"id"];
+        
+        if ([aDeviceID compare:deviceID] == NSOrderedSame)
+        {
+            device = aDevice;
+            break;
+        }
+    }
+    
+    // Add the device to the list of logging devices
+    
+    if (loggedDevices == nil) loggedDevices = [[NSMutableArray alloc] init];
+    
+    if (loggedDevices.count < kMaxLogStreamDevices)
+    {
+        [loggedDevices addObject:deviceID];
+    }
+    else
+    {
+        NSInteger index = -1;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; ++i)
+        {
+            NSString *aDeviceID = [loggedDevices objectAtIndex:i];
+            
+            if ([aDeviceID compare:@"FREE"] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index != -1)
+        {
+            [loggedDevices replaceObjectAtIndex:index withObject:deviceID];
+        }
+        else
+        {
+            NSLog(@"loggedDevices index error in loggingStarted:");
+        }
+    }
+    
+    // Inform the user
+    
+    [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
+    
+    // Update the UI: add logging marks to menus, colour to the toolbar item,
+    // and set the menu item's text and state; set the Inspector
+    
+    iwvc.loggingDevices = loggedDevices;
+    
+    if (device == selectedDevice)
+    {
+        streamLogsItem.state = kStreamToolbarItemStateOn;
+        streamLogsMenuItem.title = @"Stop Log Streaming";
+        iwvc.device = selectedDevice;
+    }
+    
+    [streamLogsItem validate];
+    [self refreshDevicesMenus];
+    [self refreshDevicesPopup];
+}
+
+
+
+- (void)loggingStopped:(NSNotification *)note
+{
+    // Called in response to a notification from BuildAPIAccess that a device has been removed from the log stream
+    
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSString *dvid = [data objectForKey:@"device"];
+    NSDictionary *device;
+    
+    // The returned data includes the device's ID,
+    // so use that to find the device in the device array
+    
+    for (NSDictionary *aDevice in devicesArray)
+    {
+        NSString *advid = [aDevice objectForKey:@"id"];
+        
+        if ([advid compare:dvid] == NSOrderedSame)
+        {
+            device = aDevice;
+            break;
+        }
+    }
+    
+    // Remove the device from the list of logging devices WITHOUT eliminating its index
+    
+    if (loggedDevices.count == 1)
+    {
+        // Only one device on the list which will now be removed,
+        // so we don't need to replace it, just empty the array
+        
+        [loggedDevices removeAllObjects];
+    }
+    else
+    {
+        NSInteger index = -1;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:dvid] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index != -1)
+        {
+            [loggedDevices replaceObjectAtIndex:index withObject:@"FREE"];
+        }
+        else
+        {
+            NSLog(@"loggedDevices index error in loggingStopped:");
+        }
+    }
+    
+    // Inform the user
+    
+    [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
+    
+    // Update the UI: remove logging marks, re-colour to the toolbar item,
+    // and set the menu item's text and state, including the inspector
+    
+    iwvc.loggingDevices = loggedDevices;
+    
+    if (device == selectedDevice)
+    {
+        streamLogsItem.state = kStreamToolbarItemStateOff;
+        streamLogsMenuItem.title = @"Start Log Streaming";
+        iwvc.device = selectedDevice;
+    }
+    
+    [streamLogsItem validate];
+    [self refreshDevicesMenus];
+    [self refreshDevicesPopup];
+}
+
+
+
+- (void)presentLogEntry:(NSNotification *)note
+{
+    // Decode a streamed log entry relayed from BuildAPIAccess
+    // Log entry formats:
+    // @"232390b030728cee 2017-05-19T17:28:19.095Z development server.log Connected by WiFi on SSID \"darkmatter\" with IP address 192.168.0.2"
+    // @"subscribed 232390b030728cee"
+    
+    NSDictionary *data = (NSDictionary *)note.object;
+    NSString *logItem = [data objectForKey:@"message"];
+    NSArray *parts = [logItem componentsSeparatedByString:@" "];
+    
+    if (parts.count > 2)
+    {
+        // Indicates the first of the message formats listed above, ie.
+        // {device ID} {timestamp} {log type} {event type} {message}
+        // NOTE {message} comprises the remaining parts of the string
+        
+        NSUInteger width = 11;
+        NSColor *logColour;
+        NSString *device;
+        NSString *log;
+        
+        NSString *type = [parts objectAtIndex:3];
+        NSString *stype = [NSString stringWithFormat:@"[%@]", type];
+        stype = [self recodeLogTags:stype];
+        
+        NSString *timestamp = [parts objectAtIndex:1];
+        timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
+        timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
+        timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+        
+        if (stype.length > width) width = stype.length;
+        
+        NSString *spacer = [@"                                      " substringToIndex:width - stype.length];
+        NSString *dvid = [parts objectAtIndex:0];
+        
+        for (NSDictionary *dev in devicesArray)
+        {
+            NSString *adid = [dev objectForKey:@"id"];
+            
+            if ([dvid compare:adid] == NSOrderedSame)
+            {
+                device = [self getValueFrom:dev withKey:@"name"];
+                break;
+            }
+        }
+        
+        // Get the index of the entry's device in the loggedDevices array.
+        // We will use this to get correct logging colour
+        
+        NSUInteger index = 0;
+        
+        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
+        {
+            NSString *advid = [loggedDevices objectAtIndex:i];
+            
+            if ([advid compare:dvid] == NSOrderedSame)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        NSRange range = [logItem rangeOfString:type];
+        NSString *message = [logItem substringFromIndex:(range.location + type.length + 1)];
+        
+        if (ide.numberOfLogStreams > 1)
+        {
+            NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
+            log = [NSString stringWithFormat:@"\"%@\"%@: %@ %@%@", device, subspacer, stype, spacer, message];
+        }
+        else
+        {
+            log = [NSString stringWithFormat:@"\"%@\": %@ %@%@", device, stype, spacer, message];
+        }
+        
+        log = [timestamp stringByAppendingFormat:@" %@", log];
+        logColour = [colors objectAtIndex:index];
+        
+        [self writeNoteToLog:log :logColour :NO];
+    }
+}
+
+
+
+- (void)endLogging:(NSNotification *)note
+{
+    // Notification-triggered method called when logging ends because of a connection break
+    
+    NSString *devid = (NSString *)note.object;
+    
+    if (selectedDevice != nil)
+    {
+        NSString *seldevid = [self getValueFrom:selectedDevice withKey:@"id"];
+        
+        if ([devid compare:seldevid] == NSOrderedSame)
+        {
+            streamLogsItem.state = kStreamToolbarItemStateOff;
+            streamLogsMenuItem.title = @"Start Log Streaming";
+        }
+        
+        [streamLogsItem validate];
+        [self refreshDevicesMenus];
+        [self refreshDevicesPopup];
+    }
+}
+
+
+
+#pragma mark - Log and Logging Methods
 
 - (void)logLogs:(NSString *)logLine
 {
@@ -10537,279 +10934,10 @@
 
 
 
-- (void)loggingStarted:(NSNotification *)note
-{
-    // Called in response to a notification from BuildAPIAccess that a device has been added to the log stream
-
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSString *deviceID = [data objectForKey:@"device"];
-    NSDictionary *device;
-
-    // The returned data includes the device's ID,
-    // so use that to find the device in the device array
-
-    for (NSDictionary *aDevice in devicesArray)
-    {
-        NSString *aDeviceID = [aDevice objectForKey:@"id"];
-
-        if ([aDeviceID compare:deviceID] == NSOrderedSame)
-        {
-            device = aDevice;
-            break;
-        }
-    }
-    
-    // Add the device to the list of logging devices
-    
-    if (loggedDevices == nil) loggedDevices = [[NSMutableArray alloc] init];
-    
-    if (loggedDevices.count < kMaxLogStreamDevices)
-    {
-        [loggedDevices addObject:deviceID];
-    }
-    else
-    {
-        NSInteger index = -1;
-        
-        for (NSInteger i = 0 ; i < loggedDevices.count ; ++i)
-        {
-            NSString *aDeviceID = [loggedDevices objectAtIndex:i];
-            
-            if ([aDeviceID compare:@"FREE"] == NSOrderedSame)
-            {
-                index = i;
-                break;
-            }
-        }
-        
-        if (index != -1)
-        {
-            [loggedDevices replaceObjectAtIndex:index withObject:deviceID];
-        }
-        else
-        {
-            NSLog(@"loggedDevices index error in loggingStarted:");
-        }
-    }
-    
-    // Inform the user
-
-    [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" added to log stream", [self getValueFrom:device withKey:@"name"]] :YES];
-
-    // Update the UI: add logging marks to menus, colour to the toolbar item,
-    // and set the menu item's text and state; set the Inspector
-
-    iwvc.loggingDevices = loggedDevices;
-
-    if (device == selectedDevice)
-    {
-        streamLogsItem.state = kStreamToolbarItemStateOn;
-        streamLogsMenuItem.title = @"Stop Log Streaming";
-        iwvc.device = selectedDevice;
-    }
-
-    [streamLogsItem validate];
-
-    // Update menus
-
-    [self refreshDevicesMenus];
-    [self refreshDevicesPopup];
-}
-
-
-
-- (void)loggingStopped:(NSNotification *)note
-{
-    // Called in response to a notification from BuildAPIAccess that a device has been removed from the log stream
-
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSString *dvid = [data objectForKey:@"device"];
-    NSDictionary *device;
-
-    // The returned data includes the device's ID,
-    // so use that to find the device in the device array
-
-    for (NSDictionary *aDevice in devicesArray)
-    {
-        NSString *advid = [aDevice objectForKey:@"id"];
-
-        if ([advid compare:dvid] == NSOrderedSame)
-        {
-            device = aDevice;
-            break;
-        }
-    }
-    
-    // Remove the device from the list of logging devices WITHOUT eliminating its index
-    
-    if (loggedDevices.count == 1)
-    {
-        // Only one device on the list which will now be removed,
-        // so we don't need to replace it, just empty the array
-        
-        [loggedDevices removeAllObjects];
-    }
-    else
-    {
-        NSInteger index = -1;
-        
-        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
-        {
-            NSString *advid = [loggedDevices objectAtIndex:i];
-            
-            if ([advid compare:dvid] == NSOrderedSame)
-            {
-                index = i;
-                break;
-            }
-        }
-        
-        if (index != -1)
-        {
-            [loggedDevices replaceObjectAtIndex:index withObject:@"FREE"];
-        }
-        else
-        {
-            NSLog(@"loggedDevices index error in loggingStopped:");
-        }
-    }
-    
-    // Inform the user
-
-    [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
-
-    // Update the UI: remove logging marks, re-colour to the toolbar item,
-    // and set the menu item's text and state
-
-    if (device == selectedDevice)
-    {
-        streamLogsItem.state = kStreamToolbarItemStateOff;
-        streamLogsMenuItem.title = @"Start Log Streaming";
-    }
-
-    [streamLogsItem validate];
-    [self refreshDevicesMenus];
-    [self refreshDevicesPopup];
-    
-    // Update the Inspector
-    
-    iwvc.loggingDevices = loggedDevices;
-    iwvc.device = selectedDevice;
-}
-
-
-
-- (void)presentLogEntry:(NSNotification *)note
-{
-    // Decode a streamed log entry relayed from BuildAPIAccess
-    // Log entry formats:
-    // @"232390b030728cee 2017-05-19T17:28:19.095Z development server.log Connected by WiFi on SSID \"darkmatter\" with IP address 192.168.0.2"
-    // @"subscribed 232390b030728cee"
-
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSString *logItem = [data objectForKey:@"message"];
-    NSArray *parts = [logItem componentsSeparatedByString:@" "];
-
-    if (parts.count > 2)
-    {
-        // Indicates the first of the message formats listed above, ie.
-        // {device ID} {timestamp} {log type} {event type} {message}
-        // NOTE {message} comprises the remaining parts of the string
-
-        NSUInteger width = 11;
-        NSColor *logColour;
-        NSString *device;
-        NSString *log;
-
-        NSString *type = [parts objectAtIndex:3];
-        NSString *stype = [NSString stringWithFormat:@"[%@]", type];
-        stype = [self recodeLogTags:stype];
-
-        NSString *timestamp = [parts objectAtIndex:1];
-        timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
-        timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
-        timestamp = [timestamp stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-
-        if (stype.length > width) width = stype.length;
-
-        NSString *spacer = [@"                                      " substringToIndex:width - stype.length];
-        NSString *dvid = [parts objectAtIndex:0];
-
-        for (NSDictionary *dev in devicesArray)
-        {
-            NSString *adid = [dev objectForKey:@"id"];
-
-            if ([dvid compare:adid] == NSOrderedSame)
-            {
-                device = [self getValueFrom:dev withKey:@"name"];
-                break;
-            }
-        }
-        
-        // Get the index of the entry's device in the loggedDevices array.
-        // We will use this to get correct logging colour
-        
-        NSUInteger index = 0;
-        
-        for (NSInteger i = 0 ; i < loggedDevices.count ; i++)
-        {
-            NSString *advid = [loggedDevices objectAtIndex:i];
-            
-            if ([advid compare:dvid] == NSOrderedSame)
-            {
-                index = i;
-                break;
-            }
-        }
-        
-        NSRange range = [logItem rangeOfString:type];
-        NSString *message = [logItem substringFromIndex:(range.location + type.length + 1)];
-
-        if (ide.numberOfLogStreams > 1)
-        {
-            NSString *subspacer = [@"                                      " substringToIndex:logPaddingLength - device.length];
-            log = [NSString stringWithFormat:@"\"%@\"%@: %@ %@%@", device, subspacer, stype, spacer, message];
-        }
-        else
-        {
-            log = [NSString stringWithFormat:@"\"%@\": %@ %@%@", device, stype, spacer, message];
-        }
-
-        log = [timestamp stringByAppendingFormat:@" %@", log];
-        logColour = [colors objectAtIndex:index];
-
-        [self writeNoteToLog:log :logColour :NO];
-    }
-}
-
-
-
-- (void)endLogging:(NSNotification *)note
-{
-    // Notification-triggered method called when logging ends because of a connection break
-
-    NSString *devid = (NSString *)note.object;
-
-    if (selectedDevice != nil)
-    {
-        NSString *seldevid = [self getValueFrom:selectedDevice withKey:@"id"];
-
-        if ([devid compare:seldevid] == NSOrderedSame)
-        {
-            streamLogsItem.state = kStreamToolbarItemStateOff;
-            streamLogsMenuItem.title = @"Start Log Streaming";
-        }
-
-        [streamLogsItem validate];
-        [self refreshDevicesMenus];
-        [self refreshDevicesPopup];
-    }
-}
-
-
-
 - (IBAction)showProjectInfo:(id)sender
 {
+    // Output details of the current project, if there is one, to the log
+
     // If there is no currently selected project, bail
 
     if (currentProject == nil)
@@ -10975,6 +11103,10 @@
 
 - (IBAction)showDeviceGroupInfo:(id)sender
 {
+    // Output details of the current device group, if there is one, to the log
+
+    // If there is no current project, or no current device group, warn then bail
+
     if (currentProject == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedProject] :YES];
@@ -10987,6 +11119,8 @@
         return;
     }
 
+    // Gather the deviece group data and display it
+
     [self compileDevicegroupInfo:currentDevicegroup :0 :nil];
 }
 
@@ -10994,7 +11128,8 @@
 
 - (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines
 {
-    // Shows info for the selected device group.
+    // Gathers and displays info for the specified device group
+    // It's separate from 'showDeviceGroupInfo:' because it needs to be called by 'showProjectInfo:' too
 
     NSMutableArray *lines = [[NSMutableArray alloc] init];
 
@@ -11157,8 +11292,9 @@
 
 - (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines
 {
-    NSString *path;
+    // Gathers and displays info for the specified model
 
+    NSString *path;
     NSMutableArray *lines = [[NSMutableArray alloc] init];
 
     // Prepare the indent: should be 4 or 6 spaces
@@ -11285,7 +11421,7 @@
 
 - (IBAction)showDeviceInfo:(id)sender
 {
-    // Runs through the device's record in 'deviceArray' and displays
+    // Runs through the current device's record in 'deviceArray' and displays
     // key information in the main window log view
 
     if (selectedDevice == nil)
@@ -11297,13 +11433,13 @@
     NSMutableArray *lines = [[NSMutableArray alloc] init];
 
     [lines addObject:@"Device Information"];
-    
+
     NSString *item = [selectedDevice valueForKeyPath:@"attributes.name"];
     if ((NSNull *)item == [NSNull null]) item = [selectedDevice objectForKey:@"id"];
     [lines addObject:[NSString stringWithFormat:@"     Name: %@", item]];
 
     [lines addObject:[NSString stringWithFormat:@"       ID: %@", [selectedDevice objectForKey:@"id"]]];
-    
+
     item = [selectedDevice valueForKeyPath:@"attributes.imp_type"];
     if ((NSNull *)item == [NSNull null]) item = @"Unknown";
     [lines addObject:[NSString stringWithFormat:@"     Type: %@", item]];
@@ -11342,7 +11478,7 @@
     {
         [lines addObject:@"       IP: Unknown"];
     }
-    
+
     [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
 
     [lines addObject:@"\nAgent Information"];
@@ -11363,7 +11499,7 @@
     NSString *date = [selectedDevice valueForKeyPath:@"attributes.last_enrolled_at"];
     if ((NSNull *)date == [NSNull null]) date = nil;
     [lines addObject:[NSString stringWithFormat:@" Enrolled: %@", (date != nil ? date : @"Unknown")]];
-    
+
     NSString *plan = [selectedDevice valueForKeyPath:@"attributes.plan_id"];
     if ((NSNull *)plan == [NSNull null]) plan = nil;
     if (plan != nil) [lines addObject:[NSString stringWithFormat:@"  Plan ID: %@", plan]];
@@ -11371,7 +11507,7 @@
     [lines addObject:@"\nDevice Group Information"];
     NSString *dgid = [selectedDevice valueForKeyPath:@"relationships.devicegroup.id"];
     if ((NSNull *)dgid == [NSNull null]) dgid = nil;
-    
+
     if (dgid != nil)
     {
         Devicegroup *adg = nil;
@@ -11414,7 +11550,7 @@
         [lines addObject:@"   Group: Device is not assigned to a device group"];
     }
 
-    // Add the assembled lines to the log view and re-check for URLs
+    // Add the assembled lines to the log and re-check for URLs
 
     [self printInfoInLog:lines];
     [self parseLog];
@@ -11424,44 +11560,25 @@
 
 - (IBAction)logDeviceCode:(id)sender
 {
-    // Dumps compiled device source code to the main window log view
+    // Dumps compiled device source code to the log
 
-    if (currentDevicegroup == nil)
-    {
-        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
-        return;
-    }
-
-    if (currentDevicegroup.models.count == 0)
-    {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
-        return;
-    }
-
-    BOOL done = NO;
-
-    for (Model *model in currentDevicegroup.models)
-    {
-        if ([model.type compare:@"device"] == NSOrderedSame)
-        {
-            if ((currentDevicegroup.squinted & kDeviceCodeSquinted) == 0) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest device code.", currentDevicegroup.name] :YES];
-
-            done = YES;
-            [self writeStringToLog:@"Device Code:" :NO];
-            //[self writeStringToLog:@" " :NO];
-            [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
-            break;
-        }
-    }
-
-    if (!done) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no device code.", currentDevicegroup.name] :YES];
+    [self logModelCode:@"device"];
 }
 
 
 
 - (IBAction)logAgentCode:(id)sender
 {
-    // Dumps compiled agent source code to the main window log view
+    // Dumps compiled agent source code to the log
+
+    [self logModelCode:@"agent"];
+}
+
+
+
+- (void)logModelCode:(NSString *)codeType
+{
+    // Processes the display of the specified type of source code from the current device group, if there is one
 
     if (currentDevicegroup == nil)
     {
@@ -11471,7 +11588,7 @@
 
     if (currentDevicegroup.models.count == 0)
     {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no %@ code.", currentDevicegroup.name, codeType] :YES];
         return;
     }
 
@@ -11479,41 +11596,28 @@
 
     for (Model *model in currentDevicegroup.models)
     {
-        if ([model.type compare:@"agent"] == NSOrderedSame)
+        if ([model.type compare:codeType] == NSOrderedSame)
         {
-            if ((currentDevicegroup.squinted & kAgentCodeSquinted) == 0) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest agent code.", currentDevicegroup.name] :YES];
+            NSUInteger squintedTest = [codeType hasPrefix:@"a"] ? kAgentCodeSquinted : kDeviceCodeSquinted;
+
+            if ((currentDevicegroup.squinted & squintedTest) == 0) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest %@ code.", currentDevicegroup.name, codeType] :YES];
 
             done = YES;
-            [self writeStringToLog:@"Agent Code:" :NO];
-            //[self writeStringToLog:@" " :NO];
+            NSString *firstChar = [[codeType substringToIndex:1] capitalizedString];
+            codeType = [codeType stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:firstChar];
+            [self writeStringToLog:[NSString stringWithFormat:@"%@ Code:", codeType] :NO];
             [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
             break;
         }
     }
 
-    if (!done) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no agent code.", currentDevicegroup.name] :YES];
+    if (!done) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no %@ code.", currentDevicegroup.name, codeType] :YES];
 }
-
 
 
 - (IBAction)clearLog:(id)sender
 {
-    // Clear the main window log view of all text
-
-    /*
-    NSNumber *index = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
-    NSString *fontName = [self getFontName:index.integerValue];
-    index = [defaults objectForKey:@"com.bps.squinter.fontSizeIndex"];
-
-    NSArray *values = [NSArray arrayWithObjects:textColour, nil];
-    NSArray *keys = [NSArray arrayWithObjects:NSForegroundColorAttributeName, nil];
-    NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-
-    [logTextView setTypingAttributes:attributes];
-    logTextView.font = [self setLogViewFont:fontName :index.integerValue :false];
-
-    [logTextView setString:@""];
-    */
+    // Clear the log of all text
 
     NSTextStorage *textStorage = logTextView.textStorage;
     NSArray *values = [NSArray arrayWithObjects:textColour, logFont, nil];
@@ -11530,9 +11634,7 @@
 
 - (void)printInfoInLog:(NSMutableArray *)lines
 {
-    // This method is used to present a series of lines by prefixing and suffixing
-    // them with a line of dashes that is caclulated to be as long as the longest
-    // line in the list passed into 'lines'
+    // Write each of lines of test in the list passed into 'lines' to the log
 
     for (NSString *string in lines) [self writeNoteToLog:string :textColour :NO];
 }
@@ -11592,36 +11694,7 @@
 
     if (string.length > 0)
     {
-        /*
-        logTextView.editable = YES;
-
-        // Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
-
-        [logTextView setSelectedRange:NSMakeRange(logTextView.string.length,0)];
-
-        if (addTimestamp)
-        {
-            NSDictionary *attributes = [string fontAttributesInRange:NSMakeRange(0, string.length)];
-            NSString *date = [def stringFromDate:[NSDate date]];
-            date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-
-            [logTextView insertText:[[NSAttributedString alloc] initWithString:date attributes:attributes]
-                   replacementRange:NSMakeRange(logTextView.string.length, 0)];
-
-            [logTextView insertText:@" "
-                   replacementRange:NSMakeRange(logTextView.string.length, 0)];
-        }
-
-        [logTextView insertText:string
-               replacementRange:NSMakeRange(logTextView.string.length, 0)];
-
-        [logTextView insertText:@"\n"
-               replacementRange:NSMakeRange(logTextView.string.length, 0)];
-
-		logTextView.editable = NO;
-		*/
-
-		NSDictionary *attributes = [string attributesAtIndex:0 effectiveRange:nil];
+        NSDictionary *attributes = [string attributesAtIndex:0 effectiveRange:nil];
 		NSTextStorage *textStorage = logTextView.textStorage;
 
         if (addTimestamp)
@@ -11646,49 +11719,6 @@
 		// Scroll to the end of the window
 
         [logTextView scrollToEndOfDocument:nil];
-    }
-}
-
-
-
-- (void)showCodeErrors:(NSNotification *)note
-{
-    // This method is triggered by a notification from BuildAPIAccess signalling
-    // that there are errors in uploaded code - which this method displays
-
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSDictionary *object = [data objectForKey:@"object"];
-    Devicegroup *devicegroup = [object objectForKey:@"devicegroup"];
-    NSMutableArray *errors = [data objectForKey:@"data"];
-
-    if (errors.count > 0)
-    {
-        [self writeErrorToLog:@"The impCloud reported the following syntax errors in your code:" :YES];
-        [self writeErrorToLog:@" " :NO];
-
-        // Run through each of the errors
-
-        for (NSArray *error in errors)
-        {
-            // Extract the reported line and column number
-            // NOTE 'err' is a dictionary defined by BuildAPIAccess
-
-            NSDictionary *err = [error objectAtIndex:0];
-            NSUInteger row = [[err objectForKey:@"row"] integerValue];
-            NSUInteger col = [[err objectForKey:@"column"] integerValue];
-            NSString *filename = [err objectForKey:@"file"];
-            NSArray *parts = [filename componentsSeparatedByString:@"_"];
-            filename = [parts objectAtIndex:0];
-
-            [self writeErrorToLog:[NSString stringWithFormat:@"Error in %@ code: %@ (line %lu, column %lu)", filename, [err objectForKey:@"text"], (unsigned long)row, (unsigned long)col] :NO];
-
-            // Get the line of code from the relevant model and display it
-
-            for (Model *model in devicegroup.models)
-            {
-                if ([model.type compare:filename] == NSOrderedSame) [self listCode:model.code :row - 5 :row + 5 :row :col];
-            }
-        }
     }
 }
 
@@ -11792,114 +11822,6 @@
 }
 
 
-/*
-- (void)writeStreamToLog:(NSAttributedString *)string
-{
-    // Write a decoded log stream event to the main window log view
-
-    logTextView.editable = YES;
-
-    // Make sure the insertion point is at the end of the text (it may not be if the user has clicked on the log)
-
-    [logTextView setSelectedRange:NSMakeRange(logTextView.string.length, 0)];
-
-    if (string != nil && string.length > 0)
-    {
-        [logTextView insertText:string
-               replacementRange:NSMakeRange(logTextView.string.length, 0)];
-
-        [logTextView insertText:@"\n"
-               replacementRange:NSMakeRange(logTextView.string.length, 0)];
-    }
-
-    logTextView.editable = NO;
-}
-*/
-
-
-- (void)displayError:(NSNotification *)note;
-{
-    // Relay a BuildAPIAccess error
-
-    NSDictionary *error = (NSDictionary *)note.object;
-    NSString *errorMessage = [error objectForKey:@"message"];
-    NSNumber *code = [error objectForKey:@"code"];
-    NSInteger errorCode = [code integerValue];
-
-    if (isLoggingIn)
-    {
-        // We are attempting to log in, so the error should relate to that action, ie.
-        // most likely a failed connection, or missing or rejected credentials
-
-        BOOL flag = NO;
-
-        if (saveDetailsCheckbox.state == NSOnState && errorCode == kErrorNetworkError)
-        {
-            // User has indicated they want the credentials saved for next time
-            // NOTE only save the credentials if we were unable to connect, ie. ignore rejected credentials
-
-            PDKeychainBindings *pc = [PDKeychainBindings sharedKeychainBindings];
-            NSString *untf = usernameTextField.stringValue;
-            NSString *pwtf = passwordTextField.stringValue;
-
-            // Compare the entered value with the existing value - only overwrite if they are different
-
-            NSString *cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tully"];
-
-            cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
-
-            if ([cs compare:untf] != NSOrderedSame)
-            {
-                [pc setString:[ide encodeBase64String:untf] forKey:@"com.bps.Squinter.ak.notional.tully"];
-                flag = YES;
-            }
-
-            cs = [pc stringForKey:@"com.bps.Squinter.ak.notional.tilly"];
-
-            cs = (cs == nil) ? @"" : [ide decodeBase64String:cs];
-
-            if ([cs compare:pwtf] != NSOrderedSame)
-            {
-                [pc setString:[ide encodeBase64String:pwtf] forKey:@"com.bps.Squinter.ak.notional.tilly"];
-                flag = YES;
-            }
-
-            if (flag) [self writeStringToLog:@"impCloud credentials saved in your keychain." :YES];
-        }
-
-        // Notify the user
-
-        if (errorCode == kErrorNetworkError)
-        {
-            [self writeErrorToLog:@"[LOGIN ERROR] Could not access the Electric Imp impCloud. Please check your network connection." :YES];
-        }
-        else if (errorCode == kErrorLoginRejectCredentials)
-        {
-            [self writeErrorToLog:@"[LOGIN ERROR] Your impCloud access credentials have been rejected. Please check your username and password." : YES];
-        }
-        else
-        {
-            [self writeErrorToLog:[NSString stringWithFormat:@"[LOGIN ERROR] %@", errorMessage] : YES];
-        }
-
-        // Register that we are no longer trying to log in
-
-        isLoggingIn = NO;
-    }
-    else
-    {
-        // The error was not specifically related to log in
-
-        [self writeErrorToLog:errorMessage :YES];
-
-        // Just in case we are attemmpting to log stream from the current device
-
-        streamLogsItem.state = 0;
-        [squinterToolbar validateVisibleItems];
-    }
-}
-
-
 
 #pragma mark - Squint Methods
 
@@ -11929,17 +11851,17 @@
 - (IBAction)externalOpen:(id)sender
 {
     // Open the original source code files an external editor - whatever the user has set to opne text files (or .nut files)
-    
+
     // Only continue if a device group is selected
-    
+
     if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
-    
+
     // Open the device code, if requested
-    
+
     if (sender == externalOpenDeviceItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewDeviceCode)
     {
         for (Model *model in currentDevicegroup.models)
@@ -11951,9 +11873,9 @@
             }
         }
     }
-    
+
     // Open the agent code, if requested
-    
+
     if (sender == externalOpenAgentItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewAgentCode)
     {
         for (Model *model in currentDevicegroup.models)
@@ -12593,15 +12515,15 @@
             if (item.submenu != nil)
             {
                 bool shouldClear = YES;
-                
+
                 for (NSMenuItem *sitem in item.submenu.itemArray)
                 {
                     if (sitem.representedObject == selectedProduct)
                     {
                         sitem.state = NSOnState;
-                        
+
                         // Highlight the submenu title so the user knows a subsdiiary Product has been selected
-                        
+
                         item.state = NSMixedState;
                         shouldClear = NO;
                     }
@@ -12610,7 +12532,7 @@
                         sitem.state = NSOffState;
                     }
                 }
-                
+
                 if (shouldClear) item.state = NSOffState;
             }
             else
@@ -12875,10 +12797,10 @@
     checkImpLibrariesMenuItem.enabled = currentDevicegroup != nil && gotFiles == YES ? YES : NO;
     removeFilesMenuItem.enabled = currentDevicegroup != nil && gotFiles == YES ? YES : NO;
     listTestBlessedDevicesMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"pre_production"]) ? YES : NO;
-    
+
     // FROM 2.3.128
     // Set the Set Target menu titles appropriate to test/production
-    
+
     if ([currentDevicegroup.type containsString:@"pre_"])
     {
         setProductionTargetMenuItem.title = @"Set Target Test Production Device Group...";
@@ -12889,7 +12811,7 @@
         setProductionTargetMenuItem.title = @"Set Target Production Device Group...";
         setDUTTargetMenuItem.title = @"Set Target DUT Device Group...";
     }
-    
+
     // Enable or Disable the source code submenu based on whether's there's a selected device group
     // and whether that deviece group has agent and/or device code or not
 
@@ -13284,11 +13206,11 @@
     NSString *imageNameString = @"";
     NSString *dvid = [self getValueFrom:device withKey:@"id"];
     NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
-    
+
     // FROM 2.3.128
     // Check 'boolean' isn't null, which it can be at certain times
     // In this case, assume offline
-    
+
     if ((NSNull *)boolean == [NSNull null])
     {
         boolean = [NSNumber numberWithBool:NO];
@@ -14168,9 +14090,9 @@
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
     [defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
     [defaults setBool:(showDeviceWarnigCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoselectdevice"];
-    
+
     // FROM 2.3.128
-    
+
     iwvc.pathType = locationMenu.indexOfSelectedItem;
     if (currentProject != nil) iwvc.project = currentProject;
 
@@ -14284,15 +14206,15 @@
     if (connectionIndicator.hidden == YES)
     {
         // Start the connection indicator
-        
+
         connectionIndicator.hidden = NO;
         [connectionIndicator startAnimation:self];
     }
-    
+
     // Send the string etc.
 
     NSError *error = nil;
-    
+
     NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
     NSString *userAgent = [NSString stringWithFormat:@"%@/%@.%@ (macOS %li.%li.%li)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleExecutable"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
                  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], (long)sysVer.majorVersion, (long)sysVer.minorVersion, (long)sysVer.patchVersion];
@@ -14369,38 +14291,38 @@
         if (eiLibListTime != nil)
         {
             // NOTE 'eiLibListTime' is a proxy flag for 'have I asked for the library list'
-            
+
             if (eiLibListData == nil || eiLibListData.length == 0)
             {
                 // We haven't acquired the library list yet, so just cache the specified device group.
                 // We'll process the cached devicegroups when we have the list
-                
+
                 [eiDeviceGroupCache addObject:devicegroup];
                 return;
             }
-            
+
             // Is the library list still valid? We assume it is for the hour after it was
             // acquired - after that we need to get a new list
-            
+
             NSDate *now = [NSDate date];
             NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
-            
+
             if (interval >= kEILibCheckInterval)
             {
                 // Last check was less than 1 hour earlier, so use existing list if it exists
                 // NOTE 'interval' is negative
-                
+
                 [self compareElectricImpLibs:devicegroup];
                 return;
             }
         }
-        
+
         // Set the library list acquisition time
-        
+
         eiLibListTime = [NSDate date];
-        
+
         // Initalize or clear the devicegroup cache
-        
+
         if (eiDeviceGroupCache == nil)
         {
             eiDeviceGroupCache = [[NSMutableArray alloc] init];
@@ -14409,14 +14331,14 @@
         {
             [eiDeviceGroupCache removeAllObjects];
         }
-        
+
         // Cache the specified device group and get the library list
-        
+
         [eiDeviceGroupCache addObject:devicegroup];
         [self writeStringToLog:@"Loading a list of supported Electric Imp libraries from the Electric Imp impCloud..." :YES];
         [ide getLibraries];
         return;
-        
+
         /*
          if (eiLibListTime != nil)
         {
@@ -14435,7 +14357,7 @@
         // Set/reset the time of the most recent check
 
         eiLibListTime = [NSDate date];
-        
+
          if (connectionIndicator.hidden == YES)
         {
             // Start the connection indicator
@@ -14465,7 +14387,7 @@
 - (void)compareElectricImpLibs:(Devicegroup *)devicegroup
 {
     // This is where we actually compare a devicegroup's EI libraries
-    
+
     NSString *parsedData;
 
     if (devicegroup != nil && devicegroup.models.count == 0) return;
@@ -14626,9 +14548,9 @@
     }
 
     eiLibListData = [NSMutableData dataWithData:[eilibs dataUsingEncoding:NSUTF8StringEncoding]];
-    
+
     // Check all of the cached devicegroups
-    
+
     for (Devicegroup *devicegroup in eiDeviceGroupCache)
     {
         [self compareElectricImpLibs:devicegroup];
