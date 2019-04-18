@@ -80,6 +80,7 @@
     deviceCheckCount = -1;
     updateDevicePeriod = 300.0;
     loginMode = kLoginModeNone;
+    accountType = kElectricImpAccountTypeNone;
 
     nswsw = NSWorkspace.sharedWorkspace;
     nsfm = NSFileManager.defaultManager;
@@ -3417,7 +3418,28 @@
         newDevicegroupCheckbox.state = NSOnState;
         newDevicegroupCheckbox.enabled = YES;
     }
-
+    
+    newDevicegroupTypePopup.menu.autoenablesItems = NO;
+    
+    if (accountType != kElectricImpAccountTypePaid)
+    {
+        for (NSUInteger i = 0 ; i < newDevicegroupTypePopup.itemArray.count ; ++i)
+        {
+            if (i > 0)
+            {
+                NSMenuItem *item = [newDevicegroupTypePopup.itemArray objectAtIndex:i];
+                item.enabled = NO;
+            }
+        }
+    }
+    else
+    {
+        for (NSMenuItem *item in newDevicegroupTypePopup.itemArray)
+        {
+            if (!item.enabled) item.enabled = YES;
+        }
+    }
+    
     [newDevicegroupTypePopup selectItemAtIndex:0];
 
     [_window beginSheet:newDevicegroupSheet completionHandler:nil];
@@ -7742,6 +7764,10 @@
     {
         // Because the BuildAPIAccess instance's own attempt to get the account info will come here, we
         // (uniquely) need to make sure that we have a passed object ('source') to work with before processing
+        
+        accountType = kElectricImpAccountTypeFree;
+        NSString *accType = [data valueForKeyPath:@"account.attributes.tier"];
+        if ([accType hasPrefix:@"ent"]) accountType = kElectricImpAccountTypePaid;
 
         if (action != nil)
         {
@@ -7854,6 +7880,7 @@
     NSString *cloudName = [self getCloudName:ide.impCloudCode];
     accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
     if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
+
     loginMenuItem.title = @"Log out of this Account";
     // switchAccountMenuItem.enabled = YES;
 
@@ -7966,6 +7993,7 @@
     loginMenuItem.title = @"Log in to your Main Account";
     switchAccountMenuItem.title = @"Log in to a Different Account...";
     loginMode = kLoginModeNone;
+    accountType = kElectricImpAccountTypeNone;
 }
 
 

@@ -88,4 +88,10 @@
 #define kTargetDeviceGroupTypeProd          1
 #define kTargetDeviceGroupTypeDUT           2
 
+// ADDED 2.3.128
+// Account type
+#define kElectricImpAccountTypeNone         0
+#define kElectricImpAccountTypeFree         1
+#define kElectricImpAccountTypePaid         2
+
 #endif
