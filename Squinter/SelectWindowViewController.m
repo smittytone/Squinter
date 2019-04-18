@@ -52,6 +52,9 @@
         targetAPIType = groupType.length > 0 ? @"pre_dut_devicegroup" : @"dut_devicegroup" ;
     }
     
+    NSString *currentTargetName = @"";
+    currentTargetID = @"";
+    
     if (project != nil)
 	{
         if (groups == nil)
@@ -65,9 +68,17 @@
 
 		if (project.devicegroups != nil && project.devicegroups.count > 0)
 		{
-			for (Devicegroup *dg in project.devicegroups)
+            // Save the current target device group's ID so it can be auto-selected
+            
+            NSString *source = targetType == kTargetDeviceGroupTypeProd ? @"production" : @"dut";
+            source = [NSString stringWithFormat:@"relationships.%@_target.id", source];
+            currentTargetID = [theNewDevicegroup.data valueForKeyPath:source];
+            if ((NSNull *)currentTargetID == [NSNull null]) currentTargetID = @"";
+            
+            for (Devicegroup *dg in project.devicegroups)
 			{
 				if ([dg.type compare:targetAPIType] == NSOrderedSame) [groups addObject:dg];
+                if (currentTargetID.length > 0 && [currentTargetID compare:dg.did] == NSOrderedSame) currentTargetName = dg.name;
 			}
 		}
 	}
@@ -78,10 +89,21 @@
         selectLabel.stringValue = @"ERROR - Please contact the developer";
         return;
     }
-
-	selectLabel.stringValue = [NSString stringWithFormat:@"Select the %@ Fixture Device Group’s %@ %@ Device Group target:", groupType, groupType, targetAPIName];
-
-	[selectTable reloadData];
+    
+    // Update the UI
+    
+    NSString *labelString = [NSString stringWithFormat:@"Select the %@ Fixture Device Group’s new %@ %@ Device Group target.\n", groupType, groupType, targetAPIName];
+    
+    if (currentTargetName.length > 0)
+    {
+        selectLabel.stringValue = [labelString stringByAppendingFormat:@"The current target is “%@”:", currentTargetName];
+    }
+    else
+    {
+        selectLabel.stringValue = [labelString stringByAppendingString:@"No target has yet been set:"];
+    }
+    
+    [selectTable reloadData];
 
 	selectTable.needsDisplay = YES;
     theSelectedTarget = nil;
@@ -143,8 +165,17 @@
 	{
 		Devicegroup *dg = [groups objectAtIndex:row];
 		cell.minimumCheckbox.title = dg.name;
-		cell.minimumCheckbox.state = NSOffState;
-		cell.minimumCheckbox.action = @selector(checkGroup:);
+        cell.minimumCheckbox.action = @selector(checkGroup:);
+        
+        if (currentTargetID != nil && [currentTargetID compare:dg.did] == NSOrderedSame)
+        {
+            cell.minimumCheckbox.state = NSOnState;
+            theSelectedTarget = dg;
+        }
+        else
+        {
+            cell.minimumCheckbox.state = NSOffState;
+        }
 	}
 
 	return cell;

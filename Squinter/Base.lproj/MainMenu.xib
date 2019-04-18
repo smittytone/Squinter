@@ -4195,21 +4195,21 @@ Gw
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="ZPk-Wx-j2Q">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="283" y="305" width="612" height="324"/>
+            <rect key="contentRect" x="283" y="305" width="612" height="367"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="612" height="324"/>
             <view key="contentView" id="SfP-J6-928">
-                <rect key="frame" x="0.0" y="0.0" width="612" height="324"/>
+                <rect key="frame" x="0.0" y="0.0" width="612" height="367"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jUV-zz-1e9">
-                        <rect key="frame" x="20" y="61" width="572" height="218"/>
+                        <rect key="frame" x="20" y="61" width="572" height="244"/>
                         <clipView key="contentView" id="NWZ-vh-YNt">
-                            <rect key="frame" x="1" y="1" width="570" height="216"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <rect key="frame" x="1" y="1" width="570" height="242"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="20" viewBased="YES" floatsGroupRows="NO" id="bLn-Rm-uCb">
-                                    <rect key="frame" x="0.0" y="0.0" width="570" height="216"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="570" height="242"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -4271,17 +4271,6 @@ Gw
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Eu0-Tg-NhL">
-                        <rect key="frame" x="18" y="287" width="576" height="17"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="17" id="vfy-t4-kjf"/>
-                        </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Select the target device group:" id="rNB-zy-7VT">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2hz-xo-KPJ">
                         <rect key="frame" x="519" y="13" width="79" height="32"/>
                         <constraints>
@@ -4316,6 +4305,17 @@ Gw
                             <action selector="cancelSelectTarget:" target="Voe-Tx-rLC" id="6sj-8C-URP"/>
                         </connections>
                     </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Eu0-Tg-NhL">
+                        <rect key="frame" x="18" y="313" width="576" height="34"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="34" id="vfy-t4-kjf"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Select the target device group:" id="rNB-zy-7VT">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Eu0-Tg-NhL" firstAttribute="top" secondItem="SfP-J6-928" secondAttribute="top" constant="20" id="5Yy-q0-OPO"/>
@@ -4332,7 +4332,7 @@ Gw
                     <constraint firstAttribute="bottom" secondItem="8u5-wR-Ekg" secondAttribute="bottom" constant="20" id="rr2-W1-eMm"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="736" y="298"/>
+            <point key="canvasLocation" x="736" y="319.5"/>
         </window>
         <viewController id="RrL-ld-oJQ" customClass="SelectWindowViewController">
             <connections>
@@ -4727,7 +4727,7 @@ DQ
                         <rect key="frame" x="20" y="61" width="572" height="242"/>
                         <clipView key="contentView" id="N6h-Cz-diW">
                             <rect key="frame" x="1" y="0.0" width="570" height="241"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" headerView="Ppk-wb-okh" viewBased="YES" floatsGroupRows="NO" id="mvc-Z9-FCn">
                                     <rect key="frame" x="0.0" y="0.0" width="572" height="216"/>

@@ -20,6 +20,8 @@
 	IBOutlet NSTextField *selectLabel;
     
 	NSMutableArray *groups;
+    
+    NSString *currentTargetID;
 }
 
 
