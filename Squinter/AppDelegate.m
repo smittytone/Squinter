@@ -7784,11 +7784,10 @@
     {
         if ([action compare:@"getaccountid"] == NSOrderedSame)
         {
-            NSString *productName = [account valueForKeyPath:@"attributes.name"];
-
-            if ([product objectForKey:@"shared"])
+            if (product[@"shared"])
             {
-                [product setValue:productName forKeyPath:@"shared.name"];
+                NSString *userName = [account valueForKeyPath:@"attributes.username"];
+                [product setValue:userName forKeyPath:@"shared.name"];
                 [self refreshProductsMenu];
             }
         }
@@ -12439,7 +12438,7 @@
             // the account ID (which may asynchronously be replaced - see 'gotAnAccount:'
 
             NSString *name = [sharer objectForKey:@"name"];
-            if (name.length == 0) name = [sharer objectForKey:@"id"];
+            if (name == nil || name.length == 0) name = [sharer objectForKey:@"id"];
 
             // Add the account name (or ID) to the sub-menu...
             NSMenuItem *aitem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", name]
