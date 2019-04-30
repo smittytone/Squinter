@@ -9906,15 +9906,16 @@
 
             for (NSDictionary *device in devices)
             {
-                // Construct a dictionary for each device derived from the fixed data returned by the server.
-                // The inner dictionary, 'attributes' is converted to a mutable dictionary
-
-                NSString *dtype = [device objectForKey:@"type"];
-
-                if ([dtype hasPrefix:@"dev"])
+                // Only list development devices
+                
+                NSString *dtype = [device valueForKeyPath:@"relationships.devicegroup.type"];
+                if ((NSNull *)dtype == [NSNull null]) dtype = nil;
+                
+                if (dtype == nil || (![dtype hasPrefix:@"pro"] && ![dtype hasPrefix:@"pre-p"] && ![dtype hasPrefix:@"pre-du"] && ![dtype hasPrefix:@"dut"]))
                 {
-                    // Only list development devices
-
+                    // Construct a dictionary for each device derived from the fixed data returned by the server.
+                    // The inner dictionary, 'attributes' is converted to a mutable dictionary
+                    
                     NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[device objectForKey:@"attributes"]];
                     NSString *name = [self getValueFrom:device withKey:@"name"];
 
@@ -10130,7 +10131,7 @@
             return;
         }
 
-        // The following is only executed on action '????'
+        // The following is only executed on action 'getdevice'
 
         NSString *version = [self getValueFrom:device withKey:@"swversion"];
         if (version != nil) [attributes setObject:version forKey:@"swversion"];
