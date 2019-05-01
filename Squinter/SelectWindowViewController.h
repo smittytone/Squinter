@@ -27,6 +27,7 @@
 
 - (void)prepSheet;
 - (IBAction)checkGroup:(id)sender;
+- (IBAction)showWebHelp:(id)sender;
 
 
 @property (nonatomic, strong) Project *project;

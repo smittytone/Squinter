@@ -3902,6 +3902,20 @@ Gw
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zZ4-W1-8U4">
+                        <rect key="frame" x="18" y="16" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="21" id="O2x-0k-gS6"/>
+                            <constraint firstAttribute="height" constant="21" id="him-09-kgY"/>
+                        </constraints>
+                        <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L37-g5-kM8">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="showWebHelp:" target="GLc-pi-9mm" id="8TN-Pa-edk"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Vic-FK-lm3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bVS-tJ-OiH" secondAttribute="leading" constant="20" symbolic="YES" id="APM-IP-sLK"/>
@@ -3910,6 +3924,7 @@ Gw
                     <constraint firstItem="MKa-nh-fgg" firstAttribute="leading" secondItem="0Vk-S9-5eM" secondAttribute="trailing" constant="8" id="M9d-pL-uDG"/>
                     <constraint firstAttribute="trailing" secondItem="dYU-gR-Y50" secondAttribute="trailing" constant="20" id="StL-rf-5zH"/>
                     <constraint firstItem="goy-Na-8RW" firstAttribute="top" secondItem="0Vk-S9-5eM" secondAttribute="bottom" constant="8" id="Tw7-xC-8R1"/>
+                    <constraint firstItem="zZ4-W1-8U4" firstAttribute="leading" secondItem="bVS-tJ-OiH" secondAttribute="leading" constant="20" id="VEH-1Y-WlC"/>
                     <constraint firstItem="0Vk-S9-5eM" firstAttribute="top" secondItem="bVS-tJ-OiH" secondAttribute="top" constant="20" id="Wv1-St-V5a"/>
                     <constraint firstAttribute="bottom" secondItem="NZW-3M-4Kf" secondAttribute="bottom" constant="20" id="Zao-4U-Vqg"/>
                     <constraint firstItem="NZW-3M-4Kf" firstAttribute="leading" secondItem="Vic-FK-lm3" secondAttribute="trailing" constant="12" symbolic="YES" id="Zb0-4T-gZR"/>
@@ -3917,6 +3932,7 @@ Gw
                     <constraint firstItem="0Vk-S9-5eM" firstAttribute="leading" secondItem="bVS-tJ-OiH" secondAttribute="leading" constant="20" id="axg-Nw-9fT"/>
                     <constraint firstItem="goy-Na-8RW" firstAttribute="leading" secondItem="bVS-tJ-OiH" secondAttribute="leading" constant="20" id="cZC-pm-a9q"/>
                     <constraint firstAttribute="trailing" secondItem="MKa-nh-fgg" secondAttribute="trailing" constant="20" id="g6D-FE-LW8"/>
+                    <constraint firstAttribute="bottom" secondItem="zZ4-W1-8U4" secondAttribute="bottom" constant="20" id="jU1-Y2-jiV"/>
                     <constraint firstItem="MKa-nh-fgg" firstAttribute="top" secondItem="bVS-tJ-OiH" secondAttribute="top" constant="21" id="tWm-gL-gyp"/>
                     <constraint firstAttribute="trailing" secondItem="goy-Na-8RW" secondAttribute="trailing" constant="20" id="wKN-oy-dYu"/>
                     <constraint firstAttribute="trailing" secondItem="NZW-3M-4Kf" secondAttribute="trailing" constant="20" id="xQC-Eo-HYt"/>
@@ -4206,7 +4222,7 @@ Gw
                         <rect key="frame" x="20" y="61" width="572" height="244"/>
                         <clipView key="contentView" id="NWZ-vh-YNt">
                             <rect key="frame" x="1" y="1" width="570" height="242"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="20" viewBased="YES" floatsGroupRows="NO" id="bLn-Rm-uCb">
                                     <rect key="frame" x="0.0" y="0.0" width="570" height="242"/>
@@ -4316,6 +4332,20 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Je-F1-D1V">
+                        <rect key="frame" x="18" y="16" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="Uvt-DZ-uyv"/>
+                            <constraint firstAttribute="width" constant="21" id="lCl-dg-32h"/>
+                        </constraints>
+                        <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ImJ-gj-axm">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="showWebHelp:" target="RrL-ld-oJQ" id="1Jz-9f-3HT"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Eu0-Tg-NhL" firstAttribute="top" secondItem="SfP-J6-928" secondAttribute="top" constant="20" id="5Yy-q0-OPO"/>
@@ -4327,6 +4357,8 @@ Gw
                     <constraint firstAttribute="bottom" secondItem="2hz-xo-KPJ" secondAttribute="bottom" constant="20" id="YjO-lQ-YZm"/>
                     <constraint firstItem="2hz-xo-KPJ" firstAttribute="leading" secondItem="8u5-wR-Ekg" secondAttribute="trailing" constant="12" id="bHT-XK-zvq"/>
                     <constraint firstItem="jUV-zz-1e9" firstAttribute="leading" secondItem="SfP-J6-928" secondAttribute="leading" constant="20" id="bZw-IJ-TXm"/>
+                    <constraint firstItem="9Je-F1-D1V" firstAttribute="leading" secondItem="SfP-J6-928" secondAttribute="leading" constant="20" id="gVq-SI-Cbn"/>
+                    <constraint firstAttribute="bottom" secondItem="9Je-F1-D1V" secondAttribute="bottom" constant="20" id="hhh-QE-yLJ"/>
                     <constraint firstItem="jUV-zz-1e9" firstAttribute="top" secondItem="Eu0-Tg-NhL" secondAttribute="bottom" constant="8" id="jQ7-0M-TSE"/>
                     <constraint firstItem="Eu0-Tg-NhL" firstAttribute="leading" secondItem="SfP-J6-928" secondAttribute="leading" constant="20" id="nJf-W1-frN"/>
                     <constraint firstAttribute="bottom" secondItem="8u5-wR-Ekg" secondAttribute="bottom" constant="20" id="rr2-W1-eMm"/>
@@ -4937,15 +4969,31 @@ Gw
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eKS-hO-9Sd">
+                        <rect key="frame" x="18" y="16" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="BVh-6T-ONf"/>
+                            <constraint firstAttribute="width" constant="21" id="WPj-no-xNW"/>
+                        </constraints>
+                        <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PHe-oj-Y0z">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="showWebHelp:" target="aH1-l0-Y8P" id="g7G-7z-JJO"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="wm9-Da-wui" firstAttribute="top" secondItem="Xxo-rz-IWc" secondAttribute="top" constant="20" id="20o-BZ-xvT"/>
                     <constraint firstItem="r11-lm-xcg" firstAttribute="top" secondItem="wm9-Da-wui" secondAttribute="bottom" constant="8" id="6bS-XC-Tec"/>
+                    <constraint firstItem="eKS-hO-9Sd" firstAttribute="leading" secondItem="Xxo-rz-IWc" secondAttribute="leading" constant="20" id="70R-AJ-D9C"/>
                     <constraint firstItem="F7l-5J-53A" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Xxo-rz-IWc" secondAttribute="leading" constant="20" symbolic="YES" id="Drm-sq-gSv"/>
                     <constraint firstItem="Hyt-fb-wRd" firstAttribute="top" secondItem="r11-lm-xcg" secondAttribute="bottom" constant="8" id="I2G-C3-SmR"/>
                     <constraint firstItem="Hyt-fb-wRd" firstAttribute="leading" secondItem="Xxo-rz-IWc" secondAttribute="leading" constant="20" id="UAX-Rs-mU5"/>
                     <constraint firstItem="r11-lm-xcg" firstAttribute="leading" secondItem="Xxo-rz-IWc" secondAttribute="leading" constant="20" id="UBZ-LC-c6F"/>
                     <constraint firstItem="WM1-oN-0DK" firstAttribute="leading" secondItem="F7l-5J-53A" secondAttribute="trailing" constant="12" id="eqC-1B-phr"/>
+                    <constraint firstAttribute="bottom" secondItem="eKS-hO-9Sd" secondAttribute="bottom" constant="20" id="f8c-fq-EGs"/>
                     <constraint firstAttribute="trailing" secondItem="Hyt-fb-wRd" secondAttribute="trailing" constant="20" id="hbI-ja-hi6"/>
                     <constraint firstAttribute="trailing" secondItem="wm9-Da-wui" secondAttribute="trailing" constant="20" id="jt9-B5-TzW"/>
                     <constraint firstAttribute="bottom" secondItem="WM1-oN-0DK" secondAttribute="bottom" constant="20" id="oZ0-L2-3Kv"/>

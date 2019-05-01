@@ -26,6 +26,7 @@
 - (void)prepSheet;
 - (void)setCommits:(NSArray *)input;
 - (IBAction)checkMinimum:(id)sender;
+- (IBAction)showWebHelp:(id)sender;
 
 
 @property (nonatomic, weak, setter=setCommits:) NSArray *commits;

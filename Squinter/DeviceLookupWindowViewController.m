@@ -35,6 +35,13 @@
 
 
 
+- (IBAction)showWebHelp:(id)sender
+{
+    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#lookup"]];
+}
+
+
+
 #pragma mark - NSTextFieldDelegate Methods
 
 

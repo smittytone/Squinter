@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)prepSheet;
+- (IBAction)showWebHelp:(id)sender;
 
 
 @property (nonatomic, strong) NSMutableArray *deviceArray;

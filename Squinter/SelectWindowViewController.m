@@ -140,6 +140,13 @@
 
 
 
+- (IBAction)showWebHelp:(id)sender
+{
+    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#targets"]];
+}
+
+
+
 #pragma mark - NSTableView Delegate and DataSource Methods
 
 
