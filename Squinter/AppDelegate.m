@@ -9062,21 +9062,21 @@
     NSInteger count = (recentFilesCountMenu.indexOfSelectedItem + 1) * 5;
 
     [defaults setObject:[NSNumber numberWithInteger:count] forKey:@"com.bps.squinter.recentFilesCount"];
-
+    
+    // If the max is now lower than the current list total, we should prune the list
+    
+    if (recentFiles.count > count)
+    {
+        while (recentFiles.count > count) [recentFiles removeLastObject];
+        [self refreshRecentFilesMenu];
+    }
+    
     // Set max list items count
 
     count = maxLogCountMenu.selectedTag;
     ide.maxListCount = count;
 
     [defaults setObject:[NSNumber numberWithInteger:count] forKey:@"com.bps.squinter.logListCount"];
-
-    // If the max is now lower than the current list total, we should prune the list
-
-    if (recentFiles.count > count)
-    {
-        while (recentFiles.count > count) [recentFiles removeLastObject];
-        [self refreshRecentFilesMenu];
-    }
 
     // Start or stop auto-updating the device list
     if ([defaults boolForKey:@"com.bps.squinter.updatedevs"] != updateDevicesCheckbox.state == NSOnState)
@@ -9250,6 +9250,15 @@
 
 - (IBAction)checkElectricImpLibraries:(id)sender
 {
+    // FROM 2.3.129
+    // Check we can access the impCloud before proceeding
+    
+    if (!ide.isLoggedIn)
+    {
+        [self loginAlert:@"get Electric Imp libraries"];
+        return;
+    }
+    
     [self checkElectricImpLibs:currentDevicegroup];
 }
 
@@ -9261,6 +9270,14 @@
     // Only do this if the project contains EI libraries and 1 hour has
     // passed since the last look-up
 
+    // FROM 2.3.129
+    // Check we can access the impCloud before proceeding
+    // NOTE We don't post an error here because this call is sometimes made on behalf
+    //      of the user, not by the user. So we check in 'checkElectricImpLibraries:'
+    //      instead
+    
+    if (!ide.isLoggedIn) return;
+        
     if (devicegroup.models.count > 0)
     {
         if (eiLibListTime != nil)
