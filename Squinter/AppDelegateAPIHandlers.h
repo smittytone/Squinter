@@ -66,6 +66,7 @@
 - (void)displayError:(NSNotification *)note;
 - (void)listCommits:(NSNotification *)note;
 - (void)listLogs:(NSNotification *)note;
+- (void)gotLibraries:(NSNotification *)note;
 
 // API Called Logging Methods
 - (void)loggingStarted:(NSNotification *)note;
