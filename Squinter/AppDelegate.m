@@ -216,8 +216,8 @@
     refreshModelsItem.inactiveImageName = @"refresh_grey";
     refreshModelsItem.toolTip = @"Refresh the list of devices from the impCloud";
 
-    newDevicegroupItem.activeImageName = @"plus";
-    newDevicegroupItem.inactiveImageName = @"plus_grey";
+    newDevicegroupItem.activeImageName = @"newdg";
+    newDevicegroupItem.inactiveImageName = @"newdg_grey";
     newDevicegroupItem.toolTip = @"Create a new device group for your selected project";
 
     devicegroupInfoItem.activeImageName = @"info";
