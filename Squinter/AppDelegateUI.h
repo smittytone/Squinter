@@ -11,8 +11,8 @@
 
 
 // UI Update Methods
-// Projects menu
 
+// Projects menu
 - (void)refreshProjectsMenu;
 - (void)refreshOpenProjectsMenu;
 - (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
@@ -20,7 +20,6 @@
 - (void)setProductsMenuTick;
 
 // Device Groups menu
-
 - (void)refreshDevicegroupMenu;
 - (void)refreshDevicegroupByType:(NSString *)type;
 - (void)refreshMainDevicegroupsMenu;
@@ -36,7 +35,6 @@
 - (void)addItemToFileMenu:(NSString *)text :(BOOL)isActive;
 
 // Device menu
-
 - (void)refreshDeviceMenu;
 - (void)refreshDevicesPopup;
 - (void)setDevicesPopupTick;
@@ -45,18 +43,15 @@
 - (void)setUnassignedDevicesMenuTick;
 
 // View menu
-
 - (void)refreshViewMenu;
 - (void)refreshRecentFilesMenu;
 - (IBAction)showHideToolbar:(id)sender;
 
 // Toolbar
-
 - (void)setToolbar;
 
 
 // Dock Menu Methods
-
 - (void)dockMenuAction:(id)sender;
 
 

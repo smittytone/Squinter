@@ -9,8 +9,7 @@
 @interface AppDelegate(AppDelegateUtilities)
 
 
-// File Path Methods
-
+// File Path Processing Methods
 - (NSString *)getDisplayPath:(NSString *)path;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;
@@ -21,24 +20,20 @@
 - (NSURL *)urlForBookmark:(NSData *)bookmark;
 
 // File Watch Methods
-
 - (BOOL)checkAndWatchFile:(NSString *)filePath;
 - (void)watchfiles:(Project *)project;
 
 // Progress Indicator Methods
-
 - (void)startProgress;
 - (void)stopProgress;
 
 // Logging Utility Methods
-
 - (void)parseLog;
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold;
 - (void)setColours;
 // - (void)setLoggingColours;
 
 // Preferences Panel Subsidiary Methods
-
 - (void)showPanelForText;
 - (void)showPanelForBack;
 - (void)showPanelForDev1;
@@ -51,12 +46,10 @@
 - (void)showPanelForDev8;
 
 // Sleep/wake Methods
-
 - (void)receiveSleepNote:(NSNotification *)note;
 - (void)receiveWakeNote:(NSNotification *)note;
 
 // Utility Methods
-
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key;
 - (id)checkForNull:(id)value;
 - (void)updateDevicegroup:(Devicegroup	 *)devicegroup;
@@ -78,10 +71,10 @@
 - (BOOL)isCorrectAccount:(Project *)project;
 
 // Alert Methods
-
 - (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow;
 - (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow;
 - (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow;
 - (void)unsavedAlert:(NSString *)name :(NSString *)message :(NSWindow *)sheetWindow;
+
 
 @end
