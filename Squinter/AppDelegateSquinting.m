@@ -6,6 +6,7 @@
 
 #import "AppDelegateSquinting.h"
 
+
 @implementation AppDelegate(AppDelegateSquinting)
 
 

@@ -6,6 +6,8 @@
 
 #import "AppDelegate.h"
 #import "AppDelegateUtilities.h"
+#import "AppDelegateUI.h"
+
 
 @interface AppDelegate(AppDelegateSquinting)
 

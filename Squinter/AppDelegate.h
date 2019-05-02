@@ -4,31 +4,31 @@
 //  Copyright (c) 2015-18 Tony Smith. All rights reserved.
 
 
-#import <Cocoa/Cocoa.h>
+#import  <Cocoa/Cocoa.h>
 #include <CoreServices/CoreServices.h>
 #include <Security/Security.h>
 #include <Foundation/Foundation.h>
 #include <Sparkle/Sparkle.h>
 #include <math.h>
-#import "ConstantsPrivate.h"
-#import "Constants.h"
-#import "StatusLight.h"
-#import "Project.h"
-#import "Devicegroup.h"
-#import "Model.h"
-#import "File.h"
-#import "BuildAPIAccess.h"
-#import "VDKQueue.h"
-#import "SquinterToolbarItem.h"
-#import "StreamToolbarItem.h"
-#import "LoginToolbarItem.h"
-#import "PDKeychainBindings.h"
-#import "CommitWindowViewController.h"
-#import "SelectWindowViewController.h"
-#import "InspectorViewController.h"
-#import "LogView.h"
-#import "DeviceLookupWindowViewController.h"
-#import "SyncWindowViewController.h"
+#import  "ConstantsPrivate.h"
+#import  "Constants.h"
+#import  "StatusLight.h"
+#import  "Project.h"
+#import  "Devicegroup.h"
+#import  "Model.h"
+#import  "File.h"
+#import  "BuildAPIAccess.h"
+#import  "VDKQueue.h"
+#import  "SquinterToolbarItem.h"
+#import  "StreamToolbarItem.h"
+#import  "LoginToolbarItem.h"
+#import  "PDKeychainBindings.h"
+#import  "CommitWindowViewController.h"
+#import  "SelectWindowViewController.h"
+#import  "InspectorViewController.h"
+#import  "LogView.h"
+#import  "DeviceLookupWindowViewController.h"
+#import  "SyncWindowViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -373,7 +373,8 @@
     Project *currentProject, *creatingProject, *savingProject;
     Devicegroup *currentDevicegroup, *eiDeviceGroup;
     VDKQueue *fileWatchQueue;
-
+    
+    NSWindow *mainWindow;
     NSOperatingSystemVersion sysVer;
     NSWorkspace *nswsw;
     NSFileManager *nsfm;
@@ -407,23 +408,13 @@
 }
 
 
-@property (assign) IBOutlet NSWindow *window;
-
-
-// Dock Menu Methods
-
-- (void)dockMenuAction:(id)sender;
-
-
 // Inspector Methods
-
 - (IBAction)showInspector:(id)sender;
 - (IBAction)showProjectInspector:(id)sender;
 - (IBAction)showDeviceInspector:(id)sender;
 
 
 // Login Methods
-
 - (IBAction)loginOrOut:(id)sender;
 - (void)logout;
 - (void)autoLogin;
@@ -442,7 +433,6 @@
 
 
 // New Project Methods
-
 - (IBAction)newProject:(id)sender;
 - (IBAction)newProjectSheetCancel:(id)sender;
 - (IBAction)newProjectSheetCreate:(id)sender;
@@ -451,7 +441,6 @@
 
 
 // Existing Project Methods
-
 - (IBAction)pickProject:(id)sender;
 - (void)chooseProject:(id)sender;
 - (IBAction)openProject:(id)sender;
@@ -476,7 +465,6 @@
 
 
 // Product Methods
-
 - (void)chooseProduct:(id)sender;
 - (IBAction)getProductsFromServer:(id)sender;
 - (IBAction)deleteProduct:(id)sender;
@@ -485,7 +473,6 @@
 
 
 // New Device Group Methods
-
 - (IBAction)newDevicegroup:(id)sender;
 - (IBAction)newDevicegroupSheetCancel:(id)sender;
 - (IBAction)newDevicegroupSheetCreate:(id)sender;
@@ -501,7 +488,6 @@
 
 
 // Existing Device Group Methods
-
 - (void)chooseDevicegroup:(id)sender;
 - (IBAction)incrementCurrentDevicegroup:(id)sender;
 - (IBAction)decrementCurrentDevicegroup:(id)sender;
@@ -522,7 +508,6 @@
 
 
 // Existing Device Methods
-
 - (void)selectFirstDevice;
 - (IBAction)updateDevicesStatus:(id)sender;
 - (IBAction)keepDevicesStatusUpdated:(id)sender;
@@ -547,7 +532,6 @@
 
 
 // File Location and Opening Methods
-
 - (void)presentOpenFilePanel:(NSInteger)openActionType;
 - (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
 - (void)openSquirrelProjects:(NSMutableArray *)urls;
@@ -563,7 +547,6 @@
 
 
 // Save Project Methods
-
 - (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName;
 - (IBAction)saveProjectAs:(id)sender;
 - (IBAction)saveProject:(id)sender;
@@ -577,55 +560,10 @@
 
 
 // Squint Methods
-
 - (IBAction)squint:(id)sender;
 
 
-// BuildAPIAccess Response Handler Methods
-
-- (void)gotMyAccount:(NSNotification *)note;
-- (void)gotAnAccount:(NSNotification *)note;
-- (void)loggedIn:(NSNotification *)note;
-- (void)loggedInStageTwo;
-- (void)loginRejected:(NSNotification *)note;
-- (void)loggedOut:(NSNotification *)note;
-- (void)uploadProjectStageThree:(Project *)project;
-- (void)listProducts:(NSNotification *)note;
-- (void)productToProjectStageTwo:(NSNotification *)note;
-- (void)productToProjectStageThree:(NSNotification *)note;
-- (void)productToProjectStageFour:(Project *)project;
-- (void)getCurrentDeployment:(NSDictionary *)data;
-- (void)createProductStageTwo:(NSNotification *)note;
-- (void)deleteProductStageTwo:(NSMutableDictionary *)productToDelete;
-- (void)deleteProductStageThree:(NSNotification *)note;
-- (void)updateProductStageTwo:(NSNotification *)note;
-- (void)updateDevicegroupStageTwo:(NSNotification *)note;
-- (void)deleteDevicegroupStageTwo:(NSNotification *)note;
-- (void)createDevicegroupStageTwo:(NSNotification *)note;
-- (void)syncLocalDevicegroupsStageTwo:(Devicegroup *)devicegroup;
-- (void)uploadDevicegroupCode:(Devicegroup *)devicegroup :(Project *)project;
-- (void)updateCodeStageTwo:(NSNotification *)note;
-- (void)uploadCodeStageTwo:(NSNotification *)note;
-- (void)showCodeErrors:(NSNotification *)note;
-- (void)listDevices:(NSNotification *)note;
-- (void)listBlessedDevices:(NSArray *)devices :(Devicegroup *)devicegroup;
-- (void)updateDevice:(NSNotification *)note;
-- (void)restarted:(NSNotification *)note;
-- (void)reassigned:(NSNotification *)note;
-- (void)renameDeviceStageTwo:(NSNotification *)note;
-- (void)deleteDeviceStageTwo:(NSNotification *)note;
-- (void)setMinimumDeploymentStageTwo:(NSNotification *)note;
-- (void)displayError:(NSNotification *)note;
-- (void)listCommits:(NSNotification *)note;
-- (void)listLogs:(NSNotification *)note;
-- (void)loggingStarted:(NSNotification *)note;
-- (void)loggingStopped:(NSNotification *)note;
-- (void)presentLogEntry:(NSNotification *)note;
-- (void)endLogging:(NSNotification *)note;
-
-
 // Log and Logging Methods
-
 - (void)logLogs:(NSString *)logLine;
 - (IBAction)printLog:(id)sender;
 - (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo;
@@ -650,7 +588,6 @@
 
 
 // External Editor Methods
-
 - (IBAction)externalOpen:(id)sender;
 - (void)switchToEditor:(Model *)model;
 - (IBAction)externalLibOpen:(id)sender;
@@ -665,66 +602,18 @@
 - (IBAction)launchReleaseNotesPage:(id)sender;
 
 
-// UI Update Methods
-// Projects menu
-
-- (void)refreshProjectsMenu;
-- (void)refreshOpenProjectsMenu;
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
-- (void)refreshProductsMenu;
-- (void)setProductsMenuTick;
-
-// Device Groups menu
-
-- (void)refreshDevicegroupMenu;
-- (void)refreshDevicegroupByType:(NSString *)type;
-- (void)refreshMainDevicegroupsMenu;
-- (void)defaultExternalMenus;
-- (void)refreshDevicesMenus;
-- (void)setDevicesMenusTicks;
-- (void)refreshLibraryMenus;
-- (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib;
-- (void)addLibraryToMenu:(File *)lib :(BOOL)isEILib :(BOOL)isActive;
-- (void)refreshFilesMenu;
-- (void)fileAdder:(NSMutableArray *)models;
-- (void)addFileToMenu:(File *)file :(BOOL)isActive;
-- (void)addItemToFileMenu:(NSString *)text :(BOOL)isActive;
-
-// Device menu
-
-- (void)refreshDeviceMenu;
-- (void)refreshDevicesPopup;
-- (void)setDevicesPopupTick;
-- (NSImage *)menuImage:(NSMutableDictionary *)device;
-- (void)refreshUnassignedDevicesMenu;
-- (void)setUnassignedDevicesMenuTick;
-
-// View menu
-
-- (void)refreshViewMenu;
-- (void)refreshRecentFilesMenu;
-- (IBAction)showHideToolbar:(id)sender;
-
-// Toolbar
-
-- (void)setToolbar;
-
-
 // About Sheet Methods
-
 - (IBAction)showAboutSheet:(id)sender;
 - (IBAction)viewSquinterSite:(id)sender;
 - (IBAction)closeAboutSheet:(id)sender;
 
 
 // Help Menu Methods
-
 - (IBAction)showAuthor:(id)sender;
 - (IBAction)showWebHelp:(id)sender;
 
 
 // Preferences Sheet Methods
-
 - (IBAction)showPrefs:(id)sender;
 - (IBAction)selectFontName:(id)sender;
 - (IBAction)cancelPrefs:(id)sender;
@@ -733,7 +622,6 @@
 
 
 // Report a Problem Sheet Methods
-
 - (IBAction)showFeedbackSheet:(id)sender;
 - (IBAction)cancelFeedbackSheet:(id)sender;
 - (IBAction)sendFeedback:(id)sender;
@@ -741,7 +629,6 @@
 
 
 // Check Electric Imp Libraries Methods
-
 - (IBAction)checkElectricImpLibraries:(id)sender;
 - (void)checkElectricImpLibs:(Devicegroup *)devicegroup;
 - (void)compareElectricImpLibs:(Devicegroup *)devicegroup;
@@ -749,19 +636,18 @@
 
 
 // Pasteboard Methods
-
 - (IBAction)copyDeviceCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentURL:(id)sender;
 
 
-// File Watching Methods
-
+// VDKQueueDelegate Methods methods
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath;
 
 
-
+@property (assign) IBOutlet NSWindow *window;
 @property (nonatomic, strong) NSTouchBar *touchBar;
+
 
 
 @end

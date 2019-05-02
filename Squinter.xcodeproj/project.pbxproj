@@ -40,6 +40,8 @@
 		3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
+		3BCEB7B9227AF77F0090B137 /* AppDelegateUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BCEB7B8227AF77F0090B137 /* AppDelegateUI.m */; };
+		3BCEB7BD227AFAEE0090B137 /* AppDelegateAPIHandlers.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BCEB7BC227AFAED0090B137 /* AppDelegateAPIHandlers.m */; };
 		3BD74E461D423D6A00565B0E /* SourceCodePro-Regular.otf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BE520BC197554A0000BAD52 /* docicon.iconbuilder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3BE520BB197554A0000BAD52 /* docicon.iconbuilder.icns */; };
 		3BE6C4DD19B76AA200D228AF /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE6C4DC19B76AA200D228AF /* Security.framework */; };
@@ -156,6 +158,11 @@
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = StatusLight.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
 		3BC577251A717F120014F78E /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VDKQueue.m; sourceTree = "<group>"; };
+		3BCEB7B3227AF1C00090B137 /* Squinter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Squinter.entitlements; sourceTree = "<group>"; };
+		3BCEB7B4227AF6EF0090B137 /* AppDelegateUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegateUI.h; sourceTree = "<group>"; };
+		3BCEB7B8227AF77F0090B137 /* AppDelegateUI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateUI.m; sourceTree = "<group>"; };
+		3BCEB7BB227AFA9B0090B137 /* AppDelegateAPIHandlers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegateAPIHandlers.h; sourceTree = "<group>"; };
+		3BCEB7BC227AFAED0090B137 /* AppDelegateAPIHandlers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateAPIHandlers.m; sourceTree = "<group>"; };
 		3BE520BA19752883000BAD52 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Constants.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BE520BB197554A0000BAD52 /* docicon.iconbuilder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = docicon.iconbuilder.icns; sourceTree = "<group>"; };
 		3BE6C4DC19B76AA200D228AF /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -271,8 +278,10 @@
 		3B36D1C81970A0990029CEC0 /* Squinter */ = {
 			isa = PBXGroup;
 			children = (
-				3B7ACF7E1CFEEBEA0080C3DB /* Core Classes */,
+				3BCEB7B3227AF1C00090B137 /* Squinter.entitlements */,
+				3B7ACF7E1CFEEBEA0080C3DB /* AppDelegate Classes */,
 				3B7ACF7D1CFEEBC10080C3DB /* UI Classes */,
+				3BCEB7BA227AF90E0090B137 /* Squinter entities */,
 				3B3015471CFE05C900596CF2 /* BuildAPIAccess */,
 				3B3015481CFE05E400596CF2 /* Third-Party */,
 				3B7ACF821CFF0B7B0080C3DB /* Bundled Entities */,
@@ -329,27 +338,23 @@
 			sourceTree = "<group>";
 			usesTabs = 0;
 		};
-		3B7ACF7E1CFEEBEA0080C3DB /* Core Classes */ = {
+		3B7ACF7E1CFEEBEA0080C3DB /* AppDelegate Classes */ = {
 			isa = PBXGroup;
 			children = (
 				3B34A98D215CC91F00120353 /* ConstantsPrivate.h */,
 				3BE520BA19752883000BAD52 /* Constants.h */,
 				3B36D1D41970A0990029CEC0 /* AppDelegate.h */,
 				3B36D1D51970A0990029CEC0 /* AppDelegate.m */,
+				3BCEB7B4227AF6EF0090B137 /* AppDelegateUI.h */,
+				3BCEB7B8227AF77F0090B137 /* AppDelegateUI.m */,
+				3BCEB7BB227AFA9B0090B137 /* AppDelegateAPIHandlers.h */,
+				3BCEB7BC227AFAED0090B137 /* AppDelegateAPIHandlers.m */,
 				3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */,
 				3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */,
 				3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */,
 				3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */,
-				3B6AF0D9197127B10083744C /* Project.h */,
-				3B6AF0DA197127B10083744C /* Project.m */,
-				3B8B8E0E1E9527D6009363C8 /* Devicegroup.h */,
-				3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */,
-				3B8B8E111E952C1D009363C8 /* Model.h */,
-				3B8B8E121E952C1D009363C8 /* Model.m */,
-				3B8B8E141E952E5A009363C8 /* File.h */,
-				3B8B8E151E952E5A009363C8 /* File.m */,
 			);
-			name = "Core Classes";
+			name = "AppDelegate Classes";
 			sourceTree = "<group>";
 			usesTabs = 0;
 		};
@@ -364,6 +369,21 @@
 				3BF464111CF87C720094EF59 /* dsa_pub.pem */,
 			);
 			name = "Bundled Entities";
+			sourceTree = "<group>";
+		};
+		3BCEB7BA227AF90E0090B137 /* Squinter entities */ = {
+			isa = PBXGroup;
+			children = (
+				3B6AF0D9197127B10083744C /* Project.h */,
+				3B6AF0DA197127B10083744C /* Project.m */,
+				3B8B8E0E1E9527D6009363C8 /* Devicegroup.h */,
+				3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */,
+				3B8B8E111E952C1D009363C8 /* Model.h */,
+				3B8B8E121E952C1D009363C8 /* Model.m */,
+				3B8B8E141E952E5A009363C8 /* File.h */,
+				3B8B8E151E952E5A009363C8 /* File.m */,
+			);
+			name = "Squinter entities";
 			sourceTree = "<group>";
 		};
 		9D21E7CE86082310D04E5080 /* Frameworks */ = {
@@ -443,6 +463,11 @@
 					3B36D1BE1970A0990029CEC0 = {
 						DevelopmentTeam = Y5J3K52DNA;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -546,10 +571,12 @@
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
 				3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */,
 				3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */,
+				3BCEB7B9227AF77F0090B137 /* AppDelegateUI.m in Sources */,
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
 				3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */,
 				3B077B3121118A5E00C17D25 /* InspectorLinkButton.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
+				3BCEB7BD227AFAEE0090B137 /* AppDelegateAPIHandlers.m in Sources */,
 				3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,
 				3BC577261A717F120014F78E /* VDKQueue.m in Sources */,
@@ -762,6 +789,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
 				DEVELOPMENT_TEAM = Y5J3K52DNA;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Squinter",
@@ -796,6 +824,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
 				DEVELOPMENT_TEAM = Y5J3K52DNA;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Squinter",
