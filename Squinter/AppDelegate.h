@@ -557,32 +557,34 @@
 - (void)doneSaving:(Project *)project;
 
 
-// Squint Methods
-- (IBAction)squint:(id)sender;
-
-
 // Log and Logging Methods
-- (void)logLogs:(NSString *)logLine;
 - (IBAction)printLog:(id)sender;
-- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo;
 - (IBAction)showProjectInfo:(id)sender;
 - (IBAction)showDeviceGroupInfo:(id)sender;
-- (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines;
-- (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines;
 - (IBAction)showDeviceInfo:(id)sender;
 - (IBAction)logDeviceCode:(id)sender;
 - (IBAction)logAgentCode:(id)sender;
-// ADDED IN 2.3.128:
-- (void)logModelCode:(NSString *)codeType;
 - (IBAction)clearLog:(id)sender;
-- (void)printInfoInLog:(NSMutableArray *)lines;
+
+- (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines;
+- (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines;
+- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo;
+
+- (void)writeLinesToLog:(NSMutableArray *)lines;
 - (void)writeStringToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeErrorToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeWarningToLog:(NSString *)string :(BOOL)addTimestamp;
 - (void)writeNoteToLog:(NSString *)string :(NSColor *)colour :(BOOL)addTimestamp;
 - (void)writeStyledStringToLog:(NSAttributedString *)string :(BOOL)addTimestamp;
+
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
 - (void)logCode;
+- (void)logModelCode:(NSString *)codeType; // ADDED IN 2.3.128
+- (void)logLogs:(NSString *)logLine;
+
+
+// Squint Methods
+- (IBAction)squint:(id)sender;
 
 
 // External Editor Methods
@@ -602,7 +604,9 @@
 - (IBAction)showReleaseNotesPage:(id)sender;
 - (IBAction)showAuthor:(id)sender;
 - (IBAction)showWebHelp:(id)sender;
+- (IBAction)showPrefsHelp:(id)sender;
 - (void)showEILibsPage;
+- (void)launchOwnSite:(NSString *)anchor;
 - (void)launchWebSite:(NSString *)url;
 
 
@@ -614,9 +618,9 @@
 
 // Preferences Sheet Methods
 - (IBAction)showPrefs:(id)sender;
-- (IBAction)selectFontName:(id)sender;
 - (IBAction)cancelPrefs:(id)sender;
 - (IBAction)setPrefs:(id)sender;
+- (IBAction)selectFontName:(id)sender;
 - (IBAction)chooseWorkingDirectory:(id)sender;
 
 
@@ -631,13 +635,13 @@
 - (IBAction)checkElectricImpLibraries:(id)sender;
 - (void)checkElectricImpLibs:(Devicegroup *)devicegroup;
 - (void)compareElectricImpLibs:(Devicegroup *)devicegroup;
-- (void)gotLibraries:(NSNotification *)note;
 
 
 // Pasteboard Methods
+- (IBAction)copyAgentURL:(id)sender;
 - (IBAction)copyDeviceCodeToPasteboard:(id)sender;
 - (IBAction)copyAgentCodeToPasteboard:(id)sender;
-- (IBAction)copyAgentURL:(id)sender;
+- (void)copyCodeToPasteboard:(NSString *)type;
 
 
 // VDKQueueDelegate Methods methods

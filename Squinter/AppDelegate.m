@@ -1116,7 +1116,9 @@
 
 - (IBAction)signup:(id)sender
 {
-    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html#account"];
+    // Show EI account sign-up help information
+    
+    [self launchOwnSite:@"#electric-imp-accounts"];
 }
 
 
@@ -7491,14 +7493,6 @@
 
 #pragma mark - Log and Logging Methods
 
-- (void)logLogs:(NSString *)logLine
-{
-    // Write a line of a list of log entries to the main window's log view
-
-    [self writeStringToLog:logLine :NO];
-}
-
-
 
 - (IBAction)printLog:(id)sender
 {
@@ -7532,15 +7526,6 @@
                                                                printInfo:pInfo];
     [printOp setCanSpawnSeparateThread:YES];
     [printOp runOperationModalForWindow:_window delegate:self didRunSelector:@selector(printDone: success: contextInfo:) contextInfo:nil];
-}
-
-
-
-- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo
-{
-    // Show a post-print message
-
-    if (success) [self writeStringToLog:@"Log contents sent to print system." :YES];
 }
 
 
@@ -7707,7 +7692,7 @@
 
     // Finally, print out the lines in the log
 
-    [self printInfoInLog:lines];
+    [self writeLinesToLog:lines];
 }
 
 
@@ -7733,299 +7718,6 @@
     // Gather the deviece group data and display it
 
     [self compileDevicegroupInfo:currentDevicegroup :0 :nil];
-}
-
-
-
-- (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines
-{
-    // Gathers and displays info for the specified device group
-    // It's separate from 'showDeviceGroupInfo:' because it needs to be called by 'showProjectInfo:' too
-
-    NSMutableArray *lines = [[NSMutableArray alloc] init];
-
-    // Prepare the indent: should be 0 or 2 spaces
-
-    NSString *spaces = @"";
-    NSString *liner = @"";
-
-    if (inset > 0)
-    {
-        for (NSUInteger i = 0 ; i < inset ; ++i) spaces = [spaces stringByAppendingString:@" "];
-    }
-
-    [lines addObject:[NSString stringWithFormat:@"%@Device Group \"%@\"", spaces, devicegroup.name]];
-
-    if (devicegroup.did != nil && devicegroup.did.length > 0 && [devicegroup.did compare:@"old"] != NSOrderedSame)
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@Device Group ID: %@", spaces, devicegroup.did]];
-    }
-    else
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@Device Group not uploaded to the impCloud", spaces]];
-    }
-
-    if (devicegroup.mdid != nil || devicegroup.mdid.length > 0)
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@Minimum Supported Deployment Set (ID: %@)", spaces, devicegroup.mdid]];
-    }
-
-    [lines addObject:[NSString stringWithFormat:@"%@Device Group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
-
-    if (devicegroup.data != nil && [devicegroup.type containsString:@"fixture"])
-    {
-        NSString *prefix = [devicegroup.type hasPrefix:@"pre"] ? @"Test " : @"";
-        NSDictionary *aTarget = [self getValueFrom:devicegroup.data withKey:@"production_target"];
-
-        if (aTarget != nil)
-        {
-            NSString *tid = [aTarget objectForKey:@"id"];
-
-            for (Devicegroup *dg in currentProject.devicegroups)
-            {
-                if ([dg.did compare:tid] == NSOrderedSame)
-                {
-                    [lines addObject:[NSString stringWithFormat:@"%@Target %@Production Device Group: %@", spaces, prefix, dg.name]];
-                    break;
-                }
-            }
-        }
-
-        aTarget = [self getValueFrom:devicegroup.data withKey:@"dut_target"];
-
-        if (aTarget != nil)
-        {
-            NSString *tid = [aTarget objectForKey:@"id"];
-
-            for (Devicegroup *dg in currentProject.devicegroups)
-            {
-                if ([dg.did compare:tid] == NSOrderedSame)
-                {
-                    [lines addObject:[NSString stringWithFormat:@"%@Target %@DUT Device Group: %@", spaces, prefix, dg.name]];
-                    break;
-                }
-            }
-        }
-    }
-
-    if (devicegroup.models.count > 0)
-    {
-        if (devicegroup.models.count == 1)
-        {
-            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has 1 source code file:", spaces]];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has %li source code files:", spaces, (long)devicegroup.models.count]];
-        }
-
-        for (NSUInteger j = 0 ; j < devicegroup.models.count ; ++j)
-        {
-            Model *model = [devicegroup.models objectAtIndex:j];
-            NSString *showPath = [self getPrintPath:currentProject.path :model.path];
-            if (showPath.length > 0) showPath = [showPath stringByAppendingString:@"/"];
-            if (j > 0) liner = @"\n";
-
-            NSString *m = [NSString stringWithFormat:@"%@%@  %li. %@%@", liner, spaces, (long)(j + 1), showPath, model.filename];
-            if (model.hasMoved) m = [m stringByAppendingString:@" ** FILE HAS MOVED FROM THIS LOCATION **"];
-            [lines addObject:m];
-            [self compileModelInfo:model :(inset + 4) :lines];
-        }
-    }
-    else
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@This Device Group has no source code yet.", spaces]];
-    }
-
-    // Get devices for this device group
-
-    if (devicesArray.count > 0)
-    {
-        BOOL first = YES;
-
-        for (NSMutableDictionary *device in devicesArray)
-        {
-            NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = [self getValueFrom:dg withKey:@"id"];
-
-            if (devicegroup.did != nil && devicegroup.did.length > 0 && ([devicegroup.did compare:dgid] == NSOrderedSame))
-            {
-                if (first)
-                {
-                    [lines addObject:[NSString stringWithFormat:@"\n%@The following device(s) have been assigned to this Device Group:", spaces]];
-                    first = NO;
-                }
-
-                [lines addObject:[NSString stringWithFormat:@"%@     %@ (%@)", spaces, [self getValueFrom:device withKey:@"name"], [self getValueFrom:device withKey:@"id"]]];
-            }
-        }
-    }
-
-    // Insert the description if there is one - we do this here in order to ensure the description
-    // line width matches that of the longest line in the device group data
-
-    if (devicegroup.description != nil && devicegroup.description.length > 0)
-    {
-        // Get the length of the widest line
-
-        NSUInteger dashCount = 0;
-
-        for (NSString *string in lines)
-        {
-            if (string.length > dashCount) dashCount = string.length;
-        }
-
-        // Format the description for that maximum line width
-
-        NSArray *dLines = [self displayDescription:devicegroup.description :dashCount :spaces];
-
-        // Add the description lines into the ones we already have, ie. on line 1 after the name
-
-        for (NSInteger i = 0 ; i < dLines.count ; ++i)
-        {
-            [lines insertObject:[dLines objectAtIndex:i] atIndex:i + 1];
-        }
-    }
-
-    // Add the new lines to either the passed in array, or a local one
-
-    if (otherLines == nil)
-    {
-        [self printInfoInLog:lines];
-    }
-    else
-    {
-        [otherLines addObjectsFromArray:lines];
-    }
-}
-
-
-
-- (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines
-{
-    // Gathers and displays info for the specified model
-
-    NSString *path;
-    NSMutableArray *lines = [[NSMutableArray alloc] init];
-
-    // Prepare the indent: should be 4 or 6 spaces
-
-    NSString *spaces = @"";
-
-    if (inset > 0)
-    {
-        for (NSUInteger i = 0 ; i < inset ; ++i)
-        {
-            spaces = [spaces stringByAppendingString:@" "];
-        }
-    }
-
-    if (model.libraries.count > 0)
-    {
-        if (model.libraries.count == 1)
-        {
-            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local library:", spaces, model.type]];
-
-            File *lib = [model.libraries objectAtIndex:0];
-
-            path = [self getPrintPath:currentProject.path :lib.path];
-            path = (path.length == 0) ? lib.filename : [path stringByAppendingFormat:@"/%@", lib.filename];
-
-            [lines addObject:[NSString stringWithFormat:@"%@   %@ (version %@)", spaces, path, ((lib.version.length == 0) ? @"unknown" : lib.version)]];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local libraries:", spaces, model.type]];
-
-            for (NSUInteger i = 0 ; i < model.libraries.count ; ++i)
-            {
-                File *lib = [model.libraries objectAtIndex:i];
-
-                path = [self getPrintPath:currentProject.path :lib.path];
-                path = (path.length == 0) ? lib.filename : [path stringByAppendingFormat:@"/%@", lib.filename];
-
-                [lines addObject:[NSString stringWithFormat:@"%@   %li. %@ (%@)", spaces, (long)(i + 1), path, ((lib.version.length == 0) ? @"unknown" : lib.version)]];
-            }
-        }
-    }
-    else
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports no local libraries.", spaces, model.type]];
-    }
-
-    if (model.files.count > 0)
-    {
-        if (model.files.count == 1)
-        {
-            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local file:", spaces, model.type]];
-
-            File *file = [model.files objectAtIndex:0];
-
-            path = [self getPrintPath:currentProject.path :file.path];
-            path = (path.length == 0) ? file.filename : [path stringByAppendingFormat:@"/%@", file.filename];
-
-            [lines addObject:[NSString stringWithFormat:@"%@   %@", spaces, path]];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local files:", spaces, model.type]];
-
-            for (NSUInteger i = 0 ; i < model.files.count ; ++i)
-            {
-                File *file = [model.files objectAtIndex:i];
-
-                path = [self getPrintPath:currentProject.path :file.path];
-                path = (path.length == 0) ? file.filename : [path stringByAppendingFormat:@"/%@", file.filename];
-
-                [lines addObject:[NSString stringWithFormat:@"%@   %li. %@", spaces, (long)(i + 1), path]];
-            }
-        }
-    }
-    else
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports no local files.", spaces, model.type]];
-    }
-
-    if (!model.squinted) [lines addObject:[NSString stringWithFormat:@"%@ [WARNING] This file has not been compiled so the list above may be out of date.", spaces]];
-
-    if (model.impLibraries.count > 0)
-    {
-        if (model.impLibraries.count == 1)
-        {
-            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads the following Electric Imp library:", spaces, model.type]];
-
-            File *elib = [model.impLibraries objectAtIndex:0];
-            [lines addObject:[NSString stringWithFormat:@"%@   %@ (%@)", spaces, elib.filename, elib.version]];
-        }
-        else
-        {
-            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads the following Electric Imp libraries:", spaces, model.type]];
-
-            for (NSUInteger i = 0 ; i < model.impLibraries.count ; ++i)
-            {
-                File *elib = [model.impLibraries objectAtIndex:i];
-                [lines addObject:[NSString stringWithFormat:@"%@   %li. %@ (%@)", spaces, (long)(i + 1), elib.filename, elib.version]];
-            }
-        }
-    }
-    else
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads no Electric Imp libraries.", spaces, model.type]];
-    }
-
-    if (model.sha != nil && model.sha.length > 0)
-    {
-        [lines addObject:[NSString stringWithFormat:@"%@ Code uploaded at %@ as SHA %@", spaces, model.updated, model.sha]];
-    }
-
-    if (otherLines == nil)
-    {
-        [self printInfoInLog:lines];
-    }
-    else
-    {
-        [otherLines addObjectsFromArray:lines];
-    }
 }
 
 
@@ -8163,7 +7855,7 @@
 
     // Add the assembled lines to the log and re-check for URLs
 
-    [self printInfoInLog:lines];
+    [self writeLinesToLog:lines];
     [self parseLog];
 }
 
@@ -8187,45 +7879,6 @@
 
 
 
-- (void)logModelCode:(NSString *)codeType
-{
-    // Processes the display of the specified type of source code from the current device group, if there is one
-
-    if (currentDevicegroup == nil)
-    {
-        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
-        return;
-    }
-
-    if (currentDevicegroup.models.count == 0)
-    {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no %@ code.", currentDevicegroup.name, codeType] :YES];
-        return;
-    }
-
-    BOOL done = NO;
-
-    for (Model *model in currentDevicegroup.models)
-    {
-        if ([model.type compare:codeType] == NSOrderedSame)
-        {
-            NSUInteger squintedTest = [codeType hasPrefix:@"a"] ? kAgentCodeSquinted : kDeviceCodeSquinted;
-
-            if ((currentDevicegroup.squinted & squintedTest) == 0) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest %@ code.", currentDevicegroup.name, codeType] :YES];
-
-            done = YES;
-            NSString *firstChar = [[codeType substringToIndex:1] capitalizedString];
-            codeType = [codeType stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:firstChar];
-            [self writeStringToLog:[NSString stringWithFormat:@"%@ Code:", codeType] :NO];
-            [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
-            break;
-        }
-    }
-
-    if (!done) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no %@ code.", currentDevicegroup.name, codeType] :YES];
-}
-
-
 - (IBAction)clearLog:(id)sender
 {
     // Clear the log of all text
@@ -8243,7 +7896,309 @@
 
 
 
-- (void)printInfoInLog:(NSMutableArray *)lines
+- (void)printDone:(NSPrintOperation *)printOperation success:(BOOL)success contextInfo:(void *)contextInfo
+{
+    // Show a post-print message
+    
+    if (success) [self writeStringToLog:@"Log contents sent to print system." :YES];
+}
+
+
+
+- (void)compileDevicegroupInfo:(Devicegroup *)devicegroup :(NSUInteger)inset :(NSMutableArray *)otherLines
+{
+    // Gathers and displays info for the specified device group
+    // It's separate from 'showDeviceGroupInfo:' because it needs to be called by 'showProjectInfo:' too
+    
+    NSMutableArray *lines = [[NSMutableArray alloc] init];
+    
+    // Prepare the indent: should be 0 or 2 spaces
+    
+    NSString *spaces = @"";
+    NSString *liner = @"";
+    
+    if (inset > 0)
+    {
+        for (NSUInteger i = 0 ; i < inset ; ++i) spaces = [spaces stringByAppendingString:@" "];
+    }
+    
+    [lines addObject:[NSString stringWithFormat:@"%@Device Group \"%@\"", spaces, devicegroup.name]];
+    
+    if (devicegroup.did != nil && devicegroup.did.length > 0 && [devicegroup.did compare:@"old"] != NSOrderedSame)
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@Device Group ID: %@", spaces, devicegroup.did]];
+    }
+    else
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@Device Group not uploaded to the impCloud", spaces]];
+    }
+    
+    if (devicegroup.mdid != nil || devicegroup.mdid.length > 0)
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@Minimum Supported Deployment Set (ID: %@)", spaces, devicegroup.mdid]];
+    }
+    
+    [lines addObject:[NSString stringWithFormat:@"%@Device Group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
+    
+    if (devicegroup.data != nil && [devicegroup.type containsString:@"fixture"])
+    {
+        NSString *prefix = [devicegroup.type hasPrefix:@"pre"] ? @"Test " : @"";
+        NSDictionary *aTarget = [self getValueFrom:devicegroup.data withKey:@"production_target"];
+        
+        if (aTarget != nil)
+        {
+            NSString *tid = [aTarget objectForKey:@"id"];
+            
+            for (Devicegroup *dg in currentProject.devicegroups)
+            {
+                if ([dg.did compare:tid] == NSOrderedSame)
+                {
+                    [lines addObject:[NSString stringWithFormat:@"%@Target %@Production Device Group: %@", spaces, prefix, dg.name]];
+                    break;
+                }
+            }
+        }
+        
+        aTarget = [self getValueFrom:devicegroup.data withKey:@"dut_target"];
+        
+        if (aTarget != nil)
+        {
+            NSString *tid = [aTarget objectForKey:@"id"];
+            
+            for (Devicegroup *dg in currentProject.devicegroups)
+            {
+                if ([dg.did compare:tid] == NSOrderedSame)
+                {
+                    [lines addObject:[NSString stringWithFormat:@"%@Target %@DUT Device Group: %@", spaces, prefix, dg.name]];
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (devicegroup.models.count > 0)
+    {
+        if (devicegroup.models.count == 1)
+        {
+            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has 1 source code file:", spaces]];
+        }
+        else
+        {
+            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has %li source code files:", spaces, (long)devicegroup.models.count]];
+        }
+        
+        for (NSUInteger j = 0 ; j < devicegroup.models.count ; ++j)
+        {
+            Model *model = [devicegroup.models objectAtIndex:j];
+            NSString *showPath = [self getPrintPath:currentProject.path :model.path];
+            if (showPath.length > 0) showPath = [showPath stringByAppendingString:@"/"];
+            if (j > 0) liner = @"\n";
+            
+            NSString *m = [NSString stringWithFormat:@"%@%@  %li. %@%@", liner, spaces, (long)(j + 1), showPath, model.filename];
+            if (model.hasMoved) m = [m stringByAppendingString:@" ** FILE HAS MOVED FROM THIS LOCATION **"];
+            [lines addObject:m];
+            [self compileModelInfo:model :(inset + 4) :lines];
+        }
+    }
+    else
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@This Device Group has no source code yet.", spaces]];
+    }
+    
+    // Get devices for this device group
+    
+    if (devicesArray.count > 0)
+    {
+        BOOL first = YES;
+        
+        for (NSMutableDictionary *device in devicesArray)
+        {
+            NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+            NSString *dgid = [self getValueFrom:dg withKey:@"id"];
+            
+            if (devicegroup.did != nil && devicegroup.did.length > 0 && ([devicegroup.did compare:dgid] == NSOrderedSame))
+            {
+                if (first)
+                {
+                    [lines addObject:[NSString stringWithFormat:@"\n%@The following device(s) have been assigned to this Device Group:", spaces]];
+                    first = NO;
+                }
+                
+                [lines addObject:[NSString stringWithFormat:@"%@     %@ (%@)", spaces, [self getValueFrom:device withKey:@"name"], [self getValueFrom:device withKey:@"id"]]];
+            }
+        }
+    }
+    
+    // Insert the description if there is one - we do this here in order to ensure the description
+    // line width matches that of the longest line in the device group data
+    
+    if (devicegroup.description != nil && devicegroup.description.length > 0)
+    {
+        // Get the length of the widest line
+        
+        NSUInteger dashCount = 0;
+        
+        for (NSString *string in lines)
+        {
+            if (string.length > dashCount) dashCount = string.length;
+        }
+        
+        // Format the description for that maximum line width
+        
+        NSArray *dLines = [self displayDescription:devicegroup.description :dashCount :spaces];
+        
+        // Add the description lines into the ones we already have, ie. on line 1 after the name
+        
+        for (NSInteger i = 0 ; i < dLines.count ; ++i)
+        {
+            [lines insertObject:[dLines objectAtIndex:i] atIndex:i + 1];
+        }
+    }
+    
+    // Add the new lines to either the passed in array, or a local one
+    
+    if (otherLines == nil)
+    {
+        [self writeLinesToLog:lines];
+    }
+    else
+    {
+        [otherLines addObjectsFromArray:lines];
+    }
+}
+
+
+
+- (void)compileModelInfo:(Model *)model :(NSUInteger)inset :(NSMutableArray *)otherLines
+{
+    // Gathers and displays info for the specified model
+    
+    NSString *path;
+    NSMutableArray *lines = [[NSMutableArray alloc] init];
+    
+    // Prepare the indent: should be 4 or 6 spaces
+    
+    NSString *spaces = @"";
+    
+    if (inset > 0)
+    {
+        for (NSUInteger i = 0 ; i < inset ; ++i)
+        {
+            spaces = [spaces stringByAppendingString:@" "];
+        }
+    }
+    
+    if (model.libraries.count > 0)
+    {
+        if (model.libraries.count == 1)
+        {
+            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local library:", spaces, model.type]];
+            
+            File *lib = [model.libraries objectAtIndex:0];
+            
+            path = [self getPrintPath:currentProject.path :lib.path];
+            path = (path.length == 0) ? lib.filename : [path stringByAppendingFormat:@"/%@", lib.filename];
+            
+            [lines addObject:[NSString stringWithFormat:@"%@   %@ (version %@)", spaces, path, ((lib.version.length == 0) ? @"unknown" : lib.version)]];
+        }
+        else
+        {
+            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local libraries:", spaces, model.type]];
+            
+            for (NSUInteger i = 0 ; i < model.libraries.count ; ++i)
+            {
+                File *lib = [model.libraries objectAtIndex:i];
+                
+                path = [self getPrintPath:currentProject.path :lib.path];
+                path = (path.length == 0) ? lib.filename : [path stringByAppendingFormat:@"/%@", lib.filename];
+                
+                [lines addObject:[NSString stringWithFormat:@"%@   %li. %@ (%@)", spaces, (long)(i + 1), path, ((lib.version.length == 0) ? @"unknown" : lib.version)]];
+            }
+        }
+    }
+    else
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports no local libraries.", spaces, model.type]];
+    }
+    
+    if (model.files.count > 0)
+    {
+        if (model.files.count == 1)
+        {
+            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local file:", spaces, model.type]];
+            
+            File *file = [model.files objectAtIndex:0];
+            
+            path = [self getPrintPath:currentProject.path :file.path];
+            path = (path.length == 0) ? file.filename : [path stringByAppendingFormat:@"/%@", file.filename];
+            
+            [lines addObject:[NSString stringWithFormat:@"%@   %@", spaces, path]];
+        }
+        else
+        {
+            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports the following local files:", spaces, model.type]];
+            
+            for (NSUInteger i = 0 ; i < model.files.count ; ++i)
+            {
+                File *file = [model.files objectAtIndex:i];
+                
+                path = [self getPrintPath:currentProject.path :file.path];
+                path = (path.length == 0) ? file.filename : [path stringByAppendingFormat:@"/%@", file.filename];
+                
+                [lines addObject:[NSString stringWithFormat:@"%@   %li. %@", spaces, (long)(i + 1), path]];
+            }
+        }
+    }
+    else
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@ This %@ code imports no local files.", spaces, model.type]];
+    }
+    
+    if (!model.squinted) [lines addObject:[NSString stringWithFormat:@"%@ [WARNING] This file has not been compiled so the list above may be out of date.", spaces]];
+    
+    if (model.impLibraries.count > 0)
+    {
+        if (model.impLibraries.count == 1)
+        {
+            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads the following Electric Imp library:", spaces, model.type]];
+            
+            File *elib = [model.impLibraries objectAtIndex:0];
+            [lines addObject:[NSString stringWithFormat:@"%@   %@ (%@)", spaces, elib.filename, elib.version]];
+        }
+        else
+        {
+            [lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads the following Electric Imp libraries:", spaces, model.type]];
+            
+            for (NSUInteger i = 0 ; i < model.impLibraries.count ; ++i)
+            {
+                File *elib = [model.impLibraries objectAtIndex:i];
+                [lines addObject:[NSString stringWithFormat:@"%@   %li. %@ (%@)", spaces, (long)(i + 1), elib.filename, elib.version]];
+            }
+        }
+    }
+    else
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@ This %@ code loads no Electric Imp libraries.", spaces, model.type]];
+    }
+    
+    if (model.sha != nil && model.sha.length > 0)
+    {
+        [lines addObject:[NSString stringWithFormat:@"%@ Code uploaded at %@ as SHA %@", spaces, model.updated, model.sha]];
+    }
+    
+    if (otherLines == nil)
+    {
+        [self writeLinesToLog:lines];
+    }
+    else
+    {
+        [otherLines addObjectsFromArray:lines];
+    }
+}
+
+
+
+- (void)writeLinesToLog:(NSMutableArray *)lines
 {
     // Write each of lines of test in the list passed into 'lines' to the log
 
@@ -8418,6 +8373,7 @@
     // Get main thread to output the string
 
     listString = outputString;
+    
     [self performSelectorOnMainThread:@selector(logCode) withObject:nil waitUntilDone:NO];
 }
 
@@ -8425,11 +8381,60 @@
 
 - (void)logCode
 {
-    // Write the string assembled in listCode: to the main window log view
+    // Write the string assembled in 'listCode:' to the main window log view
     // Use 'writeNoteToLog:' to avoid the message status parsing that 'writeStringToLog:' does
 
     [self writeNoteToLog:listString :textColour :NO];
     [self writeNoteToLog:@" " :textColour :NO];
+}
+
+
+
+- (void)logModelCode:(NSString *)codeType
+{
+    // Processes the display of the specified type of source code from the current device group, if there is one
+    
+    if (currentDevicegroup == nil)
+    {
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        return;
+    }
+    
+    if (currentDevicegroup.models.count == 0)
+    {
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no %@ code.", currentDevicegroup.name, codeType] :YES];
+        return;
+    }
+    
+    BOOL done = NO;
+    
+    for (Model *model in currentDevicegroup.models)
+    {
+        if ([model.type compare:codeType] == NSOrderedSame)
+        {
+            NSUInteger squintedTest = [codeType hasPrefix:@"a"] ? kAgentCodeSquinted : kDeviceCodeSquinted;
+            
+            if ((currentDevicegroup.squinted & squintedTest) == 0) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" has not been compiled using the latest %@ code.", currentDevicegroup.name, codeType] :YES];
+            
+            done = YES;
+            NSString *firstChar = [[codeType substringToIndex:1] capitalizedString];
+            codeType = [codeType stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:firstChar];
+            [self writeStringToLog:[NSString stringWithFormat:@"%@ Code:", codeType] :NO];
+            [extraOpQueue addOperationWithBlock:^{[self listCode:model.code :-1 :-1 :-1 :-1];}];
+            break;
+        }
+    }
+    
+    if (!done) [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" currently has no %@ code.", currentDevicegroup.name, codeType] :YES];
+}
+
+
+
+- (void)logLogs:(NSString *)logLine
+{
+    // Write a line of a list of log entries to the main window's log view
+    
+    [self writeStringToLog:logLine :NO];
 }
 
 
@@ -8738,9 +8743,20 @@
 
 - (IBAction)showWebHelp:(id)sender
 {
-    // Open the Squinter Release Notes page from 'Help > Show Squinter Help'
+    // Open the Squinter web page from 'Help > Show Squinter Help'
+    // NOTE Jumps to the 'How to Use Squinter' section
     
-    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html#account"];
+    [self launchOwnSite:@"#account"];
+}
+
+
+
+- (IBAction)showPrefsHelp:(id)sender
+{
+    // Open the Squinter web page from either of the 'Preferences' sheet's tabs
+    // NOTE Jumps to the 'Configuring Squinter' section
+    
+    [self launchOwnSite:@"#configuring-squinter"];
 }
 
 
@@ -8754,8 +8770,20 @@
 
 
 
+- (void)launchOwnSite:(NSString *)anchor
+{
+    // Open the Squinter web site and jump to the specified anchor
+    // NOTE Pass in an empty string to just view the page
+    
+    [self launchWebSite:[@"https://smittytone.github.io/squinter/index.html" stringByAppendingString:anchor]];
+}
+
+
+
 - (void)launchWebSite:(NSString *)url
 {
+    // Open the specified URL in the machine's defauls web browser
+    
     [nswsw openURL:[NSURL URLWithString:url]];
 }
 
@@ -8766,6 +8794,8 @@
 
 - (IBAction)showAboutSheet:(id)sender
 {
+    // Set the current version string and show the 'About' sheet
+    
     [aboutVersionLabel setStringValue:[NSString stringWithFormat:@"Version %@.%@",
                                        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
                                        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]];
@@ -8776,14 +8806,18 @@
 
 - (IBAction)viewSquinterSite:(id)sender
 {
+    // The user has clicked on the 'About' sheet's Squinter icon, so open the web site
+    
     [_window endSheet:aboutSheet];
-    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html"];
+    [self launchOwnSite:@"#about"];
 }
 
 
 
 - (IBAction)closeAboutSheet:(id)sender
 {
+    // The user has clicked on the 'About' sheet's 'OK" button, so just close the sheet
+    
     [_window endSheet:aboutSheet];
 }
 
@@ -8794,8 +8828,7 @@
 
 - (IBAction)showPrefs:(id)sender
 {
-    // The user has invoked the Preferences panel, so populate the panel's settings
-    // with the current saved defaults
+    // The user has invoked the Preferences panel, so populate the panel's settings with the current saved defaults
 
     // Set working directory
 
@@ -8852,38 +8885,6 @@
         }
     }
 
-/*
-    r = [[defaults objectForKey:@"com.bps.squinter.dev1.red"] floatValue];
-    b = [[defaults objectForKey:@"com.bps.squinter.dev1.blue"] floatValue];
-    g = [[defaults objectForKey:@"com.bps.squinter.dev1.green"] floatValue];
-    dev1ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
-    [dev1ColorWell setAction:@selector(showPanelForDev1)];
-
-    r = [[defaults objectForKey:@"com.bps.squinter.dev2.red"] floatValue];
-    b = [[defaults objectForKey:@"com.bps.squinter.dev2.blue"] floatValue];
-    g = [[defaults objectForKey:@"com.bps.squinter.dev2.green"] floatValue];
-    dev2ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
-    [dev2ColorWell setAction:@selector(showPanelForDev2)];
-
-    r = [[defaults objectForKey:@"com.bps.squinter.dev3.red"] floatValue];
-    b = [[defaults objectForKey:@"com.bps.squinter.dev3.blue"] floatValue];
-    g = [[defaults objectForKey:@"com.bps.squinter.dev3.green"] floatValue];
-    dev3ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
-    [dev3ColorWell setAction:@selector(showPanelForDev3)];
-
-    r = [[defaults objectForKey:@"com.bps.squinter.dev4.red"] floatValue];
-    b = [[defaults objectForKey:@"com.bps.squinter.dev4.blue"] floatValue];
-    g = [[defaults objectForKey:@"com.bps.squinter.dev4.green"] floatValue];
-    dev4ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
-    [dev4ColorWell setAction:@selector(showPanelForDev4)];
-
-    r = [[defaults objectForKey:@"com.bps.squinter.dev5.red"] floatValue];
-    b = [[defaults objectForKey:@"com.bps.squinter.dev5.blue"] floatValue];
-    g = [[defaults objectForKey:@"com.bps.squinter.dev5.green"] floatValue];
-    dev5ColorWell.color = [NSColor colorWithRed:r green:g blue:b alpha:1.0];;
-    [dev5ColorWell setAction:@selector(showPanelForDev5)];
-*/
-
     // Set font name and size menus
 
     NSInteger index = [[defaults objectForKey:@"com.bps.squinter.fontSizeIndex"] integerValue] - 9;
@@ -8903,10 +8904,10 @@
     autoUpdateCheckCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) ? NSOnState : NSOffState;
     boldTestCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.showboldtext"]) ? NSOnState : NSOffState;
     loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
-    //showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
     updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
     showDeviceWarnigCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"]) ? NSOnState : NSOffState;
-
+    //showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
+    
     // Set file location display mode menu
 
     [locationMenu selectItemAtIndex:[[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue]];
@@ -8924,17 +8925,6 @@
     // Show the sheet
 
     [_window beginSheet:preferencesSheet completionHandler:nil];
-}
-
-
-
-- (IBAction)selectFontName:(id)sender
-{
-    // Disable the 'show bold' checkbox for fonts not available in bold
-
-    NSPopUpButton *list = (NSPopUpButton *)sender;
-    NSInteger index = list.indexOfSelectedItem;
-    boldTestCheckbox.enabled = index < 3 ? YES : NO;
 }
 
 
@@ -9034,48 +9024,6 @@
     [defaults setObject:[NSArray arrayWithArray:savedColours] forKey:@"com.bps.squinter.devicecolours"];
     [self setColours];
 
-/*
-    r = (float)dev1ColorWell.color.redComponent;
-    b = (float)dev1ColorWell.color.blueComponent;
-    g = (float)dev1ColorWell.color.greenComponent;
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev1.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev1.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev1.blue"];
-
-    r = (float)dev2ColorWell.color.redComponent;
-    b = (float)dev2ColorWell.color.blueComponent;
-    g = (float)dev2ColorWell.color.greenComponent;
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev2.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev2.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev2.blue"];
-
-    r = (float)dev3ColorWell.color.redComponent;
-    b = (float)dev3ColorWell.color.blueComponent;
-    g = (float)dev3ColorWell.color.greenComponent;
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev3.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev3.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev3.blue"];
-
-    r = (float)dev4ColorWell.color.redComponent;
-    b = (float)dev4ColorWell.color.blueComponent;
-    g = (float)dev4ColorWell.color.greenComponent;
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev4.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev4.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev4.blue"];
-
-    r = (float)dev5ColorWell.color.redComponent;
-    b = (float)dev5ColorWell.color.blueComponent;
-    g = (float)dev5ColorWell.color.greenComponent;
-
-    [defaults setObject:[NSNumber numberWithFloat:r] forKey:@"com.bps.squinter.dev5.red"];
-    [defaults setObject:[NSNumber numberWithFloat:g] forKey:@"com.bps.squinter.dev5.green"];
-    [defaults setObject:[NSNumber numberWithFloat:b] forKey:@"com.bps.squinter.dev5.blue"];
-*/
-
     NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
     NSNumber *num = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
     if (fontsMenu.indexOfSelectedItem != num.integerValue) textChange = YES;
@@ -9144,8 +9092,22 @@
 
 
 
+- (IBAction)selectFontName:(id)sender
+{
+    // Disable the 'show bold' checkbox for fonts not available in bold
+    
+    NSPopUpButton *list = (NSPopUpButton *)sender;
+    NSInteger index = list.indexOfSelectedItem;
+    boldTestCheckbox.enabled = index < 3 ? YES : NO;
+}
+
+
+
 - (IBAction)chooseWorkingDirectory:(id)sender
 {
+    // Present a subsidiary sheet on the Preferences sheet to allow the user
+    // to select the current working directory
+    
     if (choosePanel) choosePanel = nil;
     choosePanel = [NSOpenPanel openPanel];
     choosePanel.message = @"Select a directory for your projects...";
@@ -9176,14 +9138,8 @@
 
 
 
-- (IBAction)getHelpPrefs:(id)sender
-{
-    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html#configuring"];
-}
-
-
-
 #pragma mark - Report a Problem Sheet Methods
+
 
 - (IBAction)showFeedbackSheet:(id)sender
 {
@@ -9356,48 +9312,6 @@
         [eiDeviceGroupCache addObject:devicegroup];
         [self writeStringToLog:@"Loading a list of supported Electric Imp libraries from the Electric Imp impCloud..." :YES];
         [ide getLibraries];
-        return;
-
-        /*
-         if (eiLibListTime != nil)
-        {
-            NSDate *now = [NSDate date];
-            NSTimeInterval interval = [eiLibListTime timeIntervalSinceDate:now];
-
-            if (interval >= kEILibCheckInterval && eiLibListData != nil && eiLibListData.length > 0)
-            {
-                // Last check was less than 1 hour earlier, so use existing list if it exists
-
-                [self compareElectricImpLibs:devicegroup];
-                return;
-            }
-        }
-
-        // Set/reset the time of the most recent check
-
-        eiLibListTime = [NSDate date];
-
-         if (connectionIndicator.hidden == YES)
-        {
-            // Start the connection indicator
-
-            connectionIndicator.hidden = NO;
-            [connectionIndicator startAnimation:self];
-        }
-
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://smittytone.github.io/files/liblist.csv"]];
-        request.HTTPMethod = @"GET";
-
-        eiDeviceGroup = devicegroup;
-        eiLibListData = [NSMutableData dataWithCapacity:0];
-
-        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-        NSURLSession *session = [NSURLSession sessionWithConfiguration: config
-                                                              delegate: self
-                                                         delegateQueue: nil];
-        eiLibListTask = [session dataTaskWithRequest:request];
-        [eiLibListTask resume];
-         */
     }
 }
 
@@ -9527,54 +9441,88 @@
 
 
 
-- (void)gotLibraries:(NSNotification *)note
+#pragma mark - Pasteboard Methods
+
+
+- (IBAction)copyAgentURL:(id)sender
 {
-    // This method should ONLY be called by the BuildAPIAccess object instance AFTER loading a list of devices
-    // This list may have been request by many methods — check the source object's 'action' key to find out
-    // which flow we need to run here
-
-    NSDictionary *data = (NSDictionary *)note.object;
-    NSArray *libs = [data objectForKey:@"data"];
-
-    NSString *eilibs = @"";
-    NSInteger count = 0;
-
-    for (NSDictionary *lib in libs)
+    if (selectedDevice == nil)
     {
-        NSString *name = [lib valueForKeyPath:@"attributes.name"];
-
-        if ([name hasPrefix:@"private:"]) break;
-
-        bool supported = [lib valueForKeyPath:@"attributes.supported"];
-        NSString *latest;
-
-        if (supported)
-        {
-            NSArray *versions = [lib valueForKeyPath:@"relationships.versions"];
-            NSDictionary *version = [versions objectAtIndex:0];
-            latest = [version objectForKey:@"id"];
-            NSArray *parts = [latest componentsSeparatedByString:@":"];
-            latest = [parts objectAtIndex:1];
-        }
-        else
-        {
-            latest = @"dep";
-        }
-
-        name = [name stringByAppendingFormat:@",%@\n", latest];
-        eilibs = [eilibs stringByAppendingString:name];
-        count++;
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
+        return;
     }
+    
+    NSString *agentid = [self getValueFrom:selectedDevice withKey:@"agent_id"];
+    NSString *ustring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", agentid];
+    NSPasteboard *pb = [NSPasteboard generalPasteboard];
+    NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
+    
+    [pb declareTypes:ptypes owner:self];
+    [pb setString:ustring forType:NSStringPboardType];
+    
+    [self writeStringToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
+}
 
-    eiLibListData = [NSMutableData dataWithData:[eilibs dataUsingEncoding:NSUTF8StringEncoding]];
 
-    // Check all of the cached devicegroups
 
-    for (Devicegroup *devicegroup in eiDeviceGroupCache)
+- (IBAction)copyDeviceCodeToPasteboard:(id)sender
+{
+    // Put the current device code onto the pasteboard
+    
+    [self copyCodeToPasteboard:@"device"];
+}
+
+
+
+- (IBAction)copyAgentCodeToPasteboard:(id)sender
+{
+    // Put the current agent code onto the pasteboard
+    
+    [self copyCodeToPasteboard:@"agent"];
+}
+
+
+
+- (void)copyCodeToPasteboard:(NSString *)type
+{
+    if (currentDevicegroup == nil)
     {
-        [self compareElectricImpLibs:devicegroup];
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        return;
+    }
+    
+    BOOL flag = NO;
+    NSString *code;
+    
+    for (Model *model in currentDevicegroup.models)
+    {
+        if ([model.type compare:type] == NSOrderedSame)
+        {
+            if (model.squinted && model.code.length > 0)
+            {
+                code = model.code;
+                flag = YES;
+            }
+            
+            break;
+        }
+    }
+    
+    if (flag)
+    {
+        NSPasteboard *pb = [NSPasteboard generalPasteboard];
+        NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+        
+        [pb declareTypes:types owner:self];
+        [pb setString:code forType:NSStringPboardType];
+        [self writeStringToLog:[NSString stringWithFormat:@"Compiled %@ code copied to clipboard.", type] :YES];
+    }
+    else
+    {
+        [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] This device group has no compiled %@ code to copy.", type] :YES];
     }
 }
+
 
 
 #pragma mark - NSURLSession Delegate Methods
@@ -9677,6 +9625,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 
 #pragma mark - NSTextFieldDelegate Methods
+
 
 - (void)controlTextDidChange:(NSNotification *)obj
 {
@@ -9863,97 +9812,9 @@ didReceiveResponse:(NSURLResponse *)response
 }
 
 
-#pragma mark - Pasteboard Methods
-
-
-- (IBAction)copyDeviceCodeToPasteboard:(id)sender
-{
-    if (currentDevicegroup == nil)
-    {
-        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
-        return;
-    }
-
-    BOOL flag = NO;
-
-    for (Model *model in currentDevicegroup.models)
-    {
-        if ([model.type compare:@"device"] == NSOrderedSame)
-        {
-            if (model.squinted && model.code.length > 0)
-            {
-                NSPasteboard *pb = [NSPasteboard generalPasteboard];
-                NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
-                [pb declareTypes:types owner:self];
-                [pb setString:model.code forType:NSStringPboardType];
-                [self writeStringToLog:@"Compiled device code copied to clipboard." :YES];
-                flag = YES;
-            }
-
-            break;
-        }
-    }
-
-    if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled device code to copy." :YES];
-}
-
-
-
-- (IBAction)copyAgentCodeToPasteboard:(id)sender
-{
-    if (currentDevicegroup == nil)
-    {
-        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
-        return;
-    }
-
-    BOOL flag = NO;
-
-    for (Model *model in currentDevicegroup.models)
-    {
-        if ([model.type compare:@"agent"] == NSOrderedSame)
-        {
-            if (model.squinted && model.code.length > 0)
-            {
-                NSPasteboard *pb = [NSPasteboard generalPasteboard];
-                NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
-                [pb declareTypes:types owner:self];
-                [pb setString:model.code forType:NSStringPboardType];
-                [self writeStringToLog:@"Compiled agent code copied to clipboard." :YES];
-                flag = YES;
-            }
-
-            break;
-        }
-    }
-
-    if (!flag) [self writeWarningToLog:@"[WARNING] This device group has no compiled agent code to copy." :YES];
-}
-
-
-
-- (IBAction)copyAgentURL:(id)sender
-{
-    if (selectedDevice == nil)
-    {
-        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
-        return;
-    }
-
-    NSString *agentid = [self getValueFrom:selectedDevice withKey:@"agent_id"];
-    NSString *ustring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", agentid];
-    NSPasteboard *pb = [NSPasteboard generalPasteboard];
-    NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
-
-    [pb declareTypes:ptypes owner:self];
-    [pb setString:ustring forType:NSStringPboardType];
-
-    [self writeStringToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
-}
-
-
 
 # pragma mark - VDKQueueDelegate Methods
+
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
 {
@@ -9985,8 +9846,6 @@ didReceiveResponse:(NSURLResponse *)response
         [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] File \"%@\" has been edited - you may wish to recompile this device group's code.", [fpath lastPathComponent]] :YES];
     }
 }
-
-
 
 
 

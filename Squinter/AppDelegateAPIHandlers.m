@@ -3056,7 +3056,7 @@
                 }
             }
             
-            [self performSelectorOnMainThread:@selector(printInfoInLog:) withObject:lines waitUntilDone:YES];
+            [self performSelectorOnMainThread:@selector(writeLinesInLog:) withObject:lines waitUntilDone:YES];
             
             // Look for URLs etc one all the items have gone in
             
