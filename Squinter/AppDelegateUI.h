@@ -15,9 +15,9 @@
 // Projects menu
 - (void)refreshProjectsMenu;
 - (void)refreshOpenProjectsMenu;
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
 - (void)refreshProductsMenu;
 - (void)setProductsMenuTick;
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
 
 // Device Groups menu
 - (void)refreshDevicegroupMenu;
@@ -38,14 +38,14 @@
 - (void)refreshDeviceMenu;
 - (void)refreshDevicesPopup;
 - (void)setDevicesPopupTick;
-- (NSImage *)menuImage:(NSMutableDictionary *)device;
 - (void)refreshUnassignedDevicesMenu;
 - (void)setUnassignedDevicesMenuTick;
+- (NSImage *)menuImage:(NSMutableDictionary *)device;
 
 // View menu
+- (IBAction)showHideToolbar:(id)sender;
 - (void)refreshViewMenu;
 - (void)refreshRecentFilesMenu;
-- (IBAction)showHideToolbar:(id)sender;
 
 // Toolbar
 - (void)setToolbar;

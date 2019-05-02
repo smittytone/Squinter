@@ -16,12 +16,12 @@
 - (void)refreshProjectsMenu
 {
     // Manages the Projects menu's state,
-    // except for the Open Projects submenu ('refreshOpenProjectsMenu')
-    // and the Current Products submenu ('refreshProductsmenu')
+    // except for the Open Projects submenu (see 'refreshOpenProjectsMenu')
+    // and the Current Products submenu (see 'refreshProductsmenu')
     
     if (currentProject != nil)
     {
-        // A project is selected
+        // A project is selected...
         
         showProjectInfoMenuItem.title = [NSString stringWithFormat:@"Show “%@” Info", currentProject.name];
         showProjectFinderMenuItem.title = [NSString stringWithFormat:@"Show “%@” in Finder", currentProject.name];
@@ -163,78 +163,6 @@
         [projectsPopUp addItemWithTitle:@"None"];
         projectsPopUp.enabled = NO;
     }
-}
-
-
-
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject
-{
-    // Create a new menu entry to the 'Projects' menu’s 'Open Projects' submenu and to the Current Project popup
-    // For the Open Projects submenu, each menu item's representedObject points to the named project
-    // For the Current Project popup, each menu item's tag is set to the index of the project in the submenu
-    // This allows us to choose projects irrespective of the name used in the menu, for example letting us
-    // distinguish between 'explorer' and 'explorer 2'
-    
-    // Run through the existing menu items, to check that we're not adding one already there
-    // If there are no menu items, we can proceed safely
-    
-    if (projectArray == nil || projectArray.count == 0)
-    {
-        // There are no open projects yet (the one we're adding is the first
-        // so clear the 'None' entries from the menu pop-up
-        
-        [openProjectsMenu removeAllItems];
-        [projectsPopUp removeAllItems];
-    }
-    else
-    {
-        // There are projects, so check that the passed in title is not on the menu already
-        // TODO should have checked this already, so we can dispose of this section eventually
-        
-        for (NSMenuItem *item in openProjectsMenu.itemArray)
-        {
-            if ([item.title compare:menuItemTitle] == NSOrderedSame)
-            {
-                // The title is there already - but does the menu item reference the same project?
-                
-                if (aProject == item.representedObject)
-                {
-                    // Yes it does, so signal failure to add
-                    
-                    return NO;
-                }
-            }
-        }
-    }
-    
-    // Switch off all the menu items
-    
-    if (openProjectsMenu.itemArray.count > 0)
-    {
-        for (NSMenuItem *item in openProjectsMenu.itemArray)
-        {
-            if (item.state == NSOnState) item.state = NSOffState;
-        }
-    }
-    
-    // Add the menu to the list of open projects and select it...
-    
-    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:menuItemTitle action:@selector(chooseProject:) keyEquivalent:@""];
-    item.representedObject = aProject;
-    item.state = NSOnState;
-    [openProjectsMenu addItem:item];
-    
-    // ...and add it to the popup and select it
-    
-    [projectsPopUp addItemWithTitle:menuItemTitle];
-    NSMenuItem *pitem = [projectsPopUp itemWithTitle:menuItemTitle];
-    pitem.representedObject = aProject;
-    projectsPopUp.enabled = YES;
-    [projectsPopUp selectItem:pitem];
-    
-    // Return success
-    
-    return YES;
 }
 
 
@@ -505,6 +433,78 @@
 
 
 
+- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject
+{
+    // Create a new menu entry to the 'Projects' menu’s 'Open Projects' submenu and to the Current Project popup
+    // For the Open Projects submenu, each menu item's representedObject points to the named project
+    // For the Current Project popup, each menu item's tag is set to the index of the project in the submenu
+    // This allows us to choose projects irrespective of the name used in the menu, for example letting us
+    // distinguish between 'explorer' and 'explorer 2'
+    
+    // Run through the existing menu items, to check that we're not adding one already there
+    // If there are no menu items, we can proceed safely
+    
+    if (projectArray == nil || projectArray.count == 0)
+    {
+        // There are no open projects yet (the one we're adding is the first
+        // so clear the 'None' entries from the menu pop-up
+        
+        [openProjectsMenu removeAllItems];
+        [projectsPopUp removeAllItems];
+    }
+    else
+    {
+        // There are projects, so check that the passed in title is not on the menu already
+        // TODO should have checked this already, so we can dispose of this section eventually
+        
+        for (NSMenuItem *item in openProjectsMenu.itemArray)
+        {
+            if ([item.title compare:menuItemTitle] == NSOrderedSame)
+            {
+                // The title is there already - but does the menu item reference the same project?
+                
+                if (aProject == item.representedObject)
+                {
+                    // Yes it does, so signal failure to add
+                    
+                    return NO;
+                }
+            }
+        }
+    }
+    
+    // Switch off all the menu items
+    
+    if (openProjectsMenu.itemArray.count > 0)
+    {
+        for (NSMenuItem *item in openProjectsMenu.itemArray)
+        {
+            if (item.state == NSOnState) item.state = NSOffState;
+        }
+    }
+    
+    // Add the menu to the list of open projects and select it...
+    
+    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:menuItemTitle action:@selector(chooseProject:) keyEquivalent:@""];
+    item.representedObject = aProject;
+    item.state = NSOnState;
+    [openProjectsMenu addItem:item];
+    
+    // ...and add it to the popup and select it
+    
+    [projectsPopUp addItemWithTitle:menuItemTitle];
+    NSMenuItem *pitem = [projectsPopUp itemWithTitle:menuItemTitle];
+    pitem.representedObject = aProject;
+    projectsPopUp.enabled = YES;
+    [projectsPopUp selectItem:pitem];
+    
+    // Return success
+    
+    return YES;
+}
+
+
+
 #pragma mark Device Groups Menu
 
 
@@ -585,6 +585,8 @@
 
 - (void)refreshDevicegroupByType:(NSString *)type
 {
+    // Update 'Device Groups > Current Project' with a list of device groups of the specified type
+    
     BOOL first = NO;
     NSMenuItem *item = nil;
     
@@ -1019,10 +1021,7 @@
         
         for (Model *model in currentDevicegroup.models)
         {
-            if ([model.type compare:@"agent"] == NSOrderedSame)
-            {
-                [self libAdder:model.impLibraries :YES];
-            }
+            if ([model.type compare:@"agent"] == NSOrderedSame) [self libAdder:model.impLibraries :YES];
         }
     }
     
@@ -1041,10 +1040,7 @@
         
         for (Model *model in currentDevicegroup.models)
         {
-            if ([model.type compare:@"device"] == NSOrderedSame)
-            {
-                [self libAdder:model.impLibraries :YES];
-            }
+            if ([model.type compare:@"device"] == NSOrderedSame) [self libAdder:model.impLibraries :YES];
         }
     }
     
@@ -1064,10 +1060,7 @@
 
 - (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib
 {
-    for (File *lib in libs)
-    {
-        [self addLibraryToMenu:lib :isEILib :YES];
-    }
+    for (File *lib in libs) [self addLibraryToMenu:lib :isEILib :YES];
 }
 
 
@@ -1105,34 +1098,6 @@
 
 
 
-- (NSImage *)menuImage:(NSMutableDictionary *)device
-{
-    // Sets a device's menu and/or popup icon according to the device's connection status
-    
-    NSString *imageNameString = @"";
-    NSString *dvid = [self getValueFrom:device withKey:@"id"];
-    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
-    
-    // FROM 2.3.128
-    // Check 'boolean' isn't null, which it can be at certain times
-    // In this case, assume offline
-    
-    if ((NSNull *)boolean == [NSNull null])
-    {
-        boolean = [NSNumber numberWithBool:NO];
-#ifdef DEBUG
-        NSLog(@"Device %@ has no 'device_online' value", dvid);
-#endif
-    }
-    
-    imageNameString = boolean.boolValue ? @"online" : @"offline";
-    if ([ide isDeviceLogging:dvid]) imageNameString = [imageNameString stringByAppendingString:@"_logging"];
-    
-    return [NSImage imageNamed:imageNameString];
-}
-
-
-
 - (void)refreshFilesMenu
 {
     // Update the external files menu. First clear the current menu
@@ -1147,11 +1112,11 @@
     {
         if ([model.type compare:@"agent"] == NSOrderedSame)
         {
-            aFileCount = aFileCount + model.files.count;
+            aFileCount += model.files.count;
         }
         else
         {
-            dFileCount = dFileCount + model.files.count;
+            dFileCount += model.files.count;
         }
     }
     
@@ -1165,10 +1130,7 @@
         
         for (Model *model in currentDevicegroup.models)
         {
-            if ([model.type compare:@"agent"] == NSOrderedSame)
-            {
-                [self fileAdder:model.files];
-            }
+            if ([model.type compare:@"agent"] == NSOrderedSame) [self fileAdder:model.files];
         }
     }
     
@@ -1186,10 +1148,7 @@
         
         for (Model *model in currentDevicegroup.models)
         {
-            if ([model.type compare:@"device"] == NSOrderedSame)
-            {
-                [self fileAdder:model.files];
-            }
+            if ([model.type compare:@"device"] == NSOrderedSame) [self fileAdder:model.files];
         }
     }
     
@@ -1235,10 +1194,7 @@
 
 - (void)fileAdder:(NSMutableArray *)models
 {
-    for (File *file in models)
-    {
-        [self addFileToMenu:file :YES];
-    }
+    for (File *file in models) [self addFileToMenu:file :YES];
 }
 
 
@@ -1516,6 +1472,33 @@
 
 
 
+- (NSImage *)menuImage:(NSMutableDictionary *)device
+{
+    // Sets a device's menu and/or popup icon according to the device's connection status
+    
+    NSString *imageNameString = @"";
+    NSString *dvid = [self getValueFrom:device withKey:@"id"];
+    NSNumber *boolean = [self getValueFrom:device withKey:@"device_online"];
+    
+    // FROM 2.3.128
+    // Check 'boolean' isn't null, which it can be at certain times
+    // In this case, assume offline
+    
+    if ((NSNull *)boolean == [NSNull null])
+    {
+        boolean = [NSNumber numberWithBool:NO];
+#ifdef DEBUG
+        NSLog(@"Device %@ has no 'device_online' value", dvid);
+#endif
+    }
+    
+    imageNameString = boolean.boolValue ? @"online" : @"offline";
+    if ([ide isDeviceLogging:dvid]) imageNameString = [imageNameString stringByAppendingString:@"_logging"];
+    return [NSImage imageNamed:imageNameString];
+}
+
+
+
 #pragma mark View Menu
 
 
@@ -1530,27 +1513,18 @@
 
 
 
+#pragma mark Files Menu
+
+
 - (IBAction)showHideToolbar:(id)sender
 {
     // Flip the menu item in the View menu
     
-    if (squinterToolbar.isVisible)
-    {
-        squinterToolbar.visible = NO;
-        showHideToolbarMenuItem.title = @"Show Toolbar";
-        [defaults setValue:[NSNumber numberWithBool:NO] forKey:@"com.bps.squinter.toolbarstatus"];
-    }
-    else
-    {
-        squinterToolbar.visible = YES;
-        showHideToolbarMenuItem.title = @"Hide Toolbar";
-        [defaults setValue:[NSNumber numberWithBool:YES] forKey:@"com.bps.squinter.toolbarstatus"];
-    }
+    squinterToolbar.visible = !squinterToolbar.isVisible;
+    showHideToolbarMenuItem.title = squinterToolbar.isVisible ? @"Hide Toolbar" : @"Show Toolbar";
+    [defaults setValue:[NSNumber numberWithBool:squinterToolbar.isVisible] forKey:@"com.bps.squinter.toolbarstatus"];
 }
 
-
-
-#pragma mark Files Menu
 
 
 - (void)refreshRecentFilesMenu
@@ -1563,12 +1537,16 @@
     
     if (recentFiles == nil || recentFiles.count == 0)
     {
+        // No recent files listed, so just put a disabled 'clear menu' option in place
+        
         item = [[NSMenuItem alloc] initWithTitle:@"Clear Menu" action:@selector(clearRecent:) keyEquivalent:@""];
         item.enabled = NO;
         [openRecentMenu addItem:item];
     }
     else
     {
+        // Iterate through the recent files list and add each one to the menu
+        
         for (NSDictionary *file in recentFiles)
         {
             item = [[NSMenuItem alloc] initWithTitle:[file objectForKey:@"name"] action:@selector(openRecent:) keyEquivalent:@""];
@@ -1577,13 +1555,21 @@
             [openRecentMenu addItem:item];
         }
         
+        // Add a separator...
+        
         [openRecentMenu addItem:[NSMenuItem separatorItem]];
+        
+        // ...then an 'Open All' option...
         
         item = [[NSMenuItem alloc] initWithTitle:@"Open All" action:@selector(openRecentAll) keyEquivalent:@""];
         item.enabled = YES;
         [openRecentMenu addItem:item];
         
+        // ...then another separator...
+        
         [openRecentMenu addItem:[NSMenuItem separatorItem]];
+        
+        // ...and lastly the 'Clear Menu' option
         
         item = [[NSMenuItem alloc] initWithTitle:@"Clear Menu" action:@selector(clearRecent:) keyEquivalent:@""];
         item.enabled = YES;
@@ -1626,7 +1612,7 @@
     
     loginAndOutItem.isLoggedIn = ide.isLoggedIn;
     
-    // Validate items
+    // Validate items to set the colour of items that have different modes
     
     [squinterToolbar validateVisibleItems];
 }
@@ -1645,33 +1631,34 @@
         dockMenu = [[NSMenu alloc] init];
         dockMenu.autoenablesItems = NO;
     }
+    else
+    {
+        // Clear the dock menu's list items because we may have new items to add
     
-    // Clear the dock menu's list items because we may have new items to add
+        [dockMenu removeAllItems];
+    }
     
-    [dockMenu removeAllItems];
-    
-    // Add the list of recently opened files
+    // Add the list of recently opened files, if any
     
     if (recentFiles.count > 0)
     {
+        // Add the files themselves
+        
         for (NSDictionary *file in recentFiles)
         {
             item = [[NSMenuItem alloc] initWithTitle:[file objectForKey:@"name"] action:@selector(openRecent:) keyEquivalent:@""];
             item.representedObject = file;
             item.target = self;
-            //item.image = [NSImage imageNamed:@"docpic"];
-            //item.onStateImage = item.image;
-            //item.offStateImage = item.image;
-            //item.mixedStateImage = item.image;
             item.tag = -1;
             [dockMenu addItem:item];
         }
         
-        item = [NSMenuItem separatorItem];
-        [dockMenu addItem:item];
+        // Then add a separator
+        
+        [dockMenu addItem:[NSMenuItem separatorItem]];
     }
     
-    // Add the fixed items: directory and web links
+    // Finally, add the fixed items: directory, separator and web links
     
     item = [[NSMenuItem alloc] initWithTitle:@"Open Working Directory" action:@selector(dockMenuAction:) keyEquivalent:@""];
     [item setImage:[NSImage imageNamed:@"folder"]];
@@ -1679,8 +1666,7 @@
     item.tag = 99;
     [dockMenu addItem:item];
     
-    item = [NSMenuItem separatorItem];
-    [dockMenu addItem:item];
+    [dockMenu addItem:[NSMenuItem separatorItem]];
     
     item = [[NSMenuItem alloc] initWithTitle:@"Squinter Information" action:@selector(dockMenuAction:) keyEquivalent:@""];
     item.tag = 1;
@@ -1708,15 +1694,15 @@
         switch(item.tag)
         {
             case 1:
-                [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html"]];
+                [self launchOwnSite:@""];
                 break;
                 
             case 2:
-                [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/"]];
+                [self launchWebSite:@"https://developer.electricimp.com/"];
                 break;
                 
             case 3:
-                [nswsw openURL:[NSURL URLWithString:@"https://forums.electricimp.com/"]];
+                [self launchWebSite:@"https://forums.electricimp.com/"];
                 break;
                 
             default:
