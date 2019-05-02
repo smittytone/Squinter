@@ -158,8 +158,6 @@
     IBOutlet SquinterToolbarItem *newProjectItem;
     IBOutlet SquinterToolbarItem *infoItem;
     IBOutlet SquinterToolbarItem *openAllItem;
-    IBOutlet SquinterToolbarItem *viewDeviceCode;
-    IBOutlet SquinterToolbarItem *viewAgentCode;
     IBOutlet SquinterToolbarItem *uploadCodeItem;
     IBOutlet SquinterToolbarItem *restartDevicesItem;
     IBOutlet SquinterToolbarItem *clearItem;
@@ -589,28 +587,29 @@
 
 // External Editor Methods
 - (IBAction)externalOpen:(id)sender;
-- (void)switchToEditor:(Model *)model;
 - (IBAction)externalLibOpen:(id)sender;
 - (IBAction)externalFileOpen:(id)sender;
-- (void)externalOpenItem:(id)sender :(BOOL)isLibrary;
-- (void)externalOpenItems:(BOOL)areLibraries;
 - (IBAction)externalOpenAll:(id)sender;
 - (IBAction)openAgentURL:(id)sender;
 - (IBAction)showProjectInFinder:(id)sender;
 - (IBAction)showModelFilesInFinder:(id)sender;
-- (void)launchLibsPage;
-- (IBAction)launchReleaseNotesPage:(id)sender;
+- (void)externalOpenItem:(id)sender :(BOOL)isLibrary;
+- (void)externalOpenItems:(BOOL)areLibraries;
+- (void)switchToEditor:(Model *)model;
+
+
+// Web Access Methods
+- (IBAction)showReleaseNotesPage:(id)sender;
+- (IBAction)showAuthor:(id)sender;
+- (IBAction)showWebHelp:(id)sender;
+- (void)showEILibsPage;
+- (void)launchWebSite:(NSString *)url;
 
 
 // About Sheet Methods
 - (IBAction)showAboutSheet:(id)sender;
 - (IBAction)viewSquinterSite:(id)sender;
 - (IBAction)closeAboutSheet:(id)sender;
-
-
-// Help Menu Methods
-- (IBAction)showAuthor:(id)sender;
-- (IBAction)showWebHelp:(id)sender;
 
 
 // Preferences Sheet Methods

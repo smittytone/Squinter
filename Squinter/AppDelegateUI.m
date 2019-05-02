@@ -1080,7 +1080,7 @@
     
     if (isEILib)
     {
-        item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", lib.version] action:@selector(launchLibsPage) keyEquivalent:@""];
+        item = [[NSMenuItem alloc] initWithTitle:[lib.filename stringByAppendingFormat:@" (%@)", lib.version] action:@selector(showEILibsPage) keyEquivalent:@""];
         item.representedObject = lib;
         [impLibrariesMenu addItem:item];
     }

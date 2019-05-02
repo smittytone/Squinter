@@ -176,13 +176,13 @@
     openAllItem.inactiveImageName = @"open_grey";
     openAllItem.toolTip = @"View the device group's code and library files in your external editor";
 
-    viewDeviceCode.activeImageName = @"open";
-    viewDeviceCode.inactiveImageName = @"open_grey";
-    viewDeviceCode.toolTip = @"Display the device group's compiled device code";
+    openDeviceCode.activeImageName = @"open";
+    openDeviceCode.inactiveImageName = @"open_grey";
+    openDeviceCode.toolTip = @"Display the device group's compiled device code";
 
-    viewAgentCode.activeImageName = @"open";
-    viewAgentCode.inactiveImageName = @"open_grey";
-    viewAgentCode.toolTip = @"Display the device group's compiled agent code";
+    openAgentCode.activeImageName = @"open";
+    openAgentCode.inactiveImageName = @"open_grey";
+    openAgentCode.toolTip = @"Display the device group's compiled agent code";
 
     uploadCodeItem.activeImageName = @"upload2";
     uploadCodeItem.inactiveImageName = @"upload2_grey";
@@ -1116,7 +1116,7 @@
 
 - (IBAction)signup:(id)sender
 {
-    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#account"]];
+    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html#account"];
 }
 
 
@@ -8462,7 +8462,14 @@
 - (IBAction)externalOpen:(id)sender
 {
     // Open the original source code files an external editor - whatever the user has set to opne text files (or .nut files)
-
+    // Called by selecting: 'Both' from the 'Device Group' menu's 'View Device Group Source' submenu
+    //                      'Agent Code' from the 'Device Group' menu's 'View Device Group Source' submenu
+    //                      'Device Code' from the 'Device Group' menu's 'View Device Group Source' submenu
+    //                      'View Device Group Source in Editor' from the 'Device Group' menu
+    //                      The Edit Agent Code toolbar item
+    //                      The Edit Device Code toolbar item
+    // Or from 'externalOpenAll:'
+    
     // Only continue if a device group is selected
 
     if (currentDevicegroup == nil)
@@ -8473,7 +8480,7 @@
 
     // Open the device code, if requested
 
-    if (sender == externalOpenDeviceItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewDeviceCode)
+    if (sender == externalOpenDeviceItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == openDeviceCode)
     {
         for (Model *model in currentDevicegroup.models)
         {
@@ -8487,7 +8494,7 @@
 
     // Open the agent code, if requested
 
-    if (sender == externalOpenAgentItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == viewAgentCode)
+    if (sender == externalOpenAgentItem || sender == externalOpenBothItem || sender == externalOpenMenuItem || sender == openAgentCode)
     {
         for (Model *model in currentDevicegroup.models)
         {
@@ -8498,25 +8505,6 @@
             }
         }
     }
-}
-
-
-
-- (void)switchToEditor:(Model *)model
-{
-    // Open the supplied model's source code in the user's preferred text editor
-
-    if (model.hasMoved)
-    {
-        // We've previously recorded that the model file or its parent project file have moved, so warn the user and bail
-
-        [self writeErrorToLog:[NSString stringWithFormat:@"Source file \"%@\" can't be found it is known location.", model.filename] :YES];
-        return;
-    }
-
-    NSString *path = [NSString stringWithFormat:@"%@/%@", model.path, model.filename];
-    path = [self getAbsolutePath:currentProject.path :path];
-    [nswsw openFile:path];
 }
 
 
@@ -8553,64 +8541,11 @@
 
 
 
-- (void)externalOpenItem:(id)sender :(BOOL)isLibrary
-{
-    // Opens a file or library from the relevant 'Device Groups' menu submenu
-
-    NSMenuItem *item = (NSMenuItem *)sender;
-    File *file = item.representedObject;
-
-    if (file.hasMoved)
-    {
-        [self writeErrorToLog:[NSString stringWithFormat:@"%@ \"%@\" can't be found it is known location.", (isLibrary ? @"Library" : @"File"), file.filename] :YES];
-    }
-    else
-    {
-        NSString *path = [self getAbsolutePath:currentProject.path :file.path];
-        path = [path stringByAppendingFormat:@"/%@", file.filename];
-        [nswsw openFile:path];
-    }
-}
-
-
-
-- (void)externalOpenItems:(BOOL)areLibraries
-{
-    // Opens all the files or libraries from the relevant 'Device Groups' menu submenu
-
-    for (Model *model in currentDevicegroup.models)
-    {
-        if (model.files.count > 0)
-        {
-            NSMutableArray *list = areLibraries ? model.libraries : model.files;
-
-            for (File *file in list)
-            {
-                if (file.hasMoved)
-                {
-                    [self writeErrorToLog:[NSString stringWithFormat:@"%@ \"%@\" can't be found it is known location.", (areLibraries ? @"Library" : @"File"), model.filename] :YES];
-                }
-                else
-                {
-                    NSString *path = [self getAbsolutePath:currentProject.path :file.path];
-                    path = [path stringByAppendingFormat:@"/%@", file.filename];
-                    [nswsw openFile:path];
-
-                    // Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
-
-                    [NSThread sleepForTimeInterval:0.2];
-                }
-            }
-        }
-    }
-}
-
-
-
 - (IBAction)externalOpenAll:(id)sender
 {
     // Open all of the source code files associated with the current device group:
     // agent and device code, and all of their included libraries and files
+    // Called by clicking on the 'Edit' toolbar item
 
     if (currentDevicegroup == nil)
     {
@@ -8696,20 +8631,132 @@
 
 
 
-- (void)launchLibsPage
+- (void)externalOpenItem:(id)sender :(BOOL)isLibrary
 {
-    // Open the Electric Imp libraries page on the Dev Center in the default Web browser
-
-    [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/codelibraries/"]];
+    // Opens a single file or libaray from the current Device Group
+    // Called by 'externalFileOpen:' or 'externalLibOpen:'
+    // 'isLibrary' should be: YES for a library, or
+    //                        NO for a regular file
+    
+    NSMenuItem *item = (NSMenuItem *)sender;
+    File *file = item.representedObject;
+    
+    if (file.hasMoved)
+    {
+        [self writeErrorToLog:[NSString stringWithFormat:@"%@ \"%@\" can't be found it is known location.", (isLibrary ? @"Library" : @"File"), file.filename] :YES];
+    }
+    else
+    {
+        NSString *path = [self getAbsolutePath:currentProject.path :file.path];
+        path = [path stringByAppendingFormat:@"/%@", file.filename];
+        [nswsw openFile:path];
+    }
 }
 
 
 
-- (IBAction)launchReleaseNotesPage:(id)sender
+- (void)externalOpenItems:(BOOL)areLibraries
 {
-    // Open the Squinter home page as the Release Notes section
+    // Opens all of the current Device Group's files or libraries
+    // Called by 'externalFileOpen:' or 'externalLibOpen:'
+    // 'areLibraries' is: YES for libraries ('externalLibOpen:'), or
+    //                    NO for files ('externalFileOpen:')
+    
+    for (Model *model in currentDevicegroup.models)
+    {
+        if (model.files.count > 0)
+        {
+            NSMutableArray *list = areLibraries ? model.libraries : model.files;
+            
+            for (File *file in list)
+            {
+                if (file.hasMoved)
+                {
+                    [self writeErrorToLog:[NSString stringWithFormat:@"%@ \"%@\" can't be found it is known location.", (areLibraries ? @"Library" : @"File"), model.filename] :YES];
+                }
+                else
+                {
+                    NSString *path = [self getAbsolutePath:currentProject.path :file.path];
+                    path = [path stringByAppendingFormat:@"/%@", file.filename];
+                    [nswsw openFile:path];
+                    
+                    // Yosemite seems to require a delay between NSWorkspace accesses, or not all files will be loaded
+                    
+                    [NSThread sleepForTimeInterval:0.2];
+                }
+            }
+        }
+    }
+}
 
-    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/releases.html"]];
+
+
+- (void)switchToEditor:(Model *)model
+{
+    // Open the supplied model's source code in the user's preferred text editor
+    
+    if (model.hasMoved)
+    {
+        // We've previously recorded that the model file or its parent project file have moved, so warn the user and bail
+        
+        [self writeErrorToLog:[NSString stringWithFormat:@"Source file \"%@\" can't be found it is known location.", model.filename] :YES];
+        return;
+    }
+    
+    NSString *path = [NSString stringWithFormat:@"%@/%@", model.path, model.filename];
+    path = [self getAbsolutePath:currentProject.path :path];
+    [nswsw openFile:path];
+}
+
+
+
+#pragma mark - Web Access Methods
+
+
+- (IBAction)showReleaseNotesPage:(id)sender
+{
+    // Open the Squinter Release Notes page from 'Help > Show Squinter Release Notes'
+
+    [self launchWebSite:@"https://smittytone.github.io/squinter/releases.html"];
+}
+
+
+
+- (IBAction)showAuthor:(id)sender
+{
+    // Open the relevant third-party source code web page from 'Help > Acknowledgements'
+    
+    if (sender == author01) [self launchWebSite:@"https://github.com/carlbrown/PDKeychainBindingsController"];
+    if (sender == author02) [self launchWebSite:@"https://github.com/bdkjones/VDKQueue"];
+    if (sender == author03) [self launchWebSite:@"https://github.com/uliwitness/UliKit"];
+    if (sender == author04) [self launchWebSite:@"https://developer.electricimp.com/"];
+    if (sender == author05) [self launchWebSite:@"https://github.com/adobe-fonts/source-code-pro"];
+    if (sender == author06) [self launchWebSite:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"];
+}
+
+
+
+- (IBAction)showWebHelp:(id)sender
+{
+    // Open the Squinter Release Notes page from 'Help > Show Squinter Help'
+    
+    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html#account"];
+}
+
+
+
+- (void)showEILibsPage
+{
+    // Open the Electric Imp libraries page on the Dev Center in the default Web browser
+    
+    [self launchWebSite:@"https://developer.electricimp.com/codelibraries/"];
+}
+
+
+
+- (void)launchWebSite:(NSString *)url
+{
+    [nswsw openURL:[NSURL URLWithString:url]];
 }
 
 
@@ -8730,7 +8777,7 @@
 - (IBAction)viewSquinterSite:(id)sender
 {
     [_window endSheet:aboutSheet];
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html"]];
+    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html"];
 }
 
 
@@ -8740,27 +8787,6 @@
     [_window endSheet:aboutSheet];
 }
 
-
-
-#pragma mark - Help Menu Methods
-
-
-- (IBAction)showAuthor:(id)sender
-{
-    if (sender == author01) [nswsw openURL:[NSURL URLWithString:@"https://github.com/carlbrown/PDKeychainBindingsController"]];
-    if (sender == author02) [nswsw openURL:[NSURL URLWithString:@"https://github.com/bdkjones/VDKQueue"]];
-    if (sender == author03) [nswsw openURL:[NSURL URLWithString:@"https://github.com/uliwitness/UliKit"]];
-    if (sender == author04) [nswsw openURL:[NSURL URLWithString:@"https://developer.electricimp.com/"]];
-    if (sender == author05) [nswsw openURL:[NSURL URLWithString:@"https://github.com/adobe-fonts/source-code-pro"]];
-    if (sender == author06) [nswsw openURL:[NSURL URLWithString:@"https://github.com/sparkle-project/Sparkle/blob/master/LICENSE"]];
-}
-
-
-
-- (IBAction)showWebHelp:(id)sender
-{
-    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#account"]];
-}
 
 
 #pragma mark - Preferences Sheet Methods
@@ -9152,7 +9178,7 @@
 
 - (IBAction)getHelpPrefs:(id)sender
 {
-    [nswsw openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#configuring"]];
+    [self launchWebSite:@"https://smittytone.github.io/squinter/index.html#configuring"];
 }
 
 
@@ -9161,15 +9187,19 @@
 
 - (IBAction)showFeedbackSheet:(id)sender
 {
-    // Show the sheet
-
+    // Show the Feedback sheet
+    
+    // Clear the text field from the last usage
+    
     feedbackField.stringValue = @"";
-
-    if (sender == feedbackButton)
-    {
-        [self closeAboutSheet:sender];
-    }
-
+    
+    // If we've come from the 'About Squinter' sheet, close it first
+    
+    if (sender == feedbackButton) [self closeAboutSheet:sender];
+    
+    // Present the window
+    // TODO make sure this is the top sheet
+    
     [_window beginSheet:feedbackSheet completionHandler:nil];
 }
 
@@ -9177,6 +9207,8 @@
 
 - (IBAction)cancelFeedbackSheet:(id)sender
 {
+    // User clicked 'Cancel' so just close the sheet
+    
     [_window endSheet:feedbackSheet];
 }
 
@@ -9184,16 +9216,18 @@
 
 - (IBAction)sendFeedback:(id)sender
 {
+    // User clicked 'Send' so get the message (if there is one) from the text field and send it
+    
     NSString *feedback = feedbackField.stringValue;
 
     [_window endSheet:feedbackSheet];
 
     if (feedback.length == 0) return;
 
+    // Start the connection indicator if it's not already visible
+    
     if (connectionIndicator.hidden == YES)
     {
-        // Start the connection indicator
-
         connectionIndicator.hidden = NO;
         [connectionIndicator startAnimation:self];
     }
@@ -9201,7 +9235,6 @@
     // Send the string etc.
 
     NSError *error = nil;
-
     NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
     NSString *userAgent = [NSString stringWithFormat:@"%@/%@.%@ (macOS %li.%li.%li)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleExecutable"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
                  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], (long)sysVer.majorVersion, (long)sysVer.minorVersion, (long)sysVer.patchVersion];
@@ -9227,7 +9260,6 @@
         // Something went wrong during the creation of the request, so tell the user and bail
 
         [self sendFeedbackError];
-
         return;
     }
 
@@ -9581,6 +9613,7 @@ didReceiveResponse:(NSURLResponse *)response
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)task didReceiveData:(NSData *)data
 {
     // Make sure we are recording data from the correct task
+    // We are only interested in the EI library list data
 
     if (task == eiLibListTask) [eiLibListData appendData:data];
 }
@@ -9610,13 +9643,13 @@ didReceiveResponse:(NSURLResponse *)response
 
     if (task == eiLibListTask)
     {
-        // The connection has come to a conclusion without error
+        // Successfully retrieved the current EI library list
 
         [self compareElectricImpLibs:eiDeviceGroup];
     }
     else if (task == feedbackTask)
     {
-        // The user just successfully posted feedback
+        // Successfully posted Squinter feedback
 
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = @"Thanks For Your Feedback!";
@@ -9647,6 +9680,10 @@ didReceiveResponse:(NSURLResponse *)response
 
 - (void)controlTextDidChange:(NSNotification *)obj
 {
+    // Generic handler for all changes made to text field that register the app delegate as their own delegate
+    // Primarily used to warn the user that they have reached the limit on the number of characters
+    // that can be entered, but it also checks the OTP entry field for numeric and hex characters
+    
     id sender = obj.object;
 
     // New Project sheet
