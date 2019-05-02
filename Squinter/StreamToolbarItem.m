@@ -42,6 +42,9 @@
         midImageNameGrey = @"log_flagging_grey";
         onImageNameGrey = @"log_flagged_grey";
         offImageNameGrey = @"streamon_grey";
+        
+        // NOTE Some of the above images are misnamed due to changes in the app's evolution.
+        //      Despite its name, 'streamon' really means 'logging_off'
     }
 
     return self;
@@ -55,38 +58,21 @@
     // and whether the current device is logging ('on'), not logging ('off') or
     // changing logging state ('mid')
     
-    if (isForeground)
+    switch (state)
     {
-        switch (state)
-        {
-            case kStreamToolbarItemStateOff:
-                [self setImage:[NSImage imageNamed:offImageName]];
-                break;
-                
-            case kStreamToolbarItemStateMid:
-                [self setImage:[NSImage imageNamed:midImageName]];
-                break;
-                
-            default:
-                [self setImage:[NSImage imageNamed:onImageName]];
-        }
+        case kStreamToolbarItemStateOff:
+            [self setImage:[NSImage imageNamed:(isForeground ? offImageName : offImageNameGrey)]];
+            break;
+            
+        case kStreamToolbarItemStateMid:
+            [self setImage:[NSImage imageNamed:(isForeground ? midImageName : midImageNameGrey)]];
+            break;
+            
+        default:
+            [self setImage:[NSImage imageNamed:(isForeground ? onImageName : onImageNameGrey)]];
     }
-    else
-    {
-        switch (state)
-        {
-            case kStreamToolbarItemStateOff:
-                [self setImage:[NSImage imageNamed:offImageNameGrey]];
-                break;
-                
-            case kStreamToolbarItemStateMid:
-                [self setImage:[NSImage imageNamed:midImageNameGrey]];
-                break;
-                
-            default:
-                [self setImage:[NSImage imageNamed:onImageNameGrey]];
-        }
-    }
+    
+    [super validate];
 }
 
 

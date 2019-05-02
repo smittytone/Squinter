@@ -40,6 +40,12 @@
         activeLoginImageName = @"login";
         inactiveLogoutImageName = @"logout_grey";
         inactiveLoginImageName = @"login_grey";
+        
+        // NOTE These images display the action that takes place when clicked, ie. the reverse
+        //      of the current stage. For example, when a user is logged in, the icon will show
+        //      an open lock to indicate that a click will cause the user to be logged out. A closed
+        //      lock icon indicates the user needs to unlock the lock, ie. log in.
+        // TODO Perhaps change these icons to be more representative of logging in/out
     }
 
     return self;
@@ -53,36 +59,18 @@
     // and whether the user is currently logged in ('Login') or not ('Logout') and update
     // the item's label while we're at it
     
-    if (isForeground)
+    if (!isLoggedIn)
     {
-        // App in foreground, so draw in green
-        
-        if (!isLoggedIn)
-        {
-            [self setImage:[NSImage imageNamed:activeLoginImageName]];
-            self.label = @"In";
-        }
-        else
-        {
-            [self setImage:[NSImage imageNamed:activeLogoutImageName]];
-            self.label = @"Out";
-        }
+        [self setImage:[NSImage imageNamed:(isForeground ? activeLoginImageName : inactiveLoginImageName)]];
+        self.label = @"In";
     }
     else
     {
-        // App in background, draw in grey
-        
-        if (!isLoggedIn)
-        {
-            [self setImage:[NSImage imageNamed:inactiveLoginImageName]];
-            self.label = @"In";
-        }
-        else
-        {
-            [self setImage:[NSImage imageNamed:inactiveLogoutImageName]];
-            self.label = @"Out";
-        }
+        [self setImage:[NSImage imageNamed:(isForeground ? activeLogoutImageName : inactiveLogoutImageName)]];
+        self.label = @"Out";
     }
+    
+    [super validate];
 }
 
 
