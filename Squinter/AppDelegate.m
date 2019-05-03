@@ -234,8 +234,8 @@
     loginAndOutItem.toolTip = @"Login or logout of your Electric Imp account";
     loginAndOutItem.isLoggedIn = NO;
 
-    listCommitsItem.activeImageName = @"commits";
-    listCommitsItem.inactiveImageName = @"commits_grey";
+    listCommitsItem.activeImageName = @"commits2";
+    listCommitsItem.inactiveImageName = @"commits2_grey";
     listCommitsItem.toolTip = @"List the commits made to the current device group";
 
     downloadProductItem.activeImageName = @"download";
