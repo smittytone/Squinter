@@ -7,13 +7,12 @@ target 'Squinter' do
 
   # Pods for Squinter
   pod 'PDKeychainBindingsController', '~> 0.0'
-  pod 'Sparkle', '~> 1.14'
-  # pod 'DarklyEventSource', '~> 1.3.0'
-  # pod 'EventSource'
+  pod 'Sparkle', '> 1.20'
 
-  #target 'SquinterTests' do
-    #inherit! :search_paths
-    # Pods for testing
-  #end
+end
 
+post_install do |installer|
+	# Sign the Sparkle helper binaries to pass App Notarization.
+	system("codesign --force -o runtime -s 'Mac Developer: Antony Smith (78SRS3FAA6)' Pods/Sparkle/Sparkle.framework/Resources/Autoupdate.app/Contents/MacOS/Autoupdate")
+	system("codesign --force -o runtime -s 'Mac Developer: Antony Smith (78SRS3FAA6)' Pods/Sparkle/Sparkle.framework/Resources/Autoupdate.app/Contents/MacOS/fileop")
 end
