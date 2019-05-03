@@ -175,6 +175,7 @@
     IBOutlet SquinterToolbarItem *listCommitsItem;
     IBOutlet SquinterToolbarItem *downloadProductItem;
     IBOutlet SquinterToolbarItem *inspectorItem;
+    IBOutlet SquinterToolbarItem *syncItem;
 
     // Sheets, dialogs and windows
 

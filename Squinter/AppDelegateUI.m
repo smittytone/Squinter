@@ -1599,6 +1599,7 @@
     uploadCodeItem.enabled = (currentProject != nil && currentDevicegroup != nil && currentDevicegroup.squinted > 0) ? YES : NO;
     uploadCodeExtraItem.enabled = (currentProject != nil && currentDevicegroup != nil && currentDevicegroup.squinted > 0) ? YES : NO;
     downloadProductItem.enabled = (selectedProduct != nil) ? YES : NO;
+    syncItem.enabled = (currentProject != nil) ? YES : NO;
     
     // Enable or disable device-specific toolbar items
     

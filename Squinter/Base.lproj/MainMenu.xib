@@ -206,6 +206,7 @@
                 <outlet property="switchAccountMenuItem" destination="HdT-W5-cit" id="Qyg-0b-Rsq"/>
                 <outlet property="swvc" destination="RrL-ld-oJQ" id="xWP-EZ-gMr"/>
                 <outlet property="syncChoiceSheet" destination="gbO-CX-hmK" id="j2g-wc-vkM"/>
+                <outlet property="syncItem" destination="Nc1-To-idI" id="fnd-TT-hH4"/>
                 <outlet property="syncProjectMenuItem" destination="9ug-Tz-yPy" id="7hz-Dt-OMy"/>
                 <outlet property="sywvc" destination="ZSP-It-RiE" id="eQi-jB-H5e"/>
                 <outlet property="textColorWell" destination="0Uf-yP-hej" id="AWU-fo-7k6"/>
@@ -1115,7 +1116,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="683" height="544"/>
                                         <clipView key="contentView" id="DPZ-Ai-vv0">
                                             <rect key="frame" x="0.0" y="0.0" width="683" height="544"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <textView editable="NO" drawsBackground="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" findStyle="bar" linkDetection="YES" id="lMN-b4-gk7" customClass="LogView">
                                                     <rect key="frame" x="0.0" y="-1" width="683" height="544"/>
@@ -1186,7 +1187,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
                                         <clipView key="contentView" drawsBackground="NO" id="EfT-Sg-QuC">
                                             <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="14" outlineTableColumn="hFO-tg-8AA" id="h7b-hJ-8PD">
                                                     <rect key="frame" x="0.0" y="0.0" width="340" height="514"/>
@@ -1366,7 +1367,7 @@
                     <constraint firstItem="lSl-gT-Zzl" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="11" id="yk5-LC-krC"/>
                 </constraints>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="B3EC3009-665A-4008-AF07-80CBA64DA7FB" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="TRV-z7-UZS">
+            <toolbar key="toolbar" implicitIdentifier="B3EC3009-665A-4008-AF07-80CBA64DA7FB" centeredItem="eYq-bK-nxW" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="TRV-z7-UZS">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="9A66F936-1D08-43E1-A73E-7567C2B63ED3" label="New Project" paletteLabel="New Project" tag="108" image="plus" autovalidates="NO" id="ucm-fZ-jVY" customClass="SquinterToolbarItem">
                         <connections>
@@ -1380,7 +1381,7 @@
                             <action selector="showProjectInfo:" target="Voe-Tx-rLC" id="aGd-1B-uJA"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="FDDE3D1E-ACFC-41D5-9207-9E80CD4BDC53" label="Download" paletteLabel="Download Product" tag="124" image="download" id="Gli-ag-yLt" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="FDDE3D1E-ACFC-41D5-9207-9E80CD4BDC53" label="Download" paletteLabel="Download Product" tag="124" image="download" autovalidates="NO" id="Gli-ag-yLt" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="downloadProduct:" target="Voe-Tx-rLC" id="pMb-1d-WKR"/>
                         </connections>
@@ -1390,7 +1391,7 @@
                             <action selector="newDevicegroup:" target="Voe-Tx-rLC" id="JRr-Ho-vmd"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="389AA2C6-CFB4-4520-AFA0-253FFD4233E8" label="Group Info" paletteLabel="Device Group Info" tag="-1" image="info" autovalidates="NO" id="JWE-8V-DcR" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="389AA2C6-CFB4-4520-AFA0-253FFD4233E8" label="Group Info" paletteLabel="Device Group Info" tag="125" image="info" autovalidates="NO" id="JWE-8V-DcR" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="showDeviceGroupInfo:" target="Voe-Tx-rLC" id="L8Q-86-15M"/>
                         </connections>
@@ -1407,12 +1408,12 @@
                             <action selector="uploadCode:" target="Voe-Tx-rLC" id="GuW-gx-Ir6"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="E3CF4403-80B0-4CB0-AE35-CA7C29D34C1F" label="Commit" paletteLabel="Commit code to the Device Grup" tag="121" image="uploadplus" id="gJg-UT-1px" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="E3CF4403-80B0-4CB0-AE35-CA7C29D34C1F" label="Commit" paletteLabel="Commit code to the Device Grup" tag="121" image="uploadplus" autovalidates="NO" id="gJg-UT-1px" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="uploadCode:" target="Voe-Tx-rLC" id="eFN-kD-qf7"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="B82AA6A1-729A-4A2C-8D01-110BE737E8A0" label="Commits" paletteLabel="Show Commits" tag="122" image="commits" id="Z6i-XT-ijk" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="B82AA6A1-729A-4A2C-8D01-110BE737E8A0" label="Commits" paletteLabel="Show Commits" tag="122" image="commits2" autovalidates="NO" id="Z6i-XT-ijk" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="getCommits:" target="Voe-Tx-rLC" id="H69-7W-EoE"/>
                         </connections>
@@ -1465,7 +1466,7 @@
                             <action selector="updateDevicesStatus:" target="Voe-Tx-rLC" id="k08-U2-eo6"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="B385803E-4250-4301-A1E0-CF037E68B235" label="Inspector" paletteLabel="Show/Hide Inspector" tag="122" image="inspect" autovalidates="NO" id="3Qg-aT-d3K" customClass="SquinterToolbarItem">
+                    <toolbarItem implicitItemIdentifier="B385803E-4250-4301-A1E0-CF037E68B235" label="Inspector" paletteLabel="Show/Hide Inspector" tag="123" image="inspect" autovalidates="NO" id="3Qg-aT-d3K" customClass="SquinterToolbarItem">
                         <connections>
                             <action selector="showInspector:" target="Voe-Tx-rLC" id="jkQ-fh-lMc"/>
                         </connections>
@@ -1490,6 +1491,13 @@
                     <toolbarItem implicitItemIdentifier="NSToolbarSeparatorItem" id="vIH-l8-9Id"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="hlu-sY-ttp"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="YmD-OV-Lst"/>
+                    <toolbarItem implicitItemIdentifier="6EE02058-08E4-40D9-BA58-E447A0FCB82E" label="Sync Project" paletteLabel="Sync Project with impCloud" tag="126" image="refresh" autovalidates="NO" id="Nc1-To-idI" customClass="SquinterToolbarItem">
+                        <size key="minSize" width="32" height="32"/>
+                        <size key="maxSize" width="32" height="32"/>
+                        <connections>
+                            <action selector="doSync:" target="Voe-Tx-rLC" id="kub-VC-QLj"/>
+                        </connections>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="ucm-fZ-jVY"/>
@@ -4220,7 +4228,7 @@ Gw
                         <rect key="frame" x="20" y="61" width="572" height="244"/>
                         <clipView key="contentView" id="NWZ-vh-YNt">
                             <rect key="frame" x="1" y="1" width="570" height="242"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="20" viewBased="YES" floatsGroupRows="NO" id="bLn-Rm-uCb">
                                     <rect key="frame" x="0.0" y="0.0" width="570" height="242"/>
@@ -5242,7 +5250,7 @@ Gw
         <image name="black_compile" width="32" height="32"/>
         <image name="button_link" width="14" height="14"/>
         <image name="clear" width="32" height="32"/>
-        <image name="commits" width="32" height="32"/>
+        <image name="commits2" width="32" height="32"/>
         <image name="copy" width="32" height="32"/>
         <image name="download" width="32" height="32"/>
         <image name="info" width="32" height="32"/>
