@@ -10,6 +10,7 @@
 
 
 #pragma mark - UI Update Methods
+
 #pragma mark Projects Menu
 
 
@@ -99,7 +100,7 @@
 
 
 
-- (void)refreshOpenProjectsMenu
+- (void)refreshOpenProjectsSubmenu
 {
     // This method manages the Open projects submenu of the Projects menu
     // It also handles the Projects Popup, which is dynamically titled so we need to
@@ -433,13 +434,14 @@
 
 
 
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject
+- (BOOL)addOpenProjectsMenuItem:(NSString *)title :(Project *)aProject
 {
     // Create a new menu entry to the 'Projects' menu’s 'Open Projects' submenu and to the Current Project popup
     // For the Open Projects submenu, each menu item's representedObject points to the named project
     // For the Current Project popup, each menu item's tag is set to the index of the project in the submenu
     // This allows us to choose projects irrespective of the name used in the menu, for example letting us
     // distinguish between 'explorer' and 'explorer 2'
+    // NOTE This is why we have a 'title' parameter and don't just user 'aProject.name'
     
     // Run through the existing menu items, to check that we're not adding one already there
     // If there are no menu items, we can proceed safely
@@ -459,16 +461,12 @@
         
         for (NSMenuItem *item in openProjectsMenu.itemArray)
         {
-            if ([item.title compare:menuItemTitle] == NSOrderedSame)
+            if ([item.title compare:title] == NSOrderedSame)
             {
                 // The title is there already - but does the menu item reference the same project?
+                // If so, bail and signal failure to add
                 
-                if (aProject == item.representedObject)
-                {
-                    // Yes it does, so signal failure to add
-                    
-                    return NO;
-                }
+                if (aProject == item.representedObject) return NO;
             }
         }
     }
@@ -485,15 +483,15 @@
     
     // Add the menu to the list of open projects and select it...
     
-    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:menuItemTitle action:@selector(chooseProject:) keyEquivalent:@""];
+    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chooseProject:) keyEquivalent:@""];
     item.representedObject = aProject;
     item.state = NSOnState;
     [openProjectsMenu addItem:item];
     
     // ...and add it to the popup and select it
     
-    [projectsPopUp addItemWithTitle:menuItemTitle];
-    NSMenuItem *pitem = [projectsPopUp itemWithTitle:menuItemTitle];
+    [projectsPopUp addItemWithTitle:title];
+    NSMenuItem *pitem = [projectsPopUp itemWithTitle:title];
     pitem.representedObject = aProject;
     projectsPopUp.enabled = YES;
     [projectsPopUp selectItem:pitem];
@@ -508,9 +506,9 @@
 #pragma mark Device Groups Menu
 
 
-- (void)refreshDevicegroupMenu
+- (void)refreshDeviceGroupsSubmenu
 {
-    // Rebuild the Device Groups menu's submenu of current project device groups
+    // Rebuild the 'Project's Device Groups' submenu, under the 'Device Groups' menu
     // This menu controls the View menu
     
     NSMenuItem *item;
@@ -576,7 +574,7 @@
     // This SHOULD be only place we call this but may not be
     // (other than updateDevice:)
     
-    [self refreshDevicesMenus];
+    [self refreshDeviceGroupSubmenuDevices];
     
     iwvc.project = currentProject;
 }
@@ -625,7 +623,7 @@
 
 
 
-- (void)refreshMainDevicegroupsMenu
+- (void)refreshDeviceGroupsMenu
 {
     // This method updates the main Device Groups menu, ie. all but the list of
     // the current Project's Device Groups, which is handled by 'refreshDevicegroupMenu:'
@@ -709,7 +707,7 @@
     // FROM 2.3.128
     // Set the Set Target menu titles appropriate to test/production
     
-    if ([currentDevicegroup.type containsString:@"pre_"])
+    if ([currentDevicegroup.type hasPrefix:@"pre_"])
     {
         setProductionTargetMenuItem.title = @"Set Target Test Production Device Group...";
         setDUTTargetMenuItem.title = @"Set Target Test DUT Device Group...";
@@ -778,7 +776,7 @@
 
 
 
-- (void)refreshDevicesMenus
+- (void)refreshDeviceGroupSubmenuDevices
 {
     // Rebuild the various sub-menus listing devices assigned to
     // listed device groups, ie. those belonging to the current project
@@ -1253,8 +1251,8 @@
 
 - (void)refreshDeviceMenu
 {
-    // Called to set the state of the main Device Menu
-    // The sub-menu 'Unassigned Devices' is set by refreshDevicesPopup:
+    // Called to set the state of the 'Device' Menu
+    // The 'Unassigned Devices' submenu is set by 'refreshDevicesPopup:'
     
     // Title menus according to whether there is a currently selected device or not
     

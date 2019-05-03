@@ -169,7 +169,7 @@
 	// Update libraries menu with updated list of local, EI libraries and local files
     // TODO Do we need to do this here?
 
-	[self refreshMainDevicegroupsMenu];
+	[self refreshDeviceGroupsMenu];
 	[self refreshLibraryMenus];
 	[self refreshFilesMenu];
 	[self setToolbar];

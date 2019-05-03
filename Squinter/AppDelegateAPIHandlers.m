@@ -419,7 +419,7 @@
     
     [self refreshProductsMenu];
     [self refreshProjectsMenu];
-    [self refreshDevicesMenus];
+    [self refreshDeviceGroupSubmenuDevices];
     [self refreshDeviceMenu];
     [self refreshDevicesPopup];
     [self setToolbar];
@@ -791,7 +791,7 @@
                     
                     NSAlert *alert = [[NSAlert alloc] init];
                     alert.messageText = [NSString stringWithFormat:@"Project “%@” in sync", project.name];
-                    alert.informativeText = @"All of the Device Groups listed on the server are accessible via the Project.";
+                    alert.informativeText = @"All of the device groups listed on the server are accessible via the project.";
                     [alert beginSheetModalForWindow:mainWindow completionHandler:nil];
                 }
             }
@@ -1093,36 +1093,6 @@
             // Update the UI for the downloaded project
             
             [self postSync:newProject];
-            
-            /*
-             NSMutableArray *filesToSave = [[NSMutableArray alloc] init];
-             
-             if (newProject.devicegroups.count > 0)
-             {
-             for (Devicegroup *dg in newProject.devicegroups)
-             {
-             if (dg.models.count > 0)
-             {
-             for (Model *model in dg.models)
-             {
-             // NOTE we save a model file even if it contains no code - the user may add code later
-             
-             if (model.filename == nil || model.filename.length == 0)
-             {
-             model.path = newProject.path;
-             model.filename = [dg.name stringByAppendingFormat:@".%@.nut", model.type];
-             
-             [filesToSave addObject:model];
-             }
-             }
-             }
-             }
-             }
-             
-             // If we have files that need saving, save them
-             
-             if (filesToSave.count > 0) [self saveFiles:filesToSave :newProject];
-             */
         }
         else
         {
@@ -1170,15 +1140,15 @@
     [saveLight show];
     [saveLight needSave:project.haschanged];
     
-    [self refreshOpenProjectsMenu];
     [self refreshProjectsMenu];
-    [self refreshDevicegroupMenu];
-    [self refreshMainDevicegroupsMenu];
+    [self refreshOpenProjectsSubmenu];
+    [self refreshDeviceGroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
     [self setToolbar];
     
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat:@"Product “%@” downloaded", project.name];
-    alert.informativeText = @"Please save the Project to write any downloaded code files to disk.";
+    alert.informativeText = @"Please save the project to write any downloaded code to disk.";
     
     [alert beginSheetModalForWindow:mainWindow completionHandler:nil];
     
@@ -1314,27 +1284,9 @@
         if ([action compare:@"newproject"] == NSOrderedSame)
         {
             // This is the action flow for a new project, new product
-            
             // Enable project-related UI items
             
-            [self refreshOpenProjectsMenu];
-            [self refreshProjectsMenu];
-            [self refreshMainDevicegroupsMenu];
-            [self refreshDevicegroupMenu];
-            [self refreshDeviceMenu];
-            [self setToolbar];
-            
-            // Mark the status light as empty, ie. in need of saving
-            
-            [saveLight show];
-            [saveLight needSave:YES];
-            
-            // Save the new project - this gives the user the chance to re-locate it
-            
-            iwvc.project = currentProject;
-            savingProject = currentProject;
-            
-            [self saveProjectAs:nil];
+            [self newProjectSheetCreateStageThree:project];
         }
         else if ([action compare:@"uploadproject"] == NSOrderedSame)
         {
@@ -1586,9 +1538,9 @@
             
             // Update the UI
             
-            [self refreshOpenProjectsMenu];
-            [self refreshDevicegroupMenu];
-            [self refreshMainDevicegroupsMenu];
+            [self refreshOpenProjectsSubmenu];
+            [self refreshDeviceGroupsMenu];
+            [self refreshDeviceGroupsSubmenu];
         }
     }
     else
@@ -1697,8 +1649,8 @@
                 [saveLight needSave:YES];
             }
             
-            [self refreshMainDevicegroupsMenu];
-            [self refreshDevicegroupMenu];
+            [self refreshDeviceGroupsMenu];
+            [self refreshDeviceGroupsSubmenu];
         }
         else
         {
@@ -1762,8 +1714,8 @@
                     [saveLight needSave:YES];
                 }
                 
-                [self refreshDevicegroupMenu];
-                [self refreshMainDevicegroupsMenu];
+                [self refreshDeviceGroupsSubmenu];
+                [self refreshDeviceGroupsMenu];
             }
             else
             {
@@ -1881,8 +1833,8 @@
                 
                 // Update the UI
                 
-                [self refreshDevicegroupMenu];
-                [self refreshMainDevicegroupsMenu];
+                [self refreshDeviceGroupsMenu];
+                [self refreshDeviceGroupsSubmenu];
                 [self setToolbar];
                 
                 // Update the inspector, if required
@@ -2450,7 +2402,7 @@
         
         [self refreshDevicesPopup];
         [self refreshDeviceMenu];
-        [self refreshDevicegroupMenu];
+        [self refreshDeviceGroupsSubmenu];
         [self setToolbar];
         
         // Update the Inspector
@@ -2552,7 +2504,7 @@
                 
                 deviceCheckCount = -1;
                 
-                [self refreshDevicesMenus];
+                [self refreshDeviceGroupSubmenuDevices];
                 [self refreshDevicesPopup];
                 //if (projectArray.count > 0) [self refreshDevicesMenus];
                 
@@ -3200,7 +3152,7 @@
     }
     
     [streamLogsItem validate];
-    [self refreshDevicesMenus];
+    [self refreshDeviceGroupSubmenuDevices];
     [self refreshDevicesPopup];
 }
 
@@ -3279,7 +3231,7 @@
     }
     
     [streamLogsItem validate];
-    [self refreshDevicesMenus];
+    [self refreshDeviceGroupSubmenuDevices];
     [self refreshDevicesPopup];
 }
 
@@ -3387,7 +3339,7 @@
         }
         
         [streamLogsItem validate];
-        [self refreshDevicesMenus];
+        [self refreshDeviceGroupSubmenuDevices];
         [self refreshDevicesPopup];
     }
 }

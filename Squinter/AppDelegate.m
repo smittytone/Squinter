@@ -125,7 +125,7 @@
 
     projectsMenu.autoenablesItems = NO;
 
-    [self refreshOpenProjectsMenu];
+    [self refreshOpenProjectsSubmenu];
     [self refreshProjectsMenu];
     [self refreshProductsMenu];
 
@@ -133,8 +133,8 @@
 
     externalSourceMenu.autoenablesItems = NO;
 
-    [self refreshDevicegroupMenu];
-    [self refreshMainDevicegroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
+    [self refreshDeviceGroupsMenu];
     [self refreshLibraryMenus];
     [self refreshFilesMenu];
 
@@ -156,7 +156,7 @@
     // View Menu
 
     showHideToolbarMenuItem.title = @"Hide Toolbar";
-    // NOTE refreshMainDevicegroupsMenu: calls refreshViewMenu:
+    // NOTE refreshDeviceGroupsMenu: calls refreshViewMenu:
 
     // Toolbar
 
@@ -683,11 +683,11 @@
 
         if (unsavedProjectCount == 1)
         {
-            [saveChangesSheetLabel setStringValue:@"1 Project has unsaved changes."];
+            [saveChangesSheetLabel setStringValue:@"1 project has unsaved changes."];
         }
         else
         {
-            [saveChangesSheetLabel setStringValue:[NSString stringWithFormat:@"%li Projects have unsaved changes.", (long)unsavedProjectCount]];
+            [saveChangesSheetLabel setStringValue:[NSString stringWithFormat:@"%li projects have unsaved changes.", (long)unsavedProjectCount]];
         }
 
         // Open the save sheet
@@ -885,7 +885,7 @@
 
     [self refreshProductsMenu];
     [self refreshProjectsMenu];
-    [self refreshDevicesMenus];
+    [self refreshDeviceGroupSubmenuDevices];
     [self refreshDeviceMenu];
     [self refreshDevicesPopup];
     [self setToolbar];
@@ -1321,11 +1321,10 @@
     if (makeNewProduct)
     {
         // NOTE 'makeNewProduct' is not selectable (ie. always NO) if the user is not logged in
-
+        
         if (productsArray != nil)
         {
-            // User wants to make a new product or doesn't want to associate with an exitsting one
-            // so compare the new product's name against existing product names
+            // Compare the new product's name against existing product names
 
             if (productsArray.count > 0)
             {
@@ -1335,8 +1334,21 @@
 
                     if ([aName compare:pName] == NSOrderedSame)
                     {
-                        [newProjectLabel setStringValue:@"A product with that name already exists. Please choose another project name, or cancel."];
-                        [_window beginSheet:newProjectSheet completionHandler:nil];
+                        NSAlert *alert = [[NSAlert alloc] init];
+                        alert.messageText = @"A product with that name already exists";
+                        alert.informativeText = @"Please click ‘Continue’ to choose another project name, or ‘Cancel’ to end the project creation process.";
+                        [alert addButtonWithTitle:@"Cancel"];
+                        [alert addButtonWithTitle:@"Continue"];
+                        [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
+                            if (returnCode == NSAlertSecondButtonReturn)
+                            {
+                                // Clear the project name text field and re-show the panel
+                                
+                                newProjectNameTextField.stringValue = @"";
+                                [_window beginSheet:newProjectSheet completionHandler:nil];
+                            }
+                        }];
+                        
                         return;
                     }
                 }
@@ -1360,7 +1372,7 @@
         }
     }
 
-    // Go on to the next phase
+    // Go on to the next stage
 
     [self newProjectSheetCreateStageTwo:pName :pDesc :makeNewProduct :associateProduct];
 }
@@ -1370,39 +1382,50 @@
 - (void)newProjectSheetCreateStageTwo:(NSString *)projectName :(NSString *)projectDesc :(BOOL)make :(BOOL)associate
 {
     // Second phase of project creation
-    // This needs to be a separate method because of the async nature of the first phase,
-    // embodied in 'newProjectSheetCreate:', which may pop up an alert whose effect may be
+    // This needs to be a separate method because of the async nature of the first phase
+    // (see 'newProjectSheetCreate:'), which may pop up an alert whose effect may be
     // to take the user away from here
 
-    // Make the new project
+    // Make the new project, and make it the current project
 
-    currentProject = [[Project alloc] init];
-    currentProject.name = projectName;
-    currentProject.description = projectDesc;
-    currentProject.path = workingDirectory;
-    currentProject.filename = [projectName stringByAppendingString:@".squirrelproj"];
-    currentProject.haschanged = YES;
-    currentProject.devicegroupIndex = -1;
-    currentDevicegroup = nil;
-
+    Project *newProject = [[Project alloc] init];
+    newProject.name = projectName;
+    newProject.description = projectDesc;
+    newProject.path = workingDirectory;
+    newProject.filename = [projectName stringByAppendingString:@".squirrelproj"];
+    newProject.haschanged = YES;
+    newProject.devicegroupIndex = -1;
+    
     // Add the account ID if we are logged in
 
-    if (ide.isLoggedIn) currentProject.aid = ide.currentAccount;
-
-    [projectArray addObject:currentProject];
-
+    if (ide.isLoggedIn) newProject.aid = ide.currentAccount;
+    
+    // Set the new project as the current project
+    
+    currentProject = newProject;
+    currentDevicegroup = nil;
+    iwvc.project = currentProject;
+    
+    [projectArray addObject:newProject];
+    
+    // Add the new project to the project menu.
+    // We've already checked for a name clash, so we needn't care about the return value
+    
+    [self addOpenProjectsMenuItem:newProject.name :newProject];
+    
     if (make)
     {
         // User wants to create a new product for this project. We will pick up saving
         // this project AFTER the product has been created (to make sure it is created)
         // NOTE 'make' can only be YES if we are logged in
 
-        [self writeStringToLog:@"Creating Project's Product on the server..." :YES];
+        [self writeStringToLog:@"Creating the project's product on the server..." :YES];
 
         NSDictionary *dict = @{ @"action"  : @"newproject",
-                                @"project" : currentProject };
+                                @"project" : newProject };
 
         [ide createProduct:projectName :projectDesc :dict];
+        
         return;
 
         // Pick up the action at 'createProductStageTwo:'
@@ -1415,35 +1438,40 @@
         // User wants to associate the new project with the selected product, so set 'pid'
         // NOTE user can't have made this choice if 'selectedProduct' is nil
 
-        currentProject.pid = [self getValueFrom:selectedProduct withKey:@"id"];
+        newProject.pid = [self getValueFrom:selectedProduct withKey:@"id"];
     }
 
-    // Add the new project to the project menu. We've already checked for a name clash,
-    // so we needn't care about the return value
+    // Go on to the next stage
+    
+    [self newProjectSheetCreateStageThree:newProject];
+}
 
-    [self addProjectMenuItem:projectName :currentProject];
 
-    // Enable project-related UI items for the new project
-    // NOTE 'addProjectMenuItem:' will have updated the sub-menus already
 
+- (void)newProjectSheetCreateStageThree:(Project *)newProject
+{
+    // This is a separate method to allow its access from multiple locations:
+    // 'newProjectSheetCreateStageTwo:' and 'createProductStageTwo:'
+    
+    // Enable project-related UI items for the new project:
+    // The 'Projects' menu
+    // The 'Device Groups' menu and 'Projects's Device Groups' submenu
+    // The Toolbar
+    
     [self refreshProjectsMenu];
-    [self refreshDevicegroupMenu];
-    [self refreshMainDevicegroupsMenu];
+    [self refreshDeviceGroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
     [self setToolbar];
-
-    // Set the inspector
-
-    iwvc.project = currentProject;
-    [iwvc setTab:0];
-
-    // Mark the status light as empty, ie. in need of saving
-
+    
+    // Status light
+    // NOTE We show this here as this may be the first project displayed
+    
     [saveLight show];
     [saveLight needSave:YES];
-
+    
     // Save the new project - this gives the user the chance to re-locate it
-
-    savingProject = currentProject;
+    
+    savingProject = newProject;
     [self saveProjectAs:nil];
 }
 
@@ -1534,12 +1562,12 @@
 
     // Have we chosen the already selected project? Bail
 
-    if (currentProject == chosenProject) return;
+    if (chosenProject == currentProject) return;
 
     // Switch in the newly chosen project and select its known selected device group
 
     currentProject = chosenProject;
-    currentDevicegroup = (currentProject.devicegroupIndex != -1) ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
+    currentDevicegroup = currentProject.devicegroupIndex != -1 ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
 
     // If we have a current device group, select its first device if it has one
 
@@ -1550,7 +1578,7 @@
     else
     {
         // If we don't have a selected device group but we do have device groups in
-        // this project, select the first one on the list
+        // this project, select the first one on the list (if there is one)
 
         if (currentProject.devicegroups.count > 0)
         {
@@ -1560,10 +1588,6 @@
             [self selectFirstDevice];
         }
     }
-
-    // Update the save? indicator if the newly selected project needs it
-
-    [saveLight needSave:currentProject.haschanged];
 
     // Is the project associated with a product? If so, select it
 
@@ -1620,14 +1644,18 @@
     // NOTE previous calls to chooseProduct: will cause the products sub-menu to be updated
 
     [self refreshProjectsMenu];
-    [self refreshOpenProjectsMenu];
-    [self refreshMainDevicegroupsMenu];
-    [self refreshDevicegroupMenu];
+    [self refreshOpenProjectsSubmenu];
+    [self refreshDeviceGroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
     [self setToolbar];
 
     // Set the inspector
 
     iwvc.project = currentProject;
+    
+    // Update the save? indicator if the newly selected project needs it
+    
+    [saveLight needSave:currentProject.haschanged];
 }
 
 
@@ -1719,7 +1747,7 @@
         // If there is only one open project, which we're about to close,
         // we can clear everything project-related in the UI
 
-        [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no open Projects.", closedName] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" closed. There are no open projects.", closedName] :YES];
         [projectArray removeAllObjects];
         [fileWatchQueue kill];
 
@@ -1755,15 +1783,15 @@
 
         if (sender != closeAllMenuItem)
         {
-            confirmMessage = [confirmMessage stringByAppendingFormat:@" %@ is now the current Project.", currentProject.name];
+            confirmMessage = [confirmMessage stringByAppendingFormat:@" %@ is now the current project.", currentProject.name];
 
             if (projectArray.count == 1)
             {
-                confirmMessage = [confirmMessage stringByAppendingString:@" There are no other open Projects."];
+                confirmMessage = [confirmMessage stringByAppendingString:@" There are no other open projects."];
             }
             else
             {
-                confirmMessage = [confirmMessage stringByAppendingFormat:@" There are %li open Projects.", projectArray.count];
+                confirmMessage = [confirmMessage stringByAppendingFormat:@" There are %li open projects.", projectArray.count];
             }
 
             [self writeStringToLog:confirmMessage :YES];
@@ -1777,9 +1805,10 @@
     // Update the UI whether we've closed one of x projects, or the last one
 
     [self refreshProjectsMenu];
-    [self refreshOpenProjectsMenu];
-    [self refreshMainDevicegroupsMenu];
-    [self refreshDevicegroupMenu];
+    [self refreshOpenProjectsSubmenu];
+    [self refreshDeviceGroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
+    [self refreshDeviceMenu];
     [self setToolbar];
 }
 
@@ -1863,8 +1892,8 @@
     NSString *desc = (renameProjectFlag) ? currentProject.description : currentDevicegroup.description;
     NSString *name = (renameProjectFlag) ? currentProject.name : currentDevicegroup.name;
 
-    renameProjectLabel.stringValue = (renameProjectFlag) ? @"Enter a new Project name or update the description:" : @"Enter a new Device Group name or update the description:";
-    renameProjectLinkCheckbox.title = (renameProjectFlag) ? @"Also update the Product linked to this Project" : @"Also update the Device Group in the impCloud";
+    renameProjectLabel.stringValue = (renameProjectFlag) ? @"Enter a new project name or update the description:" : @"Enter a new device group name or update the description:";
+    renameProjectLinkCheckbox.title = (renameProjectFlag) ? @"Also update the product linked to this project" : @"Also update the device group in the impCloud";
 
     if (renameProjectFlag)
     {
@@ -1928,7 +1957,7 @@
 
     if (newDesc.length > 255)
     {
-        renameProjectLabel.stringValue = @"That description is too long. Please choose another name, or cancel.";
+        renameProjectLabel.stringValue = @"That description is too long. Please enter another description, or cancel.";
         [_window beginSheet:renameProjectSheet completionHandler:nil];
         return;
     }
@@ -1987,7 +2016,7 @@
             }
             else
             {
-                [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
+                [self writeStringToLog:[NSString stringWithFormat:@"No changes made to project \"%@\".", currentProject.name] :YES];
             }
         }
         else
@@ -2002,10 +2031,10 @@
 
                 // Update the UI only if the name has changed
 
-                [self refreshOpenProjectsMenu];
+                [self refreshOpenProjectsSubmenu];
                 [self refreshProjectsMenu];
-                [self refreshDevicegroupMenu];
-                [self refreshMainDevicegroupsMenu];
+                [self refreshDeviceGroupsSubmenu];
+                [self refreshDeviceGroupsMenu];
             }
 
             if ([currentProject.description compare:newDesc] != NSOrderedSame)
@@ -2017,7 +2046,7 @@
 
             // Report if no changes were made
 
-            if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Project \"%@\".", currentProject.name] :YES];
+            if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to project \"%@\".", currentProject.name] :YES];
 
             // Update the save indicator if anything has changed
 
@@ -2086,7 +2115,7 @@
             }
             else
             {
-                [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
+                [self writeStringToLog:[NSString stringWithFormat:@"No changes made to device group \"%@\".", currentDevicegroup.name] :YES];
             }
         }
         else
@@ -2103,9 +2132,9 @@
                 // Update the UI; in the above code the UI will be updated
                 // in response to notification from the server
 
-                [self refreshOpenProjectsMenu];
-                [self refreshDevicegroupMenu];
-                [self refreshMainDevicegroupsMenu];
+                [self refreshOpenProjectsSubmenu];
+                [self refreshDeviceGroupsSubmenu];
+                [self refreshDeviceGroupsMenu];
             }
 
             if ([currentDevicegroup.description compare:newDesc] != NSOrderedSame)
@@ -2114,10 +2143,10 @@
                 currentProject.haschanged = YES;
                 iwvc.project = currentProject;
 
-                [self refreshOpenProjectsMenu];
+                [self refreshOpenProjectsSubmenu];
             }
 
-            if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to Device Group \"%@\".", currentDevicegroup.name] :YES];
+            if (!currentProject.haschanged) [self writeStringToLog:[NSString stringWithFormat:@"No changes made to device group \"%@\".", currentDevicegroup.name] :YES];
 
             // Update the save indicator if anything has changed
 
@@ -2139,7 +2168,7 @@
 
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"upload this Project"];
+        [self loginAlert:@"upload this project"];
         return;
     }
 
@@ -2205,7 +2234,7 @@
                 // Pick up in 'listProducts:'
             }
 
-            [self writeStringToLog:[NSString stringWithFormat:@"Uploading Project \"%@\" to impCloud: making a Product...", project.name] :YES];
+            [self writeStringToLog:[NSString stringWithFormat:@"Uploading project \"%@\" to impCloud: making a product...", project.name] :YES];
 
             // Start by creating the product
 
@@ -2239,7 +2268,7 @@
         {
             // We don't have the products list populated yet, so we need to get it first
 
-            [self writeStringToLog:@"Retrieving a list of your Products" :YES];
+            [self writeStringToLog:@"Retrieving a list of your products" :YES];
 
             NSDictionary *dict = @{ @"action" : @"uploadproject",
                                     @"project" : project };
@@ -2258,7 +2287,7 @@
 
                 if ([project.pid compare:pid] == NSOrderedSame)
                 {
-                    [self writeErrorToLog:@"This Project already exists as a Product in the impCloud." :YES];
+                    [self writeErrorToLog:@"This project already exists as a product in the impCloud." :YES];
                     deadpid = NO;
                     break;
                 }
@@ -2269,7 +2298,7 @@
                 // We have an orphan project - its product has been deleted and its PID is dead
                 // so clear the pid and proceed with the upload.
 
-                [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Project \"%@\" is linked to a deleted Product. Deleting the link.", project.name] :YES];
+                [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Project \"%@\" is linked to a deleted product. Deleting the link.", project.name] :YES];
 
                 project.pid = @"";
 
@@ -2305,19 +2334,19 @@
     // EXPERIMENTAL
 
     NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in Account.", project.name];
+    alert.messageText = [NSString stringWithFormat:@"Project “%@” is not associated with the logged in account.", project.name];
 
     if (project.pid == nil || project.pid.length == 0)
     {
-        alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Account %@), or cancel the upload?", project.aid];
+        alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current account (this will break its link with account %@), or cancel the upload?", project.aid];
     }
     else
     {
-        alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current Account (this will break its link with Product %@ and Account %@), or cancel the upload?", project.pid, project.aid];
+        alert.informativeText = [NSString stringWithFormat:@"Do you wish to re-associate it with the current account (this will break its link with product %@ and account %@), or cancel the upload?", project.pid, project.aid];
     }
 
     [alert addButtonWithTitle:@"Cancel"];
-    [alert addButtonWithTitle:@"Continue"];
+    [alert addButtonWithTitle:@"Associate"];
     [alert setAlertStyle:NSAlertStyleWarning];
     [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) {
         if (returnCode == NSAlertSecondButtonReturn)
@@ -2356,7 +2385,7 @@
 
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"upload or sync this Project"];
+        [self loginAlert:@"upload or sync this project"];
         return;
     }
 
@@ -2377,7 +2406,7 @@
 
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = [NSString stringWithFormat:@"Project “%@” is not linked to a product", currentProject.name];
-        alert.informativeText = @"You can associate the project it with a product (use the 'Projects' > 'Link Product' menu item) and then synchronise again. You may need to refresh the list of Products in the impCloud first. Or you can upload the project to a new product.";
+        alert.informativeText = @"You can associate the project it with a product (use the 'Projects' > 'Link Product' menu item) and then synchronise again. You may need to refresh the list of products in the impCloud first. Or you can upload the project to a new product.";
 
         [alert addButtonWithTitle:@"Upload"];
         [alert addButtonWithTitle:@"Associate"];
@@ -2551,8 +2580,8 @@
     // Update the UI immediately after a sync
 
     [saveLight needSave:project.haschanged];
-    [self refreshMainDevicegroupsMenu];
-    [self refreshDevicegroupMenu];
+    [self refreshDeviceGroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
     [self refreshDeviceMenu];
     [self setToolbar];
 
@@ -2560,7 +2589,7 @@
 
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat:@"Project “%@” synchronised", project.name];
-    alert.informativeText = @"All of the Device Groups listed on the server are now accessible via the Project. Please save the Project to write any downloaded code files to disk.";
+    alert.informativeText = @"All of the device groups listed on the server are now accessible via the project. Please save the project to write any downloaded code to disk.";
 
     [alert beginSheetModalForWindow:_window completionHandler:nil];
 }
@@ -2677,7 +2706,7 @@
                 changed = YES;
                 if (url != nil)
                 {
-                    [self writeStringToLog:[NSString stringWithFormat:@"Updating location of Project file \"%@\".", [recent valueForKey:@"name"]] :YES];
+                    [self writeStringToLog:[NSString stringWithFormat:@"Updating location of project file \"%@\".", [recent valueForKey:@"name"]] :YES];
 
                     NSDictionary *newRecent = @{ @"name" : [recent valueForKey:@"name"],
                                                  @"path" : [url.path stringByDeletingLastPathComponent],
@@ -2829,11 +2858,11 @@
 
     if (!ide.isLoggedIn)
     {
-        [self loginAlert:@"get a list of Products from the impCloud"];
+        [self loginAlert:@"get a list of products from the impCloud"];
         return;
     }
 
-    [self writeStringToLog:@"Getting a list of this account's Products from the impCloud..." :YES];
+    [self writeStringToLog:@"Getting a list of this account's products from the impCloud..." :YES];
 
     NSDictionary *dict = @{ @"action" : @"getproducts" };
 
@@ -3094,7 +3123,7 @@
         currentProject.haschanged = YES;
         iwvc.project = currentProject;
 
-        [self refreshOpenProjectsMenu];
+        [self refreshOpenProjectsSubmenu];
         [self writeStringToLog:[NSString stringWithFormat:@"Project \"%@\" is now linked to product \"%@\".", currentProject.name, [self getValueFrom:selectedProduct withKey:@"name"]] :YES];
 
         // TODO This has to have an implicit sync eg. if the project has device groups
@@ -3224,8 +3253,8 @@
                     currentProject.devicegroupIndex = -1;
                 }
 
-                [self refreshMainDevicegroupsMenu];
-                [self refreshDevicegroupMenu];
+                [self refreshDeviceGroupsMenu];
+                [self refreshDeviceGroupsSubmenu];
 
                 saveUrls = nil;
             }
@@ -3265,7 +3294,7 @@
     {
         // Device Group description is too long
 
-        newDevicegroupLabel.stringValue = @"The description you chose is too long. Please choose another name, or cancel.";
+        newDevicegroupLabel.stringValue = @"The description you chose is too long. Please enter another one, or cancel.";
         [NSThread sleepForTimeInterval:2.0];
         [self newDevicegroup:nil];
         return;
@@ -3275,7 +3304,7 @@
     {
         // Device Group name is too short
 
-        newDevicegroupLabel.stringValue = @"You must choose a Device Group name. Please choose a name, or cancel.";
+        newDevicegroupLabel.stringValue = @"You must choose a device group name. Please choose a name, or cancel.";
         [NSThread sleepForTimeInterval:2.0];
         [self newDevicegroup:nil];
         return;
@@ -3293,7 +3322,7 @@
         {
             if ([adg.name compare:dgname] == NSOrderedSame)
             {
-                newDevicegroupLabel.stringValue = @"The current Project already has a Device Group with that name. Please choose another, or cancel.";
+                newDevicegroupLabel.stringValue = @"The current project already has a device group with that name. Please choose another, or cancel.";
                 [NSThread sleepForTimeInterval:2.0];
                 [self newDevicegroup:nil];
                 return;
@@ -3351,8 +3380,8 @@
         if (prodCount == 0 && dutCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture Device Group", typeString];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of Device Group, you need to specify %@Production and DUT Device Groups as its targets, and you have no such Device Groups in this Project.", typeString];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture device group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify %@Production and DUT device groups as its targets, and you have no such device groups in this project.", typeString];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
@@ -3362,8 +3391,8 @@
         if (prodCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture Device Group", typeString];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of Device Group, you need to specify a %@Production Device Group as its target, and you have no such Device Group in this Project.", typeString];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture device group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@Production device group as its target, and you have no such device group in this project.", typeString];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
@@ -3373,8 +3402,8 @@
         if (dutCount == 0)
         {
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture Device Group", typeString];
-            alert.informativeText = [NSString stringWithFormat:@"To create this type of Device Group, you need to specify a %@DUT Device Group as its target, and you have no such Device Group in this Project.", typeString];
+            alert.messageText = [NSString stringWithFormat:@"You cannot create a %@Fixture device group", typeString];
+            alert.informativeText = [NSString stringWithFormat:@"To create this type of device group, you need to specify a %@DUT device group as its target, and you have no such device group in this project.", typeString];
 
             [alert beginSheetModalForWindow:_window completionHandler:nil];
 
@@ -3437,7 +3466,7 @@
                                 @"project" : project,
                                 @"files" : [NSNumber numberWithBool:makeNewFiles] };
 
-        [self writeStringToLog:[NSString stringWithFormat:@"Uploading Device Group \"%@\" to the impCloud.", devicegroup.name] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Uploading device group \"%@\" to the impCloud.", devicegroup.name] :YES];
 
         NSDictionary *details;
 
@@ -3462,8 +3491,9 @@
                 if (dg1 == dg2)
                 {
                     // ERROR
+                    
                     NSLog(@"Target device groups match");
-                    [self writeErrorToLog:[NSString stringWithFormat:@"New Device Group \"%@\" has been set with the same target twice. Cannot proceed.", devicegroup.name] :YES];
+                    [self writeErrorToLog:[NSString stringWithFormat:@"New device group \"%@\" has been set with the same target twice. Cannot proceed.", devicegroup.name] :YES];
                     return;
                 }
 
@@ -3516,13 +3546,13 @@
             project.haschanged = YES;
 
             [saveLight needSave:YES];
-            [self refreshOpenProjectsMenu];
+            [self refreshOpenProjectsSubmenu];
         }
 
         // Update the UI
 
-        [self refreshDevicegroupMenu];
-        [self refreshMainDevicegroupsMenu];
+        [self refreshDeviceGroupsSubmenu];
+        [self refreshDeviceGroupsMenu];
         [self setToolbar];
 
         // Create the new device group's files as requested
@@ -3641,7 +3671,7 @@
 
             if ([tid compare:swvc.theSelectedTarget.did] == NSOrderedSame)
             {
-                [self writeWarningToLog:[NSString stringWithFormat:@"The device group you selected is already one of Device Group \"%@\"'s targets.", currentDevicegroup.name]  :YES];
+                [self writeWarningToLog:[NSString stringWithFormat:@"The device group you selected is already one of device group \"%@\"'s targets.", currentDevicegroup.name]  :YES];
                 return;
             }
         }
@@ -3827,7 +3857,7 @@
 
             // Update the UI
 
-            [self refreshMainDevicegroupsMenu];
+            [self refreshDeviceGroupsMenu];
 
             Project *parent = [self getParentProject:currentDevicegroup];
 
@@ -3912,8 +3942,8 @@
     // the selected device group has compiled code)
 
     [self refreshLibraryMenus];
-    [self refreshDevicegroupMenu];
-    [self refreshMainDevicegroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
+    [self refreshDeviceGroupsMenu];
     [self setToolbar];
 }
 
@@ -4023,7 +4053,7 @@
         // So just try to delete it anyway - the server will warn if the group can't be deleted
 
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = [NSString stringWithFormat:@"Are you sure you wish to delete Device Group \"%@\"?", currentDevicegroup.name];
+        alert.messageText = [NSString stringWithFormat:@"Are you sure you wish to delete device group “%@”?", currentDevicegroup.name];
         [alert addButtonWithTitle:@"No"];
         [alert addButtonWithTitle:@"Yes"];
         [alert beginSheetModalForWindow:_window
@@ -4051,7 +4081,7 @@
         // Remove it and select the project's first device group if it has one
 
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = [NSString stringWithFormat:@"Are you sure you wish to delete Device Group \"%@\"?", currentDevicegroup.name];
+        alert.messageText = [NSString stringWithFormat:@"Are you sure you wish to delete device group “%@”?", currentDevicegroup.name];
         [alert addButtonWithTitle:@"No"];
         [alert addButtonWithTitle:@"Yes"];
         [alert beginSheetModalForWindow:_window
@@ -4069,9 +4099,9 @@
                  iwvc.project = currentProject;
 
                  [saveLight needSave:YES];
-                 [self refreshOpenProjectsMenu];
-                 [self refreshMainDevicegroupsMenu];
-                 [self refreshDevicegroupMenu];
+                 [self refreshOpenProjectsSubmenu];
+                 [self refreshDeviceGroupsMenu];
+                 [self refreshDeviceGroupsSubmenu];
              }
          }
          ];
@@ -4401,9 +4431,9 @@
              iwvc.project = currentProject;
 
              [saveLight needSave:YES];
-             // [self refreshOpenProjectsMenu];
+             // [self refreshOpenProjectsSubmenu];
              [self refreshLibraryMenus];
-             [self refreshMainDevicegroupsMenu];
+             [self refreshDeviceGroupsMenu];
          }
      }
      ];
@@ -4616,7 +4646,7 @@
 
     if (![currentDevicegroup.type containsString:@"factoryfixture"])
     {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a factory fixture group so has no %@ target.", currentDevicegroup.name, groupType] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a Fixture group so has no %@ target.", currentDevicegroup.name, groupType] :YES];
         return;
     }
 
@@ -4629,8 +4659,8 @@
     if (count == 0)
     {
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = [NSString stringWithFormat:@"You have no %@ %@ Device Groups in this Project", groupPrefix, groupType];
-        alert.informativeText = [NSString stringWithFormat:@"You will need to create a %@%@ Device Group in order to set it as one of the targets of %@Fixture Device Group \"%@\".", groupPrefix, groupType, groupPrefix, currentDevicegroup.name];
+        alert.messageText = [NSString stringWithFormat:@"You have no %@ %@ device groups in this project", groupPrefix, groupType];
+        alert.informativeText = [NSString stringWithFormat:@"You will need to create a %@%@ device group in order to set it as one of the targets of %@Fixture device group \"%@\".", groupPrefix, groupType, groupPrefix, currentDevicegroup.name];
 
         [alert beginSheetModalForWindow:_window completionHandler:nil];
 
@@ -4654,7 +4684,7 @@
 
     if (![currentDevicegroup.type containsString:@"pre_production"])
     {
-        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a pre-production group so has no test production devices.", currentDevicegroup.name] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" is not a Test Production group so has no test production devices.", currentDevicegroup.name] :YES];
         return;
     }
 
@@ -5124,7 +5154,7 @@
     {
         // We have no device groups to assign
 
-        [self writeErrorToLog:@"None of your open Projects have any Device Groups. You will need to create a Device Group to assign a device." :YES];
+        [self writeErrorToLog:@"None of your open projects include any device groups. You will need to create a device group to assign a device." :YES];
         return;
     }
 
@@ -5293,7 +5323,7 @@
         // The device name is already in use. This is legal, but we should confirm with the user
 
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = [NSString stringWithFormat:@"The device name \"%@\" is already in use. Having multiple devices with the same name may cause confusion. Are you sure you want to rename this device?", newName];
+        alert.messageText = [NSString stringWithFormat:@"The device name “%@” is already in use. Having multiple devices with the same name may cause confusion. Are you sure you want to rename this device?", newName];
         [alert addButtonWithTitle:@"No"];
         [alert addButtonWithTitle:@"Yes"];
         [alert addButtonWithTitle:@"Cancel"];
@@ -5413,7 +5443,7 @@
 
     // Update the menus and toolbar
 
-    [self refreshDevicegroupMenu];
+    [self refreshDeviceGroupsSubmenu];
     [self refreshDeviceMenu];
     [self setToolbar];
 
@@ -5430,7 +5460,7 @@
     }
 
     NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = [NSString stringWithFormat:@"You are about to remove device \"%@\" from your account. Are you sure?", [self getValueFrom:selectedDevice withKey:@"name"]];
+    alert.messageText = [NSString stringWithFormat:@"You are about to remove device “%@” from your account. Are you sure?", [self getValueFrom:selectedDevice withKey:@"name"]];
     alert.informativeText = @"You can always re-add the device using BlinkUp.";
 
     [alert addButtonWithTitle:@"No"];
@@ -5565,7 +5595,7 @@
 
     [squinterToolbar validateVisibleItems];
     [self refreshDevicesPopup];
-    [self refreshDevicegroupMenu];
+    [self refreshDeviceGroupsSubmenu];
 }
 
 
@@ -5655,7 +5685,6 @@
                              [openDialog orderOut:self];
 
                              if (result == NSFileHandlingPanelOKButton) [self openFileHandler:[openDialog URLs] :openActionType];
-                             return;
                          }
      ];
 
@@ -5747,8 +5776,9 @@
     BOOL projectMoved = NO;
 
     url = [urls objectAtIndex:0];
-    filePath = [url path];
     [urls removeObjectAtIndex:0];
+    
+    filePath = [url path];
     aProject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
 
     if (aProject != nil)
@@ -5763,7 +5793,7 @@
             // which uses 'devicegroups' to store old file location data and 'description' to
             // hold the number and type of files
 
-            [self writeStringToLog:[NSString stringWithFormat:@"Converting an earlier Squirrel project file (%@) to a current one (%@)", aProject.version, kSquinterCurrentVersion] :YES];
+            [self writeStringToLog:[NSString stringWithFormat:@"Converting an older project file (version %@) to a current one (version %@)", aProject.version, kSquinterCurrentVersion] :YES];
 
             NSString *agentPath, *devicePath;
             Model *model;
@@ -5879,7 +5909,7 @@
                     {
                         // Filename-derived project name doesn't match an existing name, so use that
 
-                        [self writeStringToLog:[NSString stringWithFormat:@"A Project called \"%@\" is already loaded so the new Project's filename, \"%@.squirrelproj\", will be used", aName, newName] :YES];
+                        [self writeStringToLog:[NSString stringWithFormat:@"A project called \"%@\" is already loaded so the new project's filename, \"%@.squirrelproj\", will be used", aName, newName] :YES];
                     }
                     else
                     {
@@ -5984,7 +6014,7 @@
             currentProject.path = [filePath stringByDeletingLastPathComponent];
             currentProject.filename = [filePath lastPathComponent];
 
-            [self writeStringToLog:[NSString stringWithFormat:@"Loading Project \"%@\" from file \"%@\".", currentProject.name, filePath] :YES];
+            [self writeStringToLog:[NSString stringWithFormat:@"Loading project \"%@\" from file \"%@\".", currentProject.name, filePath] :YES];
 
             // Are the loaded and stored paths different?
 
@@ -6019,7 +6049,7 @@
 
                         NSAlert *alert = [[NSAlert alloc] init];
                         alert.messageText = @"This project has been updated from an earlier version.";
-                        alert.informativeText = [NSString stringWithFormat:@"You can upload project \"%@\" as a new product, or you may prefer to associate it with an existing product or upload it later. If you see processing errors in the log, you should not upload this project.", currentProject.name];
+                        alert.informativeText = [NSString stringWithFormat:@"You can upload project “%@’ as a new product, or you may prefer to associate it with an existing product or upload it later. If you see processing errors in the log, you should not upload this project.", currentProject.name];
                         [alert addButtonWithTitle:@"Upload Now"];
                         [alert addButtonWithTitle:@"Later"];
                         [alert setAlertStyle:NSAlertStyleWarning];
@@ -6045,7 +6075,7 @@
 
                         NSAlert *alert = [[NSAlert alloc] init];
                         alert.messageText = @"You are not logged in to your account.";
-                        alert.informativeText = [NSString stringWithFormat:@"You will need to upload project \"%@\" manually later, after you have logged in.", currentProject.name];
+                        alert.informativeText = [NSString stringWithFormat:@"You will need to upload project “%@” manually later, after you have logged in.", currentProject.name];
                         [alert addButtonWithTitle:@"OK"];
                         [alert setAlertStyle:NSAlertStyleWarning];
                         [alert beginSheetModalForWindow:_window completionHandler:^(NSModalResponse returnCode) { }];
@@ -6170,7 +6200,9 @@
                         {
                             // The project doesn't match any known product. Perhaps it's on the wrong account, so check
 
-                            if (currentProject.aid != nil && currentProject.aid.length > 0 && ide.isLoggedIn)
+                            if (currentProject.aid != nil &&
+                                currentProject.aid.length > 0 &&
+                                ide.isLoggedIn)
                             {
                                 if ([currentProject.aid compare:ide.currentAccount] != NSOrderedSame)
                                 {
@@ -6192,7 +6224,8 @@
                         // in the current account, but we can check, if we're logged in, that the project account ID and the
                         // current account ID match — if not, we need to warn the user
 
-                        if (ide.isLoggedIn && currentProject.aid != nil &&
+                        if (ide.isLoggedIn &&
+                            currentProject.aid != nil &&
                             currentProject.aid.length > 0 &&
                             [ide.currentAccount compare:currentProject.aid] != NSOrderedSame)
                         {
@@ -6260,7 +6293,7 @@
             // Update the Project menu’s 'openProjectsMenu' sub-menu by adding the project's name
             // (or 'newName' if we are using a temporary name because of a match with a project on the list)
 
-            [self addProjectMenuItem:(newName != nil ? newName : currentProject.name) :currentProject];
+            [self addOpenProjectsMenuItem:(newName != nil ? newName : currentProject.name) :currentProject];
 
             // Do we have any device groups in the project?
 
@@ -6297,11 +6330,11 @@
 
                 if ([defaults boolForKey:@"com.bps.squinter.autocompile"])
                 {
-                    [self writeStringToLog:@"Auto-compiling the Project's Device Groups. This can be disabled in Preferences." :YES];
+                    [self writeStringToLog:@"Auto-compiling the project's device groups. This can be disabled in Preferences." :YES];
 
-                    for (Devicegroup *dg in currentProject.devicegroups)
+                    for (Devicegroup *devicegroup in currentProject.devicegroups)
                     {
-                        if (dg.models.count > 0) [self compile:dg :NO];
+                        if (devicegroup.models.count > 0) [self compile:devicegroup :NO];
                     }
 
                     // Add the mail project files to the watch list
@@ -6361,7 +6394,7 @@
 
                                     [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find source file \"%@\" at expected location %@.", model.filename, [self getPrintPath:currentProject.path :model.path]] :YES];
 
-                                    [self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", devicegroup.name] :YES];
+                                    [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" cannot be compiled until this is resolved.", devicegroup.name] :YES];
 
                                     model.hasMoved = YES;
                                 }
@@ -6419,14 +6452,17 @@
 
             [self selectFirstDevice];
 
-            // Update the Menus and the Toolbar
+            // Update the UI:
+            // The 'Projects' menu and its 'Open Projects' submenu
+            // The 'Device Groups' menu and its 'Project's Device Groups' submenu
+            // The 'Device' menu (because the Device Group will have changed)
+            // The Toolbar
 
-            [self refreshOpenProjectsMenu];    // Need this or we crash in refreshDevicegroupMenu: TODO - check why
             [self refreshProjectsMenu];
-            [self refreshDevicegroupMenu];
-            [self refreshMainDevicegroupsMenu];
+            [self refreshOpenProjectsSubmenu];    // Need this or we crash in refreshDeviceGroupsSubmenu: TODO - check why
+            [self refreshDeviceGroupsMenu];
+            [self refreshDeviceGroupsSubmenu];
             [self refreshDeviceMenu];
-
             [self setToolbar];
 
             // Set the status light - light is YES to be not greyed out; full is YES (solid) or NO (empty)
@@ -6451,7 +6487,8 @@
     }
 
     // Call the method again in case there are any URLs left to deal with
-
+    // NOTE The 'urls' list is tested at the start of the method
+    
     [self openSquirrelProjects:urls];
 }
 
@@ -6491,7 +6528,7 @@
     {
         [self writeWarningToLog:[NSString stringWithFormat:@"[WARNING] Could not find %@ \"%@\" at expected location %@ - source or project file has moved.", type, file.filename, [self getPrintPath:currentProject.path :file.path]] :YES];
 
-        [self writeStringToLog:[NSString stringWithFormat:@"Device Group \"%@\" cannot be compiled until this is resolved.", devicegroup.name] :YES];
+        [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" cannot be compiled until this is resolved.", devicegroup.name] :YES];
 
         file.hasMoved = YES;
     }
@@ -6624,12 +6661,12 @@
     if (currentDevicegroup != nil)
     {
         accessoryViewNewProjectCheckbox.state = NSOffState;
-        accessoryViewNewProjectCheckbox.title = [NSString stringWithFormat:@"Create a new Device Group with the file(s) – or uncheck to add the file(s) to Group \"%@\"", currentDevicegroup.name];
+        accessoryViewNewProjectCheckbox.title = [NSString stringWithFormat:@"Create a new device group with the file(s) – or uncheck to add the file(s) to group \"%@\"", currentDevicegroup.name];
     }
     else
     {
         accessoryViewNewProjectCheckbox.state = NSOnState;
-        accessoryViewNewProjectCheckbox.title = @"Create a new Device Group with the file(s)";
+        accessoryViewNewProjectCheckbox.title = @"Create a new device group with the file(s)";
     }
 
     // Add the accessory view to the panel
@@ -6653,8 +6690,8 @@
         // There's no point adding files to a non-existent and non-created device group
 
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = @"You have no Device Group selected. To add files, you must create a new Device Group for the added files";
-        alert.informativeText = @"Alternatively, cancel the 'add files' process and create a new Device Group separately.";
+        alert.messageText = @"You have no device group selected. To add files, you must create a new device group for the added files";
+        alert.informativeText = @"Alternatively, cancel the process and create a new device group separately.";
         [alert beginSheetModalForWindow:openDialog
                       completionHandler:^(NSModalResponse response)
                         {
@@ -6720,9 +6757,9 @@
 
         // Update the UI
 
-        [self refreshOpenProjectsMenu];
-        [self refreshDevicegroupMenu];
-        [self refreshMainDevicegroupsMenu];
+        [self refreshOpenProjectsSubmenu];
+        [self refreshDeviceGroupsSubmenu];
+        [self refreshDeviceGroupsMenu];
         [self setToolbar];
 
         return;
@@ -6862,7 +6899,7 @@
                     // We already have a source code file reference, so ask if the user wants to use the new one
 
                     NSAlert *alert = [[NSAlert alloc] init];
-                    alert.messageText = [NSString stringWithFormat:@"Device Group \"%@\" already has %@ code. Do you wish to replace it?", currentDevicegroup.name, fileType];
+                    alert.messageText = [NSString stringWithFormat:@"Device group “%@” already has %@ code. Do you wish to replace it?", currentDevicegroup.name, fileType];
                     [alert addButtonWithTitle:@"Yes"];
                     [alert addButtonWithTitle:@"No"];
                     [alert beginSheetModalForWindow:_window
@@ -6958,7 +6995,7 @@
 
     if (savingProject == nil)
     {
-        [self writeWarningToLog:@"[WARNING] You have not selected a Project to save." :YES];
+        [self writeWarningToLog:@"[WARNING] You have not selected a project to save." :YES];
         return;
     }
 
@@ -7009,7 +7046,7 @@
 
     if (savingProject == nil)
     {
-        [self writeWarningToLog:@"[WARNING] You have not selected a Project to save." :YES];
+        [self writeWarningToLog:@"[WARNING] You have not selected a project to save." :YES];
         return;
     }
 
@@ -7166,7 +7203,7 @@
     }
     else
     {
-        [self writeErrorToLog:@"The Project file could not be saved." :YES];
+        [self writeErrorToLog:@"The project file could not be saved." :YES];
 
         // TODO Do we bail at this point, ie. return at this point, not try and save the model files?
         //      eg. savingProject = nil;
@@ -7471,11 +7508,11 @@
     [saveLight show];
     [saveLight needSave:NO];
 
-    [self refreshOpenProjectsMenu];
+    [self refreshOpenProjectsSubmenu];
     [self refreshProjectsMenu];
-    [self refreshDevicegroupMenu];
-    [self refreshMainDevicegroupsMenu];
-
+    [self refreshDeviceGroupsMenu];
+    [self refreshDeviceGroupsSubmenu];
+    
     if (project == currentProject) iwvc.project = project;
 
     // We now need to re-save the project file, which now contains the locations
@@ -7922,23 +7959,23 @@
         for (NSUInteger i = 0 ; i < inset ; ++i) spaces = [spaces stringByAppendingString:@" "];
     }
     
-    [lines addObject:[NSString stringWithFormat:@"%@Device Group \"%@\"", spaces, devicegroup.name]];
+    [lines addObject:[NSString stringWithFormat:@"%@Device group \"%@\"", spaces, devicegroup.name]];
     
     if (devicegroup.did != nil && devicegroup.did.length > 0 && [devicegroup.did compare:@"old"] != NSOrderedSame)
     {
-        [lines addObject:[NSString stringWithFormat:@"%@Device Group ID: %@", spaces, devicegroup.did]];
+        [lines addObject:[NSString stringWithFormat:@"%@Device group ID: %@", spaces, devicegroup.did]];
     }
     else
     {
-        [lines addObject:[NSString stringWithFormat:@"%@Device Group not uploaded to the impCloud", spaces]];
+        [lines addObject:[NSString stringWithFormat:@"%@Device group not uploaded to the impCloud", spaces]];
     }
     
     if (devicegroup.mdid != nil || devicegroup.mdid.length > 0)
     {
-        [lines addObject:[NSString stringWithFormat:@"%@Minimum Supported Deployment Set (ID: %@)", spaces, devicegroup.mdid]];
+        [lines addObject:[NSString stringWithFormat:@"%@Minimum supported deployment set (ID: %@)", spaces, devicegroup.mdid]];
     }
     
-    [lines addObject:[NSString stringWithFormat:@"%@Device Group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
+    [lines addObject:[NSString stringWithFormat:@"%@Device group type: %@", spaces, [self convertDevicegroupType:devicegroup.type :NO]]];
     
     if (devicegroup.data != nil && [devicegroup.type containsString:@"fixture"])
     {
@@ -7953,7 +7990,7 @@
             {
                 if ([dg.did compare:tid] == NSOrderedSame)
                 {
-                    [lines addObject:[NSString stringWithFormat:@"%@Target %@Production Device Group: %@", spaces, prefix, dg.name]];
+                    [lines addObject:[NSString stringWithFormat:@"%@Target %@Production device group: %@", spaces, prefix, dg.name]];
                     break;
                 }
             }
@@ -7969,7 +8006,7 @@
             {
                 if ([dg.did compare:tid] == NSOrderedSame)
                 {
-                    [lines addObject:[NSString stringWithFormat:@"%@Target %@DUT Device Group: %@", spaces, prefix, dg.name]];
+                    [lines addObject:[NSString stringWithFormat:@"%@Target %@DUT device group: %@", spaces, prefix, dg.name]];
                     break;
                 }
             }
@@ -7980,11 +8017,11 @@
     {
         if (devicegroup.models.count == 1)
         {
-            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has 1 source code file:", spaces]];
+            [lines addObject:[NSString stringWithFormat:@"\n%@This device group has 1 source code file:", spaces]];
         }
         else
         {
-            [lines addObject:[NSString stringWithFormat:@"\n%@This Device Group has %li source code files:", spaces, (long)devicegroup.models.count]];
+            [lines addObject:[NSString stringWithFormat:@"\n%@This device group has %li source code files:", spaces, (long)devicegroup.models.count]];
         }
         
         for (NSUInteger j = 0 ; j < devicegroup.models.count ; ++j)
@@ -8002,7 +8039,7 @@
     }
     else
     {
-        [lines addObject:[NSString stringWithFormat:@"%@This Device Group has no source code yet.", spaces]];
+        [lines addObject:[NSString stringWithFormat:@"%@This device group has no source code yet.", spaces]];
     }
     
     // Get devices for this device group
@@ -8020,7 +8057,7 @@
             {
                 if (first)
                 {
-                    [lines addObject:[NSString stringWithFormat:@"\n%@The following device(s) have been assigned to this Device Group:", spaces]];
+                    [lines addObject:[NSString stringWithFormat:@"\n%@The following device(s) have been assigned to this device group:", spaces]];
                     first = NO;
                 }
                 

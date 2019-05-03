@@ -435,6 +435,7 @@
 - (IBAction)newProjectSheetCancel:(id)sender;
 - (IBAction)newProjectSheetCreate:(id)sender;
 - (void)newProjectSheetCreateStageTwo:(NSString *)projectName :(NSString *)projectDesc :(BOOL)make :(BOOL)associate;
+- (void)newProjectSheetCreateStageThree:(Project *)newProject;
 - (IBAction)newProjectCheckboxStateHandler:(id)sender;
 
 

@@ -14,17 +14,17 @@
 
 // Projects menu
 - (void)refreshProjectsMenu;
-- (void)refreshOpenProjectsMenu;
+- (void)refreshOpenProjectsSubmenu;
 - (void)refreshProductsMenu;
 - (void)setProductsMenuTick;
-- (BOOL)addProjectMenuItem:(NSString *)menuItemTitle :(Project *)aProject;
+- (BOOL)addOpenProjectsMenuItem:(NSString *)title :(Project *)aProject;
 
 // Device Groups menu
-- (void)refreshDevicegroupMenu;
+- (void)refreshDeviceGroupsSubmenu;
 - (void)refreshDevicegroupByType:(NSString *)type;
-- (void)refreshMainDevicegroupsMenu;
+- (void)refreshDeviceGroupsMenu;
 - (void)defaultExternalMenus;
-- (void)refreshDevicesMenus;
+- (void)refreshDeviceGroupSubmenuDevices;
 - (void)setDevicesMenusTicks;
 - (void)refreshLibraryMenus;
 - (void)libAdder:(NSMutableArray *)libs :(BOOL)isEILib;
