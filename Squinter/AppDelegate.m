@@ -246,8 +246,8 @@
     inspectorItem.inactiveImageName = @"inspect_grey";
     inspectorItem.toolTip = @"Show or hide the project and device inspector";
 
-    syncItem.activeImageName = @"refresh";
-    syncItem.inactiveImageName = @"refresh_grey";
+    syncItem.activeImageName = @"sync";
+    syncItem.inactiveImageName = @"sync_grey";
     syncItem.toolTip = @"Sync the project to the impCloud, uploading if necessary";
     
     projectsPopUp.toolTip = @"Select an open project";
