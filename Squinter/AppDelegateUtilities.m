@@ -6,28 +6,40 @@
 
 #import "AppDelegateUtilities.h"
 
+
 @implementation AppDelegate(AppDelegateUtilities)
 
 
+#pragma mark - File Path Manipulation and Presentation Methods
 
-#pragma mark - File Path Methods
 
-
-- (NSString *)getDisplayPath:(NSString *)path
+- (NSString *)getDisplayPath:(NSString *)filePath
 {
     // Convert a path string to the format required by the user's preference
+    // NOTE This assumes we are dealing the the current project
+    // NOTE Called by 'InspectorView.m' - can we convert to 'getPrintPath:'
     
     NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
 
-	if (index == 0) path = [self getAbsolutePath:currentProject.path :path];
+	if (index == 0 || index == 2) filePath = [self getAbsolutePath:currentProject.path :filePath];
+	if (index == 2) filePath = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[filePath stringByDeletingLastPathComponent]];
 
-	if (index == 2)
-	{
-		path = [self getAbsolutePath:currentProject.path :path];
-		path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[path stringByDeletingLastPathComponent]];
-	}
+	return filePath;
+}
 
-	return path;
+
+
+- (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath
+{
+    // Takes an absolute path to a project and a file path relative to that same project,
+    // and returns the user's preferred style of path for printing
+    
+    NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
+    
+    if (index == 0 || index == 2) filePath = [self getAbsolutePath:projectPath :filePath];
+    if (index == 2) filePath = [@"~" stringByAppendingString:[self getRelativeFilePath:@"~" :filePath]];
+    
+    return filePath;
 }
 
 
@@ -35,8 +47,7 @@
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath
 {
     // This method takes an absolute location ('filePath') and returns a location relative
-    // to another location ('basePath'). Typically, this is the path to the host
-    // project
+    // to another location ('basePath'). Typically, this is the path to the host project
 
     basePath = [basePath stringByStandardizingPath];
     filePath = [filePath stringByStandardizingPath];
@@ -55,22 +66,16 @@
         if (r.location != NSNotFound)
         {
             // The file path contains the base path, eg.
-            // '/Users/smitty/documents/github/squinter/files'
-            // contains
-            // '/Users/smitty/documents/github/squinter'
+            // '/Users/smitty/documents/github/squinter/files' contains '/Users/smitty/documents/github/squinter'
 
             theFilePath = [theFilePath substringFromIndex:r.length];
-            //theFilePath = [theFilePath stringByAppendingFormat:@"/%@", theFileName];
         }
         else
         {
             // The file path does not contain the base path, eg.
-            // '/Users/smitty/downloads'
-            // doesn't contain
-            // '/Users/smitty/documents/github/squinter'
+            // '/Users/smitty/downloads' doesn't contain '/Users/smitty/documents/github/squinter'
 
             theFilePath = [self getPathDelta:basePath :theFilePath];
-            //theFilePath = [theFilePath stringByAppendingString:theFileName];
         }
     }
     else if (nf < nb) // theFilePath.length < basePath.length
@@ -80,13 +85,10 @@
         if (r.location != NSNotFound)
         {
             // The base path contains the file path, eg.
-            // '/Users/smitty/documents/github/squinter/files'
-            // contains
-            // '/Users/smitty/documents'
+            // '/Users/smitty/documents/github/squinter/files' contains '/Users/smitty/documents'
 
             theFilePath = [basePath substringFromIndex:r.length];
             NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
-            //theFilePath = theFileName;
 
             // Add in '../' for each directory in the base path but not in the file path
 
@@ -98,12 +100,9 @@
         else
         {
             // The base path doesn't contains the file path, eg.
-            // '/Users/smitty/documents/github/squinter/files'
-            // doesn't contain
-            // '/Users/smitty/downloads'
+            // '/Users/smitty/documents/github/squinter/files' doesn't contain '/Users/smitty/downloads'
 
             theFilePath = [self getPathDelta:basePath :theFilePath];
-            //theFilePath = [theFilePath stringByAppendingString:theFileName];
         }
     }
     else
@@ -113,21 +112,16 @@
         if ([theFilePath compare:basePath] == NSOrderedSame)
         {
             // The file path and the base patch are the same, eg.
-            // '/Users/smitty/documents/github/squinter'
-            // matches
-            // '/Users/smitty/documents/github/squinter'
+            // '/Users/smitty/documents/github/squinter' matches '/Users/smitty/documents/github/squinter'
 
             theFilePath = @"";
         }
         else
         {
             // The file path and the base patch are not the same, eg.
-            // '/Users/smitty/documents/github/squinter'
-            // matches
-            // '/Users/smitty/downloads/archive/nofiles'
+            // '/Users/smitty/documents/github/squinter' matches '/Users/smitty/downloads/archive/nofiles'
 
             theFilePath = [self getPathDelta:basePath :theFilePath];
-            //theFilePath = [theFilePath stringByAppendingString:theFileName];
         }
     }
 
@@ -202,32 +196,6 @@
     NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
     absolutePath = [absolutePath stringByStandardizingPath];
     return absolutePath;
-}
-
-
-
-- (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath
-{
-    // Takes an absolute path to a project and a file path relative to that same project,
-    // and returns the user's preferred style of path for printing
-
-    NSInteger pathType = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
-
-    switch (pathType)
-    {
-        case 0:
-            // Absolute Path
-            return [self getAbsolutePath:projectPath :filePath];
-        case 1:
-            // Path relative to project DEFAULT
-            return filePath;
-            break;
-
-        default:
-            // Path relative to home
-            return [@"~" stringByAppendingString:[self getRelativeFilePath:@"~" :[self getAbsolutePath:projectPath :filePath]]];
-            break;
-    }
 }
 
 
@@ -321,7 +289,7 @@
 
 
 
-#pragma mark - Boookmark Methods
+#pragma mark - Bookmark Handling Methods
 
 
 // The following two methods convert URLs <-> bookmark records
@@ -411,7 +379,8 @@
 - (NSFont *)setLogViewFont:(NSString *)fontName :(NSInteger)fontSize :(BOOL)isBold
 {
 	// Return a suitable font for displaying entries in the log, based on user preference
-
+    // NOTE Not sure this actually works to display bold fonts!
+    
 	NSFontManager *fontManager = [NSFontManager sharedFontManager];
 	NSFont *font;
 
@@ -486,6 +455,7 @@
 
 
 // The following seven methods apply the colour chosen in the picker to the relevant colorWell
+// on the Preferences panel's 'Log' tab
 
 - (void)showPanelForText { [textColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
 - (void)showPanelForBack { [backColorWell setColor:[NSColorPanel sharedColorPanel].color]; }
@@ -500,12 +470,77 @@
 
 
 
+- (void)setWorkingDirectory:(NSArray *)urls
+{
+    // Set the path to the Working Directory on the Preferences panel's 'General' tab
+    
+    NSURL *url = [urls objectAtIndex:0];
+    NSString *path = [url path];
+    workingDirectoryField.stringValue = path;
+}
+
+
+
+- (NSString *)getFontName:(NSInteger)index
+{
+    // Return the font name from an index in the font list pop-up on the Preferences panel's 'Log' tab
+    
+    NSString *fontName = @"";
+    
+    switch (index)
+    {
+        case 0:
+            fontName = @"Andale Mono";
+            break;
+            
+        case 1:
+            fontName = @"Courier";
+            break;
+            
+        case 2:
+            fontName = @"Menlo";
+            break;
+            
+        case 3:
+            fontName = @"Monaco";
+            break;
+            
+        case 4:
+            fontName = @"Source Code Pro";
+            break;
+            
+        default:
+            fontName = @"Menlo";
+    }
+    
+    return fontName;
+}
+
+
+
+- (NSInteger)perceivedBrightness:(NSColor *)colour
+{
+    // Returns the perceived brightness of the specified colour
+    // Used to pick colours that will stand out against the log's background color
+    
+    CGFloat red, blue, green, alpha;
+    [colour colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
+    [colour getRed:&red green:&green blue:&blue alpha:&alpha];
+    red = red * 255;
+    blue = blue * 255;
+    green = green * 255;
+    return (NSInteger)sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068));
+}
+
+
+
 #pragma mark - Sleep/Wake Methods
 
 
 - (void)receiveSleepNote:(NSNotification *)note
 {
-    // Computer is about to sleep, so quickly
+    // Computer is about to sleep, so quickly display a note in the log
+    // TODO Make this do something useful: correctly suspend logging and restart on wake
     
     if (ide.isLoggedIn)
     {
@@ -535,13 +570,11 @@
 
 
 
-#pragma mark - Utility Methods
+#pragma mark - API Data Extraction Methods
 
 
 - (id)getValueFrom:(NSDictionary *)apiDict withKey:(NSString *)key
 {
-    NSDictionary *rd = nil;
-
     // This extracts the required key, wherever it is in the source (API) data
     // We also check here for null values, converting them to true nil
 
@@ -556,14 +589,12 @@
     if ([key compare:@"name"] == NSOrderedSame)
     {
         NSString *name = [apiDict valueForKeyPath:@"attributes.name"];
-        //if ((NSNull *)name == [NSNull null]) return nil;
         return [self checkForNull:name];
     }
 
     if ([key compare:@"description"] == NSOrderedSame)
     {
         NSString *desc = [apiDict valueForKeyPath:@"attributes.description"];
-        //if ((NSNull *)desc == [NSNull null]) return nil;
         return [self checkForNull:desc];
     }
 
@@ -580,15 +611,13 @@
 	if ([key compare:@"ip_address"] == NSOrderedSame)
 	{
 		NSString *ip = [apiDict valueForKeyPath:@"attributes.ip_address"];
-		//if ((NSNull *)ip == [NSNull null]) return nil;
 		return [self checkForNull:ip];
 	}
 
 	if ([key compare:@"last_enrolled_at"] == NSOrderedSame)
 	{
 		NSString *date = [apiDict valueForKeyPath:@"attributes.last_enrolled_at"];
-		//if ((NSNull *)date == [NSNull null]) return nil;
-        date = [self checkForNull:date];
+		date = [self checkForNull:date];
         return [self convertTimestring:date];
 	}
 
@@ -602,51 +631,46 @@
     if ([key compare:@"agent_code"] == NSOrderedSame)
     {
         NSString *ac = [apiDict valueForKeyPath:@"attributes.agent_code"];
-        //if ((NSNull *)ac == [NSNull null]) return nil;
         return [self checkForNull:ac];
     }
 
     if ([key compare:@"device_code"] == NSOrderedSame)
     {
         NSString *dc = [apiDict valueForKeyPath:@"attributes.device_code"];
-        //if ((NSNull *)dc == [NSNull null]) return nil;
         return [self checkForNull:dc];
     }
 
     if ([key compare:@"origin"] == NSOrderedSame)
     {
         NSString *or = [apiDict valueForKeyPath:@"attributes.origin"];
-        //if ((NSNull *)or == [NSNull null]) return nil;
         return [self checkForNull:or];
     }
 
     if ([key compare:@"tags"] == NSOrderedSame)
     {
         NSArray *tags = [apiDict valueForKeyPath:@"attributes.tags"];
-        //if ((NSNull *)tags == [NSNull null]) return nil;
-        return [self checkForNull:tags];
+       return [self checkForNull:tags];
     }
 
 	if ([key compare:@"free_memory"] == NSOrderedSame) {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.free_memory"];
-		//if ((NSNull *)num == [NSNull null]) return nil;
 		return [self checkForNull:num];
 	}
 
 	if ([key compare:@"rssi"] == NSOrderedSame) {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.rssi"];
-		//if ((NSNull *)num == [NSNull null]) return nil;
 		return [self checkForNull:num];
 	}
 
 	if ([key compare:@"plan_id"] == NSOrderedSame) {
 		NSString *plan = [apiDict valueForKeyPath:@"plan_id"];
-		//if ((NSNull *)plan == [NSNull null]) return nil;
 		return [self checkForNull:plan];
 	}
 
     // Relationships properties
 
+    NSDictionary *rd = nil;
+    
     if ([key compare:@"product"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.product"];
     if ([key compare:@"devicegroup"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.devicegroup"];
 	if ([key compare:@"min_supported_deployment"] == NSOrderedSame) rd = [apiDict valueForKeyPath:@"relationships.min_supported_deployment"];
@@ -662,9 +686,14 @@
 
 - (id)checkForNull:(id)value
 {
+    // Convert an input formal null value to nil
+    
     return ((NSNull *)value == [NSNull null] ? nil : value);
 }
 
+
+
+#pragma mark - Device Group Utility Methods
 
 
 - (void)updateDevicegroup:(Devicegroup *)devicegroup
@@ -783,6 +812,113 @@
 
 
 
+- (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces
+{
+    // Takes a device group or project description, adds a caption, and formats it as a series
+    // of lines up to the specified length 'maxWidth', breaking at spaces not mid-word
+    // Used by the 'showProjectInfo:' and 'showDevicegroupInfo:' methods
+    
+    description = [NSString stringWithFormat:@"Description: %@", description];
+    
+    NSInteger count = 0;
+    NSMutableArray *lines = [[NSMutableArray alloc] init];
+    
+    while (count < description.length)
+    {
+        NSRange range = NSMakeRange(count, maxWidth);
+        
+        if (count + maxWidth > description.length) range = NSMakeRange(count, description.length - count);
+        
+        NSString *line = [description substringWithRange:range];
+        NSInteger back = 1;
+        BOOL done = NO;
+        
+        if (line.length == maxWidth)
+        {
+            // Only process a line if it's the full width
+            
+            do
+            {
+                // Work back from the list line character
+                
+                range = NSMakeRange(line.length - back, 1);
+                NSString *last = [line substringWithRange:range];
+                
+                if ([last compare:@" "] == NSOrderedSame)
+                {
+                    // Found a space
+                    
+                    done = YES;
+                    line = [line substringToIndex:line.length - back];
+                }
+                else
+                {
+                    back++;
+                }
+                
+            }
+            while (!done);
+        }
+        
+        [lines addObject:[spaces stringByAppendingString:line]];
+        
+        count = count + line.length + 1;
+    }
+    
+    return lines;
+}
+
+
+
+- (void)setDevicegroupDevices:(Devicegroup *)devicegroup
+{
+    // Ensure the specified device group's 'devices' property references all of the
+    // devices that have been assigned to the specified device group
+    // This is typically performed after loading a project, as we don't store
+    // this information
+    
+    if (devicesArray.count > 0)
+    {
+        for (NSMutableDictionary *device in devicesArray)
+        {
+            NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
+            NSString *dgid = [self getValueFrom:dg withKey:@"id"];
+            
+            if (devicegroup.did != nil && devicegroup.did.length > 0 && ([devicegroup.did compare:dgid] == NSOrderedSame))
+            {
+                if (devicegroup.devices == nil) devicegroup.devices = [[NSMutableArray alloc] init];
+                
+                BOOL flag = NO;
+                
+                NSString *dvn = [self getValueFrom:device withKey:@"id"]; // [self getValueFrom:device withKey:@"name"];
+                
+                if (devicegroup.devices.count > 0)
+                {
+                    for (NSString *dgdevice in devicegroup.devices)
+                    {
+                        if ([dvn compare:dgdevice] == NSOrderedSame)
+                        {
+                            // Device is already on the list
+                            
+                            flag = YES;
+                            break;
+                        }
+                    }
+                }
+                
+                // Add the name to the list of device group devices as it's not already present
+                
+                if (!flag && dvn != nil) [devicegroup.devices addObject:dvn];
+            }
+        }
+    }
+}
+
+
+
+#pragma mark - Date and Time Conversion Methods
+
+
 - (NSDate *)convertTimestring:(NSString *)dateString
 {
     // Return an NSDate object the represents the date and time specified in the input string
@@ -797,6 +933,8 @@
 
 - (NSString *)convertDate:(NSDate *)date
 {
+    // Convert an incoming date string to Squinter style
+    
     NSString *dateString = [def stringFromDate:date];
     return dateString;
 }
@@ -805,7 +943,7 @@
 
 - (NSString *)formatTimestamp:(NSString *)timestamp
 {
-	// The input string, which records a date and time, to meet Squinter's requirements
+	// Update the input string, which records a date and time, to meet Squinter's requirements
     
     timestamp = [outLogDef stringFromDate:[inLogDef dateFromString:timestamp]];
 	timestamp = [timestamp stringByReplacingOccurrencesOfString:@"GMT" withString:@""];
@@ -813,6 +951,60 @@
 	return timestamp;
 }
 
+
+
+#pragma mark - Alert Methods
+
+
+- (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow
+{
+    // Warn that the project isn't in the current account
+    
+    [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
+                      :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
+                      :sheetWindow];
+}
+
+
+- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow
+{
+    // Warn that the device group isn't in the current account
+    
+    Project *project = [self getParentProject:devicegroup];
+    
+    [self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
+                      :[NSString stringWithFormat:@"To %@ this device group, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
+                      :sheetWindow];
+}
+
+
+
+- (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow
+{
+    // Present a generic 'wrong account' warning
+    
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = head;
+    alert.informativeText = body;
+    [alert addButtonWithTitle:@"OK"];
+    [alert beginSheetModalForWindow:sheetWindow completionHandler:nil];
+}
+
+
+- (void)unsavedAlert:(NSString *)name :(NSString *)message :(NSWindow *)sheetWindow
+{
+    // FROM 2.3.128
+    // Display a warning if the project is unsaved
+    
+    NSString *head= [NSString stringWithFormat:@"Project “%@” has not been saved", name];
+    NSString *msg = [NSString stringWithFormat:@"Please save this project before %@.", message];
+    [self accountAlert:head :msg :sheetWindow];
+    
+}
+
+
+
+#pragma mark - Misc Methods
 
 
 - (NSString *)getErrorMessage:(NSUInteger)index
@@ -838,173 +1030,6 @@
     }
 
     return @"No Error";
-}
-
-
-
-- (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces
-{
-    // Takes a device group or project description, adds a caption, and formats it as a series
-    // of lines up to the specified length 'maxWidth', breaking at spaces not mid-word
-    // Used by the 'showProjectInfo:' and 'showDevicegroupInfo:' methods
-
-    description = [NSString stringWithFormat:@"Description: %@", description];
-
-    NSInteger count = 0;
-    NSMutableArray *lines = [[NSMutableArray alloc] init];
-
-    while (count < description.length)
-    {
-        NSRange range = NSMakeRange(count, maxWidth);
-
-        if (count + maxWidth > description.length) range = NSMakeRange(count, description.length - count);
-
-        NSString *line = [description substringWithRange:range];
-        NSInteger back = 1;
-        BOOL done = NO;
-
-        if (line.length == maxWidth)
-        {
-            // Only process a line if it's the full width
-
-            do
-            {
-                // Work back from the list line character
-
-                range = NSMakeRange(line.length - back, 1);
-                NSString *last = [line substringWithRange:range];
-
-                if ([last compare:@" "] == NSOrderedSame)
-                {
-                    // Found a space
-
-                    done = YES;
-                    line = [line substringToIndex:line.length - back];
-                }
-                else
-                {
-                    back++;
-                }
-
-            }
-            while (!done);
-        }
-
-        [lines addObject:[spaces stringByAppendingString:line]];
-
-        count = count + line.length + 1;
-    }
-
-    return lines;
-}
-
-
-
-- (void)setDevicegroupDevices:(Devicegroup *)devicegroup
-{
-    // Ensure the specified device group's 'devices' property references all of the
-    // devices that have been assigned to the specified device group
-    // This is typically performed after loading a project, as we don't store
-    // this information
-    
-    if (devicesArray.count > 0)
-    {
-        for (NSMutableDictionary *device in devicesArray)
-        {
-            NSDictionary *dg = [self getValueFrom:device withKey:@"devicegroup"];
-            NSString *dgid = [self getValueFrom:dg withKey:@"id"];
-
-            if (devicegroup.did != nil && devicegroup.did.length > 0 && ([devicegroup.did compare:dgid] == NSOrderedSame))
-            {
-                if (devicegroup.devices == nil) devicegroup.devices = [[NSMutableArray alloc] init];
-
-                BOOL flag = NO;
-
-                NSString *dvn = [self getValueFrom:device withKey:@"id"]; // [self getValueFrom:device withKey:@"name"];
-
-                if (devicegroup.devices.count > 0)
-                {
-                    for (NSString *dgdevice in devicegroup.devices)
-                    {
-                        if ([dvn compare:dgdevice] == NSOrderedSame)
-                        {
-                            // Device is already on the list
-
-                            flag = YES;
-                            break;
-                        }
-                    }
-                }
-
-                // Add the name to the list of device group devices as it's not already present
-
-                if (!flag && dvn != nil) [devicegroup.devices addObject:dvn];
-            }
-        }
-    }
-}
-
-
-
-- (void)setWorkingDirectory:(NSArray *)urls
-{
-    NSURL *url = [urls objectAtIndex:0];
-    NSString *path = [url path];
-    workingDirectoryField.stringValue = path;
-}
-
-
-
-- (NSString *)getFontName:(NSInteger)index
-{
-    // Return the font name from an index in a font list pop-up
-    
-    NSString *fontName = @"";
-
-    switch (index)
-    {
-        case 0:
-            fontName = @"Andale Mono";
-            break;
-
-        case 1:
-            fontName = @"Courier";
-            break;
-
-        case 2:
-            fontName = @"Menlo";
-            break;
-
-        case 3:
-            fontName = @"Monaco";
-            break;
-
-        case 4:
-            fontName = @"Source Code Pro";
-            break;
-
-        default:
-            fontName = @"Menlo";
-            break;
-    }
-
-    return fontName;
-}
-
-
-
-- (NSInteger)perceivedBrightness:(NSColor *)colour
-{
-    // Returns the perceived brightness of the specified colour
-    // Used to pick colours that will stand out against the log's background color
-
-    CGFloat red, blue, green, alpha;
-    [colour colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
-    [colour getRed:&red green:&green blue:&blue alpha:&alpha];
-    red = red * 255;
-    blue = blue * 255;
-    green = green * 255;
-    return (NSInteger)sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068));
 }
 
 
@@ -1042,57 +1067,6 @@
     // Returns YES or NO depending on whether the user is signed into the correct account
 
     return (project.aid.length > 0 && [project.aid compare:ide.currentAccount] != NSOrderedSame) ? NO : YES;
-}
-
-
-
-#pragma mark - Alert Methods
-
-
-- (void)projectAccountAlert:(Project *)project :(NSString *)action :(NSWindow *)sheetWindow
-{
-    // Warn that the project isn't in the current account
-    
-    [self accountAlert:[NSString stringWithFormat:@"Project “%@” is not associated with the current account", project.name]
-                      :[NSString stringWithFormat:@"To %@ this project, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
-                      :sheetWindow];
-}
-
-
-- (void)devicegroupAccountAlert:(Devicegroup *)devicegroup :(NSString *)action :(NSWindow *)sheetWindow
-{
-    // Warn that the device group isn't in the current account
-    
-    Project *project = [self getParentProject:devicegroup];
-
-    [self accountAlert:[NSString stringWithFormat:@"Device group “%@” is not associated with the current account", devicegroup.name]
-                      :[NSString stringWithFormat:@"To %@ this device group, you need to log out of your current account and log into the account it is associated with (ID %@)", action, project.aid]
-                      :sheetWindow];
-}
-
-
-
-- (void)accountAlert:(NSString *)head :(NSString *)body :(NSWindow *)sheetWindow
-{
-    // Present a generic 'wrong account' warning
-    
-    NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = head;
-    alert.informativeText = body;
-    [alert addButtonWithTitle:@"OK"];
-    [alert beginSheetModalForWindow:sheetWindow completionHandler:nil];
-}
-
-
-- (void)unsavedAlert:(NSString *)name :(NSString *)message :(NSWindow *)sheetWindow
-{
-    // FROM 2.3.128
-    // Display a warning if the project is unsaved
-    
-    NSString *head= [NSString stringWithFormat:@"Project “%@” has not been saved", name];
-    NSString *msg = [NSString stringWithFormat:@"Please save this project before %@.", message];
-    [self accountAlert:head :msg :sheetWindow];
-
 }
 
 

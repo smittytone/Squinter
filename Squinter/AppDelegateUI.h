@@ -10,8 +10,6 @@
 @interface AppDelegate(AppDelegateUI)
 
 
-// UI Update Methods
-
 // Projects menu
 - (void)refreshProjectsMenu;
 - (void)refreshOpenProjectsSubmenu;
@@ -49,7 +47,6 @@
 
 // Toolbar
 - (void)setToolbar;
-
 
 // Dock Menu Methods
 - (void)dockMenuAction:(id)sender;

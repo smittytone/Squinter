@@ -531,34 +531,6 @@
 - (IBAction)useFindDeviceSheet:(id)sender;
 
 
-// File Location and Opening Methods
-- (void)presentOpenFilePanel:(NSInteger)openActionType;
-- (void)openFileHandler:(NSArray *)urls :(NSInteger)openActionType;
-- (void)openSquirrelProjects:(NSMutableArray *)urls;
-- (void)checkFiles:(File *)file :(NSString *)oldPath :(NSString *)type :(Devicegroup *)devicegroup :(BOOL)projectMoved;
-- (BOOL)checkProjectPaths:(Project *)byProject :(NSString *)orProjectPath;
-- (BOOL)checkProjectNames:(Project *)byProject :(NSString *)orName;
-- (IBAction)selectFile:(id)sender;
-- (IBAction)newDevicegroupCheckboxHander:(id)sender;
-- (void)processAddedFiles:(NSMutableArray *)urls;
-- (IBAction)endSourceTypeSheet:(id)sender;
-- (IBAction)cancelSourceTypeSheet:(id)sender;
-- (void)processAddedFilesStageTwo:(NSMutableArray *)urls :(NSString *)fileType;
-
-
-// Save Project Methods
-- (void)savePrep:(NSURL *)saveDirectory :(NSString *)newFileName;
-- (IBAction)saveProjectAs:(id)sender;
-- (IBAction)saveProject:(id)sender;
-- (IBAction)cancelChanges:(id)sender;
-- (IBAction)ignoreChanges:(id)sender;
-- (IBAction)saveChanges:(id)sender;
-- (void)saveModelFiles:(Project *)project;
-- (void)saveFiles:(NSMutableArray *)files :(Project *)project;
-- (void)showFileSavePanel:(NSString *)path :(NSMutableArray *)files :(Project *)project;
-- (void)doneSaving:(Project *)project;
-
-
 // Log and Logging Methods
 - (IBAction)printLog:(id)sender;
 - (IBAction)showProjectInfo:(id)sender;
