@@ -371,10 +371,13 @@
 
                             // Device Group x Model y Library z Data
 
+                            // FROM 2.3.129 Skip the summary
+                            /*
                             node = [[TreeNode alloc] init];
                             node.key = @"Libraries";
                             node.value = [NSString stringWithFormat:@"%li local %@ imported", (long)model.libraries.count, (model.libraries.count > 1 ? @"libraries" : @"library")];
                             [pnode.children addObject:node];
+                            */
 
                             for (File *library in model.libraries)
                             {
@@ -412,10 +415,13 @@
 
                             // Device Group x Model y File z Data
 
+                            // FROM 2.3.129 Skip summary
+                            /*
                             node = [[TreeNode alloc] init];
                             node.key = @"Files";
                             node.value = [NSString stringWithFormat:@"%li local %@ imported", (long)model.files.count, (model.files.count > 1 ? @"files" : @"file")];
                             [pnode.children addObject:node];
+                             */
 
                             for (File *file in model.files)
                             {
