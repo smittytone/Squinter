@@ -279,7 +279,6 @@
 		3B36D1C81970A0990029CEC0 /* Squinter */ = {
 			isa = PBXGroup;
 			children = (
-				3BCEB7B3227AF1C00090B137 /* Squinter.entitlements */,
 				3B7ACF7E1CFEEBEA0080C3DB /* AppDelegate Classes */,
 				3B7ACF7D1CFEEBC10080C3DB /* UI Classes */,
 				3BCEB7BA227AF90E0090B137 /* Squinter entities */,
@@ -369,6 +368,7 @@
 				3BE520BB197554A0000BAD52 /* docicon.iconbuilder.icns */,
 				3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */,
 				3BF464111CF87C720094EF59 /* dsa_pub.pem */,
+				3BCEB7B3227AF1C00090B137 /* Squinter.entitlements */,
 			);
 			name = "Bundled Entities";
 			sourceTree = "<group>";
