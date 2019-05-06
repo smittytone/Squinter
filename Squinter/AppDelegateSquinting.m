@@ -80,8 +80,14 @@
 		if (aPath != nil)
 		{
 			[self writeStringToLog:[NSString stringWithFormat:@"Processing %@ code file: \"%@\"...", model.type, aPath.lastPathComponent] :YES];
-
-			output = [self processSource:aPath :typeValue :thisProject.path :model :!justACheck];
+            
+            NSDictionary *dict = @{ @"codepath"    : aPath,
+                                    @"type"        : [NSNumber numberWithUnsignedInteger:typeValue],
+                                    @"projectpath" : thisProject.path,
+                                    @"model"       : model,
+                                    @"returncode"  : [NSNumber numberWithBool:!justACheck] };
+            
+            output = [self processSource:dict];
 
 			if (output == nil && !justACheck)
 			{
@@ -173,27 +179,30 @@
 	[self refreshLibraryMenus];
 	[self refreshFilesMenu];
 	[self setToolbar];
+    
 	[saveLight needSave:thisProject.haschanged];
 }
 
 
 
-- (NSString *)processSource:(NSString *)codePath :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode
+- (NSString *)processSource:(NSDictionary *)source
 {
-	// Loads the contents of the source code file referenced by 'codePath' - 'codeType' indicates whether the code
-	// is agent or device - and parses it for multi-line comment blocks. Only code outside these blocks is passed
-	// on for further processing, ie. parsing for #require, #include or #import directives.
-
-	// 'willReturnCode' is set to YES if we want compiled code back; if we are only parsing the code for a list
-	// of included files and libraries, we can pass in NO.
-
-	// We return nil if there is a compilation error, otherwise the processed code
-
-	NSRange commentStartRange, commentEndRange;
-	NSString *compiledCode = @"";
-
-	// Attempt to load in the source text file's contents
-
+    // Loads the contents of the source code file and parses it for multi-line comment blocks.
+    // Only code outside these blocks is passed on for further processing,
+    // ie. parsing for #require, #include or #import directives.
+    // We return nil if there is a compilation error, otherwise the processed code
+    
+    // FROM 2.3.129 Pass in a dictionary, 'source', containing the arguments as values:
+    // 'codepath'    - The path (string) to the source code we're going to process
+    // 'projectpath' - the path (string) to the parent Squinter project
+    // 'type'        - An unsigned int indicating the type of code: 1 (agent) or 2 (device) - used for output
+    // 'model'       - The model whose code we're processing
+    // 'returncode'  - Should we return compiled code (YES) or not (NO) - this will be NO if we're just
+    //                 parsing the code for a list of included files and libraries.
+    
+    // Attempt to load in the source text file's contents
+    
+    NSString *codePath = [source objectForKey:@"codepath"];
 	NSError *error;
 	NSString *sourceCode = [NSString stringWithContentsOfFile:codePath encoding:NSUTF8StringEncoding error:&error];
 
@@ -202,14 +211,27 @@
 		[self writeErrorToLog:[NSString stringWithFormat:@"Unable to load source file \"%@\" - aborting compile.", codePath] :YES];
 		return nil;
 	}
-
+    
+    // Extract the remaining source data...
+    
+    NSString *projectPath = [source objectForKey:@"projectpath"];
+    NSNumber *codeType = [source objectForKey:@"type"];
+    Model *model = [source objectForKey:@"model"];
+    BOOL willReturnCode = [[source objectForKey:@"returncode"] boolValue];
+    
+    // ...and set up the processing variables
+    
+    NSDictionary *dict;
+    NSString *processedCode;
+    NSRange commentStartRange, commentEndRange;
+    NSString *compiledCode = @"";
+    NSUInteger index = 0;
+    BOOL done = NO;
+    
 	// Run through the loaded source code searching for multi-line comment blocks
 	// When we find one, we examine all the code between the newly found comment block
 	// and the previously found one (or the start of the file). 'index' records the location
 	// of the start of file or the end of the previous comment block
-
-	NSUInteger index = 0;
-	BOOL done = NO;
 
 	while (done == NO)
 	{
@@ -230,8 +252,15 @@
 			[self processRequires:codeToProcess];
 
 			// Check for #imports
+            
+            dict = @{ @"code"       : codeToProcess,
+                      @"search"     : @"#import",
+                      @"path"       : projectPath,
+                      @"type"       : codeType,
+                      @"model"      : model,
+                      @"returncode" : [NSNumber numberWithBool:willReturnCode] };
 
-			NSString *processedCode = [self processImports:codeToProcess :@"#import" :codeType :projectPath :model :willReturnCode];
+			processedCode = [self processImports:dict];
 
 			// 'processedCode' returns nil for an error, 'none' for no #imports or checks, and processed code otherwise
 
@@ -253,8 +282,15 @@
 			}
 
 			// Check for #includes
-
-			processedCode = [self processImports:codeToProcess :@"#include" :codeType :projectPath :model :willReturnCode];
+            
+            dict = @{ @"code"       : codeToProcess,
+                      @"search"     : @"#include",
+                      @"path"       : projectPath,
+                      @"type"       : codeType,
+                      @"model"      : model,
+                      @"returncode" : [NSNumber numberWithBool:willReturnCode] };
+            
+            processedCode = [self processImports:dict];
 
 			if (processedCode != nil)
 			{
@@ -308,8 +344,15 @@
 			NSString *codeToProcess = [sourceCode substringFromIndex:index];
 
 			[self processRequires:codeToProcess];
-
-			NSString *processedCode = [self processImports:codeToProcess :@"#import" :codeType :projectPath :model :willReturnCode];
+            
+            dict = @{ @"code"       : codeToProcess,
+                      @"search"     : @"#import",
+                      @"path"       : projectPath,
+                      @"type"       : codeType,
+                      @"model"      : model,
+                      @"returncode" : [NSNumber numberWithBool:willReturnCode] };
+            
+            processedCode = [self processImports:dict];
 
 			if (processedCode != nil)
 			{
@@ -328,9 +371,16 @@
 				if (willReturnCode) return nil;
 			}
 
-			processedCode = [self processImports:codeToProcess :@"#include" :codeType :projectPath :model :willReturnCode];
-
-			if (processedCode != nil)
+            dict = @{ @"code"       : codeToProcess,
+                      @"search"     : @"#include",
+                      @"path"       : projectPath,
+                      @"type"       : codeType,
+                      @"model"      : model,
+                      @"returncode" : [NSNumber numberWithBool:willReturnCode] };
+            
+            processedCode = [self processImports:dict];
+            
+            if (processedCode != nil)
 			{
 				if (([processedCode compare:@"none"] != NSOrderedSame) && willReturnCode)
 				{
@@ -362,14 +412,25 @@
 
 
 
-- (NSString *)processImports:(NSString *)sourceCode :(NSString *)searchString :(NSUInteger)codeType :(NSString *)projectPath :(Model *)model :(BOOL)willReturnCode
+- (NSString *)processImports:(NSDictionary *)source
 {
-	// Parses the passed in 'sourceCode' for occurences of 'searchString' - either "#import" or "#include".
-	// The value of 'codeType' indicates whether the source is agent or device code.
-	// The value of 'willReturnCode' indicates whether the method should returne compiled code or not. If it is
-	// being used to gather a list of #included libraries and files, 'willReturnCode' will be NO.
-
-	// NOTE 'projectPath' should be an absolute path to the source file
+	// Parses the passed in source or occurences of the specified directive - either "#import" or "#include".
+    
+    // FROM 2.3.129 Pass in a dictionary, 'source', containing the arguments as values:
+    // 'code'       - The source code (string) we're going to process
+    // 'search'     - The directive (string) we're searching for
+    // 'path'       - The absolute path (string) to the parent project
+    // 'type'       - An unsigned int indicating the type of code: 1 (agent) or 2 (device) - used for output, passed as NSNumber
+    // 'model'      - The model whose code we're processing
+    // 'returncode' - Should we return compiled code (YES) or not (NO) - this will be NO if we're just
+    //                parsing the code for a list of included files and libraries.
+    
+    NSString *sourceCode = [source objectForKey:@"code"];
+    NSString *searchString = [source objectForKey:@"search"];
+    NSString *projectPath = [source objectForKey:@"path"];
+    NSUInteger codeType = [[source objectForKey:@"type"] unsignedIntegerValue];
+    Model *model = [source objectForKey:@"model"];
+    BOOL willReturnCode = [[source objectForKey:@"returncode"] boolValue];
 
 	NSUInteger lineStartIndex;
 	NSRange includeRange, commentRange;

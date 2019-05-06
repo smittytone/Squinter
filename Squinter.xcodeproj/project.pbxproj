@@ -35,6 +35,7 @@
 		3B8B8E161E952E5A009363C8 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E151E952E5A009363C8 /* File.m */; };
 		3B9DF2BB1ED2D4EB00B682BA /* LogStreamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */; };
 		3BA707602181D97200585728 /* InspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BA7075F2181D97100585728 /* InspectorViewController.m */; };
+		3BAC3AEF22802FE60069234C /* AppDelegateFileHandlers.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BAC3AEE22802FE60069234C /* AppDelegateFileHandlers.m */; };
 		3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */; };
 		3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */; };
 		3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */; };
@@ -148,6 +149,8 @@
 		3B9DF2BA1ED2D4EB00B682BA /* LogStreamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = LogStreamEvent.m; path = ../../BuildAPIAccess/LogStreamEvent.m; sourceTree = "<group>"; };
 		3BA7075E2181D97100585728 /* InspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorViewController.h; sourceTree = "<group>"; };
 		3BA7075F2181D97100585728 /* InspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorViewController.m; sourceTree = "<group>"; };
+		3BAC3AED22802FE50069234C /* AppDelegateFileHandlers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegateFileHandlers.h; sourceTree = "<group>"; };
+		3BAC3AEE22802FE60069234C /* AppDelegateFileHandlers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateFileHandlers.m; sourceTree = "<group>"; };
 		3BB2EF031FC7215100F7B7D1 /* SelectWindowViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SelectWindowViewController.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SelectWindowViewController.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = InspectorDataCellView.h; sourceTree = "<group>"; usesTabs = 0; };
@@ -345,12 +348,14 @@
 				3BE520BA19752883000BAD52 /* Constants.h */,
 				3B36D1D41970A0990029CEC0 /* AppDelegate.h */,
 				3B36D1D51970A0990029CEC0 /* AppDelegate.m */,
-				3BCEB7B4227AF6EF0090B137 /* AppDelegateUI.h */,
-				3BCEB7B8227AF77F0090B137 /* AppDelegateUI.m */,
+				3BAC3AED22802FE50069234C /* AppDelegateFileHandlers.h */,
+				3BAC3AEE22802FE60069234C /* AppDelegateFileHandlers.m */,
 				3BCEB7BB227AFA9B0090B137 /* AppDelegateAPIHandlers.h */,
 				3BCEB7BC227AFAED0090B137 /* AppDelegateAPIHandlers.m */,
 				3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */,
 				3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */,
+				3BCEB7B4227AF6EF0090B137 /* AppDelegateUI.h */,
+				3BCEB7B8227AF77F0090B137 /* AppDelegateUI.m */,
 				3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */,
 				3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */,
 			);
@@ -590,6 +595,7 @@
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
 				3B077B2E2111846100C17D25 /* LogView.m in Sources */,
 				3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */,
+				3BAC3AEF22802FE60069234C /* AppDelegateFileHandlers.m in Sources */,
 				3B3015461CFDE44B00596CF2 /* BuildAPIAccess.m in Sources */,
 				3B4624FA2236DB7A009CED0D /* SyncWindowViewController.m in Sources */,
 				3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */,
