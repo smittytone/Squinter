@@ -919,17 +919,13 @@
     {
         for (Project *aProject in projectArray)
         {
-            NSString *aName = aProject.filename;
-            NSString *aPath = aProject.path;
-            aPath = [NSString stringWithFormat:@"%@/%@", aPath, aName];
+            NSString *aPath = [NSString stringWithFormat:@"%@/%@", aProject.path, aProject.filename];
             
             if (orProjectPath != nil && [orProjectPath compare:aPath] == NSOrderedSame) return YES;
             
             if (byProject != nil)
             {
-                NSString *bName = byProject.filename;
-                NSString *bPath = byProject.path;
-                bPath = [NSString stringWithFormat:@"%@/%@", bPath, bName];
+                NSString *bPath = [NSString stringWithFormat:@"%@/%@", byProject.path, byProject.filename];
                 
                 if ([bPath compare:aPath] == NSOrderedSame) return YES;
             }
