@@ -8007,7 +8007,7 @@ didReceiveResponse:(NSURLResponse *)response
 # pragma mark - VDKQueueDelegate Methods
 
 
-- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString*)noteName forPath:(NSString*)fpath
+- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString *)noteName forPath:(NSString *)fpath
 {
     // A file has changed so notify the user
     // IMPORTANT: fpath is the MONITORED location. VDKQueue will continue watching this file wherever it is moved
@@ -8015,7 +8015,7 @@ didReceiveResponse:(NSURLResponse *)response
     // TODO Review for new archtecture
     
 #ifdef DEBUG
-    NSLog(@"File change: %@", fpath);
+    NSLog(@"File change: %@ (%@)", fpath, noteName);
 #endif
     
     if ([noteName compare:VDKQueueRenameNotification] == NSOrderedSame)
