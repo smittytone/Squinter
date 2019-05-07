@@ -1207,16 +1207,16 @@
                                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                             <prototypeCellViews>
-                                                                <tableCellView identifier="header.cell" id="KMh-Zl-tSI">
+                                                                <tableCellView identifier="header.cell" id="shQ-Yv-iAq">
                                                                     <rect key="frame" x="0.0" y="0.0" width="337" height="28"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a8d-Iw-cbu">
+                                                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LCZ-Yn-zR9">
                                                                             <rect key="frame" x="9" y="6" width="328" height="14"/>
                                                                             <constraints>
-                                                                                <constraint firstAttribute="height" constant="14" id="hqN-6r-AyN"/>
+                                                                                <constraint firstAttribute="height" constant="14" id="bVW-x5-wdD"/>
                                                                             </constraints>
-                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="HEADER CELL" id="gNJ-ed-evW">
+                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="HEADER CELL" id="oro-Os-qRu">
                                                                                 <font key="font" metaFont="smallSystemBold"/>
                                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1224,12 +1224,12 @@
                                                                         </textField>
                                                                     </subviews>
                                                                     <constraints>
-                                                                        <constraint firstAttribute="trailing" secondItem="a8d-Iw-cbu" secondAttribute="trailing" constant="2" id="9mu-2S-Iul"/>
-                                                                        <constraint firstItem="a8d-Iw-cbu" firstAttribute="leading" secondItem="KMh-Zl-tSI" secondAttribute="leading" constant="11" id="Zcr-uK-k0F"/>
-                                                                        <constraint firstAttribute="bottom" secondItem="a8d-Iw-cbu" secondAttribute="bottom" constant="6" id="sLZ-VL-JO6"/>
+                                                                        <constraint firstItem="LCZ-Yn-zR9" firstAttribute="leading" secondItem="shQ-Yv-iAq" secondAttribute="leading" constant="11" id="53u-w9-cf9"/>
+                                                                        <constraint firstAttribute="trailing" secondItem="LCZ-Yn-zR9" secondAttribute="trailing" constant="2" id="QJN-j7-Zci"/>
+                                                                        <constraint firstAttribute="bottom" secondItem="LCZ-Yn-zR9" secondAttribute="bottom" constant="6" id="gLV-Ck-nG8"/>
                                                                     </constraints>
                                                                     <connections>
-                                                                        <outlet property="textField" destination="a8d-Iw-cbu" id="HWg-PC-EuR"/>
+                                                                        <outlet property="textField" destination="LCZ-Yn-zR9" id="Ty4-8i-8MJ"/>
                                                                     </connections>
                                                                 </tableCellView>
                                                                 <tableCellView identifier="data.cell" id="jEq-GW-sx4" customClass="InspectorDataCellView">
@@ -1282,6 +1282,23 @@
                                                                         <outlet property="goToButton" destination="lFh-4C-BKm" id="e1q-I4-CeH"/>
                                                                         <outlet property="title" destination="1l7-NR-g9s" id="lgk-yp-J3q"/>
                                                                     </connections>
+                                                                </tableCellView>
+                                                                <tableCellView identifier="line.cell" id="KMh-Zl-tSI">
+                                                                    <rect key="frame" x="0.0" y="48" width="337" height="12"/>
+                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                    <subviews>
+                                                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="7iI-we-1N9">
+                                                                            <rect key="frame" x="57" y="4" width="224" height="5"/>
+                                                                            <constraints>
+                                                                                <constraint firstAttribute="width" constant="224" id="QNP-CY-IVQ"/>
+                                                                                <constraint firstAttribute="height" constant="1" id="Qs9-jb-Wql"/>
+                                                                            </constraints>
+                                                                        </box>
+                                                                    </subviews>
+                                                                    <constraints>
+                                                                        <constraint firstItem="7iI-we-1N9" firstAttribute="centerX" secondItem="KMh-Zl-tSI" secondAttribute="centerX" id="W3d-GR-0zF"/>
+                                                                        <constraint firstItem="7iI-we-1N9" firstAttribute="centerY" secondItem="KMh-Zl-tSI" secondAttribute="centerY" id="uYk-6D-sAH"/>
+                                                                    </constraints>
                                                                 </tableCellView>
                                                             </prototypeCellViews>
                                                         </tableColumn>

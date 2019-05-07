@@ -299,6 +299,12 @@
                     node.value = devicegroup.description;
                     [pnode.children addObject:node];
                 }
+                
+                // Separator Line
+                
+                node = [[TreeNode alloc] init];
+                node.value = @"--";
+                [pnode.children addObject:node];
 
                 // Device Group x Models
 
@@ -309,7 +315,16 @@
                     for (Model *model in devicegroup.models)
                     {
                         NSString *typeString = [model.type compare:@"agent"] == NSOrderedSame ? @"Agent" : @"Device";
-
+                        
+                        // Separator Line
+                        
+                        if (modcount == 2)
+                        {
+                            node = [[TreeNode alloc] init];
+                            node.value = @"--";
+                            [pnode.children addObject:node];
+                        }
+                        
                         // Device Group x Model y Header
 
                         node = [[TreeNode alloc] init];
@@ -1005,6 +1020,11 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
         NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"header.cell" owner:self];
         cv.textField.stringValue = !node.flag ? [node.key uppercaseString] : node.key;
+        cellView = cv;
+    }
+    else if ([node.value hasPrefix:@"-"])
+    {
+        NSTableCellView *cv = [outlineView makeViewWithIdentifier:@"line.cell" owner:self];
         cellView = cv;
     }
     else
