@@ -1384,7 +1384,7 @@
                     <constraint firstItem="lSl-gT-Zzl" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="11" id="yk5-LC-krC"/>
                 </constraints>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="B3EC3009-665A-4008-AF07-80CBA64DA7FB" centeredItem="eYq-bK-nxW" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="TRV-z7-UZS">
+            <toolbar key="toolbar" implicitIdentifier="B3EC3009-665A-4008-AF07-80CBA64DA7FB" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="TRV-z7-UZS">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="9A66F936-1D08-43E1-A73E-7567C2B63ED3" label="New Project" paletteLabel="New Project" tag="108" image="plus" autovalidates="NO" id="ucm-fZ-jVY" customClass="SquinterToolbarItem">
                         <connections>
@@ -1396,6 +1396,13 @@
                         <size key="maxSize" width="96" height="96"/>
                         <connections>
                             <action selector="showProjectInfo:" target="Voe-Tx-rLC" id="aGd-1B-uJA"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="D2AAA206-443F-4C0B-AAF0-6282E38AFCD6" label="Sync Project" paletteLabel="Sync Project with impCloud" tag="126" image="sync" autovalidates="NO" id="Nc1-To-idI" customClass="SquinterToolbarItem">
+                        <size key="minSize" width="32" height="32"/>
+                        <size key="maxSize" width="32" height="32"/>
+                        <connections>
+                            <action selector="doSync:" target="Voe-Tx-rLC" id="kub-VC-QLj"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="FDDE3D1E-ACFC-41D5-9207-9E80CD4BDC53" label="Download" paletteLabel="Download Product" tag="124" image="download" autovalidates="NO" id="Gli-ag-yLt" customClass="SquinterToolbarItem">
@@ -1508,13 +1515,6 @@
                     <toolbarItem implicitItemIdentifier="NSToolbarSeparatorItem" id="vIH-l8-9Id"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="hlu-sY-ttp"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="YmD-OV-Lst"/>
-                    <toolbarItem implicitItemIdentifier="6EE02058-08E4-40D9-BA58-E447A0FCB82E" label="Sync Project" paletteLabel="Sync Project with impCloud" tag="126" image="sync" autovalidates="NO" id="Nc1-To-idI" customClass="SquinterToolbarItem">
-                        <size key="minSize" width="32" height="32"/>
-                        <size key="maxSize" width="32" height="32"/>
-                        <connections>
-                            <action selector="doSync:" target="Voe-Tx-rLC" id="kub-VC-QLj"/>
-                        </connections>
-                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="ucm-fZ-jVY"/>
