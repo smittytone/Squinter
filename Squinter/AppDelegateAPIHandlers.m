@@ -2775,6 +2775,9 @@
     {
         // The error was not specifically related to log in
         
+        if (errorCode == kErrorNetworkError && lastAPIError == kErrorNetworkError) return;
+        lastAPIError = errorCode;
+        
         [self writeErrorToLog:errorMessage :YES];
         
         // Just in case we are attemmpting to log stream from the current device

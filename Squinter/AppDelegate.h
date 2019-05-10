@@ -399,7 +399,7 @@
 
     NSString *workingDirectory, *listString, *newDevicegroupName, *loginKey, *otpLoginToken;
     NSUInteger syncItemCount, logPaddingLength, deviceCheckCount, loginMode;
-    NSInteger wantsToHide, accountType;
+    NSInteger wantsToHide, accountType, lastAPIError;
 
     BOOL closeProjectFlag, noProjectsFlag, newDevicegroupFlag, deviceSelectFlag, newTargetsFlag;
     BOOL renameProjectFlag, saveAsFlag, credsFlag, switchingAccount, doubleSaveFlag, reconnectAfterSleepFlag;

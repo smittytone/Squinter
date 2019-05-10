@@ -80,7 +80,8 @@
     switchingAccount = NO;
     doubleSaveFlag = NO;
     reconnectAfterSleepFlag = NO;
-
+    
+    lastAPIError = 0;
     syncItemCount = 0;
     logPaddingLength = 0;
     deviceCheckCount = -1;
