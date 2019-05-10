@@ -935,13 +935,13 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                         <items>
-                            <menuItem title="Show Squinter Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                            <menuItem title="Show Squinter Help" keyEquivalent="H" id="FKE-Sm-Kum">
                                 <connections>
                                     <action selector="showWebHelp:" target="Voe-Tx-rLC" id="sHJ-jB-EMP"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Squinter Release Notes" id="zEK-Kt-mDj">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Squinter Release Notes" keyEquivalent="r" id="zEK-Kt-mDj">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="showReleaseNotesPage:" target="Voe-Tx-rLC" id="yYw-WM-T2W"/>
                                 </connections>
@@ -957,48 +957,39 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Acknowledgements" id="Shr-UV-6Wh">
                                     <items>
-                                        <menuItem title="Third-party Software" enabled="NO" id="7AL-TT-pqN">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="PDKeychainBindings – Carl Brown" id="5sk-hX-9AU">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="tVx-79-bRm"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Sparkle - Andy Matuschak et al." id="tuL-Jl-lsM">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="zkZ-HS-ndi"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="UKKQueue – Uli Kusterer" id="veC-o7-7n2">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="OHA-E5-56M"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="VDKQueue – Bryan D K Jones" id="8IP-2a-Phr">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="iZS-jA-5o4"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="Duw-2H-NcK"/>
-                                        <menuItem title="Electric Imp Software" enabled="NO" id="Rez-15-sQE">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="Electric Imp Dev Center" id="sWG-4E-su6">
+                                        <menuItem title="impCentral API — Electric Imp" id="sWG-4E-su6">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="showAuthor:" target="Voe-Tx-rLC" id="LMO-KY-BAJ"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="WK8-D0-ycx"/>
-                                        <menuItem title="Fonts" enabled="NO" id="kaV-4a-4a8">
+                                        <menuItem isSeparatorItem="YES" id="Duw-2H-NcK"/>
+                                        <menuItem title="PDKeychainBindings — Carl Brown" id="5sk-hX-9AU">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="tVx-79-bRm"/>
+                                            </connections>
                                         </menuItem>
-                                        <menuItem title="Source Code Pro - Adobe" id="VcO-Va-ZZc">
+                                        <menuItem title="Sparkle — Andy Matuschak et al." id="tuL-Jl-lsM">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="zkZ-HS-ndi"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="UKKQueue — Uli Kusterer" id="veC-o7-7n2">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="OHA-E5-56M"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="VDKQueue — Bryan D K Jones" id="8IP-2a-Phr">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showAuthor:" target="Voe-Tx-rLC" id="iZS-jA-5o4"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="WK8-D0-ycx"/>
+                                        <menuItem title="Source Code Pro — Adobe" id="VcO-Va-ZZc">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="showAuthor:" target="Voe-Tx-rLC" id="31d-9y-wQL"/>
