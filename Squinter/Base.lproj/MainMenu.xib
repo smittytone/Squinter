@@ -2618,7 +2618,7 @@ Gw
                         </constraints>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="sMp-Bb-890">
                             <font key="font" metaFont="smallSystem"/>
-                            <string key="title">If your chosen device group is not yet sync’d with the impCloud, you will not be able to assign a device to it. Additionally, you cannot assign development devices to DUT, Test DUT, Production or Test Production device groups, so these device group types are not listed.</string>
+                            <string key="title">If your chosen device group is not yet sync’d with the impCloud, you will not be able to assign a device to it. Additionally, you cannot assign development devices to Test DUT, DUT or Production device groups, so these device group types are not listed.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
