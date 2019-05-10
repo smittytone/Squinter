@@ -5139,7 +5139,7 @@
 
             for (Devicegroup *dg in project.devicegroups)
             {
-                if (![dg.type containsString:@"production"])
+                if (![dg.type containsString:@"production"] && ![dg.type containsString:@"dut"])
                 {
                     if (firstDone)
                     {
