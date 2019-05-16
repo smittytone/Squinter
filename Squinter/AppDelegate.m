@@ -6974,9 +6974,10 @@
 {
     // Set the current version string and show the 'About' sheet
     
-    [aboutVersionLabel setStringValue:[NSString stringWithFormat:@"Version %@.%@",
-                                       [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
-                                       [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]];
+    [aboutVersionLabel setStringValue:[NSString stringWithFormat:@"Version %@.%@ (%@)",
+                                        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+                                        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
+                                        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"SQBuildVersion"]]];
     [_window beginSheet:aboutSheet completionHandler:nil];
 }
 
@@ -7370,8 +7371,12 @@
 
     NSError *error = nil;
     NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
-    NSString *userAgent = [NSString stringWithFormat:@"%@/%@.%@ (macOS %li.%li.%li)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleExecutable"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
-                 [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], (long)sysVer.majorVersion, (long)sysVer.minorVersion, (long)sysVer.patchVersion];
+    NSString *userAgent = [NSString stringWithFormat:@"%@ %@.%@.%@ (macOS %li.%li.%li)",
+                           [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleExecutable"],
+                           [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+                           [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
+                           [[NSBundle mainBundle] objectForInfoDictionaryKey:@"SQBuildVersion"],
+                           (long)sysVer.majorVersion, (long)sysVer.minorVersion, (long)sysVer.patchVersion];
 
     // UP TO 2.2.126
     // NSDictionary *dict = @{ @"comment" : feedback, @"useragent" : userAgent };

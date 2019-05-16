@@ -430,6 +430,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B36D1F01970A0990029CEC0 /* Build configuration list for PBXNativeTarget "Squinter" */;
 			buildPhases = (
+				3BF5773D228DD10100C5A9FE /* ShellScript */,
 				C83F9CF4AD6FBA83DF807D0E /* [CP] Check Pods Manifest.lock */,
 				3B36D1BB1970A0990029CEC0 /* Sources */,
 				3B36D1BC1970A0990029CEC0 /* Frameworks */,
@@ -515,6 +516,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3BF5773D228DD10100C5A9FE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nbuildNum=$(/usr/libexec/PlistBuddy -c \"Print SQBuildVersion\" \"${PRODUCT_SETTINGS_PATH}\")\nbuildNum=$(($buildNum + 1))\n/usr/libexec/PlistBuddy -c \"Set :SQBuildVersion $buildNum\" \"${PRODUCT_SETTINGS_PATH}\"\n";
+		};
 		C83F9CF4AD6FBA83DF807D0E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
