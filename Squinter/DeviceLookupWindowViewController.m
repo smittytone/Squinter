@@ -26,7 +26,7 @@
     // - Clear
 
     entryField.stringValue = @"";
-    selectedDeviceID = nil;
+    selectedDeviceID = @"";
     searchOnDeviceId = YES;
     if (listedDevices == nil) listedDevices = [[NSMutableArray alloc] init];
     if (listedDevices.count > 0) [listedDevices removeAllObjects];
@@ -178,6 +178,19 @@
     NSDictionary *device = [listedDevices objectAtIndex:rowIndex];
     selectedDeviceID = [device objectForKey:@"id"];
     return YES;
+}
+
+
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    // ADDED 2.3.129
+    // If no row is selected ('selectedRow' = -1) then clear 'selectedDeviceID'
+    // to make sure the device doesn't change when the dialog closes after 'Select Device'
+    // was clicked
+    
+    NSTableView *tableView = (NSTableView *)notification.object;
+    if (tableView.selectedRow == -1) selectedDeviceID = @"";
 }
 
 
