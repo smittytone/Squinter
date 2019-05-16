@@ -753,10 +753,14 @@
                             
                             if ([dg.name compare:aname] == NSOrderedSame)
                             {
+                                // Name but not ID match, so change the name temporarily with 'count' as
+                                // a suffix, flag there's a match and reset the loop variable to start
+                                // checking from the start (in case there's already a 'name xx' devicegroup)
+                                
                                 nameMatch = YES;
                                 index = 0;
                                 ++count;
-                                name = [dg.name stringByAppendingFormat:@"%li", index];
+                                name = [dg.name stringByAppendingFormat:@"%li", count];
                             }
                             else
                             {
@@ -764,9 +768,9 @@
                             }
                         } while (index < devicegroups.count);
                         
-                        if ([name compare:dg.name] != NSOrderedSame)
+                        if (nameMatch)
                         {
-                            // Record the updated name for later
+                            // Record the updated name for later usage
                             
                             if (dg.data == nil) dg.data = [[NSMutableDictionary alloc] init];
                             [dg.data setObject:name forKey:@"dgname"];

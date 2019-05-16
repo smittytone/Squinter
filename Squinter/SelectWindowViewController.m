@@ -21,13 +21,6 @@
     // NOTE This should only be called ONCE per request for two targets
     //      as it clears the list of stored targets
     
-    NSString *groupType = [theNewDevicegroup.type hasPrefix:@"pre_"] ? @"Test" : @"";
-    
-    // Get the target group type’s Squinter name from its API type
-    
-    NSString *targetAPIType;
-    NSString *targetAPIName = @"ERROR";
-    
     // FROM 2.3.128
     // Add 'targetType' property and code to update the UI depending on its value,
     // which is the type of target device group being selected
@@ -40,13 +33,19 @@
         return;
     }
     
+    NSString *groupType = [theNewDevicegroup.type hasPrefix:@"pre_"] ? @"Test" : @"";
+    
+    // Get the target group type’s Squinter name from its API type
+    
+    NSString *targetAPIType = @"";
+    NSString *targetAPIName = @"ERROR";
+    
     if (targetType == kTargetDeviceGroupTypeProd)
     {
         targetAPIName = @"Production";
         targetAPIType = groupType.length > 0 ? @"pre_production_devicegroup" : @"production_devicegroup" ;
     }
-    
-    if (targetType == kTargetDeviceGroupTypeDUT)
+    else
     {
         targetAPIName = @"DUT";
         targetAPIType = groupType.length > 0 ? @"pre_dut_devicegroup" : @"dut_devicegroup" ;

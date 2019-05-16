@@ -1549,54 +1549,57 @@
             }
         }
     }
-
-    Project *chosenProject = nil;
-
-    if (item.representedObject != nil)
+    
+    if (item != nil)
     {
-        chosenProject = item.representedObject;
-    }
-    else
-    {
-        // Just in case we didn't set the represented object for some reason
+        Project *chosenProject = nil;
 
-        for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
+        if (item.representedObject != nil)
         {
-            chosenProject = [projectArray objectAtIndex:i];
-
-            if ([chosenProject.name compare:item.title] == NSOrderedSame) break;
+            chosenProject = item.representedObject;
         }
-    }
-
-    // Have we chosen the already selected project? Bail
-
-    if (chosenProject == currentProject) return;
-
-    // Switch in the newly chosen project and select its known selected device group
-
-    currentProject = chosenProject;
-    currentDevicegroup = currentProject.devicegroupIndex != -1 ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
-
-    // If we have a current device group, select its first device if it has one
-
-    if (currentDevicegroup != nil)
-    {
-        [self selectFirstDevice];
-    }
-    else
-    {
-        // If we don't have a selected device group but we do have device groups in
-        // this project, select the first one on the list (if there is one)
-
-        if (currentProject.devicegroups.count > 0)
+        else
         {
-            currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
-            currentProject.devicegroupIndex = 0;
+            // Just in case we didn't set the represented object for some reason
 
+            for (NSUInteger i = 0 ; i < projectArray.count ; ++i)
+            {
+                chosenProject = [projectArray objectAtIndex:i];
+
+                if ([chosenProject.name compare:item.title] == NSOrderedSame) break;
+            }
+        }
+        
+        // Have we chosen the already selected project? Bail
+
+        if (chosenProject == currentProject) return;
+
+        // Switch in the newly chosen project and select its known selected device group
+
+        currentProject = chosenProject;
+        currentDevicegroup = currentProject.devicegroupIndex != -1 ? [currentProject.devicegroups objectAtIndex:currentProject.devicegroupIndex] : nil;
+
+        // If we have a current device group, select its first device if it has one
+
+        if (currentDevicegroup != nil)
+        {
             [self selectFirstDevice];
         }
-    }
+        else
+        {
+            // If we don't have a selected device group but we do have device groups in
+            // this project, select the first one on the list (if there is one)
 
+            if (currentProject.devicegroups.count > 0)
+            {
+                currentDevicegroup = [currentProject.devicegroups objectAtIndex:0];
+                currentProject.devicegroupIndex = 0;
+
+                [self selectFirstDevice];
+            }
+        }
+    }
+    
     // Is the project associated with a product? If so, select it
 
     if (currentProject.pid.length > 0)
@@ -5643,7 +5646,7 @@
 {
     [_window endSheet:findDeviceSheet];
 
-    if (dlvc.selectedDeviceID != nil)
+    if (dlvc.selectedDeviceID.length != 0)
     {
         for (NSMenuItem *item in devicesPopUp.itemArray)
         {

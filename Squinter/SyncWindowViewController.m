@@ -175,9 +175,7 @@
 
         if (cell != nil)
         {
-            NSString *type;
-            
-            NSString *name;
+            NSString *type = @"";
             
             if (presentingRemotes)
             {
@@ -187,7 +185,7 @@
             else
             {
                 Devicegroup *dg = [syncGroups objectAtIndex:row];
-                name = dg.type;
+                type = dg.type;
             }
             
             cell.textField.stringValue = [self convertDevicegroupType:type :NO];
