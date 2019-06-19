@@ -105,6 +105,7 @@
     IBOutlet NSMenu     *impLibrariesMenu;
     IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
     IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
+    IBOutlet NSMenuItem *logAllDevicegroupDevices;
 
     #pragma mark Device Menu outlets
 
@@ -505,6 +506,8 @@
 - (IBAction)chooseDUTTarget:(id)sender;
 - (void)chooseTarget:(NSInteger)type;
 - (IBAction)showTestBlessedDevices:(id)sender;
+// ADDED IN 2.3.130
+- (IBAction)logAllDevices:(id)sender;
 
 
 // Existing Device Methods
@@ -553,8 +556,10 @@
 
 - (void)listCode:(NSString *)code :(NSUInteger)from :(NSUInteger)to :(NSUInteger)at :(NSUInteger)col;
 - (void)logCode;
-- (void)logModelCode:(NSString *)codeType; // ADDED IN 2.3.128
 - (void)logLogs:(NSString *)logLine;
+// ADDED IN 2.3.128
+- (void)logModelCode:(NSString *)codeType;
+
 
 
 // Squint Methods

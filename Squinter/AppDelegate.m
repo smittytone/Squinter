@@ -4723,6 +4723,63 @@
 
 
 
+- (IBAction)logAllDevices:(id)sender
+{
+    // ADDED IN 2.3.130
+    // Add all of the devices in the devicegroup, if any, to the log stream
+    
+    if (currentDevicegroup == nil)
+    {
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        return;
+    }
+    
+    if (currentDevicegroup.devices.count > 0)
+    {
+        if (currentDevicegroup.devices.count <= kMaxLogStreamDevices - ide.numberOfLogStreams)
+        {
+            for (NSString *device in currentDevicegroup.devices)
+            {
+                if (![ide isDeviceLogging:device])
+                {
+                    // Set the Toolbar Item's state
+                    
+                    if (device == (NSString *)[selectedDevice valueForKey:@"id"]) streamLogsItem.state = 1;
+                    
+                    // Start logging
+                    
+                    NSDictionary *theDevice = [self deviceWithID:device];
+                    
+                    [ide startLogging:device :@{ @"device" : theDevice }];
+                    
+                    // Set the spacing for the log output so that log messages align after the device name
+                    
+                    NSString *devname = [self getValueFrom:theDevice withKey:@"name"];
+                    if (devname.length > logPaddingLength) logPaddingLength = devname.length;
+                }
+            }
+        }
+        else
+        {
+            // There aren't enough logging slots for the
+            
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = @"There are insufficient logging slots";
+            alert.informativeText = [NSString stringWithFormat:@"You are currently logging %li devices. Devicegroup “%@” has %li devices assigned to it. Please select devices individually, or stop logging from some devices.", (long)ide.numberOfLogStreams, currentDevicegroup.name, (long)currentDevicegroup.devices.count];
+            [alert addButtonWithTitle:@"OK"];
+            [alert beginSheetModalForWindow:_window completionHandler:nil];
+        }
+    }
+    else
+    {
+        // The device group has no devices, so inform the user
+        
+        [self writeWarningToLog:[NSString stringWithFormat:@"Devicegroup “%@” has no devices assigned to it.", currentDevicegroup.name] :YES];
+    }
+}
+
+
+
 #pragma mark - Existing Device Methods
 
 
@@ -5536,7 +5593,7 @@
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
-
+    
     // We have a selected device
 
     NSString *devid = [self getValueFrom:selectedDevice withKey:@"id"];
@@ -5610,6 +5667,7 @@
 }
 
 
+
 // ADDED IN 2.2.127
 - (IBAction)findDevice:(id)sender
 {
@@ -5634,11 +5692,13 @@
 }
 
 
+
 // ADDED IN 2.2.127
 - (IBAction)cancelFindDeviceSheet:(id)sender
 {
     [_window endSheet:findDeviceSheet];
 }
+
 
 
 // ADDED IN 2.2.127

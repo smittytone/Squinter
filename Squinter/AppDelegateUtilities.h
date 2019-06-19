@@ -67,6 +67,10 @@
 - (NSArray *)displayDescription:(NSString *)description :(NSInteger)maxWidth :(NSString *)spaces;
 - (void)setDevicegroupDevices:(Devicegroup *)devicegroup;
 
+// FROM 2.3.130
+// Device Utility Methods
+- (NSDictionary *)deviceWithID:(NSString *)devID;
+
 // Date and Time Conversion Methods
 - (NSDate *)convertTimestring:(NSString *)dateString;
 - (NSString *)convertDate:(NSDate *)date;

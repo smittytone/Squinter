@@ -52,7 +52,6 @@
 #define kDoneChecking                       9999999
 
 // Login
-
 #define kLoginResultCodeSuccess             0
 #define kLoginResultCodeNetFail             1
 #define kLoginResultCodeCredFail            2
@@ -65,25 +64,21 @@
 #define kLoginModeAlt                       2
 
 // Squinted
-
 #define kDeviceCodeSquinted                 0x01
 #define kAgentCodeSquinted                  0x02
 #define kBothCodeSquinted                   0x03
 
 // StreamToolbarItem
-
 #define kStreamToolbarItemStateOff          0
 #define kStreamToolbarItemStateMid          1
 #define kStreamToolbarItemStateOn           2
 
 // Inspector Tabs
-
 #define kInspectorTabProject                0
 #define kInspectorTabDevice                 1
 
 // ADDED 2.3.127
 // Target Device Group types
-
 #define kTargetDeviceGroupTypeNone          0
 #define kTargetDeviceGroupTypeProd          1
 #define kTargetDeviceGroupTypeDUT           2

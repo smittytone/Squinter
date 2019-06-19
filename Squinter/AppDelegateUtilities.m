@@ -916,6 +916,21 @@
 
 
 
+#pragma mark - Device Utility Methods
+
+
+- (NSDictionary *)deviceWithID:(NSString *)devID
+{
+    for (NSDictionary *aDevice in devicesArray)
+    {
+        if ([(NSString *)[aDevice valueForKey:@"id"] compare:devID] == NSOrderedSame) return aDevice;
+    }
+    
+    return nil;
+}
+
+
+
 #pragma mark - Date and Time Conversion Methods
 
 
