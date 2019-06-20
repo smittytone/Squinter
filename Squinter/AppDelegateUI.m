@@ -703,6 +703,8 @@
     listTestBlessedDevicesMenuItem.enabled = (currentDevicegroup != nil && [currentDevicegroup.type containsString:@"pre_production"]) ? YES : NO;
     // FROM 2.3.130
     logAllDevicegroupDevices.enabled = currentDevicegroup != nil ? YES : NO;
+    nextDevicegroupMenuItem.enabled = (currentProject != nil && currentProject.devicegroups.count > 1) ? YES : NO;
+    previousDevicegroupMenuItem.enabled = (currentProject != nil && currentProject.devicegroups.count > 1) ? YES : NO;
     
     // FROM 2.3.128
     // Set the Set Target menu titles appropriate to test/production

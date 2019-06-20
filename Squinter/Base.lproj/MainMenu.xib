@@ -133,6 +133,7 @@
                 <outlet property="newProjectNameTextField" destination="wBs-gc-5Tg" id="mlc-iw-kem"/>
                 <outlet property="newProjectNewProductCheckbox" destination="SC5-3D-S9p" id="Bw2-6A-y6q"/>
                 <outlet property="newProjectSheet" destination="D74-Fr-OkO" id="tXq-XY-bOp"/>
+                <outlet property="nextDevicegroupMenuItem" destination="3qJ-zc-HYc" id="AOX-n2-onp"/>
                 <outlet property="openAgentCode" destination="QLz-UA-e6J" id="sta-iD-ldw"/>
                 <outlet property="openAgentURLMenuItem" destination="pFc-je-W9B" id="qHr-IA-WBH"/>
                 <outlet property="openAllItem" destination="qP6-Nj-CWs" id="D2K-V2-XEe"/>
@@ -145,6 +146,7 @@
                 <outlet property="passwordTextFieldCell" destination="mzG-0G-0je" id="Tdy-pN-17k"/>
                 <outlet property="preferencesSheet" destination="h6Z-xR-T8e" id="wqb-yM-nls"/>
                 <outlet property="preserveCheckbox" destination="DkE-vS-yQU" id="EuC-Me-Ivt"/>
+                <outlet property="previousDevicegroupMenuItem" destination="GMu-of-Beq" id="3Ab-5G-W7f"/>
                 <outlet property="printItem" destination="p2B-MB-ilv" id="NGa-yN-EBC"/>
                 <outlet property="productsMenu" destination="NLb-q9-hbs" id="jnH-hZ-TL6"/>
                 <outlet property="projectFromFilesAccessoryView" destination="7b2-dB-tnl" id="nPK-LE-Azm"/>

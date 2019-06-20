@@ -106,6 +106,8 @@
     IBOutlet NSMenuItem *checkImpLibrariesMenuItem;
     IBOutlet NSMenuItem *listTestBlessedDevicesMenuItem;
     IBOutlet NSMenuItem *logAllDevicegroupDevices;
+    IBOutlet NSMenuItem *nextDevicegroupMenuItem;
+    IBOutlet NSMenuItem *previousDevicegroupMenuItem;
 
     #pragma mark Device Menu outlets
 
