@@ -1267,12 +1267,12 @@
         copyAgentURLMenuItem.title = [NSString stringWithFormat:@"Copy “%@” Agent URL", dName];
         openAgentURLMenuItem.title = [NSString stringWithFormat:@"Open “%@” Agent URL", dName];
         unassignDeviceMenuItem.title = [NSString stringWithFormat:@"Unassign “%@”", dName];
-        getLogsMenuItem.title = [NSString stringWithFormat:@"Get Logs from “%@”", dName];
+        getLogsMenuItem.title = [NSString stringWithFormat:@"Get Past Logs from “%@”", dName];
         getHistoryMenuItem.title = [NSString stringWithFormat:@"Get History of “%@”", dName];
         deleteDeviceMenuItem.title = [NSString stringWithFormat:@"Delete “%@”", dName];
 
         BOOL flag = [ide isDeviceLogging:[selectedDevice objectForKey:@"id"]];
-        streamLogsMenuItem.title = flag ? @"Stop Log Streaming" : @"Start Log Streaming";
+        streamLogsMenuItem.title = flag ? [NSString stringWithFormat:@"Close Log Stream for “%@”", dName] : [NSString stringWithFormat:@"Open Log Stream for “%@”", dName];
     }
     else
     {
@@ -1281,7 +1281,7 @@
         copyAgentURLMenuItem.title = @"Copy Device’s Agent URL";
         openAgentURLMenuItem.title = @"Open Device’s Agent URL";
         unassignDeviceMenuItem.title = @"Unassign Device";
-        getLogsMenuItem.title = @"Get Logs from Device";
+        getLogsMenuItem.title = @"Get Past Logs from Device";
         getHistoryMenuItem.title = @"Get History of Device";
         deleteDeviceMenuItem.title = @"Delete Device";
         streamLogsMenuItem.title = @"Start Log Streaming";
