@@ -3161,6 +3161,41 @@
     [streamLogsItem validate];
     [self refreshDeviceGroupSubmenuDevices];
     [self refreshDevicesPopup];
+    
+    // FROM 2.3.130
+    // Add in any other devices that might also need logging, typically because the 'Log All Devicegroup Devices'
+    // menu item was selected (see 'logAllDevices:' in 'AppDelegate.m')
+    
+    if ([data valueForKey:@"object"] != nil)
+    {
+        NSDictionary *object = [data valueForKey:@"object"];
+        
+        if ([object valueForKey:@"devices"] != nil)
+        {
+            NSMutableArray *devices = (NSMutableArray *)[object valueForKey:@"devices"];
+            
+            for (NSDictionary *device in devices)
+            {
+                NSString *devID = [device valueForKey:@"id"];
+                
+                if (![ide isDeviceLogging:devID])
+                {
+                    // Set the Toolbar Item's state if it's now the current selected device
+                    
+                    if (device == selectedDevice) streamLogsItem.state = 1;
+                    
+                    // Start logging the device
+                    
+                    [ide startLogging:devID :@{ @"device" : device }];
+                    
+                    // Set the spacing for the log output so that log messages align after the device name
+                    
+                    NSString *devname = [self getValueFrom:device withKey:@"name"];
+                    if (devname.length > logPaddingLength) logPaddingLength = devname.length;
+                }
+            }
+        }
+    }
 }
 
 

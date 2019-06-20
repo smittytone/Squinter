@@ -4728,34 +4728,56 @@
     // ADDED IN 2.3.130
     // Add all of the devices in the devicegroup, if any, to the log stream
     
+    // Make sure we have a device group selected - this should always be the case because we disable the menu item otherwise
+    
     if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
     
+    // Are there any devices in the group to log from?
+    
     if (currentDevicegroup.devices.count > 0)
     {
         if (currentDevicegroup.devices.count <= kMaxLogStreamDevices - ide.numberOfLogStreams)
         {
-            for (NSString *device in currentDevicegroup.devices)
+            NSMutableArray *devicesToAdd = [[NSMutableArray alloc] init];
+            
+            // Run through all the devices. If any are not logging already, prep them for logging
+            
+            for (NSUInteger i = 0 ; i < currentDevicegroup.devices.count ; i++)
             {
+                NSString *device = [currentDevicegroup.devices objectAtIndex:i];
+                
                 if (![ide isDeviceLogging:device])
                 {
-                    // Set the Toolbar Item's state
+                    // Set the Toolbar Item's state if the device is the currently selected one
                     
                     if (device == (NSString *)[selectedDevice valueForKey:@"id"]) streamLogsItem.state = 1;
                     
-                    // Start logging
-                    
                     NSDictionary *theDevice = [self deviceWithID:device];
                     
-                    [ide startLogging:device :@{ @"device" : theDevice }];
-                    
-                    // Set the spacing for the log output so that log messages align after the device name
-                    
-                    NSString *devname = [self getValueFrom:theDevice withKey:@"name"];
-                    if (devname.length > logPaddingLength) logPaddingLength = devname.length;
+                    if (i == currentDevicegroup.devices.count - 1)
+                    {
+                        // Only try to start logging on the last device in the group, otherwise
+                        // add the device to an array. This array will be processed when (a) a log stream
+                        // has been started and then (b) the last device has been added to it successfully.
+                        // We can't just call 'startLogging:' for all the devices at once because of the
+                        // async nature of the op: starting logging a device can only begin when a stream is
+                        // up and running, and when don't know when that will be
+                        
+                        [ide startLogging:device :@{ @"device" : theDevice, @"devices" : devicesToAdd }];
+                        
+                        // Set the spacing for the log output so that log messages align after the device name
+                        
+                        NSString *devname = [self getValueFrom:theDevice withKey:@"name"];
+                        if (devname.length > logPaddingLength) logPaddingLength = devname.length;
+                    }
+                    else
+                    {
+                        [devicesToAdd addObject:theDevice];
+                    }
                 }
             }
         }
