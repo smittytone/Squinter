@@ -127,6 +127,7 @@
     IBOutlet NSMenuItem *deleteDeviceMenuItem;
     IBOutlet NSMenu     *unassignedDevicesMenu;
     IBOutlet NSMenuItem *findDeviceMenuItem;
+    IBOutlet NSMenuItem *closeAllDeviceLogsMenuItem;
 
     #pragma mark Account Menu Outlets
 
@@ -510,6 +511,7 @@
 - (IBAction)showTestBlessedDevices:(id)sender;
 // ADDED IN 2.3.130
 - (IBAction)logAllDevices:(id)sender;
+- (IBAction)closeAllDeviceLogs:(id)sender;
 
 
 // Existing Device Methods

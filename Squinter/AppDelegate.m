@@ -4817,6 +4817,26 @@
 
 
 
+- (IBAction)closeAllDeviceLogs:(id)sender
+{
+    // ADDED 2.3.130
+    // Stop logging any devices that are currently streaming
+    // NOTE The UI is updated at the async pick-up: 'loggingStopped:' in 'AppDelegateAPIHandlers.m'
+
+    if (loggedDevices.count > 0)
+    {
+        for (NSString *devID in loggedDevices)
+        {
+            // Empty-string entries are freed slots in the list, so
+            // make sure we ignore them here
+
+            if (devID.length > 0) [ide stopLogging:devID];
+        }
+    }
+}
+
+
+
 #pragma mark - Existing Device Methods
 
 
@@ -5675,6 +5695,11 @@
 
         [ide stopLogging:devid];
 
+        // FROM 2.3.130
+        // Handle the UI update in the async pick-up: 'loggingStopped:' in 'AppDelegateAPIHandlers.m'
+
+        /*
+
         // Reset the log padding to the longest logging device name
 
         logPaddingLength = 0;
@@ -5694,13 +5719,15 @@
         // Set the Toolbar Item's state
 
         streamLogsItem.state = 1;
+        */
     }
 
     // Update the UI elements showing device names
 
-    [squinterToolbar validateVisibleItems];
-    [self refreshDevicesPopup];
-    [self refreshDeviceGroupsSubmenu];
+    //[squinterToolbar validateVisibleItems];
+    //[self refreshDeviceMenu];
+    //[self refreshDevicesPopup];
+    //[self refreshDeviceGroupsSubmenu];
 }
 
 

@@ -646,6 +646,8 @@
         renameDeviceGroupMenuItem.title = [NSString stringWithFormat:@"Edit “%@”...", name];
         compileMenuItem.title = [NSString stringWithFormat:@"Compile “%@” Code", name];
         uploadMenuItem.title = [NSString stringWithFormat:@"Upload “%@” Code", name];
+        // FROM 2.3.130
+        logAllDevicegroupDevices.title = [NSString stringWithFormat:@"Log All “%@” Devices", name];;
 
         externalSourceMenu.title = [NSString stringWithFormat:@"View “%@” Source in Editor", name];
         externalLibsMenu.title = [NSString stringWithFormat:@"View “%@” Local Libraries in Editor", name];
@@ -675,6 +677,8 @@
         renameDeviceGroupMenuItem.title = @"Edit Device Group";
         compileMenuItem.title = @"Compile Device Group Code";
         uploadMenuItem.title = @"Upload Device Group Code";
+        // FROM 2.3.130
+        logAllDevicegroupDevices.title = @"Log All Device Group Devices";
 
         externalSourceMenu.title = @"View Device Group Source in Editor";
         externalLibsMenu.title = @"View Device Group Local Libraries in Editor";
@@ -1287,7 +1291,7 @@
         streamLogsMenuItem.title = @"Start Log Streaming";
     }
 
-    // Title menus according to whether there is a currently selected device or not
+    // Enable menus according to whether there is a currently selected device or not
 
     showDeviceInfoMenuItem.enabled = selectedDevice != nil ? YES : NO;
     restartDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
@@ -1299,12 +1303,32 @@
     streamLogsMenuItem.enabled = selectedDevice != nil ? YES : NO;
     deleteDeviceMenuItem.enabled = selectedDevice != nil ? YES : NO;
 
-    // Title menus according to whether there is a loaded list of devices or not
+    // Enable menus according to whether there is a loaded list of devices or not
 
     unassignDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
     renameDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
     assignDeviceMenuItem.enabled = devicesArray.count > 0 && projectArray.count > 0 ? YES : NO;
     findDeviceMenuItem.enabled = devicesArray.count > 0 ? YES : NO;
+
+    // FROM 2.3.130
+    // Enable menus according to whether there is a list of logging devices or not
+
+    bool show = NO;
+
+    if (loggedDevices.count > 0)
+    {
+        for (NSInteger i = 0 ; i < loggedDevices.count ; ++i)
+        {
+            NSString *aDeviceID = [loggedDevices objectAtIndex:i];
+
+            if (aDeviceID.length != 0) {
+                show = YES;
+                break;
+            }
+        }
+    }
+
+    closeAllDeviceLogsMenuItem.enabled = show ? YES : NO;
 }
 
 

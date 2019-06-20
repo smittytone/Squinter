@@ -3093,21 +3093,7 @@
     
     NSDictionary *data = (NSDictionary *)note.object;
     NSString *deviceID = [data objectForKey:@"device"];
-    NSDictionary *device;
-    
-    // The returned data includes the device's ID,
-    // so use that to find the device in the device array
-    
-    for (NSDictionary *aDevice in devicesArray)
-    {
-        NSString *aDeviceID = [aDevice objectForKey:@"id"];
-        
-        if ([aDeviceID compare:deviceID] == NSOrderedSame)
-        {
-            device = aDevice;
-            break;
-        }
-    }
+    NSDictionary *device = [self deviceWithID:deviceID];
     
     // Add the device to the list of logging devices
     
@@ -3125,7 +3111,7 @@
         {
             NSString *aDeviceID = [loggedDevices objectAtIndex:i];
             
-            if ([aDeviceID compare:@"FREE"] == NSOrderedSame)
+            if (aDeviceID.length == 0)
             {
                 index = i;
                 break;
@@ -3160,6 +3146,7 @@
     
     [streamLogsItem validate];
     [self refreshDeviceGroupSubmenuDevices];
+    [self refreshDeviceMenu];
     [self refreshDevicesPopup];
     
     // FROM 2.3.130
@@ -3205,22 +3192,8 @@
     // Called in response to a notification from BuildAPIAccess that a device has been removed from the log stream
     
     NSDictionary *data = (NSDictionary *)note.object;
-    NSString *dvid = [data objectForKey:@"device"];
-    NSDictionary *device;
-    
-    // The returned data includes the device's ID,
-    // so use that to find the device in the device array
-    
-    for (NSDictionary *aDevice in devicesArray)
-    {
-        NSString *advid = [aDevice objectForKey:@"id"];
-        
-        if ([advid compare:dvid] == NSOrderedSame)
-        {
-            device = aDevice;
-            break;
-        }
-    }
+    NSString *deviceID = [data objectForKey:@"device"];
+    NSDictionary *device = [self deviceWithID:deviceID];
     
     // Remove the device from the list of logging devices WITHOUT eliminating its index
     
@@ -3239,7 +3212,7 @@
         {
             NSString *advid = [loggedDevices objectAtIndex:i];
             
-            if ([advid compare:dvid] == NSOrderedSame)
+            if ([advid compare:deviceID] == NSOrderedSame)
             {
                 index = i;
                 break;
@@ -3248,14 +3221,32 @@
         
         if (index != -1)
         {
-            [loggedDevices replaceObjectAtIndex:index withObject:@"FREE"];
+            // Replace the removed device with an empty string
+
+            [loggedDevices replaceObjectAtIndex:index withObject:@""];
         }
         else
         {
             NSLog(@"loggedDevices index error in loggingStopped:");
         }
     }
-    
+
+    // Reset the log padding to the longest logging device name
+
+    logPaddingLength = 0;
+
+    for (NSMutableDictionary *device in devicesArray)
+    {
+        deviceID = [self getValueFrom:device withKey:@"id"];
+
+        if ([ide isDeviceLogging:deviceID])
+        {
+            NSString *devname = [self getValueFrom:device withKey:@"name"];
+
+            if (devname.length > logPaddingLength) logPaddingLength = devname.length;
+        }
+    }
+
     // Inform the user
     
     [self writeStringToLog:[NSString stringWithFormat:@"Device \"%@\" removed from log stream", [self getValueFrom:device withKey:@"name"]] :YES];
@@ -3274,6 +3265,7 @@
     
     [streamLogsItem validate];
     [self refreshDeviceGroupSubmenuDevices];
+    [self refreshDeviceMenu];
     [self refreshDevicesPopup];
 }
 
