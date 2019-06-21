@@ -157,7 +157,7 @@
 		3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = InspectorDataCellView.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BBA879622BCD28C004E59ED /* HelpWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HelpWindowViewController.h; sourceTree = "<group>"; };
 		3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HelpWindowViewController.m; sourceTree = "<group>"; };
-		3BBA879922BCE019004E59ED /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = help; sourceTree = "<group>"; };
+		3BBA879922BCE019004E59ED /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = help; path = /Users/smitty/OneDrive/Programming/Squinter/help; sourceTree = "<absolute>"; };
 		3BC06B802226CF9600A57A4D /* DeviceLookupWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLookupWindowViewController.h; sourceTree = "<group>"; };
 		3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceLookupWindowViewController.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = StatusLight.h; sourceTree = "<group>"; usesTabs = 0; };
