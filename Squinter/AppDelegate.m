@@ -668,6 +668,17 @@
 
 
 
+- (void)windowWillClose:(NSNotification *)notification
+{
+    if (hwvc.isOnScreen)
+    {
+        hwvc.isOnScreen = NO;
+        [hwvc.view.window close];
+    }
+}
+
+
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSNotification *)notification
 {
     // Check for unsaved changes
@@ -743,6 +754,12 @@
     // Stop watching for notifications
 
     [nsncdc removeObserver:self];
+    
+    if (hwvc.isOnScreen)
+    {
+        hwvc.isOnScreen = NO;
+        [hwvc.view.window close];
+    }
 }
 
 
@@ -7048,7 +7065,39 @@
     // Open the Squinter web page from 'Help > Show Squinter Help'
     // NOTE Jumps to the 'How to Use Squinter' section
     
-    [self launchOwnSite:@"#account"];
+    if (!hwvc.isOnScreen)
+    {
+        // Size the window to fit neatly alongside the main Squinter window, either immediately
+        // to its right, or overlapping if the gap between the Squinter window and the edge of
+        // the screen is too narrow
+        
+        NSRect rect = _window.frame;
+        NSInteger w = [[NSScreen mainScreen] frame].size.width - rect.size.width;
+        rect.origin.x = (w < 800) ? ([[NSScreen mainScreen] frame].size.width - 800) : (rect.size.width + rect.origin.x);
+        rect.size.width = 800;
+        rect.size.height = [[NSScreen mainScreen] frame].size.height;
+        
+        // Save the new frame specification...
+        
+        hwvc.initialFrame = rect;
+        
+        // ...and apply it
+        
+        [hwvc.view.window setFrame:rect display:NO];
+        
+        // Call 'prepSheet' to load the contents; this will trigger the window's
+        // appearance when the content has loaded
+        
+        [hwvc prepSheet];
+    }
+    else
+    {
+        // Call this in case the window is hidden
+        
+        [hwvc.view.window makeKeyAndOrderFront:self];
+    }
+    
+    //[self launchOwnSite:@"#account"];
 }
 
 

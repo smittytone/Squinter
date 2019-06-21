@@ -29,6 +29,7 @@
 #import  "LogView.h"
 #import  "DeviceLookupWindowViewController.h"
 #import  "SyncWindowViewController.h"
+#import  "HelpWindowViewController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -40,7 +41,8 @@
                                    NSURLSessionTaskDelegate,
                                    NSTextFieldDelegate,
                                    NSTouchBarProvider,
-                                   NSSplitViewDelegate>
+                                   NSSplitViewDelegate,
+                                   NSWindowDelegate>
 {
     #pragma mark - Main UI element outlets
 
@@ -369,6 +371,10 @@
     // Touch Bar
 
     IBOutlet NSTouchBar *appBar;
+    
+    // Help View
+    
+    IBOutlet HelpWindowViewController *hwvc;
 
     #pragma mark Main Properties
 

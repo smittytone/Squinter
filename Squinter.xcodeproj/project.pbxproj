@@ -37,6 +37,8 @@
 		3BAC3AEF22802FE60069234C /* AppDelegateFileHandlers.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BAC3AEE22802FE60069234C /* AppDelegateFileHandlers.m */; };
 		3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */; };
 		3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */; };
+		3BBA879822BCD28C004E59ED /* HelpWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */; };
+		3BBA879A22BCE019004E59ED /* help in Resources */ = {isa = PBXBuildFile; fileRef = 3BBA879922BCE019004E59ED /* help */; };
 		3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
@@ -153,6 +155,9 @@
 		3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SelectWindowViewController.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BB5DCBF202B921D00FA6F7D /* InspectorDataCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = InspectorDataCellView.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = InspectorDataCellView.m; sourceTree = "<group>"; usesTabs = 0; };
+		3BBA879622BCD28C004E59ED /* HelpWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HelpWindowViewController.h; sourceTree = "<group>"; };
+		3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HelpWindowViewController.m; sourceTree = "<group>"; };
+		3BBA879922BCE019004E59ED /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = help; sourceTree = "<group>"; };
 		3BC06B802226CF9600A57A4D /* DeviceLookupWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLookupWindowViewController.h; sourceTree = "<group>"; };
 		3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceLookupWindowViewController.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = StatusLight.h; sourceTree = "<group>"; usesTabs = 0; };
@@ -333,6 +338,8 @@
 				3BB5DCC0202B921D00FA6F7D /* InspectorDataCellView.m */,
 				3B077B2F21118A5D00C17D25 /* InspectorLinkButton.h */,
 				3B077B3021118A5E00C17D25 /* InspectorLinkButton.m */,
+				3BBA879622BCD28C004E59ED /* HelpWindowViewController.h */,
+				3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -364,6 +371,7 @@
 			isa = PBXGroup;
 			children = (
 				3B36D1D71970A0990029CEC0 /* MainMenu.xib */,
+				3BBA879922BCE019004E59ED /* help */,
 				3B36D1DA1970A0990029CEC0 /* Images.xcassets */,
 				3BE520BB197554A0000BAD52 /* docicon.iconbuilder.icns */,
 				3B1252DE1D423BD5003A8065 /* SourceCodePro-Regular.otf */,
@@ -510,6 +518,7 @@
 				3BE520BC197554A0000BAD52 /* docicon.iconbuilder.icns in Resources */,
 				3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */,
 				3B36D1D91970A0990029CEC0 /* MainMenu.xib in Resources */,
+				3BBA879A22BCE019004E59ED /* help in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,6 +616,7 @@
 				3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */,
 				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
+				3BBA879822BCD28C004E59ED /* HelpWindowViewController.m in Sources */,
 				3B077B2E2111846100C17D25 /* LogView.m in Sources */,
 				3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */,
 				3BAC3AEF22802FE60069234C /* AppDelegateFileHandlers.m in Sources */,
