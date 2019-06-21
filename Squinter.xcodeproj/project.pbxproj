@@ -107,7 +107,7 @@
 		3B311E891ECCDEFC0076B066 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B311E8D1ECCDF8C0076B066 /* SquinterDockTilePlugIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquinterDockTilePlugIn.h; sourceTree = "<group>"; };
 		3B311E8E1ECCDF8C0076B066 /* SquinterDockTilePlugIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquinterDockTilePlugIn.m; sourceTree = "<group>"; };
-		3B34A98D215CC91F00120353 /* ConstantsPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConstantsPrivate.h; path = ../../../../OneDrive/Programming/Squinter/Inlcudes/ConstantsPrivate.h; sourceTree = "<group>"; };
+		3B34A98D215CC91F00120353 /* ConstantsPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConstantsPrivate.h; path = /Users/smitty/OneDrive/Programming/Squinter/Includes/ConstantsPrivate.h; sourceTree = "<absolute>"; };
 		3B36D1BF1970A0990029CEC0 /* Squinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Squinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B36D1C21970A0990029CEC0 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		3B36D1C51970A0990029CEC0 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
