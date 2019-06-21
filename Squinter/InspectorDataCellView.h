@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 #import "InspectorLinkButton.h"
 
+
 @interface InspectorDataCellView : NSTableCellView
 
 

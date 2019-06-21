@@ -670,6 +670,11 @@
 
 - (void)windowWillClose:(NSNotification *)notification
 {
+    // ADDED 2.3.130
+    // This is an NSWindowDelegate method, tripped whenn the user clicks the red close button
+    // It's used here to make sure the Help window, if open, doesn't block the app from being
+    // shut down becuase it's open and the last window visible (see 'applicationShouldTerminateAfterLastWindowClosed:')
+
     if (hwvc.isOnScreen)
     {
         hwvc.isOnScreen = NO;
@@ -754,7 +759,10 @@
     // Stop watching for notifications
 
     [nsncdc removeObserver:self];
-    
+
+    // FROM 2.3.130
+    // Make sure we close the Help window, if it's open, first
+
     if (hwvc.isOnScreen)
     {
         hwvc.isOnScreen = NO;

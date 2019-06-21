@@ -1,10 +1,9 @@
-//
-//  HelpWindowViewController.h
-//  Squinter
-//
+
+
 //  Created by Tony Smith on 21/06/2019.
-//  Copyright © 2019 Tony Smith. All rights reserved.
-//
+//  Copyright (c) 2019 Tony Smith. All rights reserved.
+//  ADDED 2.3.130
+
 
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>

@@ -6,6 +6,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+
 @interface InspectorLinkButton : NSButton
+
 
 @end
