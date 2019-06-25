@@ -7068,7 +7068,7 @@
 
 
 
-- (IBAction)showWebHelp:(id)sender
+- (IBAction)showOfflineHelp:(id)sender
 {
     // Open the Squinter web page from 'Help > Show Squinter Help'
     // NOTE Jumps to the 'How to Use Squinter' section
@@ -7104,8 +7104,16 @@
         
         [hwvc.view.window makeKeyAndOrderFront:self];
     }
+}
+
+
+
+- (IBAction)showWebHelp:(id)sender
+{
+    // Open the Squinter web page from 'Help > Show Squinter Help'
+    // NOTE Jumps to the 'How to Use Squinter' section
     
-    //[self launchOwnSite:@"#account"];
+    [self launchOwnSite:@"#account"];
 }
 
 

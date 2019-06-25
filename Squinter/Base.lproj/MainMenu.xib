@@ -958,6 +958,12 @@
                                     <action selector="showWebHelp:" target="Voe-Tx-rLC" id="sHJ-jB-EMP"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show Offline Squinter Help" alternate="YES" keyEquivalent="H" id="SIF-0H-KmL">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="showOfflineHelp:" target="Voe-Tx-rLC" id="vXC-G2-Nua"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Show Squinter Release Notes" keyEquivalent="r" id="zEK-Kt-mDj">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>

@@ -597,6 +597,8 @@
 - (void)showEILibsPage;
 - (void)launchOwnSite:(NSString *)anchor;
 - (void)launchWebSite:(NSString *)url;
+// FROM 2.3.130
+- (IBAction)showOfflineHelp:(id)sender;
 
 
 // About Sheet Methods
