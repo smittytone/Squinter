@@ -51,7 +51,7 @@
 - (void)setNilDevice;
 - (void)showNilItems:(BOOL)shouldShow;
 
-- (CGFloat)renderedHeightOfString:(NSString *)string;
+- (CGFloat)renderedHeightOfString:(NSString *)string :(NSInteger)width;
 - (IBAction)switchTable:(id)sender;
 
 

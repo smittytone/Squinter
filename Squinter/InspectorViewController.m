@@ -86,6 +86,27 @@
 
 
 
+- (IBAction)goToFolder:(id)sender
+{
+    // Project path buttons in the Inspector panel come here when clicked
+    
+    NSButton *linkButton = (NSButton *)sender;
+    InspectorDataCellView *cellView = (InspectorDataCellView *)linkButton.superview;
+    NSString *path = cellView.path;
+    
+    if (cellView.row < 5)
+    {
+        // This will be the location of the project file, which is already open,
+        // so just reveal it in Finder...
+        
+        path = [NSString stringWithFormat:@"%@/%@", project.path, project.filename];
+    }
+    
+    [nswsw selectFile:path inFileViewerRootedAtPath:project.path];
+}
+
+
+
 - (IBAction)goToURL:(id)sender
 {
     // Agent URL buttons in the Inspector panel come here when clicked
@@ -1030,47 +1051,48 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     else
     {
         // This is a a data row
-
-        InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:@"data.cell" owner:self];
+        
+        NSString *cellTypeID = node.flag ? @"data.cell" : @"data.cell.alt";
+        InspectorDataCellView *cv = [outlineView makeViewWithIdentifier:cellTypeID owner:self];
         cv.title.stringValue = node.key;
         cv.data.stringValue = node.value;
-
+        
+        // Hide the buttons by default
+        
+        cv.goFolderButton.hidden = YES;
+        cv.openFileButton.hidden = YES;
+        
         if ([self isLinkRow:node])
         {
             // If data is a URL or a file link, make sure there's an active button at the end of the row
-
-            cv.goToButton.target = self;
-
-            if ([node.value compare:@"No agent"] == NSOrderedSame)
-            {
-                cv.goToButton.hidden = YES;
-            }
-            else
+            
+            if ([node.value compare:@"No agent"] != NSOrderedSame)
             {
                 cv.path = node.value;
-
+                cv.openFileButton.hidden = NO;
+                cv.openFileButton.target = self;
+                
                 if (panelSelector.selectedSegment == 1)
                 {
                     // Button setup for the Device Inspector
 
-                    cv.goToButton.action = @selector(goToURL:);
-                    cv.goToButton.toolTip = @"Click this icon to open the displayed URL in a browser";
+                    cv.openFileButton.action = @selector(goToURL:);
+                    cv.openFileButton.toolTip = @"Click this icon to open the displayed URL in a browser";
                 }
                 else
                 {
                     // Button setup for the Project Inspector
 
-                    cv.goToButton.action = @selector(link:);
-                    cv.goToButton.toolTip = @"Click this icon to open the displayed file in your editor";
+                    cv.openFileButton.action = @selector(link:);
+                    cv.openFileButton.toolTip = @"Click this icon to open the displayed file in your editor";
                     cv.row = (node.flag && [node.value hasSuffix:@"squirrelproj"]) ? 0 : 99;
+                    
+                    cv.goFolderButton.action = @selector(goToFolder:);
+                    cv.goFolderButton.toolTip = @"Click this icon to show the displayed file in the Finder";
+                    cv.goFolderButton.hidden = NO;
+                    cv.goFolderButton.target = self;
                 }
-
-                cv.goToButton.hidden = NO;
             }
-        }
-        else
-        {
-            cv.goToButton.hidden = YES;
         }
 
         cellView = cv;
@@ -1096,7 +1118,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     // Get the data of the cell we're sizing
     // Is it a spacer row — ie. 'key' and 'value' equal a single space
 
-    if (key.length == 1 && value.length == 1) return 10;
+    if (key.length == 1 && value.length == 1) return 10.0;
 
     // Information row - but is it a header ('value' equals zero-length string) or a data row?
 
@@ -1104,30 +1126,37 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     {
         // Get the rendered height of the data text - it's drawn into an area as wide as the data column
 
-        CGFloat renderHeight = [self renderedHeightOfString:value];
+        CGFloat renderHeight = [self renderedHeightOfString:value :(node.flag ? 148 : 180)];
 
         // 20 is the height of one standard line
 
-        if (renderHeight < 20) renderHeight = 20;
+        if (renderHeight < 20.0) renderHeight = 20.0;
 
         // Calculate the maximum, dealing with a fudge factor
-
-        if (renderHeight > 20 && fmod(renderHeight, 20) > 0) renderHeight = renderHeight - fmod(renderHeight, 20) + 20;
+        
+        // REMOVE IN 2.3.130
+        // if (renderHeight > 20 && fmod(renderHeight, 20) > 0) renderHeight = renderHeight - fmod(renderHeight, 20) + 20;
 
         return renderHeight;
     }
 
     // Return the height of a header row
 
-    return 30;
+    return 30.0;
 }
 
 
 
-- (CGFloat)renderedHeightOfString:(NSString *)string
+- (CGFloat)renderedHeightOfString:(NSString *)string :(NSInteger)width
 {
-    NSTextField *nstf = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 172, 400)];
+    // Returns the vertical height in pixels of the rendered string
+    // FROM 2.3.130: add 'width' parameter for multiple use-cases
+    
+    NSTextField *nstf = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, width, 800)];
     nstf.cell.wraps = YES;
+    nstf.cell.bordered = NO;
+    nstf.cell.bezeled = NO;
+    nstf.allowsEditingTextAttributes = NO;
     nstf.cell.lineBreakMode = NSLineBreakByWordWrapping; //NSLineBreakByCharWrapping;
     NSFont *font = [NSFont systemFontOfSize:11];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
