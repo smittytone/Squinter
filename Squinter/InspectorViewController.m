@@ -1136,7 +1136,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
         
         // REMOVE IN 2.3.130
         // if (renderHeight > 20 && fmod(renderHeight, 20) > 0) renderHeight = renderHeight - fmod(renderHeight, 20) + 20;
-
+        NSLog(@"%f - %@", renderHeight, key);
         return renderHeight;
     }
 
@@ -1154,9 +1154,9 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     
     NSTextField *nstf = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, width, 800)];
     nstf.cell.wraps = YES;
-    nstf.cell.bordered = NO;
-    nstf.cell.bezeled = NO;
-    nstf.allowsEditingTextAttributes = NO;
+    //nstf.cell.bordered = NO;
+    //nstf.cell.bezeled = NO;
+    //nstf.allowsEditingTextAttributes = NO;
     nstf.cell.lineBreakMode = NSLineBreakByWordWrapping; //NSLineBreakByCharWrapping;
     NSFont *font = [NSFont systemFontOfSize:11];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
