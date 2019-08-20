@@ -21,6 +21,8 @@
     // Assume the help panel is not on screen at launch
 
     isOnScreen = NO;
+    
+    [super viewDidLoad]
 }
 
 

@@ -40,6 +40,7 @@
 		3BBA879822BCD28C004E59ED /* HelpWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */; };
 		3BBA879A22BCE019004E59ED /* help in Resources */ = {isa = PBXBuildFile; fileRef = 3BBA879922BCE019004E59ED /* help */; };
 		3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */; };
+		3BC1CCB6230447F6000D5B23 /* EnvVarWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC1CCB5230447F6000D5B23 /* EnvVarWindowController.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BCEB7B9227AF77F0090B137 /* AppDelegateUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BCEB7B8227AF77F0090B137 /* AppDelegateUI.m */; };
@@ -160,6 +161,8 @@
 		3BBA879922BCE019004E59ED /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = help; path = /Users/smitty/OneDrive/Programming/Squinter/help; sourceTree = "<absolute>"; };
 		3BC06B802226CF9600A57A4D /* DeviceLookupWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLookupWindowViewController.h; sourceTree = "<group>"; };
 		3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceLookupWindowViewController.m; sourceTree = "<group>"; };
+		3BC1CCB4230447F6000D5B23 /* EnvVarWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnvVarWindowController.h; sourceTree = "<group>"; };
+		3BC1CCB5230447F6000D5B23 /* EnvVarWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnvVarWindowController.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = StatusLight.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = StatusLight.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -340,6 +343,8 @@
 				3B077B3021118A5E00C17D25 /* InspectorLinkButton.m */,
 				3BBA879622BCD28C004E59ED /* HelpWindowViewController.h */,
 				3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */,
+				3BC1CCB4230447F6000D5B23 /* EnvVarWindowController.h */,
+				3BC1CCB5230447F6000D5B23 /* EnvVarWindowController.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -596,6 +601,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3BA707602181D97200585728 /* InspectorViewController.m in Sources */,
+				3BC1CCB6230447F6000D5B23 /* EnvVarWindowController.m in Sources */,
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
 				3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */,
 				3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */,

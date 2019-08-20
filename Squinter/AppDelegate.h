@@ -30,6 +30,7 @@
 #import  "DeviceLookupWindowViewController.h"
 #import  "SyncWindowViewController.h"
 #import  "HelpWindowViewController.h"
+#import  "EnvVarWindowController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -353,6 +354,11 @@
     
     IBOutlet NSPanel     *multiDeviceSheet;
     IBOutlet NSTextField *multiDeviceLabel;
+    
+    // ADDED IN 2.3.131
+    #pragma mark Environment Vars Sheet
+    IBOutlet NSPanel    *envVarSheet;
+    IBOutlet EnvVarWindowController *evvc;
 
     #pragma mark Other Sheets
 
