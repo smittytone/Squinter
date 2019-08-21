@@ -709,6 +709,8 @@
     logAllDevicegroupDevices.enabled = currentDevicegroup != nil ? YES : NO;
     nextDevicegroupMenuItem.enabled = (currentProject != nil && currentProject.devicegroups.count > 1) ? YES : NO;
     previousDevicegroupMenuItem.enabled = (currentProject != nil && currentProject.devicegroups.count > 1) ? YES : NO;
+    // FROM 2.3.131
+    envVarsMenuItem.enabled = currentDevicegroup != nil ? YES : NO;
     
     // FROM 2.3.128
     // Set the Set Target menu titles appropriate to test/production

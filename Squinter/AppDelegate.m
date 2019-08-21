@@ -4862,6 +4862,60 @@
 
 
 
+- (IBAction)editEnvVariables:(id)sender
+{
+    // ADDED 2.3.131
+    // Show the device group's environment variables
+
+    if (currentDevicegroup == nil)
+    {
+        [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
+        return;
+    }
+
+    if (!ide.isLoggedIn)
+    {
+        [self loginAlert:@"view or edit the Device Group’s environment variables"];
+        return;
+    }
+
+    // Set inital values
+
+    evvc.devicegroup = currentDevicegroup.name;
+    evvc.jsonString = [self getValueFrom:currentDevicegroup.data withKey:@"env_vars"];
+    if (evvc.jsonString == nil) evvc.jsonString = @"";
+
+    // Update the sheet itself
+
+    [evvc prepSheet];
+    [_window beginSheet:envVarSheet completionHandler:nil];
+}
+
+
+
+- (IBAction)cancelEnvVarSheet:(id)sender
+{
+    // Close the unsynced device groups sheet and end the operation
+
+    [_window endSheet:envVarSheet];
+}
+
+
+
+- (IBAction)saveEnvVarSheet:(id)sender
+{
+    [evvc updateData];
+    NSString *newJson = evvc.jsonString;
+
+    [_window endSheet:envVarSheet];
+
+    // Update the device group on the server
+
+    //[ide updateDevicegroup:currentDevicegroup.cdid :@[@"env_vars"] :@[newJson] :currentDevicegroup];
+}
+
+
+
 #pragma mark - Existing Device Methods
 
 

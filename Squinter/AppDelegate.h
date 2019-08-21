@@ -111,6 +111,7 @@
     IBOutlet NSMenuItem *logAllDevicegroupDevices;
     IBOutlet NSMenuItem *nextDevicegroupMenuItem;
     IBOutlet NSMenuItem *previousDevicegroupMenuItem;
+    IBOutlet NSMenuItem *envVarsMenuItem;
 
     #pragma mark Device Menu outlets
 
@@ -524,6 +525,11 @@
 // ADDED IN 2.3.130
 - (IBAction)logAllDevices:(id)sender;
 - (IBAction)closeAllDeviceLogs:(id)sender;
+// ADDED IN 2.3.131
+- (IBAction)editEnvVariables:(id)sender;
+- (IBAction)cancelEnvVarSheet:(id)sender;
+- (IBAction)saveEnvVarSheet:(id)sender;
+
 
 
 // Existing Device Methods
