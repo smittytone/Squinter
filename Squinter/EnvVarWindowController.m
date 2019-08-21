@@ -15,11 +15,15 @@
 @synthesize devicegroup, envVars;
 
 
+
+#pragma mark - ViewController Lifecycle and Initialisation Methods
+
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    // Watch for text field changes
+    // Watch for table text field changes
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(textDidEndEditing:)
@@ -31,7 +35,7 @@
 
 - (void)prepSheet
 {
-    // Ready the window for viewing
+    // Ready the window for viewing before its appearance
     
     json = @"";
     
@@ -52,6 +56,8 @@
     if (envVars.count > 0)
     {
         // Transfer the incoming dictonary of KV pairs into separate, editable arrays
+        // NOTE We do this through iteration (rather than use '[envVars allValues]')
+        //      in order to be sure we have the order of the items on both arrays correct
         
         [envKeys addObjectsFromArray:[envVars allKeys]];
         for (NSString *key in envKeys) [envValues addObject:[envVars valueForKey:key]];
@@ -68,12 +74,17 @@
 
 
 
+#pragma mark - Data-sizing Methods
+
+
 - (void)updateData
 {
-    // Convert the current table data to a JSON string, typically when editing ends
+    // Rebuild the environment variables dictionary from the table source arrays
 
     envVars = [NSDictionary dictionaryWithObjects:envValues forKeys:envKeys];
-    
+
+    // Build a JSON string equivalent for data length checking and display
+
     [self convertToJSON];
 }
 
@@ -81,7 +92,7 @@
 
 - (void)convertToJSON
 {
-    // Convert the KV pairs dictionary to a JSON string to determine the data length
+    // Convert the environment variables dictionary to a JSON string to determine the data length
     
     if ([NSJSONSerialization isValidJSONObject:envVars])
     {
@@ -100,7 +111,7 @@
 
 - (BOOL)checkDataSize
 {
-    // Return YES if the string is too long, otherwise NO
+    // Return YES if the JSON representation of the environment variables dictionary is too long, otherwise NO
     
     return (json.length > 16000);
 }
@@ -114,16 +125,16 @@
 {
     // Add an item to the table with a dummy KV pair
     
-    [envKeys addObject:[NSString stringWithFormat:@"Key %li", (long)(envKeys.count + 1)]];
-    [envValues addObject:[NSString stringWithFormat:@"Value %li", (long)(envKeys.count + 1)]];
+    [envKeys addObject:[NSString stringWithFormat:@"Key_%li", (long)(envKeys.count + 1)]];
+    [envValues addObject:[NSString stringWithFormat:@"Value_%li", (long)(envKeys.count + 1)]];
     [variablesTableView reloadData];
 
-    // Select the new (last) item
+    // Select the new (last) item in the table
     
     NSIndexSet *rows = [[NSIndexSet alloc] initWithIndex:envKeys.count - 1];
     [variablesTableView selectRowIndexes:rows byExtendingSelection:NO];
     
-    // Update the JSON store
+    // Build a JSON string equivalent for data length checking and display
     
     [self updateData];
 }
@@ -160,7 +171,7 @@
          ];
     }
     
-    // Update the JSON store
+    // Build a JSON string equivalent for data length checking and display
     
     [self updateData];
 }
@@ -189,7 +200,7 @@
             cellTextField.stringValue =  [envValues objectAtIndex:row];
             cellTextField.delegate = self;
             cellTextField.tableRow = row;
-            cellTextField.type = 1;
+            cellTextField.type = kEnvVarTypeValue;
             return cell;
         }
     }
@@ -203,7 +214,7 @@
             cellTextField.stringValue =  [envKeys objectAtIndex:row];
             cellTextField.delegate = self;
             cellTextField.tableRow = row;
-            cellTextField.type = 2;
+            cellTextField.type = kEnvVarTypeKey;
             return cell;
         }
     }
@@ -228,13 +239,13 @@
         NSString *editedValue = cellTextField.stringValue;
         BOOL isNumber = NO;
         
-        if (cellTextField.type == 1)
+        if (cellTextField.type == kEnvVarTypeValue)
         {
             // Check whether the entered value is a numeric value, either a float or an int
 
             // First, check for an integer - ie. 'xxxx' only (no periods
             NSError *error = nil;
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^[0-9]+$"
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:kEnvVarIntRegex
                                                                                    options:NSRegularExpressionCaseInsensitive
                                                                                      error:&error];
             NSRange rofm = [regex rangeOfFirstMatchInString:editedValue
@@ -253,7 +264,7 @@
             {
                 // Didn't find an int, so try for a float, ie. 'xxx.yyy' ONLY
 
-                regex = [NSRegularExpression regularExpressionWithPattern:@"^[0-9]+.[0-9]+$"
+                regex = [NSRegularExpression regularExpressionWithPattern:kEnvVarFloatRegex
                                                                   options:NSRegularExpressionCaseInsensitive
                                                                     error:&error];
                 rofm = [regex rangeOfFirstMatchInString:editedValue
@@ -309,7 +320,7 @@
             // Check for API key limitations:
             // 1. 100 chars max
             
-            if (editedkey.length > 100)
+            if (editedkey.length > kEnvVarMaxKeySize)
             {
                 [self showWarning:@"Key too long"
                                  :@"Keys must contain no more than 100 alphanumeric characters."];
@@ -320,7 +331,7 @@
             // 2. Alphanumeric only
             
             NSError *error = nil;
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^[a-zA-Z][_a-zA-Z0-9]{0,99}$"
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:kEnvVarKeyRegex
                                                                                    options:NSRegularExpressionCaseInsensitive
                                                                                      error:&error];
             NSRange rofm = [regex rangeOfFirstMatchInString:editedValue

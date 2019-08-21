@@ -89,4 +89,15 @@
 #define kElectricImpAccountTypeFree         1
 #define kElectricImpAccountTypePaid         2
 
+// ADDED 2.3.131
+// Environment Variable Types, etc.
+#define kEnvVarTypeKey                      1
+#define kEnvVarTypeValue                    2
+#define kEnvVarMaxKeySize                   100
+#define kEnvVarMaxDataSize                  16000
+#define kEnvVarKeyRegex                     @"^[a-zA-Z][_a-zA-Z0-9]{0,99}$"
+#define kEnvVarFloatRegex                   @"^[0-9]+.[0-9]+$"
+#define kEnvVarIntRegex                     @"^[0-9]+$"
+
+
 #endif

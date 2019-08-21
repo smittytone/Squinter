@@ -5,9 +5,12 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import "Constants.h"
 #import "EnvVarTextField.h"
 
+
 NS_ASSUME_NONNULL_BEGIN
+
 
 @interface EnvVarWindowController : NSViewController <NSTableViewDelegate,
                                                       NSTableViewDataSource,
@@ -25,9 +28,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)prepSheet;
 - (void)updateData;
+- (void)convertToJSON;
+- (BOOL)checkDataSize;
 - (IBAction)doAddItem:(id)sender;
 - (IBAction)doRemoveItem:(id)sender;
 - (void)textDidEndEditing:(NSNotification *)notification;
+- (void)showWarning:(NSString *)header :(NSString *)body;
 
 
 @property (nonatomic, strong) NSString *devicegroup;
@@ -35,5 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @end
+
 
 NS_ASSUME_NONNULL_END
