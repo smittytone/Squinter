@@ -5,6 +5,7 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import "EnvVarTextField.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,10 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     IBOutlet NSTableView *envVarTableView;
     IBOutlet NSTextField *headerTextField;
+    IBOutlet NSTextField *jsonSizeTextField;
     
     NSMutableArray *envKeys, *envValues;
-    
-    
 }
 
 
@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateData;
 - (IBAction)doAddItem:(id)sender;
 - (IBAction)doRemoveItem:(id)sender;
+- (void)textDidEndEditing:(NSNotification *)notification;
 
 
 @property (nonatomic, strong) NSString *jsonString;
