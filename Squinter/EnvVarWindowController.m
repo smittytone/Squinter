@@ -12,7 +12,7 @@
 
 @implementation EnvVarWindowController
 
-@synthesize jsonString;
+@synthesize jsonString, devicegroup;
 
 
 - (void)viewDidLoad
@@ -21,11 +21,12 @@
 }
 
 
+
 - (void)prepSheet
 {
     // Ready the window for viewing
     
-    if (envData == nil) envData = [[NSMutableDictionary alloc] init];
+    if (envValues == nil) envValues = [[NSMutableArray alloc] init];
     if (envKeys == nil) envKeys = [[NSMutableArray alloc] init];
     
     if (jsonString.length > 0)
@@ -39,13 +40,76 @@
         
         if (error == nil)
         {
-            envData = [NSMutableDictionary dictionaryWithDictionary:dict];
+            // Get all of the incoming data's keys
+
             [envKeys addObjectsFromArray:[dict allKeys]];
+
+            // Iterate through the list of keys to get the relevant values.
+            // We do this to ensure we have the correct order CHECK
+
+            for (NSString *key in envKeys)
+            {
+                [envValues addObject:[dict valueForKey:key]];
+            }
         }
     }
+
+    // Update the table view
     
     [envVarTableView reloadData];
+
+    // Set the header text
+
+    headerTextField.stringValue = [NSString stringWithFormat:@"Environment variable set for “%@”", devicegroup];
 }
+
+
+
+- (void)updateData
+{
+    // Convert the current table data back to a JSON string
+
+    NSDictionary *dict = [NSDictionary dictionaryWithObjects:envValues forKeys:envKeys];
+    NSError *error = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+
+    if (error == nil)
+    {
+        jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    }
+}
+
+
+
+- (BOOL)checkDataSize
+{
+    
+}
+
+
+#pragma mark - Action Methods
+
+
+- (IBAction)doAddItem:(id)sender
+{
+    NSString *keyName = [NSString stringWithFormat:@"Key %li", (long)(envKeys.count + 1)];
+    [envKeys addObject:keyName];
+    [envValues addObject:@""];
+    [envVarTableView reloadData];
+
+    // Select the new (last) item
+    
+    NSIndexSet *rows = [[NSIndexSet alloc] initWithIndex:envKeys.count - 1];
+    [envVarTableView selectRowIndexes:rows byExtendingSelection:NO];
+}
+
+
+
+- (IBAction)doRemoveItem:(id)sender
+{
+
+}
+
 
 
 #pragma mark - NSTableView Delegate and DataSource Methods
@@ -53,7 +117,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return envData.count;
+    return envKeys.count;
 }
 
 
@@ -66,8 +130,8 @@
         
         if (cell != nil)
         {
-            NSString *key = [envKeys objectAtIndex:row];
-            cell.textField.stringValue = [envData objectForKey:key];
+            cell.textField.stringValue =  [envValues objectAtIndex:row];
+            cell.textField.delegate = self;
             return cell;
         }
     }
@@ -77,8 +141,7 @@
         
         if (cell != nil)
         {
-            NSString *key = [envKeys objectAtIndex:row];
-            cell.textField.stringValue = key;
+            cell.textField.stringValue = [envKeys objectAtIndex:row];;
             return cell;
         }
     }
@@ -87,5 +150,16 @@
 }
 
 
+
+#pragma mark - NSTextFieldDelegate Methods
+
+- (void)textDidEndEditing:(NSNotification *)notification
+{
+    NSTextField *tf = (NSTextField *)notification.object;
+    NSUInteger row = [envVarTableView rowForView:tf.superview];
+    [envValues addObject:tf.stringValue];
+    [envValues exchangeObjectAtIndex:row withObjectAtIndex:(envValues.count - 1)];
+    [envValues removeLastObject];
+}
 
 @end

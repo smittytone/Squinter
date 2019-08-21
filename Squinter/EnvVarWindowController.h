@@ -9,18 +9,26 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface EnvVarWindowController : NSViewController <NSTableViewDelegate,
-                                                      NSTableViewDataSource>
+                                                      NSTableViewDataSource,
+                                                      NSTextFieldDelegate>
 {
     IBOutlet NSTableView *envVarTableView;
+    IBOutlet NSTextField *headerTextField;
     
-    NSMutableDictionary *envData;
-    NSMutableArray *envKeys;
+    NSMutableArray *envKeys, *envValues;
     
     
 }
 
 
+- (void)prepSheet;
+- (void)updateData;
+- (IBAction)doAddItem:(id)sender;
+- (IBAction)doRemoveItem:(id)sender;
+
+
 @property (nonatomic, strong) NSString *jsonString;
+@property (nonatomic, strong) NSString *devicegroup;
 
 
 @end

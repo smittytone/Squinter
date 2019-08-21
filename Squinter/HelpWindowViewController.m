@@ -22,7 +22,7 @@
 
     isOnScreen = NO;
     
-    [super viewDidLoad]
+    [super viewDidLoad];
 }
 
 
