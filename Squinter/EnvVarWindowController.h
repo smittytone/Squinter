@@ -23,10 +23,13 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *envKeys, *envValues;
     
     NSString *json;
+
+    NSFont *italicFont;
 }
 
 
 - (void)prepSheet;
+- (void)prepareToCloseSheet;
 - (void)updateData;
 - (void)convertToJSON;
 - (BOOL)checkDataSize;

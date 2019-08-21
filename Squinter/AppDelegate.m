@@ -4907,6 +4907,7 @@
 
 - (IBAction)saveEnvVarSheet:(id)sender
 {
+    [evvc prepareToCloseSheet];
     [_window endSheet:envVarSheet];
 
     // Update the device group on the server

@@ -29,6 +29,10 @@
                                            selector:@selector(textDidEndEditing:)
                                                name:NSControlTextDidEndEditingNotification
                                              object:nil];
+
+    NSFontManager *nsfm = [NSFontManager sharedFontManager];
+    italicFont = [nsfm convertFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]
+                       toHaveTrait:NSFontItalicTrait];
 }
 
 
@@ -72,6 +76,23 @@
     [variablesTableView reloadData];
 }
 
+
+
+- (void)prepareToCloseSheet
+{
+    // Make sure all the 'editing' fields are saved
+
+    if (variablesTableView.selectedRow != -1)
+    {
+        NSTableRowView *row = [variablesTableView rowViewAtRow:variablesTableView.selectedRow makeIfNecessary:NO];
+
+        for (NSUInteger i = 0 ; i < 2 ; i++)
+        {
+            NSTableCellView *cell = [row viewAtColumn:i];
+            [cell.textField resignFirstResponder];
+        }
+    }
+}
 
 
 #pragma mark - Data-sizing Methods
@@ -197,7 +218,26 @@
         if (cell != nil)
         {
             EnvVarTextField *cellTextField = (EnvVarTextField *)cell.textField;
-            cellTextField.stringValue =  [envValues objectAtIndex:row];
+
+            id value = [envValues objectAtIndex:row];
+
+            if ([value isKindOfClass:[NSNumber class]])
+            {
+                NSNumberFormatter *nsnf = [[NSNumberFormatter alloc] init];
+                nsnf.maximumFractionDigits = 6;
+                NSNumber *num = (NSNumber *)value;
+                NSString *str = [nsnf stringFromNumber:num];
+                NSArray *values = [NSArray arrayWithObjects:italicFont, nil];
+                NSArray *keys = [NSArray arrayWithObjects:NSFontAttributeName, nil];
+                NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
+                NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:str attributes:attributes];
+                cellTextField.attributedStringValue = attrString;
+            }
+            else
+            {
+                cellTextField.stringValue = (NSString *)value;
+            }
+
             cellTextField.delegate = self;
             cellTextField.tableRow = row;
             cellTextField.type = kEnvVarTypeValue;
@@ -211,7 +251,7 @@
         if (cell != nil)
         {
             EnvVarTextField *cellTextField = (EnvVarTextField *)cell.textField;
-            cellTextField.stringValue =  [envKeys objectAtIndex:row];
+            cellTextField.stringValue = [envKeys objectAtIndex:row];
             cellTextField.delegate = self;
             cellTextField.tableRow = row;
             cellTextField.type = kEnvVarTypeKey;
@@ -276,7 +316,7 @@
                     // Found a float, so save it as such
 
                     isNumber = YES;
-                    [envValues insertObject:[NSNumber numberWithInteger:editedValue.floatValue] atIndex:cellTextField.tableRow];
+                    [envValues insertObject:[NSNumber numberWithFloat:editedValue.floatValue] atIndex:cellTextField.tableRow];
                     [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
                 }
             }
@@ -355,7 +395,8 @@
         // Update the JSON string
         
         [self updateData];
-        
+        [variablesTableView reloadData];
+
         // Check the overall size of the data
         
         if ([self checkDataSize])
