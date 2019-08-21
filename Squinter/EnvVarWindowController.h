@@ -13,11 +13,13 @@ NS_ASSUME_NONNULL_BEGIN
                                                       NSTableViewDataSource,
                                                       NSTextFieldDelegate>
 {
-    IBOutlet NSTableView *envVarTableView;
+    IBOutlet NSTableView *variablesTableView;
     IBOutlet NSTextField *headerTextField;
-    IBOutlet NSTextField *jsonSizeTextField;
+    IBOutlet NSTextField *dataSizeTextField;
     
     NSMutableArray *envKeys, *envValues;
+    
+    NSString *json;
 }
 
 
@@ -28,8 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)textDidEndEditing:(NSNotification *)notification;
 
 
-@property (nonatomic, strong) NSString *jsonString;
 @property (nonatomic, strong) NSString *devicegroup;
+@property (nonatomic, strong) NSDictionary *envVars;
 
 
 @end

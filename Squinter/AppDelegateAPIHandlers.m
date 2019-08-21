@@ -1590,7 +1590,7 @@
             NSString *newDesc = [self getValueFrom:rawGroupData withKey:@"description"];
             
             // FROM 2.3.128
-            // Store retrieved type (may have been changed BuildAPIAccess
+            // Store retrieved type (may have been changed by BuildAPIAccess)
             
             devicegroup.type = [self getValueFrom:rawGroupData withKey:@"type"];
             
@@ -1627,6 +1627,10 @@
             [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" now has a new target %@ device group: \"%@\".", devicegroup.name, type, targetDevicegroup.name] :YES];
             
             updated = YES;
+        }
+        else if ([action compare:@"devicegroupvarschanged"] == NSOrderedSame)
+        {
+            [self writeStringToLog:[NSString stringWithFormat:@"Device group \"%@\" enviroment variables updated.", devicegroup.name] :YES];
         }
     }
     else

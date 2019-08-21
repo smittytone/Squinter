@@ -3364,7 +3364,7 @@ Gw
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="aVl-pt-Cg4"/>
                         </constraints>
-                        <secureTextFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="mzG-0G-0je">
+                        <secureTextFieldCell key="cell" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="mzG-0G-0je">
                             <font key="font" size="12" name="Menlo-Regular"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -4509,9 +4509,9 @@ Gw
         </viewController>
         <viewController id="StY-GQ-q3d" customClass="EnvVarWindowController">
             <connections>
-                <outlet property="envVarTableView" destination="maZ-QV-cyK" id="tsD-4I-JWW"/>
+                <outlet property="dataSizeTextField" destination="08e-4o-xOU" id="Dof-Xs-DVu"/>
                 <outlet property="headerTextField" destination="zDK-uH-M2W" id="t9D-p7-m8j"/>
-                <outlet property="jsonSizeTextField" destination="08e-4o-xOU" id="hEr-VB-ZV0"/>
+                <outlet property="variablesTableView" destination="maZ-QV-cyK" id="GJj-l4-w5l"/>
                 <outlet property="view" destination="uLW-a9-1oX" id="BAj-7m-Fda"/>
             </connections>
         </viewController>

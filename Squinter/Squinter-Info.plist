@@ -48,7 +48,7 @@
 	<key>CFBundleSignature</key>
 	<string>BPSq</string>
 	<key>CFBundleVersion</key>
-	<string>130</string>
+	<string>131</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSItemContentTypes</key>
@@ -68,7 +68,7 @@
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
 	<key>SQBuildVersion</key>
-	<integer>115</integer>
+	<integer>148</integer>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>

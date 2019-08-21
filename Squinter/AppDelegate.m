@@ -2132,8 +2132,6 @@
                 changed = YES;
             }
 
-
-
             if (changed)
             {
                 // Add the device group's type to the keys - values arrays. It will not be changed,
@@ -4878,12 +4876,17 @@
         [self loginAlert:@"view or edit the Device Group’s environment variables"];
         return;
     }
+    
+    if (currentDevicegroup.data == nil)
+    {
+        [self writeWarningToLog:@"Device Group data still loading... please try again in a moment" :YES];
+        return;
+    }
 
     // Set inital values
 
     evvc.devicegroup = currentDevicegroup.name;
-    evvc.jsonString = [self getValueFrom:currentDevicegroup.data withKey:@"env_vars"];
-    if (evvc.jsonString == nil) evvc.jsonString = @"";
+    evvc.envVars = [self getValueFrom:currentDevicegroup.data withKey:@"env_vars"];
 
     // Update the sheet itself
 
@@ -4904,14 +4907,16 @@
 
 - (IBAction)saveEnvVarSheet:(id)sender
 {
-    [evvc updateData];
-    NSString *newJson = evvc.jsonString;
-
     [_window endSheet:envVarSheet];
 
     // Update the device group on the server
-
-    //[ide updateDevicegroup:currentDevicegroup.cdid :@[@"env_vars"] :@[newJson] :currentDevicegroup];
+    
+    NSDictionary *dict = @{ @"action" : @"devicegroupvarschanged",
+                            @"devicegroup" : currentDevicegroup };
+    
+    [ide updateDevicegroup:currentDevicegroup.did
+                          :@[@"env_vars", @"type"] 
+                          :@[evvc.envVars, currentDevicegroup.type] :dict];
 }
 
 

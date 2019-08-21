@@ -12,7 +12,7 @@
 
 @implementation EnvVarWindowController
 
-@synthesize jsonString, devicegroup;
+@synthesize devicegroup, envVars;
 
 
 - (void)viewDidLoad
@@ -33,6 +33,8 @@
 {
     // Ready the window for viewing
     
+    json = @"";
+    
     // Set the header text
     
     headerTextField.stringValue = [NSString stringWithFormat:@"Environment variable(s) set for “%@”:", devicegroup];
@@ -47,36 +49,21 @@
     
     // Do we have any KV pairs already?
     
-    if (jsonString.length > 0)
+    if (envVars.count > 0)
     {
-        // Decode the JSON string passed to the iunstance into KV pairs
+        // Transfer the incoming dictonary of KV pairs into separate, editable arrays
         
-        NSError *error = nil;
-        NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data
-                                                             options:0
-                                                               error:&error];
-        
-        if (error == nil)
-        {
-            // Get all of the incoming data's keys
-
-            [envKeys addObjectsFromArray:[dict allKeys]];
-
-            // Iterate through the list of keys to get the relevant values.
-            // We do this to ensure we have the correct order CHECK
-
-            for (NSString *key in envKeys) [envValues addObject:[dict valueForKey:key]];
-        }
+        [envKeys addObjectsFromArray:[envVars allKeys]];
+        for (NSString *key in envKeys) [envValues addObject:[envVars valueForKey:key]];
     }
     
     // Update the size status readout
     
-    jsonSizeTextField.stringValue = [NSString stringWithFormat:@"Variable storage size: %li bytes", (long)jsonString.length];
+    [self convertToJSON];
 
     // Update the table view
     
-    [envVarTableView reloadData];
+    [variablesTableView reloadData];
 }
 
 
@@ -85,15 +72,28 @@
 {
     // Convert the current table data to a JSON string, typically when editing ends
 
-    NSError *error = nil;
-    NSDictionary *dict = [NSDictionary dictionaryWithObjects:envValues forKeys:envKeys];
-    NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+    envVars = [NSDictionary dictionaryWithObjects:envValues forKeys:envKeys];
+    
+    [self convertToJSON];
+}
 
-    if (error == nil) jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+
+- (void)convertToJSON
+{
+    // Convert the KV pairs dictionary to a JSON string to determine the data length
+    
+    if ([NSJSONSerialization isValidJSONObject:envVars])
+    {
+        NSError *error = nil;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:envVars options:0 error:&error];
+        
+        if (error == nil) json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    }
     
     // Update the size status readout
     
-    jsonSizeTextField.stringValue = [NSString stringWithFormat:@"Variable storage size: %li bytes", (long)jsonString.length];
+    dataSizeTextField.stringValue = [NSString stringWithFormat:@"Variable storage size: %li bytes", (long)json.length];
 }
 
 
@@ -102,7 +102,7 @@
 {
     // Return YES if the string is too long, otherwise NO
     
-    return (jsonString.length > 16000);
+    return (json.length > 16000);
 }
 
 
@@ -116,12 +116,12 @@
     
     [envKeys addObject:[NSString stringWithFormat:@"Key %li", (long)(envKeys.count + 1)]];
     [envValues addObject:[NSString stringWithFormat:@"Value %li", (long)(envKeys.count + 1)]];
-    [envVarTableView reloadData];
+    [variablesTableView reloadData];
 
     // Select the new (last) item
     
     NSIndexSet *rows = [[NSIndexSet alloc] initWithIndex:envKeys.count - 1];
-    [envVarTableView selectRowIndexes:rows byExtendingSelection:NO];
+    [variablesTableView selectRowIndexes:rows byExtendingSelection:NO];
     
     // Update the JSON store
     
@@ -135,7 +135,7 @@
     // Delete the selcted rows from the data store, provided there is at least one selected row
     // and, if so, the user confirms the deletion
     
-    NSIndexSet *selectedRows = [envVarTableView selectedRowIndexes];
+    NSIndexSet *selectedRows = [variablesTableView selectedRowIndexes];
     
     if (selectedRows.count != 0)
     {
@@ -153,7 +153,7 @@
                           {
                               [envKeys removeObjectsAtIndexes:selectedRows];
                               [envValues removeObjectsAtIndexes:selectedRows];
-                              [envVarTableView reloadData];
+                              [variablesTableView reloadData];
                               [self updateData];
                           }
                       }
@@ -231,37 +231,30 @@
         {
             // Check whether the entered value is a numeric value, either a float or an int
             
+            NSInteger intResult;
+            float floatResult;
             NSString *editedValue = cellTextField.stringValue;
-            NSRange range = [editedValue rangeOfString:@"."];
-            if (range.location != NSNotFound)
+            NSScanner *scanner = [NSScanner scannerWithString:editedValue];
+            BOOL validInteger = [scanner scanInteger:&intResult];
+            BOOL validFloat = [scanner scanFloat:&floatResult];
+            
+            if (validInteger && intResult != INT_MAX && intResult != INT_MIN)
             {
-                // String contains a decimal point - see if it is a float
-                
-                float floatValue = [editedValue floatValue];
-                
-                if (floatValue != HUGE_VAL && floatValue != -HUGE_VAL && floatValue != 0.0)
-                {
-                    [envValues insertObject:[NSNumber numberWithFloat:floatValue] atIndex:cellTextField.tableRow];
-                    [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
-                    isNumber = YES;
-                }
+                isNumber = YES;
+                [envValues insertObject:[NSNumber numberWithInteger:intResult] atIndex:cellTextField.tableRow];
+                [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
             }
-            else
+            else if (validFloat && floatResult != HUGE_VAL && floatResult != -HUGE_VAL && floatResult != 0.0)
             {
-                // String may be an integer
-                
-                NSInteger intValue = [editedValue integerValue];
-                
-                if (intValue != 0)
-                {
-                    [envValues insertObject:[NSNumber numberWithInteger:intValue] atIndex:cellTextField.tableRow];
-                    [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
-                    isNumber = YES;
-                }
+                isNumber = YES;
+                [envValues insertObject:[NSNumber numberWithFloat:floatResult] atIndex:cellTextField.tableRow];
+                [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
             }
             
             if (!isNumber)
             {
+                // Store the value as a string
+                
                 [envValues insertObject:cellTextField.stringValue atIndex:cellTextField.tableRow];
                 [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
             }
@@ -288,6 +281,42 @@
                 
                 [self showWarning:@"That key already exits"
                                  :@"Keys must be unique. Either edit the value of the existing key, or change the key’s name before editing this one."];
+                cellTextField.stringValue = [envKeys objectAtIndex:cellTextField.tableRow];
+                return;
+            }
+            
+            // Check for API key limitations:
+            // 1. 100 chars max
+            
+            if (editedkey.length > 100)
+            {
+                [self showWarning:@"Key too long"
+                                 :@"Keys must contain no more than 100 alphanumeric characters."];
+                cellTextField.stringValue = [envKeys objectAtIndex:cellTextField.tableRow];
+                return;
+            }
+            
+            // 2. Alphanumeric only
+            
+            NSCharacterSet *alphaSet = [NSCharacterSet alphanumericCharacterSet];
+            BOOL valid = [[editedkey stringByTrimmingCharactersInSet:alphaSet] isEqualToString:@""];
+            
+            if (!valid)
+            {
+                [self showWarning:@"Key contains illegal characters"
+                                 :@"Keys must contain only alphanumeric characters."];
+                cellTextField.stringValue = [envKeys objectAtIndex:cellTextField.tableRow];
+                return;
+            }
+            
+            // 3. Can't start with a number
+            
+            unichar firstChar = [editedkey characterAtIndex:0];
+            alphaSet = [NSCharacterSet letterCharacterSet];
+            if (![alphaSet characterIsMember:firstChar])
+            {
+                [self showWarning:@"Key does not start with a letter"
+                                 :@"Keys must not start with numeric characters."];
                 cellTextField.stringValue = [envKeys objectAtIndex:cellTextField.tableRow];
                 return;
             }

@@ -602,8 +602,8 @@
 
     if ([key compare:@"env_vars"] == NSOrderedSame)
     {
-        NSString *evs = [apiDict valueForKeyPath:@"attributes.env_vars"];
-        return [self checkForNull:evs];
+        NSDictionary *envVars = [apiDict valueForKeyPath:@"attributes.env_vars"];
+        return [self checkForNull:envVars];
     }
     
     // Attributes Device properties
