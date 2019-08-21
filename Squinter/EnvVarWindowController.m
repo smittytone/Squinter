@@ -225,37 +225,56 @@
     if ([notification.object isKindOfClass:[EnvVarTextField class]])
     {
         EnvVarTextField *cellTextField = (EnvVarTextField *)notification.object;
+        NSString *editedValue = cellTextField.stringValue;
         BOOL isNumber = NO;
         
         if (cellTextField.type == 1)
         {
             // Check whether the entered value is a numeric value, either a float or an int
-            
-            NSInteger intResult;
-            float floatResult;
-            NSString *editedValue = cellTextField.stringValue;
-            NSScanner *scanner = [NSScanner scannerWithString:editedValue];
-            BOOL validInteger = [scanner scanInteger:&intResult];
-            BOOL validFloat = [scanner scanFloat:&floatResult];
-            
-            if (validInteger && intResult != INT_MAX && intResult != INT_MIN)
+
+            // First, check for an integer - ie. 'xxxx' only (no periods
+            NSError *error = nil;
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^[0-9]+$"
+                                                                                   options:NSRegularExpressionCaseInsensitive
+                                                                                     error:&error];
+            NSRange rofm = [regex rangeOfFirstMatchInString:editedValue
+                                                    options:0
+                                                      range:NSMakeRange(0, editedValue.length)];
+
+            if (rofm.location != NSNotFound)
             {
+                // Found an int, so save it as such
+
                 isNumber = YES;
-                [envValues insertObject:[NSNumber numberWithInteger:intResult] atIndex:cellTextField.tableRow];
+                [envValues insertObject:[NSNumber numberWithInteger:editedValue.integerValue] atIndex:cellTextField.tableRow];
                 [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
             }
-            else if (validFloat && floatResult != HUGE_VAL && floatResult != -HUGE_VAL && floatResult != 0.0)
+            else
             {
-                isNumber = YES;
-                [envValues insertObject:[NSNumber numberWithFloat:floatResult] atIndex:cellTextField.tableRow];
-                [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
+                // Didn't find an int, so try for a float, ie. 'xxx.yyy' ONLY
+
+                regex = [NSRegularExpression regularExpressionWithPattern:@"^[0-9]+.[0-9]+$"
+                                                                  options:NSRegularExpressionCaseInsensitive
+                                                                    error:&error];
+                rofm = [regex rangeOfFirstMatchInString:editedValue
+                                                options:0
+                                                  range:NSMakeRange(0, editedValue.length)];
+
+                if (rofm.location != NSNotFound)
+                {
+                    // Found a float, so save it as such
+
+                    isNumber = YES;
+                    [envValues insertObject:[NSNumber numberWithInteger:editedValue.floatValue] atIndex:cellTextField.tableRow];
+                    [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
+                }
             }
             
             if (!isNumber)
             {
                 // Store the value as a string
                 
-                [envValues insertObject:cellTextField.stringValue atIndex:cellTextField.tableRow];
+                [envValues insertObject:editedValue atIndex:cellTextField.tableRow];
                 [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
             }
         }
@@ -266,9 +285,11 @@
             NSString *editedkey = cellTextField.stringValue;
             BOOL got = NO;
             
-            for (NSString *key in envKeys)
+            for (NSUInteger i = 0 ; i < envKeys.count ; i++)
             {
-                if ([key compare:editedkey] == NSOrderedSame)
+                NSString *key = [envKeys objectAtIndex:i];
+
+                if ([key compare:editedkey] == NSOrderedSame && i != cellTextField.tableRow)
                 {
                     got = YES;
                     break;
@@ -298,25 +319,18 @@
             
             // 2. Alphanumeric only
             
-            NSCharacterSet *alphaSet = [NSCharacterSet alphanumericCharacterSet];
-            BOOL valid = [[editedkey stringByTrimmingCharactersInSet:alphaSet] isEqualToString:@""];
-            
-            if (!valid)
+            NSError *error = nil;
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^[a-zA-Z][_a-zA-Z0-9]{0,99}$"
+                                                                                   options:NSRegularExpressionCaseInsensitive
+                                                                                     error:&error];
+            NSRange rofm = [regex rangeOfFirstMatchInString:editedValue
+                                                    options:0
+                                                      range:NSMakeRange(0, editedValue.length)];
+
+            if (rofm.length == 0)
             {
                 [self showWarning:@"Key contains illegal characters"
-                                 :@"Keys must contain only alphanumeric characters."];
-                cellTextField.stringValue = [envKeys objectAtIndex:cellTextField.tableRow];
-                return;
-            }
-            
-            // 3. Can't start with a number
-            
-            unichar firstChar = [editedkey characterAtIndex:0];
-            alphaSet = [NSCharacterSet letterCharacterSet];
-            if (![alphaSet characterIsMember:firstChar])
-            {
-                [self showWarning:@"Key does not start with a letter"
-                                 :@"Keys must not start with numeric characters."];
+                                 :@"Keys must contain only alphanumeric characters and must not start with numeric characters."];
                 cellTextField.stringValue = [envKeys objectAtIndex:cellTextField.tableRow];
                 return;
             }
