@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 #import "Constants.h"
 #import "EnvVarTextField.h"
+#import "EnvVarValueCell.h"
 
 
 NS_ASSUME_NONNULL_BEGIN

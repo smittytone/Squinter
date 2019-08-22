@@ -224,7 +224,7 @@
 {
     if ([tableColumn.identifier compare:@"env-var-val-col"] == NSOrderedSame)
     {
-        NSTableCellView *cell = [tableView makeViewWithIdentifier:@"env-var-val-cell" owner:nil];
+        EnvVarValueCell *cell = (EnvVarValueCell *)[tableView makeViewWithIdentifier:@"env-var-val-cell" owner:nil];
         
         if (cell != nil)
         {
@@ -241,9 +241,10 @@
                 
                 NSNumber *number = (NSNumber *)value;
                 NSString *numberString = (strcmp([number objCType], @encode(double)) == 0) ? [nsnf stringFromNumber:number] : number.stringValue;
+                cell.isString = NO;
                 
                 // Set up the italic string
-                
+                /*
                 NSArray *values = [NSArray arrayWithObjects:italicFont, nil];
                 NSArray *keys = [NSArray arrayWithObjects:NSFontAttributeName, nil];
                 NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values
@@ -251,12 +252,15 @@
                 NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:numberString
                                                                                  attributes:attributes];
                 cellTextField.attributedStringValue = attrString;
+                 */
+                cellTextField.stringValue = numberString;
             }
             else
             {
                 // Display the value as a string
                 
                 cellTextField.stringValue = (NSString *)value;
+                cell.isString = YES;
             }
 
             cellTextField.delegate = self;
