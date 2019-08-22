@@ -1,4 +1,4 @@
-# Squinter 2.3 #
+# Squinter 2.3.131 #
 
 Squinter is a macOS GUI application for managing Squirrel programming projects targeting the [Electric Imp Platform](https://devloper.electricimp.com).
 
