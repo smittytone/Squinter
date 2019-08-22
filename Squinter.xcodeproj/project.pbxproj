@@ -23,6 +23,7 @@
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
 		3B4624FA2236DB7A009CED0D /* SyncWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B4624F92236DB7A009CED0D /* SyncWindowViewController.m */; };
 		3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */; };
+		3B5C32D4230EB89F0013294E /* EnvVarValueCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5C32D3230EB89F0013294E /* EnvVarValueCell.m */; };
 		3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */; };
 		3B6AF0DB197127B10083744C /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6AF0DA197127B10083744C /* Project.m */; };
 		3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */; };
@@ -129,6 +130,8 @@
 		3B4624F92236DB7A009CED0D /* SyncWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncWindowViewController.m; sourceTree = "<group>"; };
 		3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppDelegateSquinting.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppDelegateSquinting.m; sourceTree = "<group>"; usesTabs = 0; };
+		3B5C32D2230EB89F0013294E /* EnvVarValueCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnvVarValueCell.h; sourceTree = "<group>"; };
+		3B5C32D3230EB89F0013294E /* EnvVarValueCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnvVarValueCell.m; sourceTree = "<group>"; };
 		3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = LoginToolbarItem.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = LoginToolbarItem.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B6AF0D9197127B10083744C /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Project.h; sourceTree = "<group>"; usesTabs = 0; };
@@ -350,6 +353,8 @@
 				3BC1CCB5230447F6000D5B23 /* EnvVarWindowController.m */,
 				3B7CDFB6230D5CFB00538183 /* EnvVarTextField.h */,
 				3B7CDFB7230D5CFB00538183 /* EnvVarTextField.m */,
+				3B5C32D2230EB89F0013294E /* EnvVarValueCell.h */,
+				3B5C32D3230EB89F0013294E /* EnvVarValueCell.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -626,6 +631,7 @@
 				3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */,
 				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
 				3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */,
+				3B5C32D4230EB89F0013294E /* EnvVarValueCell.m in Sources */,
 				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
 				3BBA879822BCD28C004E59ED /* HelpWindowViewController.m in Sources */,

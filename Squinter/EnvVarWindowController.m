@@ -52,7 +52,7 @@
     
     // Set the header text
     
-    headerTextField.stringValue = [NSString stringWithFormat:@"Environment variable(s) set for “%@”:", devicegroup];
+    headerTextField.stringValue = [NSString stringWithFormat:@"Device Group “%@” environment variables:", devicegroup];
     
     // Prepare the table-friendly data storage arrays
     

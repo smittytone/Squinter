@@ -38,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)checkDataSize;
 - (IBAction)doAddItem:(id)sender;
 - (IBAction)doRemoveItem:(id)sender;
+- (IBAction)doShowHelp:(id)sender;
 - (void)textDidEndEditing:(NSNotification *)notification;
 - (void)showWarning:(NSString *)header :(NSString *)body;
 
