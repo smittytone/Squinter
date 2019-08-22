@@ -23,16 +23,23 @@
 {
     [super viewDidLoad];
     
+    envVars = [[NSDictionary alloc] init];
+    
     // Watch for table text field changes
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(textDidEndEditing:)
                                                name:NSControlTextDidEndEditingNotification
                                              object:nil];
-
+    
+    // Set uo the various managers and fonts we will require later
     NSFontManager *nsfm = [NSFontManager sharedFontManager];
     italicFont = [nsfm convertFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]
                        toHaveTrait:NSFontItalicTrait];
+    
+    nsnf = [[NSNumberFormatter alloc] init];
+    nsnf.maximumFractionDigits = 8;
+    nsnf.minimumFractionDigits = 1;
 }
 
 
@@ -80,7 +87,7 @@
 
 - (void)prepareToCloseSheet
 {
-    // Make sure all the 'editing' fields are saved
+    // Make sure all the 'editing' fields are committed before closing the sheet
 
     if (variablesTableView.selectedRow != -1)
     {
@@ -121,11 +128,15 @@
         NSData *data = [NSJSONSerialization dataWithJSONObject:envVars options:0 error:&error];
         
         if (error == nil) json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+#if DEBUG
+        NSLog(@"%@", json);
+#endif
     }
     
     // Update the size status readout
     
-    dataSizeTextField.stringValue = [NSString stringWithFormat:@"Variable storage size: %li bytes", (long)json.length];
+    dataSizeTextField.stringValue = [NSString stringWithFormat:@"Variable storage size: %li bytes out of 16000", (long)json.length];
 }
 
 
@@ -218,23 +229,33 @@
         if (cell != nil)
         {
             EnvVarTextField *cellTextField = (EnvVarTextField *)cell.textField;
-
+            
+            // Get the value - it may be an NSString or an NSNumber (int or float)
+            
             id value = [envValues objectAtIndex:row];
-
+            
             if ([value isKindOfClass:[NSNumber class]])
             {
-                NSNumberFormatter *nsnf = [[NSNumberFormatter alloc] init];
-                nsnf.maximumFractionDigits = 6;
-                NSNumber *num = (NSNumber *)value;
-                NSString *str = [nsnf stringFromNumber:num];
+                // If 'value' is an NSNUmber, is it an int or a float?
+                // SEE https://stackoverflow.com/questions/2518761/get-type-of-nsnumber
+                
+                NSNumber *number = (NSNumber *)value;
+                NSString *numberString = (strcmp([number objCType], @encode(double)) == 0) ? [nsnf stringFromNumber:number] : number.stringValue;
+                
+                // Set up the italic string
+                
                 NSArray *values = [NSArray arrayWithObjects:italicFont, nil];
                 NSArray *keys = [NSArray arrayWithObjects:NSFontAttributeName, nil];
-                NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-                NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:str attributes:attributes];
+                NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values
+                                                                       forKeys:keys];
+                NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:numberString
+                                                                                 attributes:attributes];
                 cellTextField.attributedStringValue = attrString;
             }
             else
             {
+                // Display the value as a string
+                
                 cellTextField.stringValue = (NSString *)value;
             }
 
@@ -302,7 +323,7 @@
             }
             else
             {
-                // Didn't find an int, so try for a float, ie. 'xxx.yyy' ONLY
+                // Didn't find an int, so try for a float (double), ie. 'xxx.yyy' ONLY
 
                 regex = [NSRegularExpression regularExpressionWithPattern:kEnvVarFloatRegex
                                                                   options:NSRegularExpressionCaseInsensitive
@@ -316,7 +337,8 @@
                     // Found a float, so save it as such
 
                     isNumber = YES;
-                    [envValues insertObject:[NSNumber numberWithFloat:editedValue.floatValue] atIndex:cellTextField.tableRow];
+                    double value = editedValue.doubleValue;
+                    [envValues insertObject:[NSNumber numberWithDouble:value] atIndex:cellTextField.tableRow];
                     [envValues removeObjectAtIndex:(cellTextField.tableRow + 1)];
                 }
             }

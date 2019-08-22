@@ -68,7 +68,7 @@
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
 	<key>SQBuildVersion</key>
-	<integer>170</integer>
+	<integer>184</integer>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
