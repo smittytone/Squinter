@@ -5431,12 +5431,12 @@ Gw
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eOE-Wb-6Hg">
-                        <rect key="frame" x="514" y="13" width="84" height="32"/>
+                        <rect key="frame" x="528" y="13" width="70" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="58" id="Cbm-YZ-Qge"/>
                             <constraint firstAttribute="height" constant="21" id="RHX-Nq-IuE"/>
                         </constraints>
-                        <buttonCell key="cell" type="push" title="Upload" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pkF-OI-fYN">
+                        <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pkF-OI-fYN">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -5445,7 +5445,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XUp-GR-SMh">
-                        <rect key="frame" x="432" y="13" width="82" height="32"/>
+                        <rect key="frame" x="446" y="13" width="82" height="32"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="Cid-hq-00r"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="jLs-8D-coi"/>
