@@ -30,6 +30,7 @@
 #import  "DeviceLookupWindowViewController.h"
 #import  "SyncWindowViewController.h"
 #import  "HelpWindowViewController.h"
+#import  "EnvVarWindowController.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -110,6 +111,7 @@
     IBOutlet NSMenuItem *logAllDevicegroupDevices;
     IBOutlet NSMenuItem *nextDevicegroupMenuItem;
     IBOutlet NSMenuItem *previousDevicegroupMenuItem;
+    IBOutlet NSMenuItem *envVarsMenuItem;
 
     #pragma mark Device Menu outlets
 
@@ -353,6 +355,11 @@
     
     IBOutlet NSPanel     *multiDeviceSheet;
     IBOutlet NSTextField *multiDeviceLabel;
+    
+    // ADDED IN 2.3.131
+    #pragma mark Environment Vars Sheet
+    IBOutlet NSPanel    *envVarSheet;
+    IBOutlet EnvVarWindowController *evvc;
 
     #pragma mark Other Sheets
 
@@ -518,6 +525,11 @@
 // ADDED IN 2.3.130
 - (IBAction)logAllDevices:(id)sender;
 - (IBAction)closeAllDeviceLogs:(id)sender;
+// ADDED IN 2.3.131
+- (IBAction)editEnvVariables:(id)sender;
+- (IBAction)cancelEnvVarSheet:(id)sender;
+- (IBAction)saveEnvVarSheet:(id)sender;
+
 
 
 // Existing Device Methods

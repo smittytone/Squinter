@@ -598,6 +598,14 @@
         return [self checkForNull:desc];
     }
 
+    // Attributes Device Group properties
+
+    if ([key compare:@"env_vars"] == NSOrderedSame)
+    {
+        NSDictionary *envVars = [apiDict valueForKeyPath:@"attributes.env_vars"];
+        return [self checkForNull:envVars];
+    }
+    
     // Attributes Device properties
 
     if ([key compare:@"device_online"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.device_online"];

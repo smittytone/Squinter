@@ -23,12 +23,14 @@
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
 		3B4624FA2236DB7A009CED0D /* SyncWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B4624F92236DB7A009CED0D /* SyncWindowViewController.m */; };
 		3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */; };
+		3B5C32D4230EB89F0013294E /* EnvVarValueCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5C32D3230EB89F0013294E /* EnvVarValueCell.m */; };
 		3B6057B51F8EB17A00E9CBA3 /* LoginToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */; };
 		3B6AF0DB197127B10083744C /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6AF0DA197127B10083744C /* Project.m */; };
 		3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */; };
 		3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */; };
 		3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */; };
 		3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7ACF801CFF0A980080C3DB /* Connexion.m */; };
+		3B7CDFB8230D5CFB00538183 /* EnvVarTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7CDFB7230D5CFB00538183 /* EnvVarTextField.m */; };
 		3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */; };
 		3B8B8E131E952C1D009363C8 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E121E952C1D009363C8 /* Model.m */; };
 		3B8B8E161E952E5A009363C8 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E151E952E5A009363C8 /* File.m */; };
@@ -40,6 +42,7 @@
 		3BBA879822BCD28C004E59ED /* HelpWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */; };
 		3BBA879A22BCE019004E59ED /* help in Resources */ = {isa = PBXBuildFile; fileRef = 3BBA879922BCE019004E59ED /* help */; };
 		3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */; };
+		3BC1CCB6230447F6000D5B23 /* EnvVarWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC1CCB5230447F6000D5B23 /* EnvVarWindowController.m */; };
 		3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC56F321975BF17002CA8FE /* StatusLight.m */; };
 		3BC577261A717F120014F78E /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC577251A717F120014F78E /* VDKQueue.m */; };
 		3BCEB7B9227AF77F0090B137 /* AppDelegateUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BCEB7B8227AF77F0090B137 /* AppDelegateUI.m */; };
@@ -127,6 +130,8 @@
 		3B4624F92236DB7A009CED0D /* SyncWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncWindowViewController.m; sourceTree = "<group>"; };
 		3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppDelegateSquinting.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppDelegateSquinting.m; sourceTree = "<group>"; usesTabs = 0; };
+		3B5C32D2230EB89F0013294E /* EnvVarValueCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnvVarValueCell.h; sourceTree = "<group>"; };
+		3B5C32D3230EB89F0013294E /* EnvVarValueCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnvVarValueCell.m; sourceTree = "<group>"; };
 		3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = LoginToolbarItem.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = LoginToolbarItem.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B6AF0D9197127B10083744C /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Project.h; sourceTree = "<group>"; usesTabs = 0; };
@@ -139,6 +144,8 @@
 		3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppDelegateUtilities.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Connexion.h; path = ../../BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
 		3B7ACF801CFF0A980080C3DB /* Connexion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = Connexion.m; path = ../BuildAPIAccess/Connexion.m; sourceTree = SOURCE_ROOT; };
+		3B7CDFB6230D5CFB00538183 /* EnvVarTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnvVarTextField.h; sourceTree = "<group>"; };
+		3B7CDFB7230D5CFB00538183 /* EnvVarTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnvVarTextField.m; sourceTree = "<group>"; };
 		3B8B8E0E1E9527D6009363C8 /* Devicegroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Devicegroup.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = Devicegroup.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B8B8E111E952C1D009363C8 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Model.h; sourceTree = "<group>"; usesTabs = 0; };
@@ -160,6 +167,8 @@
 		3BBA879922BCE019004E59ED /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = help; path = /Users/smitty/OneDrive/Programming/Squinter/help; sourceTree = "<absolute>"; };
 		3BC06B802226CF9600A57A4D /* DeviceLookupWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLookupWindowViewController.h; sourceTree = "<group>"; };
 		3BC06B812226CF9600A57A4D /* DeviceLookupWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceLookupWindowViewController.m; sourceTree = "<group>"; };
+		3BC1CCB4230447F6000D5B23 /* EnvVarWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnvVarWindowController.h; sourceTree = "<group>"; };
+		3BC1CCB5230447F6000D5B23 /* EnvVarWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnvVarWindowController.m; sourceTree = "<group>"; };
 		3BC56F311975BF17002CA8FE /* StatusLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = StatusLight.h; sourceTree = "<group>"; usesTabs = 0; };
 		3BC56F321975BF17002CA8FE /* StatusLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = StatusLight.m; sourceTree = "<group>"; usesTabs = 0; };
 		3BC577241A717F120014F78E /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -340,6 +349,12 @@
 				3B077B3021118A5E00C17D25 /* InspectorLinkButton.m */,
 				3BBA879622BCD28C004E59ED /* HelpWindowViewController.h */,
 				3BBA879722BCD28C004E59ED /* HelpWindowViewController.m */,
+				3BC1CCB4230447F6000D5B23 /* EnvVarWindowController.h */,
+				3BC1CCB5230447F6000D5B23 /* EnvVarWindowController.m */,
+				3B7CDFB6230D5CFB00538183 /* EnvVarTextField.h */,
+				3B7CDFB7230D5CFB00538183 /* EnvVarTextField.m */,
+				3B5C32D2230EB89F0013294E /* EnvVarValueCell.h */,
+				3B5C32D3230EB89F0013294E /* EnvVarValueCell.m */,
 			);
 			name = "UI Classes";
 			sourceTree = "<group>";
@@ -596,8 +611,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				3BA707602181D97200585728 /* InspectorViewController.m in Sources */,
+				3BC1CCB6230447F6000D5B23 /* EnvVarWindowController.m in Sources */,
 				3B36D1CF1970A0990029CEC0 /* main.m in Sources */,
 				3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */,
+				3B7CDFB8230D5CFB00538183 /* EnvVarTextField.m in Sources */,
 				3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */,
 				3BCEB7B9227AF77F0090B137 /* AppDelegateUI.m in Sources */,
 				3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */,
@@ -614,6 +631,7 @@
 				3BC06B822226CF9600A57A4D /* DeviceLookupWindowViewController.m in Sources */,
 				3B8B8E131E952C1D009363C8 /* Model.m in Sources */,
 				3BB5DCC1202B921D00FA6F7D /* InspectorDataCellView.m in Sources */,
+				3B5C32D4230EB89F0013294E /* EnvVarValueCell.m in Sources */,
 				3B8B8E161E952E5A009363C8 /* File.m in Sources */,
 				3BC56F331975BF17002CA8FE /* StatusLight.m in Sources */,
 				3BBA879822BCD28C004E59ED /* HelpWindowViewController.m in Sources */,

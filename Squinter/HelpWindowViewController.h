@@ -11,6 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 @interface HelpWindowViewController : NSViewController <WKUIDelegate, NSWindowDelegate>
 {
     IBOutlet WKWebView *helpView;
@@ -27,5 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @end
+
 
 NS_ASSUME_NONNULL_END
