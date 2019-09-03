@@ -17,10 +17,12 @@
                                                        NSOutlineViewDataSource>
 {
     IBOutlet NSOutlineView *deviceOutlineView;
-    IBOutlet NSSegmentedControl *panelSelector;
     IBOutlet NSTextField *field;
     IBOutlet NSTextField *subfield;
     IBOutlet NSImageView *image;
+    // ADDED 2.3.131
+    IBOutlet NSButton *deviceViewButton;
+    IBOutlet NSButton *projectViewButton;
 
     NSMutableArray *projectData, *deviceData;
     NSMutableArray *deviceKeys, *deviceValues;

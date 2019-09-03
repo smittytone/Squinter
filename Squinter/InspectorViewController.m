@@ -52,7 +52,11 @@
 
     // Set up the tabs
 
-    panelSelector.selectedSegment = 0;
+    //panelSelector.selectedSegment = 0;
+    tabIndex = 0;
+    
+    deviceViewButton.state = NSOffState;
+    projectViewButton.state = NSOnState;
 
     [self setNilProject];
 }
@@ -506,7 +510,7 @@
         }
     }
 
-    if (panelSelector.selectedSegment == 0)
+    if (tabIndex == 0)
     {
         // The Project 'tab' is already selected, so update
         // the NSOutlineView to reflect the new project
@@ -818,7 +822,7 @@
         [deviceData addObject:dnode];
     }
 
-    if (panelSelector.selectedSegment == 1)
+    if (tabIndex == 1)
     {
         // The Device 'tab' is already selected, so update
         // the NSOutlineView to reflect the new device
@@ -858,10 +862,13 @@
 {
     // This is the 'tabIndex' setter method, which we trap in order
     // to trigger a switch to the implicitly requested tab
-
+    // REDUNDANT FROM 2.3.131
+    
+    /*
     if ((aTab > panelSelector.segmentCount || aTab == panelSelector.selectedSegment) && !deviceOutlineView.hidden) return;
     panelSelector.selectedSegment = aTab;
     [self switchTable:nil];
+    */
 }
 
 
@@ -870,11 +877,42 @@
 {
     // This method is called when the user clicks on the NSSegmentedControl, or code
     // calls setTab: (in which case 'sender' is nil
+    // UPDATED 2.3.131: Remove NSSegmentedControl, add 2x NSButton for Xcode-style panel tabs
 
-    NSInteger aTab = panelSelector.selectedSegment;
-    tabIndex = aTab;
+    if (sender == deviceViewButton) {
+        if (tabIndex == 1) {
+            // Clicking on the already selected 'tab', so just put the button back on
+            
+            deviceViewButton.state = NSOnState;
+            return;
+        } else {
+            // Was previously on the project 'tab', so switch in the new images, etc.
+            
+            projectViewButton.image = [NSImage imageNamed:@"pap_u"];
+            projectViewButton.state = NSOffState;
+            deviceViewButton.image = [NSImage imageNamed:@"pad_s"];
+            deviceViewButton.state = NSOnState;
+            tabIndex = 1;
+        }
+    } else {
+        // Clicked on the project button
+        if (tabIndex == 0) {
+            // Clicking on the already selected 'tab', so just put the button back on
+            
+            projectViewButton.state = NSOnState;
+            return;
+        } else {
+            // Was previously on the device 'tab', so switch in the new images, etc.
+            
+            projectViewButton.image = [NSImage imageNamed:@"pap_s"];
+            projectViewButton.state = NSOnState;
+            deviceViewButton.image = [NSImage imageNamed:@"pad_u"];
+            deviceViewButton.state = NSOffState;
+            tabIndex = 0;
+        }
+    }
 
-    if (aTab == 0)
+    if (tabIndex == 0)
     {
         // This is the project panel. If it is empty, just show the message
 
@@ -957,7 +995,7 @@
 {
     // Only expand Project items
 
-    if (panelSelector.selectedSegment == 0 && item != nil)
+    if (tabIndex == 0 && item != nil)
     {
         TreeNode *node = (TreeNode *)item;
         if (node.children != nil) return YES;
@@ -983,7 +1021,7 @@
     // This will always be the number of items in the root item, ie.
     // the number of items in the appropriate data set
 
-    if (panelSelector.selectedSegment == 0)
+    if (tabIndex == 0)
     {
         if (item == nil) return projectData.count;
         TreeNode *node = (TreeNode *)item;
@@ -1001,7 +1039,7 @@
 {
     // Only the Project Inspector has children
 
-    if (panelSelector.selectedSegment == 0)
+    if (tabIndex == 0)
     {
         if (item == nil) return (projectData.count > 0 ? [projectData objectAtIndex:index] : [projectData objectAtIndex:0]);
         TreeNode *node = (TreeNode *)item;
@@ -1021,7 +1059,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 {
     // This needs to be here or the NSOutlineView viewForColumn: method is never called
 
-    return (panelSelector.selectedSegment == 1 ? @"DD" : @"PP");
+    return (tabIndex == 1 ? @"DD" : @"PP");
 }
 
 
@@ -1072,7 +1110,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
                 cv.openFileButton.hidden = NO;
                 cv.openFileButton.target = self;
                 
-                if (panelSelector.selectedSegment == 1)
+                if (tabIndex == 1)
                 {
                     // Button setup for the Device Inspector
 
@@ -1168,7 +1206,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
 - (void)outlineViewItemDidExpand:(NSNotification *)notification
 {
-    if (panelSelector.selectedSegment == 0)
+    if (tabIndex == 0)
     {
         NSDictionary *ui = notification.userInfo;
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
@@ -1186,7 +1224,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 
 - (void)outlineViewItemDidCollapse:(NSNotification *)notification
 {
-    if (panelSelector.selectedSegment == 0)
+    if (tabIndex == 0)
     {
         NSDictionary *ui = notification.userInfo;
         TreeNode *node = (TreeNode *)[ui objectForKey:@"NSObject"];
