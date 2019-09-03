@@ -1180,7 +1180,7 @@
                                         <rect key="frame" x="10" y="261" width="320" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="22" id="L9U-QQ-rbY"/>
-                                            <constraint firstAttribute="width" constant="316" id="fvd-7Y-419"/>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="316" id="fvd-7Y-419"/>
                                         </constraints>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Label" usesSingleLineMode="YES" id="jIw-gb-EO8">
                                             <font key="font" metaFont="system" size="18"/>
@@ -1192,7 +1192,7 @@
                                         <rect key="frame" x="40" y="151" width="260" height="100"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="100" id="SnL-ar-wy3"/>
-                                            <constraint firstAttribute="width" constant="256" id="pcu-rq-o89"/>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="256" id="pcu-rq-o89"/>
                                         </constraints>
                                         <textFieldCell key="cell" allowsUndo="NO" alignment="center" title="Multiline Label" id="Dka-Nt-o6h">
                                             <font key="font" usesAppearanceFont="YES"/>
