@@ -316,10 +316,11 @@
     
     NSString *cloudName = [self getCloudName:ide.impCloudCode];
     accountMenuItem.title = [NSString stringWithFormat:@"Signed in to “%@”", usernameTextField.stringValue];
-    if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
+
+    // FROM 2.31.131 Hide the impCloud type
+    // if (cloudName.length > 0) accountMenuItem.title = [accountMenuItem.title stringByAppendingFormat:@" (%@ impCloud)", [cloudName substringToIndex:cloudName.length - 1]];
     
     loginMenuItem.title = @"Log out of this Account";
-    // switchAccountMenuItem.enabled = YES;
     
     if (switchingAccount)
     {

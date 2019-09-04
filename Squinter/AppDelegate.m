@@ -962,7 +962,17 @@
     // Set the credentials for reading
 
     [self setLoginCreds];
-
+    
+    // ADDED 2.3.131
+    // Disable Azure impCloud login - no longer supported
+    
+    impCloudPopup.menu.autoenablesItems = NO;
+    [impCloudPopup selectItemAtIndex:0];
+    NSMenuItem *item = [impCloudPopup.menu itemAtIndex:1];
+    item.enabled = NO;
+    
+    // Show the sheet
+    
     [_window beginSheet:loginSheet completionHandler:nil];
 }
 
@@ -1133,6 +1143,14 @@
         saveDetailsCheckbox.state = NSOffState;
         usernameTextField.stringValue = @"";
         passwordTextField.stringValue = @"";
+        
+        // ADDED 2.3.131
+        // Disable Azure impCloud login - no longer supported
+        
+        impCloudPopup.menu.autoenablesItems = NO;
+        [impCloudPopup selectItemAtIndex:0];
+        NSMenuItem *item = [impCloudPopup.menu itemAtIndex:1];
+        item.enabled = NO;
 
         [_window beginSheet:loginSheet completionHandler:nil];
     }

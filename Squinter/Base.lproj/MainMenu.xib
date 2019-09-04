@@ -3485,13 +3485,13 @@ Gw
                             <constraint firstAttribute="height" constant="21" id="Qaz-KF-g2i"/>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="183" id="fjp-aa-cPq"/>
                         </constraints>
-                        <popUpButtonCell key="cell" type="push" title="AWS" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="RSL-NK-NdE" id="02X-WS-6c8">
+                        <popUpButtonCell key="cell" type="push" title="Public" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="RSL-NK-NdE" id="02X-WS-6c8">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" id="TJ3-T0-lJl">
                                 <items>
-                                    <menuItem title="AWS" state="on" id="RSL-NK-NdE"/>
-                                    <menuItem title="Azure" id="6G8-jv-wFw"/>
+                                    <menuItem title="Public" state="on" id="RSL-NK-NdE"/>
+                                    <menuItem title="Azure" enabled="NO" id="6G8-jv-wFw"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
