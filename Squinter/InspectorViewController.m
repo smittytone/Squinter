@@ -59,6 +59,24 @@
     projectViewButton.state = NSOnState;
 
     [self setNilProject];
+    
+    // ADDED 2.3.131
+    // Watch for window state changes
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appWillResignActive)
+                                                 name:NSApplicationWillResignActiveNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appWillBecomeActive)
+                                                 name:NSApplicationWillBecomeActiveNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appWillQuit)
+                                                 name:NSApplicationWillTerminateNotification
+                                               object:nil];
 }
 
 
@@ -1496,6 +1514,51 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     image.hidden = !shouldShow;
 }
 
+
+
+- (void)appWillBecomeActive
+{
+    // ADDED 2.3.131
+    // App is entering the foreground to set the StatusLight image to green
+    
+    if (tabIndex == 0) {
+        projectViewButton.alphaValue = 1.0;
+    } else {
+        deviceViewButton.alphaValue = 1.0;
+    }
+    
+    field.alphaValue = 1.0;
+    subfield.alphaValue = 1.0;
+    image.alphaValue = 1.0;
+}
+
+
+
+- (void)appWillResignActive
+{
+    // ADDED 2.3.131
+    // App is entering the background to set the Inspector's elements to half alpha
+    
+    if (tabIndex == 0) {
+        projectViewButton.alphaValue = 0.5;
+    } else {
+        deviceViewButton.alphaValue = 0.5;
+    }
+    
+    field.alphaValue = 0.5;
+    subfield.alphaValue = 0.5;
+    image.alphaValue = 0.5;
+}
+
+
+
+- (void)appWillQuit
+{
+    // ADDED 2.3.131
+    // App is about to bail, so tidy up: stop watching for notifications
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 
 @end

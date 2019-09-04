@@ -30,6 +30,8 @@
     NSWorkspace *nswsw;
 
     NSDateFormatter *inLogDef, *outLogDef;
+    
+    BOOL isInForeground;
 }
 
 
