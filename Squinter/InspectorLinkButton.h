@@ -10,4 +10,10 @@
 @interface InspectorLinkButton : NSButton
 
 
+// FROM 2.3.131
+- (void)appWillBecomeActive;
+- (void)appWillResignActive;
+- (void)appWillQuit;
+
+
 @end
