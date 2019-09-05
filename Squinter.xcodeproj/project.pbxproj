@@ -453,8 +453,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B36D1F01970A0990029CEC0 /* Build configuration list for PBXNativeTarget "Squinter" */;
 			buildPhases = (
-				3BF5773D228DD10100C5A9FE /* ShellScript */,
 				C83F9CF4AD6FBA83DF807D0E /* [CP] Check Pods Manifest.lock */,
+				3BF5773D228DD10100C5A9FE /* ShellScript */,
 				3B36D1BB1970A0990029CEC0 /* Sources */,
 				3B36D1BC1970A0990029CEC0 /* Frameworks */,
 				3B36D1BD1970A0990029CEC0 /* Resources */,
@@ -583,12 +583,10 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Squinter/Pods-Squinter-frameworks.sh",
 				"${PODS_ROOT}/Sparkle/Sparkle.framework",
-				"${PODS_ROOT}/Sparkle/Sparkle.framework.dSYM",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework",
-				"${DWARF_DSYM_FOLDER_PATH}/Sparkle.framework.dSYM",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
