@@ -382,7 +382,7 @@
             
             // Is the project associated with a product? If so, select it
             
-            if (currentProject.pid.length > 0)
+            if (currentProject.pid != nil && currentProject.pid.length > 0)
             {
                 
 #pragma mark Opened project is tied to a product
@@ -394,6 +394,10 @@
                     // We have a converted project we probably need to upload becuase it won't
                     // be associated with a product yet, and its device group (see above) won't
                     // have an ID yet either
+                    
+                    // FROM 2.3.132
+                    // Clear the PID (to prevent sync'ing, uploading etc.)
+                    currentProject.pid = nil;
                     
                     if (ide.isLoggedIn)
                     {
@@ -658,7 +662,7 @@
                 
                 // Get the device group data, provided we're logged in to the correct account
                 
-                if (ide.isLoggedIn && [self isCorrectAccount:currentProject])
+                if (ide.isLoggedIn && [self isCorrectAccount:currentProject] && currentProject.pid != nil)
                 {
                     for (Devicegroup *devicegroup in currentProject.devicegroups)
                     {
