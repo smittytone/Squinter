@@ -44,11 +44,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.3</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>BPSq</string>
 	<key>CFBundleVersion</key>
-	<string>132</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSItemContentTypes</key>
@@ -68,7 +68,7 @@
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
 	<key>SQBuildVersion</key>
-	<integer>208</integer>
+	<integer>212</integer>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
