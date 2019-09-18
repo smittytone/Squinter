@@ -616,7 +616,7 @@
     if ([key compare:@"swversion"] == NSOrderedSame) return [apiDict valueForKeyPath:@"attributes.swversion"];
 	if ([key compare:@"device_state_changed_at"] == NSOrderedSame) return [self convertTimestring:[apiDict valueForKeyPath:@"attributes.device_state_changed_at"]];
 
-	if ([key compare:@"ip_address"] == NSOrderedSame)
+    if ([key compare:@"ip_address"] == NSOrderedSame)
 	{
 		NSString *ip = [apiDict valueForKeyPath:@"attributes.ip_address"];
 		return [self checkForNull:ip];
@@ -660,20 +660,30 @@
        return [self checkForNull:tags];
     }
 
-	if ([key compare:@"free_memory"] == NSOrderedSame) {
+	if ([key compare:@"free_memory"] == NSOrderedSame)
+    {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.free_memory"];
 		return [self checkForNull:num];
 	}
 
-	if ([key compare:@"rssi"] == NSOrderedSame) {
+	if ([key compare:@"rssi"] == NSOrderedSame)
+    {
 		NSNumber *num = [apiDict valueForKeyPath:@"attributes.rssi"];
 		return [self checkForNull:num];
 	}
 
-	if ([key compare:@"plan_id"] == NSOrderedSame) {
+	if ([key compare:@"plan_id"] == NSOrderedSame)
+    {
 		NSString *plan = [apiDict valueForKeyPath:@"plan_id"];
 		return [self checkForNull:plan];
 	}
+
+    // FROM 2.3.132
+    
+    if ([key compare:@"agent_url"] == NSOrderedSame) {
+        NSString *url = [apiDict valueForKeyPath:@"attributes.agent_url"];
+        return [self checkForNull:url];
+    }
 
     // Relationships properties
 

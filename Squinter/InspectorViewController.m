@@ -724,12 +724,13 @@
         [deviceData addObject:dnode];
 
         // Agent URL
+        // FROM 2.3.132 use the 'agent_url' key
 
-        string = [device valueForKeyPath:@"attributes.agent_id"];
+        string = [device valueForKeyPath:@"attributes.agent_url"];
         if ((NSNull *)string == [NSNull null]) string = nil;
         dnode = [[TreeNode alloc] init];
         dnode.key = @"Agent URL";
-        dnode.value = string != nil ? [@"https://agent.electricimp.com/" stringByAppendingString:string] : @"No agent";
+        dnode.value = string != nil ? string : @"No agent";
         dnode.flag = YES;
         [deviceData addObject:dnode];
 

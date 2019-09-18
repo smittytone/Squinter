@@ -6196,12 +6196,15 @@
     string = boolean.boolValue ? @"Online" : @"Offline";
     [lines addObject:[NSString stringWithFormat:@"    State: %@", string]];
 
-    if (boolean.boolValue)
-    {
-        string = [selectedDevice valueForKeyPath:@"attributes.agent_id"];
-        if ((NSNull *)string == [NSNull null]) string = nil;
-        [lines addObject:(string != nil ? [NSString stringWithFormat:@"      URL: https://agent.electricimp.com/%@", string] : @"Unknown")];
-    }
+    // FROM 2.3.132
+        // Don't add a URL path -- get it from the API
+
+        string = [self getValueFrom:selectedDevice withKey:@"agent_url"];
+        //string = [selectedDevice valueForKeyPath:@"attributes.agent_id"];
+        //if ((NSNull *)string == [NSNull null]) string = nil;
+
+        [lines addObject:(string != nil ? [NSString stringWithFormat:@"      URL: %@", string] : @"      URL: Unknown")];
+
 
     [lines addObject:@"\nBlinkUp Information"];
     NSString *date = [selectedDevice valueForKeyPath:@"attributes.last_enrolled_at"];
@@ -6989,9 +6992,20 @@
         return;
     }
 
-    NSString *urlstring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]];
+    // FROM 2.3.132
+    // Don't add a URL path -- get it from the API
 
-    [nswsw openURL:[NSURL URLWithString:urlstring]];
+    NSString *urlstring = [self getValueFrom:selectedDevice withKey:@"agent_url"];
+    //NSString *urlstring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", [self getValueFrom:selectedDevice withKey:@"agent_id"]];
+
+    if (urlstring != nil)
+    {
+        [nswsw openURL:[NSURL URLWithString:urlstring]];
+    }
+    else
+    {
+        [self writeWarningToLog:@"The selected device does not yet have an agent." :YES];
+    }
 }
 
 
@@ -7918,16 +7932,29 @@
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevice] :YES];
         return;
     }
-    
-    NSString *agentid = [self getValueFrom:selectedDevice withKey:@"agent_id"];
-    NSString *ustring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", agentid];
-    NSPasteboard *pb = [NSPasteboard generalPasteboard];
-    NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
-    
-    [pb declareTypes:ptypes owner:self];
-    [pb setString:ustring forType:NSStringPboardType];
-    
-    [self writeStringToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
+
+    // FROM 2.3.132
+    // Don't add a URL path -- get it from the API
+
+    NSString *urlstring = [self getValueFrom:selectedDevice withKey:@"agent_url"];
+    //NSString *agentid = [self getValueFrom:selectedDevice withKey:@"agent_id"];
+    //NSString *urlstring = [NSString stringWithFormat:@"https://agent.electricimp.com/%@", agentid];
+
+    if (urlstring != nil)
+    {
+        // Set up the pasteboard, and add the URL string to it
+
+        NSPasteboard *pb = [NSPasteboard generalPasteboard];
+        NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
+        [pb declareTypes:ptypes owner:self];
+        [pb setString:urlstring forType:NSStringPboardType];
+
+        [self writeStringToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
+    }
+    else
+    {
+        [self writeWarningToLog:@"The selected device does not yet have an agent." :YES];
+    }
 }
 
 
