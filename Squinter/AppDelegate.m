@@ -7979,31 +7979,33 @@
 
 - (void)copyCodeToPasteboard:(NSString *)type
 {
+    // Bail if there is no device group selected
+
     if (currentDevicegroup == nil)
     {
         [self writeErrorToLog:[self getErrorMessage:kErrorMessageNoSelectedDevicegroup] :YES];
         return;
     }
-    
-    BOOL flag = NO;
-    NSString *code;
+
+    // Check that the requested code type -- agent or device -- actually has some
+    // code associated with it. if it does, place that code on the pasteboard;
+    // otherwise issue a warning in the log. Code must also be compiled
+
+    NSString *code = nil;
     
     for (Model *model in currentDevicegroup.models)
     {
         if ([model.type compare:type] == NSOrderedSame)
         {
-            if (model.squinted && model.code.length > 0)
-            {
-                code = model.code;
-                flag = YES;
-            }
-            
+            if (model.squinted && model.code.length > 0) code = model.code;
             break;
         }
     }
     
-    if (flag)
+    if (code != nil)
     {
+        // Set up the pasteboard and write the code to it
+
         NSPasteboard *pb = [NSPasteboard generalPasteboard];
         NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
         
