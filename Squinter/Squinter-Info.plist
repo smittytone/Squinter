@@ -68,13 +68,13 @@
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
 	<key>SQBuildVersion</key>
-	<integer>213</integer>
+	<integer>214</integer>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
 	<false/>
 	<key>SUFeedURL</key>
-	<string>https://smittytone.github.io/files/appcast.xml</string>
+	<string>https://smittytone.github.io/files/squinter/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>DOJKoHLyVRSXQ509W9M2WvLg1dOzQyANk0Rgq9RQqbY=</string>
 	<key>UIAppFonts</key>
