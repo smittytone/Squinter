@@ -1944,7 +1944,9 @@
             dateFormatter.dateStyle = NSDateFormatterMediumStyle;
             dateFormatter.timeStyle = NSDateFormatterNoStyle;
             
-            NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
+            // FROM 2.3.132
+            // Don't add the date to the description
+            // NSString *desc = [dateFormatter stringFromDate:[NSDate date]];
             
             // Assemble the deployment record for uploading the code
             
@@ -1956,7 +1958,7 @@
             NSDictionary *attributes = @{ @"flagged" : @NO,
                                           @"agent_code" : agentCode,
                                           @"device_code" : deviceCode,
-                                          @"description" : [NSString stringWithFormat:@"Uploaded from Squinter %@ at %@", desc, kSquinterAppVersion] };
+                                          @"description" : [NSString stringWithFormat:@"Uploaded by Squinter %@", kSquinterAppVersion] };
             
             NSDictionary *deployment = @{ @"type" : @"deployment",
                                           @"attributes" : attributes,

@@ -4295,7 +4295,7 @@
 
     [attributes setObject:(deviceCode != nil ? deviceCode : @"") forKey:@"device_code"];
     [attributes setObject:(agentCode != nil ? agentCode : @"") forKey:@"agent_code"];
-    [attributes setObject:[NSString stringWithFormat:@"Uploaded from Squinter 2.0 at %@", dt] forKey:@"description"];
+    [attributes setObject:[NSString stringWithFormat:@"Uploaded by Squinter %@", kSquinterAppVersion] forKey:@"description"];
 
     NSDictionary *deployment = @{ @"type" : @"deployment",
                                   @"attributes" : [NSDictionary dictionaryWithDictionary:attributes],
