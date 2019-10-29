@@ -777,14 +777,14 @@
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:NSWindowStyleMaskBorderless];
+    [_window setStyleMask:(NSWindowStyleMaskBorderless | NSWindowStyleMaskTitled)];
 }
 
 
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskClosable)];
+    [_window setStyleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable)];
     [_window setTitle:@"Squinter"];
 }
 
