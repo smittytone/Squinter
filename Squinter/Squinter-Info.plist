@@ -68,7 +68,7 @@
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
 	<key>SQBuildVersion</key>
-	<integer>221</integer>
+	<integer>226</integer>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
@@ -99,6 +99,23 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>squirrelproj</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Squirrel Code File</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.unknown.nut</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>nut</string>
 				</array>
 			</dict>
 		</dict>

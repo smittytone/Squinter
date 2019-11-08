@@ -29,6 +29,10 @@
 		3B6F3AC61FC31A7700A7F5C1 /* CommitTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC51FC31A7700A7F5C1 /* CommitTableCellView.m */; };
 		3B6F3AC91FC31BF000A7F5C1 /* CommitWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */; };
 		3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */; };
+		3B7503A023757F0B00564CCD /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B75039F23757F0B00564CCD /* Quartz.framework */; };
+		3B7503A323757F0B00564CCD /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B7503A223757F0B00564CCD /* PreviewViewController.swift */; };
+		3B7503A623757F0B00564CCD /* PreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3B7503A423757F0B00564CCD /* PreviewViewController.xib */; };
+		3B7503AB23757F0B00564CCD /* SquirrelPreviewer.appex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B75039E23757F0B00564CCD /* SquirrelPreviewer.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3B7ACF811CFF0A980080C3DB /* Connexion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7ACF801CFF0A980080C3DB /* Connexion.m */; };
 		3B7CDFB8230D5CFB00538183 /* EnvVarTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7CDFB7230D5CFB00538183 /* EnvVarTextField.m */; };
 		3B8B8E101E9527D6009363C8 /* Devicegroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B8E0F1E9527D6009363C8 /* Devicegroup.m */; };
@@ -56,6 +60,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3B7503A923757F0B00564CCD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3B36D1B71970A0990029CEC0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3B75039D23757F0B00564CCD;
+			remoteInfo = SquirrelPreviewer;
+		};
 		3BF5BBCB1ECCF118000C30DD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3B36D1B71970A0990029CEC0 /* Project object */;
@@ -83,6 +94,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				3BF5BBCD1ECCF12A000C30DD /* SquinterDockTilePlugIn.docktileplugin in CopyFiles */,
+				3B7503AB23757F0B00564CCD /* SquirrelPreviewer.appex in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +154,12 @@
 		3B6F3AC81FC31BF000A7F5C1 /* CommitWindowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = CommitWindowViewController.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B7375A01FC2266F000C4F88 /* AppDelegateUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppDelegateUtilities.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B7375A11FC2266F000C4F88 /* AppDelegateUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppDelegateUtilities.m; sourceTree = "<group>"; usesTabs = 0; };
+		3B75039E23757F0B00564CCD /* SquirrelPreviewer.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SquirrelPreviewer.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B75039F23757F0B00564CCD /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		3B7503A223757F0B00564CCD /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
+		3B7503A523757F0B00564CCD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreviewViewController.xib; sourceTree = "<group>"; };
+		3B7503A723757F0B00564CCD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3B7503A823757F0B00564CCD /* SquirrelPreviewer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SquirrelPreviewer.entitlements; sourceTree = "<group>"; };
 		3B7ACF7F1CFF0A980080C3DB /* Connexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Connexion.h; path = ../../BuildAPIAccess/Connexion.h; sourceTree = "<group>"; };
 		3B7ACF801CFF0A980080C3DB /* Connexion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = Connexion.m; path = ../BuildAPIAccess/Connexion.m; sourceTree = SOURCE_ROOT; };
 		3B7CDFB6230D5CFB00538183 /* EnvVarTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnvVarTextField.h; sourceTree = "<group>"; };
@@ -206,6 +224,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3B75039B23757F0B00564CCD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3B7503A023757F0B00564CCD /* Quartz.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -253,6 +279,7 @@
 			children = (
 				3B36D1C81970A0990029CEC0 /* Squinter */,
 				3B311E881ECCDEFC0076B066 /* SquinterDockTilePlugIn */,
+				3B7503A123757F0B00564CCD /* SquirrelPreviewer */,
 				3B36D1C01970A0990029CEC0 /* Products */,
 				AA37379CAA499F6C763B7D77 /* Pods */,
 				9D21E7CE86082310D04E5080 /* Frameworks */,
@@ -265,6 +292,7 @@
 			children = (
 				3B36D1BF1970A0990029CEC0 /* Squinter.app */,
 				3B311E871ECCDEFC0076B066 /* SquinterDockTilePlugIn.docktileplugin */,
+				3B75039E23757F0B00564CCD /* SquirrelPreviewer.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -314,6 +342,17 @@
 				3B36D1D01970A0990029CEC0 /* Squinter-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		3B7503A123757F0B00564CCD /* SquirrelPreviewer */ = {
+			isa = PBXGroup;
+			children = (
+				3B7503A223757F0B00564CCD /* PreviewViewController.swift */,
+				3B7503A423757F0B00564CCD /* PreviewViewController.xib */,
+				3B7503A723757F0B00564CCD /* Info.plist */,
+				3B7503A823757F0B00564CCD /* SquirrelPreviewer.entitlements */,
+			);
+			path = SquirrelPreviewer;
 			sourceTree = "<group>";
 		};
 		3B7ACF7D1CFEEBC10080C3DB /* UI Classes */ = {
@@ -416,6 +455,7 @@
 			children = (
 				29F9470FB833A59D9C952E82 /* libPods-Squinter.a */,
 				8E33BEB63E05FCF7A4BBAEDA /* libPods-SquinterTests.a */,
+				3B75039F23757F0B00564CCD /* Quartz.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -466,11 +506,29 @@
 			);
 			dependencies = (
 				3BF5BBCC1ECCF118000C30DD /* PBXTargetDependency */,
+				3B7503AA23757F0B00564CCD /* PBXTargetDependency */,
 			);
 			name = Squinter;
 			productName = Squinter;
 			productReference = 3B36D1BF1970A0990029CEC0 /* Squinter.app */;
 			productType = "com.apple.product-type.application";
+		};
+		3B75039D23757F0B00564CCD /* SquirrelPreviewer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3B7503AE23757F0B00564CCD /* Build configuration list for PBXNativeTarget "SquirrelPreviewer" */;
+			buildPhases = (
+				3B75039A23757F0B00564CCD /* Sources */,
+				3B75039B23757F0B00564CCD /* Frameworks */,
+				3B75039C23757F0B00564CCD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SquirrelPreviewer;
+			productName = SquirrelPreviewer;
+			productReference = 3B75039E23757F0B00564CCD /* SquirrelPreviewer.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -478,6 +536,7 @@
 		3B36D1B71970A0990029CEC0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1120;
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Tony Smith";
 				TargetAttributes = {
@@ -494,6 +553,11 @@
 								enabled = 1;
 							};
 						};
+					};
+					3B75039D23757F0B00564CCD = {
+						CreatedOnToolsVersion = 11.2;
+						DevelopmentTeam = Y5J3K52DNA;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -512,6 +576,7 @@
 			targets = (
 				3B36D1BE1970A0990029CEC0 /* Squinter */,
 				3B311E861ECCDEFC0076B066 /* SquinterDockTilePlugIn */,
+				3B75039D23757F0B00564CCD /* SquirrelPreviewer */,
 			);
 		};
 /* End PBXProject section */
@@ -534,6 +599,14 @@
 				3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */,
 				3B36D1D91970A0990029CEC0 /* MainMenu.xib in Resources */,
 				3BBA879A22BCE019004E59ED /* help in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3B75039C23757F0B00564CCD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3B7503A623757F0B00564CCD /* PreviewViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -647,9 +720,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3B75039A23757F0B00564CCD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3B7503A323757F0B00564CCD /* PreviewViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3B7503AA23757F0B00564CCD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3B75039D23757F0B00564CCD /* SquirrelPreviewer */;
+			targetProxy = 3B7503A923757F0B00564CCD /* PBXContainerItemProxy */;
+		};
 		3BF5BBCC1ECCF118000C30DD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3B311E861ECCDEFC0076B066 /* SquinterDockTilePlugIn */;
@@ -672,6 +758,14 @@
 				3B36D1D81970A0990029CEC0 /* Base */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		3B7503A423757F0B00564CCD /* PreviewViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3B7503A523757F0B00564CCD /* Base */,
+			);
+			name = PreviewViewController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -832,6 +926,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -871,6 +966,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 08A885A53D3FD2441B2836EF /* Pods-Squinter.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -906,6 +1002,69 @@
 			};
 			name = Release;
 		};
+		3B7503AC23757F0B00564CCD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = SquirrelPreviewer/SquirrelPreviewer.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Y5J3K52DNA;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = SquirrelPreviewer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bps.Squinter.SquirrelPreviewer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3B7503AD23757F0B00564CCD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = SquirrelPreviewer/SquirrelPreviewer.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = Y5J3K52DNA;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = SquirrelPreviewer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bps.Squinter.SquirrelPreviewer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -932,6 +1091,15 @@
 			buildConfigurations = (
 				3B36D1F11970A0990029CEC0 /* Debug */,
 				3B36D1F21970A0990029CEC0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3B7503AE23757F0B00564CCD /* Build configuration list for PBXNativeTarget "SquirrelPreviewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3B7503AC23757F0B00564CCD /* Debug */,
+				3B7503AD23757F0B00564CCD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
