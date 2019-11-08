@@ -280,9 +280,9 @@
 				3B36D1C81970A0990029CEC0 /* Squinter */,
 				3B311E881ECCDEFC0076B066 /* SquinterDockTilePlugIn */,
 				3B7503A123757F0B00564CCD /* SquirrelPreviewer */,
-				3B36D1C01970A0990029CEC0 /* Products */,
 				AA37379CAA499F6C763B7D77 /* Pods */,
 				9D21E7CE86082310D04E5080 /* Frameworks */,
+				3B36D1C01970A0990029CEC0 /* Products */,
 			);
 			sourceTree = "<group>";
 			usesTabs = 0;

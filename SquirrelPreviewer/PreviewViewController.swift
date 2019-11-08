@@ -26,8 +26,9 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         
         // Get the font name preference
         CFPreferencesAppSynchronize(("com.bps.Squinter" as CFString))
-        if let indexData = CFPreferencesCopyAppValue(("com.bps.squinter.fontNameIndex" as CFString), ("com.bps.Squinter" as CFString)) {
-            if let index = indexData as? Int {
+        if let indexData: String = CFPreferencesCopyAppValue(("com.bps.squinter.fontNameIndex" as CFString),
+                                                             ("com.bps.Squinter" as CFString)) as? String {
+            if let index:Int = Int(indexData) {
                 switch(index) {
                     case 0:
                         self.fontName = "AndaleMono";
@@ -75,7 +76,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
                             font = NSFont.init(name: self.fontName!, size: 11.0) ?? NSFont.systemFont(ofSize: 11.0)
                         } else {
                             // Just use a generic (but guaranteed) font
-                            font = NSFont.systemFont(ofSize: 11.0)
+                            font = NSFont.init(name: "SourceCodePro-Regular", size: 11.0) ?? NSFont.systemFont(ofSize: 11.0)
                         }
                         
                         // Convert the program text into an NSAtrributedString for display...
