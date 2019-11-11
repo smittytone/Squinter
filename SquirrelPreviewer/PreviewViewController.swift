@@ -24,13 +24,14 @@ class PreviewViewController: NSViewController, QLPreviewingController {
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        
+
+        /*
         // Get the font name preference
         CFPreferencesAppSynchronize(("com.bps.Squinter" as CFString))
-        if let indexData: String = CFPreferencesCopyAppValue(("com.bps.squinter.fontNameIndex" as CFString),
-                                                             ("com.bps.Squinter" as CFString)) as? String {
+        if let indexData: Int = CFPreferencesCopyAppValue(("com.bps.squinter.fontNameIndex" as CFString),
+                                                          ("com.bps.Squinter" as CFString)) as? Int {
             if let index:Int = Int(indexData) {
-                switch(index) {
+                switch(indexData) {
                     case 0:
                         self.fontName = "AndaleMono";
                     case 1:
@@ -46,6 +47,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
                 }
             }
         }
+        */
     }
     
     
