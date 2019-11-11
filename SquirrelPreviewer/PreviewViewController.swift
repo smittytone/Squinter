@@ -12,6 +12,7 @@ import Quartz
 
 class PreviewViewController: NSViewController, QLPreviewingController {
     
+    
     var fontName: String? = nil
     
     
