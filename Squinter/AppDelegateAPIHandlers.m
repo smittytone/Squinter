@@ -1655,6 +1655,7 @@
             if (project == currentProject)
             {
                 iwvc.project = currentProject;
+                iwvc.device = selectedDevice;
                 [saveLight needSave:YES];
             }
             
