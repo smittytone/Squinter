@@ -645,6 +645,12 @@
         // switchAccountMenuItem.enabled = YES;
         [self writeStringToLog:@"To make full use of Squinter, please log in to your Electric Imp account via the Account menu." :YES];
     }
+    
+    // Quick'n'Dirty Tests
+#if DEBUG
+    #include "/Users/smitty/OneDrive/Programming/Squinter/Tests/test_paths.m"
+#endif
+
 }
 
 
