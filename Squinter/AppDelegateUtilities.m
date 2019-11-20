@@ -65,8 +65,8 @@
 
         if (r.location != NSNotFound)
         {
-            // The file path contains the base path, eg.
-            // '/Users/smitty/documents/github/squinter/files' contains '/Users/smitty/documents/github/squinter'
+            // The file path is present in the base path, eg.
+            // '/Users/smitty/documents/github/squinter' contains '/Users/smitty/documents/github/squinter/files'
 
             theFilePath = [theFilePath substringFromIndex:r.length];
         }
@@ -78,24 +78,38 @@
             theFilePath = [self getPathDelta:basePath :theFilePath];
         }
     }
-    else if (nf < nb) // theFilePath.length < basePath.length
+    else if (nf < nb)
     {
+        // filePath length < basePath length, ie.
+        // file is ABOVE the project in the directory structure
+        
         NSRange r = [basePath rangeOfString:theFilePath];
 
         if (r.location != NSNotFound)
         {
-            // The base path contains the file path, eg.
+            // The base path fully contains the file path, eg.
             // '/Users/smitty/documents/github/squinter/files' contains '/Users/smitty/documents'
+            
+            // Get the path section between the base and the file, ie. the section not common to both, eg.
+            // 'github/squinter/files'
 
-            theFilePath = [basePath substringFromIndex:r.length];
-            NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
+            NSString *extraFilePath = [basePath substringFromIndex: r.length + 1];
+            NSArray *extraFilePathParts = [extraFilePath componentsSeparatedByString:@"/"];
+            
+            // The filePath IS the common component, so just clear it...
+            
+            theFilePath = @"";
 
-            // Add in '../' for each directory in the base path but not in the file path
+            // ...and add '../' for each directory in the base path but not in the file path
 
-            for (NSInteger i = 0 ; i < filePathParts.count - 1 ; ++i)
+            for (NSInteger i = 0 ; i < extraFilePathParts.count ; ++i)
             {
                 theFilePath = [@"../" stringByAppendingString:theFilePath];
             }
+            
+            // Remove the final / (it will be added later, with the filename)
+            
+            theFilePath = [theFilePath substringToIndex:(theFilePath.length - 1)];
         }
         else
         {
