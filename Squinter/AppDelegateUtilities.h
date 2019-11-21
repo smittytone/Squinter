@@ -11,7 +11,6 @@
 
 
 // File Path Manipulation and Presentation Methods
-- (NSString *)getDisplayPath:(NSString *)filePath;
 - (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath;
 - (NSString *)getRelativeFilePath:(NSString *)basePath :(NSString *)filePath;
 - (NSString *)getPathDelta:(NSString *)basePath :(NSString *)filePath;

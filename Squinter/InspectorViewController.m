@@ -1272,23 +1272,12 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     if (pathType == 2)
     {
         path = [self getAbsolutePath:project.path :path];
-        path = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[path stringByDeletingLastPathComponent]];
+        path = [@"~" stringByAppendingString:[self getRelativeFilePath:@"~" :path]];
     }
     
     // Path to be shown relative to project ('pathType' is 1) is just the stored path
     
     return path;
-}
-
-
-
-- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
-{
-    // Expand a relative path that is relative to the base path to an absolute path
-
-    NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
-    absolutePath = [absolutePath stringByStandardizingPath];
-    return absolutePath;
 }
 
 
@@ -1309,55 +1298,61 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     if (nf > nb) // theFilePath.length > basePath.length
     {
         // The file path is longer than the base path
-
+        
         NSRange r = [theFilePath rangeOfString:basePath];
 
         if (r.location != NSNotFound)
         {
-            // The file path contains the base path, eg.
-            // '/Users/smitty/documents/github/squinter/files'
-            // contains
-            // '/Users/smitty/documents/github/squinter'
+            // The file path is present in the base path, eg.
+            // '/Users/smitty/documents/github/squinter' contains '/Users/smitty/documents/github/squinter/files'
 
             theFilePath = [theFilePath substringFromIndex:r.length];
         }
         else
         {
             // The file path does not contain the base path, eg.
-            // '/Users/smitty/downloads'
-            // doesn't contain
-            // '/Users/smitty/documents/github/squinter'
+            // '/Users/smitty/downloads' doesn't contain '/Users/smitty/documents/github/squinter'
 
             theFilePath = [self getPathDelta:basePath :theFilePath];
         }
     }
-    else if (nf < nb) // theFilePath.length < basePath.length
+    else if (nf < nb)
     {
+        // filePath length < basePath length, ie.
+        // file is ABOVE the project in the directory structure
+        
         NSRange r = [basePath rangeOfString:theFilePath];
 
         if (r.location != NSNotFound)
         {
-            // The base path contains the file path, eg.
-            // '/Users/smitty/documents/github/squinter/files'
-            // contains
-            // '/Users/smitty/documents'
+            // The base path fully contains the file path, eg.
+            // '/Users/smitty/documents/github/squinter/files' contains '/Users/smitty/documents'
+            
+            // Get the path section between the base and the file, ie. the section not common to both, eg.
+            // 'github/squinter/files'
 
-            theFilePath = [basePath substringFromIndex:r.length];
-            NSArray *filePathParts = [theFilePath componentsSeparatedByString:@"/"];
+            NSString *extraFilePath = [basePath substringFromIndex: r.length + 1];
+            NSArray *extraFilePathParts = [extraFilePath componentsSeparatedByString:@"/"];
+            
+            // The filePath IS the common component, so just clear it...
+            
+            theFilePath = @"";
 
-            // Add in '../' for each directory in the base path but not in the file path
+            // ...and add '../' for each directory in the base path but not in the file path
 
-            for (NSInteger i = 0 ; i < filePathParts.count - 1 ; ++i)
+            for (NSInteger i = 0 ; i < extraFilePathParts.count ; ++i)
             {
                 theFilePath = [@"../" stringByAppendingString:theFilePath];
             }
+            
+            // Remove the final / (it will be added later, with the filename)
+            
+            theFilePath = [theFilePath substringToIndex:(theFilePath.length - 1)];
         }
         else
         {
             // The base path doesn't contains the file path, eg.
-            // '/Users/smitty/documents/github/squinter/files'
-            // doesn't contain
-            // '/Users/smitty/downloads'
+            // '/Users/smitty/documents/github/squinter/files' doesn't contain '/Users/smitty/downloads'
 
             theFilePath = [self getPathDelta:basePath :theFilePath];
         }
@@ -1369,18 +1364,14 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
         if ([theFilePath compare:basePath] == NSOrderedSame)
         {
             // The file path and the base patch are the same, eg.
-            // '/Users/smitty/documents/github/squinter'
-            // matches
-            // '/Users/smitty/documents/github/squinter'
+            // '/Users/smitty/documents/github/squinter' matches '/Users/smitty/documents/github/squinter'
 
             theFilePath = @"";
         }
         else
         {
             // The file path and the base patch are not the same, eg.
-            // '/Users/smitty/documents/github/squinter'
-            // matches
-            // '/Users/smitty/downloads/archive/nofiles'
+            // '/Users/smitty/documents/github/squinter' matches '/Users/smitty/downloads/archive/nofiles'
 
             theFilePath = [self getPathDelta:basePath :theFilePath];
         }
@@ -1441,6 +1432,17 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
 {
     NSArray *parts = [path componentsSeparatedByString:@"/"];
     return (parts.count - 1);
+}
+
+
+
+- (NSString *)getAbsolutePath:(NSString *)basePath :(NSString *)relativePath
+{
+    // Expand a relative path that is relative to the base path to an absolute path
+
+    NSString *absolutePath = [basePath stringByAppendingFormat:@"/%@", relativePath];
+    absolutePath = [absolutePath stringByStandardizingPath];
+    return absolutePath;
 }
 
 

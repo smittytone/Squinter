@@ -13,22 +13,6 @@
 #pragma mark - File Path Manipulation and Presentation Methods
 
 
-- (NSString *)getDisplayPath:(NSString *)filePath
-{
-    // Convert a path string to the format required by the user's preference
-    // NOTE This assumes we are dealing the the current project
-    // NOTE Called by 'InspectorView.m' - can we convert to 'getPrintPath:'
-    
-    NSInteger index = [[defaults objectForKey:@"com.bps.squinter.displaypath"] integerValue];
-
-	if (index == 0 || index == 2) filePath = [self getAbsolutePath:currentProject.path :filePath];
-	if (index == 2) filePath = [self getRelativeFilePath:[@"~/" stringByStandardizingPath] :[filePath stringByDeletingLastPathComponent]];
-
-	return filePath;
-}
-
-
-
 - (NSString *)getPrintPath:(NSString *)projectPath :(NSString *)filePath
 {
     // Takes an absolute path to a project and a file path relative to that same project,
