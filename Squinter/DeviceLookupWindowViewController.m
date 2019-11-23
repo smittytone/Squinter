@@ -25,6 +25,7 @@
     // - Update the device table
     // - Clear
 
+    selectButton.enabled = NO;
     entryField.stringValue = @"";
     selectedDeviceID = @"";
     searchOnDeviceId = YES;
@@ -188,9 +189,21 @@
     // If no row is selected ('selectedRow' = -1) then clear 'selectedDeviceID'
     // to make sure the device doesn't change when the dialog closes after 'Select Device'
     // was clicked
+
+    // FROM 2.3.133
+    // Enable or disable the selection button too
     
     NSTableView *tableView = (NSTableView *)notification.object;
-    if (tableView.selectedRow == -1) selectedDeviceID = @"";
+
+    if (tableView.selectedRow == -1)
+    {
+        selectedDeviceID = @"";
+        selectButton.enabled = NO;
+    }
+    else
+    {
+        selectButton.enabled = YES;
+    }
 }
 
 

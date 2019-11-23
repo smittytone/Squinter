@@ -19,6 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
     IBOutlet NSTableView *deviceTable;
     IBOutlet NSTextField *entryField;
 
+    // FROM 2.3.133
+    IBOutlet NSButton *selectButton;
+
     NSMutableArray *listedDevices;
 
     bool searchOnDeviceId;
