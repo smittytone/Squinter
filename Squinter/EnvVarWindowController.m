@@ -246,22 +246,10 @@
             if ([value isKindOfClass:[NSNumber class]])
             {
                 // If 'value' is an NSNUmber, is it an int or a float?
-                // SEE https://stackoverflow.com/questions/2518761/get-type-of-nsnumber
-                
+
                 NSNumber *number = (NSNumber *)value;
                 NSString *numberString = (strcmp([number objCType], @encode(double)) == 0) ? [nsnf stringFromNumber:number] : number.stringValue;
                 cell.isString = NO;
-                
-                // Set up the italic string
-                /*
-                NSArray *values = [NSArray arrayWithObjects:italicFont, nil];
-                NSArray *keys = [NSArray arrayWithObjects:NSFontAttributeName, nil];
-                NSDictionary *attributes = [NSDictionary dictionaryWithObjects:values
-                                                                       forKeys:keys];
-                NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:numberString
-                                                                                 attributes:attributes];
-                cellTextField.attributedStringValue = attrString;
-                 */
                 cellTextField.stringValue = numberString;
             }
             else
