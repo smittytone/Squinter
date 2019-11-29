@@ -1539,6 +1539,18 @@
 
 
 
+- (void)setInspectorMenuItemState:(BOOL)state
+{
+    // ADDED 2.3.133
+    // Update the 'Show/Hide Inpsector' menu item according to 'state'
+    // NOTE Name should be reversed to indicate action, ie. if 'state' is true
+    //      (inspector is shown), action should be 'Hide Inspector'
+    
+    showHideInspectorMenuItem.title = state ? @"Hide Inspector" : @"Show Inspector";
+}
+
+
+
 #pragma mark Files Menu
 
 
@@ -1640,6 +1652,11 @@
     loginAndOutItem.isLoggedIn = ide.isLoggedIn;
 
     // Validate items to set the colour of items that have different modes
+    
+    // FROM 2.3.133
+    // Set the inspector toolbar item state
+    
+    inspectorItem.isShown = !isInspectorHidden;
 
     [squinterToolbar validateVisibleItems];
 }

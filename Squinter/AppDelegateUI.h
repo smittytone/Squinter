@@ -44,6 +44,7 @@
 - (IBAction)showHideToolbar:(id)sender;
 - (void)refreshViewMenu;
 - (void)refreshRecentFilesMenu;
+- (void)setInspectorMenuItemState:(BOOL)state;
 
 // Toolbar
 - (void)setToolbar;

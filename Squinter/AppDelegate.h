@@ -31,6 +31,7 @@
 #import  "SyncWindowViewController.h"
 #import  "HelpWindowViewController.h"
 #import  "EnvVarWindowController.h"
+#import  "InspectorToolbarItem.h"
 
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
@@ -145,6 +146,8 @@
     IBOutlet NSMenuItem *logDeviceCodeMenuItem;
     IBOutlet NSMenuItem *logAgentCodeMenuItem;
     IBOutlet NSMenuItem *showHideToolbarMenuItem;
+    // FROM 2.3.133
+    IBOutlet NSMenuItem *showHideInspectorMenuItem;
 
     #pragma mark File Menu outlets
 
@@ -161,29 +164,29 @@
 
     #pragma mark Toolbar outlets
 
-    IBOutlet NSToolbar           *squinterToolbar;
-    IBOutlet SquinterToolbarItem *squintItem;
-    IBOutlet SquinterToolbarItem *newProjectItem;
-    IBOutlet SquinterToolbarItem *infoItem;
-    IBOutlet SquinterToolbarItem *openAllItem;
-    IBOutlet SquinterToolbarItem *uploadCodeItem;
-    IBOutlet SquinterToolbarItem *restartDevicesItem;
-    IBOutlet SquinterToolbarItem *clearItem;
-    IBOutlet SquinterToolbarItem *copyDeviceItem;
-    IBOutlet SquinterToolbarItem *copyAgentItem;
-    IBOutlet SquinterToolbarItem *printItem;
-    IBOutlet SquinterToolbarItem *openDeviceCode;
-    IBOutlet SquinterToolbarItem *openAgentCode;
-    IBOutlet StreamToolbarItem   *streamLogsItem;
-    IBOutlet SquinterToolbarItem *refreshModelsItem;
-    IBOutlet SquinterToolbarItem *newDevicegroupItem;
-    IBOutlet SquinterToolbarItem *devicegroupInfoItem;
-    IBOutlet LoginToolbarItem    *loginAndOutItem;
-    IBOutlet SquinterToolbarItem *uploadCodeExtraItem;
-    IBOutlet SquinterToolbarItem *listCommitsItem;
-    IBOutlet SquinterToolbarItem *downloadProductItem;
-    IBOutlet SquinterToolbarItem *inspectorItem;
-    IBOutlet SquinterToolbarItem *syncItem;
+    IBOutlet NSToolbar              *squinterToolbar;
+    IBOutlet SquinterToolbarItem    *squintItem;
+    IBOutlet SquinterToolbarItem    *newProjectItem;
+    IBOutlet SquinterToolbarItem    *infoItem;
+    IBOutlet SquinterToolbarItem    *openAllItem;
+    IBOutlet SquinterToolbarItem    *uploadCodeItem;
+    IBOutlet SquinterToolbarItem    *restartDevicesItem;
+    IBOutlet SquinterToolbarItem    *clearItem;
+    IBOutlet SquinterToolbarItem    *copyDeviceItem;
+    IBOutlet SquinterToolbarItem    *copyAgentItem;
+    IBOutlet SquinterToolbarItem    *printItem;
+    IBOutlet SquinterToolbarItem    *openDeviceCode;
+    IBOutlet SquinterToolbarItem    *openAgentCode;
+    IBOutlet StreamToolbarItem      *streamLogsItem;
+    IBOutlet SquinterToolbarItem    *refreshModelsItem;
+    IBOutlet SquinterToolbarItem    *newDevicegroupItem;
+    IBOutlet SquinterToolbarItem    *devicegroupInfoItem;
+    IBOutlet LoginToolbarItem       *loginAndOutItem;
+    IBOutlet SquinterToolbarItem    *uploadCodeExtraItem;
+    IBOutlet SquinterToolbarItem    *listCommitsItem;
+    IBOutlet SquinterToolbarItem    *downloadProductItem;
+    IBOutlet InspectorToolbarItem   *inspectorItem;
+    IBOutlet SquinterToolbarItem    *syncItem;
 
     // Sheets, dialogs and windows
 

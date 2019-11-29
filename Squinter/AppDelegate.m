@@ -245,8 +245,10 @@
     downloadProductItem.inactiveImageName = @"download_grey";
     downloadProductItem.toolTip = @"Download the selected product as a project";
 
-    inspectorItem.activeImageName = @"inspect";
-    inspectorItem.inactiveImageName = @"inspect_grey";
+    inspectorItem.activeShowImageName = @"inspector_show";
+    inspectorItem.inactiveShowImageName = @"inspector_show_grey";
+    inspectorItem.activeHideImageName = @"inspector_hide";
+    inspectorItem.inactiveHideImageName = @"inspector_hide_grey";
     inspectorItem.toolTip = @"Show or hide the project and device inspector";
 
     syncItem.activeImageName = @"sync";
@@ -427,6 +429,7 @@
 
             wantsToHide = -1;
             [splitView setPosition:splitView.frame.size.width ofDividerAtIndex:0];
+            showHideInspectorMenuItem.title = @"Show Inspector";
         }
         else
         {
@@ -434,6 +437,7 @@
 
             wantsToHide = 1;
             [splitView setPosition:(splitView.frame.size.width - 340.0 - splitView.dividerThickness) ofDividerAtIndex:0];
+            showHideInspectorMenuItem.title = @"Hide Inspector";
         }
     }
     else
@@ -820,6 +824,14 @@
         wantsToHide = -1;
         [splitView setPosition:proposed ofDividerAtIndex:0];
     }
+    
+    // FROM 2.3.133
+    // Update the toolbar icon
+    
+    inspectorItem.isShown = !isInspectorHidden;
+    
+    [self setInspectorMenuItemState:inspectorItem.isShown];
+    [inspectorItem validate];
 }
 
 

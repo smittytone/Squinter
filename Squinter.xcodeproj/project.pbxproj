@@ -21,6 +21,7 @@
 		3B36D1D61970A0990029CEC0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B36D1D51970A0990029CEC0 /* AppDelegate.m */; };
 		3B36D1D91970A0990029CEC0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1D71970A0990029CEC0 /* MainMenu.xib */; };
 		3B36D1DB1970A0990029CEC0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B36D1DA1970A0990029CEC0 /* Images.xcassets */; };
+		3B45D2A1239169E300EDE271 /* InspectorToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B45D2A0239169E300EDE271 /* InspectorToolbarItem.m */; };
 		3B4624FA2236DB7A009CED0D /* SyncWindowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B4624F92236DB7A009CED0D /* SyncWindowViewController.m */; };
 		3B5297081FC59E5F00A75F6B /* AppDelegateSquinting.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5297071FC59E5F00A75F6B /* AppDelegateSquinting.m */; };
 		3B5C32D4230EB89F0013294E /* EnvVarValueCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B5C32D3230EB89F0013294E /* EnvVarValueCell.m */; };
@@ -138,6 +139,8 @@
 		3B36D1D51970A0990029CEC0 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppDelegate.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B36D1D81970A0990029CEC0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		3B36D1DA1970A0990029CEC0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../../OneDrive/Programming/Squinter/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		3B45D29F239169E300EDE271 /* InspectorToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorToolbarItem.h; sourceTree = "<group>"; };
+		3B45D2A0239169E300EDE271 /* InspectorToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorToolbarItem.m; sourceTree = "<group>"; };
 		3B4624F82236DB7A009CED0D /* SyncWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncWindowViewController.h; sourceTree = "<group>"; };
 		3B4624F92236DB7A009CED0D /* SyncWindowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncWindowViewController.m; sourceTree = "<group>"; };
 		3B5297061FC59E5F00A75F6B /* AppDelegateSquinting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppDelegateSquinting.h; sourceTree = "<group>"; usesTabs = 0; };
@@ -368,6 +371,8 @@
 				3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */,
 				3B6057B31F8EB17A00E9CBA3 /* LoginToolbarItem.h */,
 				3B6057B41F8EB17A00E9CBA3 /* LoginToolbarItem.m */,
+				3B45D29F239169E300EDE271 /* InspectorToolbarItem.h */,
+				3B45D2A0239169E300EDE271 /* InspectorToolbarItem.m */,
 				3BB2EF031FC7215100F7B7D1 /* SelectWindowViewController.h */,
 				3BB2EF041FC7215100F7B7D1 /* SelectWindowViewController.m */,
 				3B4624F82236DB7A009CED0D /* SyncWindowViewController.h */,
@@ -694,6 +699,7 @@
 				3B7375A21FC2266F000C4F88 /* AppDelegateUtilities.m in Sources */,
 				3B077B3121118A5E00C17D25 /* InspectorLinkButton.m in Sources */,
 				3BE897551B0608F200645092 /* SquinterToolbarItem.m in Sources */,
+				3B45D2A1239169E300EDE271 /* InspectorToolbarItem.m in Sources */,
 				3BCEB7BD227AFAEE0090B137 /* AppDelegateAPIHandlers.m in Sources */,
 				3BB2EF051FC7215100F7B7D1 /* SelectWindowViewController.m in Sources */,
 				3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */,

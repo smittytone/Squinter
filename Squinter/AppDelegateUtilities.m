@@ -1181,6 +1181,12 @@
         {
             wantsToHide = 0;
             isInspectorHidden = NO;
+            
+            // FROM 2.3.133
+            // Update the toolbar icon
+            inspectorItem.isShown = !isInspectorHidden;
+            [inspectorItem validate];
+            
             return viewWidth - 340 - splitView.dividerThickness;
         }
         
@@ -1196,6 +1202,12 @@
         {
             wantsToHide = 0;
             isInspectorHidden = YES;
+            
+            // FROM 2.3.133
+            // Update the toolbar icon
+            inspectorItem.isShown = !isInspectorHidden;
+            [inspectorItem validate];
+            
             return viewWidth;
         }
         
