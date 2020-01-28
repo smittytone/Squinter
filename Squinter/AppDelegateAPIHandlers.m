@@ -2348,7 +2348,9 @@
                 }
                 else
                 {
+#ifdef DEBUG
                     NSLog(@"Non-development device type: %@", dtype);
+#endif
                 }
             }
             
@@ -3132,7 +3134,9 @@
         }
         else
         {
+#ifdef DEBUG
             NSLog(@"loggedDevices index error in loggingStarted:");
+#endif
         }
     }
     
@@ -3235,7 +3239,9 @@
         }
         else
         {
+#ifdef DEBUG
             NSLog(@"loggedDevices index error in loggingStopped:");
+#endif
         }
     }
 

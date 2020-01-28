@@ -1193,7 +1193,9 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
         
         // REMOVE IN 2.3.130
         // if (renderHeight > 20 && fmod(renderHeight, 20) > 0) renderHeight = renderHeight - fmod(renderHeight, 20) + 20;
+#ifdef DEBUG
         NSLog(@"%f - %@", renderHeight, key);
+#endif
         return renderHeight;
     }
 

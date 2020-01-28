@@ -281,8 +281,9 @@
             }
         }
     }
-
+#ifdef DEBUG
     if (!wasAdded) NSLog(@"Some files couldn't be added");
+#endif
 }
 
 
@@ -956,7 +957,9 @@
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-mm-DD'T'hh:mm:ss.sZ"];
+#ifdef DEBUG
     NSLog(@"convertTimestring: %@", dateString);
+#endif
     return [inLogDef dateFromString:dateString];
 }
 

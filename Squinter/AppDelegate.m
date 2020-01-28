@@ -3562,7 +3562,6 @@
                 {
                     // ERROR
                     
-                    NSLog(@"Target device groups match");
                     [self writeErrorToLog:[NSString stringWithFormat:@"New device group \"%@\" has been set with the same target twice. Cannot proceed.", devicegroup.name] :YES];
                     return;
                 }
@@ -3749,7 +3748,7 @@
         {
             // The device group were working with has no targets
 
-            NSLog(@"ERROR: attempting to set a target on a non-targetable device group in selectTarget:");
+            NSLog(@"[ERROR] Attempting to set a target on a non-targetable device group in selectTarget:");
             return;
         }
     }
@@ -3933,8 +3932,9 @@
 
             if (parent == currentProject) iwvc.project = currentProject;
         }
-
-        if (!added) NSLog(@"Some files couldn't be added");
+#ifdef DEBUG
+        if (!added) NSLog(@"[ERROR] Some files couldn't be watched in saveDevicegroupfiles:");
+#endif
     }
     else
     {

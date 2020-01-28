@@ -1088,8 +1088,9 @@
 	if (project == nil)
 	{
 		// NOTE This should not happen, but just in case...
-
+#ifdef DEBUG
 		NSLog(@"Found orphan model in processLibraries:");
+#endif
 		return;
 	}
 
