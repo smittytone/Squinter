@@ -397,7 +397,7 @@
     // Register we are no longer trying to log in
     
     isLoggingIn = NO;
-    credsFlag = YES;
+    credsFlag = YES; // SHOULD THIS BE NO???
     switchingAccount = NO;
     otpLoginToken = nil;
     loginMode = kLoginModeNone;

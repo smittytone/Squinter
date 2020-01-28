@@ -1103,7 +1103,12 @@
     [ide login:usernameTextField.stringValue
               :passwordTextField.stringValue
               :code];
-
+    
+    // Clear entered creds
+    
+    usernameTextField.stringValue = @"";
+    passwordTextField.stringValue = @"";
+    
     // Pick up the action in **loggedIn:** or **displayError:**, depending on success or failure
 }
 
