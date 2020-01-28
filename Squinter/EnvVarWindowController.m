@@ -129,7 +129,7 @@
         
         if (error == nil) json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
-#if DEBUG
+#ifdef DEBUG
         NSLog(@"%@", json);
 #endif
     }
