@@ -138,7 +138,7 @@
 		3B36D1D41970A0990029CEC0 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppDelegate.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B36D1D51970A0990029CEC0 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppDelegate.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B36D1D81970A0990029CEC0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		3B36D1DA1970A0990029CEC0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../../OneDrive/Programming/Squinter/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		3B36D1DA1970A0990029CEC0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../OneDrive/Programming/Squinter/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		3B45D29F239169E300EDE271 /* InspectorToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InspectorToolbarItem.h; sourceTree = "<group>"; };
 		3B45D2A0239169E300EDE271 /* InspectorToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InspectorToolbarItem.m; sourceTree = "<group>"; };
 		3B4624F82236DB7A009CED0D /* SyncWindowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncWindowViewController.h; sourceTree = "<group>"; };
