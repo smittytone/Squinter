@@ -26,6 +26,9 @@
 
     deviceOutlineView.indentationPerLevel = 1.0;
 
+    deviceOutlineView.rowSizeStyle = NSTableViewRowSizeStyleCustom;
+    deviceOutlineView.rowHeight = 17.0;
+
     // Clear the content arrays:
     // 'projectData' is the project outline view data
     // 'deviceData' is the device outline view data
@@ -1217,7 +1220,7 @@ objectValueForTableColumn:(nullable NSTableColumn *)tableColumn
     //nstf.cell.bezeled = NO;
     //nstf.allowsEditingTextAttributes = NO;
     nstf.cell.lineBreakMode = NSLineBreakByWordWrapping; //NSLineBreakByCharWrapping;
-    NSFont *font = [NSFont systemFontOfSize:11];
+    NSFont *font = [NSFont systemFontOfSize:12];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
     nstf.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attributes];
     return [nstf.cell cellSizeForBounds:nstf.bounds].height;

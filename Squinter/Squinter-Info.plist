@@ -60,7 +60,7 @@
 	<key>NSDockTilePlugIn</key>
 	<string>SquinterDockTilePlugIn.docktileplugin</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2015-19 Tony Smith. All rights reserved.</string>
+	<string>Copyright © 2015-20 Tony Smith. All rights reserved.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -68,7 +68,7 @@
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
 	<key>SQBuildVersion</key>
-	<integer>318</integer>
+	<integer>346</integer>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>

@@ -49,6 +49,7 @@
     // Set the toolbar item image name according to whether the app is foregrounded or not
     
     [self setImage:[NSImage imageNamed:(isForeground ? activeImageName : inactiveImageName)]];
+    [super validate];
 }
 
 
