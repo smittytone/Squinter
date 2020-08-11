@@ -787,15 +787,15 @@
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:(NSWindowStyleMaskBorderless | NSWindowStyleMaskTitled)];
+    //[_window setStyleMask:(NSWindowStyleMaskBorderless | NSWindowStyleMaskTitled)];
 }
 
 
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
-    [_window setStyleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable)];
-    [_window setTitle:@"Squinter"];
+    //[_window setStyleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable)];
+    //[_window setTitle:@"Squinter"];
 }
 
 
@@ -1106,8 +1106,8 @@
     
     // Clear entered creds
     
-    usernameTextField.stringValue = @"";
-    passwordTextField.stringValue = @"";
+    //usernameTextField.stringValue = @"";
+    //passwordTextField.stringValue = @"";
     
     // Pick up the action in **loggedIn:** or **displayError:**, depending on success or failure
 }
