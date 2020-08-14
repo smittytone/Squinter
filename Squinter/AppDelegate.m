@@ -390,6 +390,10 @@
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjects:objectArray forKeys:keyArray];
     [defaults registerDefaults:appDefaults];
 
+    NSUserDefaults *suiteDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.bps.suite.squinter"];
+    NSDictionary *suiteDict = @{ @"com.bps.suite.squinter.fontNameIndex": [NSNumber numberWithInteger:1] };
+    [suiteDefaults registerDefaults:suiteDict];
+
     // Prepare the main window
 
     wantsToHide = 0;
@@ -7510,6 +7514,9 @@
     NSString *fontName = [self getFontName:fontsMenu.indexOfSelectedItem];
     NSNumber *num = [defaults objectForKey:@"com.bps.squinter.fontNameIndex"];
     if (fontsMenu.indexOfSelectedItem != num.integerValue) textChange = YES;
+
+    NSUserDefaults *suiteDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.bps.suite.squinter"];
+    [suiteDefaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.suite.squinter.fontNameIndex"];
 
     NSInteger fontSize = kInitialFontSize + sizeMenu.indexOfSelectedItem;
     if (fontSize == 15) fontSize = 18;
