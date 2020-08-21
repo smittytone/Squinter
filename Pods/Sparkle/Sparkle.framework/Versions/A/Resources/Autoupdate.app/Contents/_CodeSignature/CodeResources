@@ -307,10 +307,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			ePnVeezq8FQgl62Lk3RuBrPg9c8=
+			3H0Vb3YkL8sDthWLmG5bKB00ctc=
 			</data>
 			<key>requirement</key>
-			<string>identifier fileop and anchor apple generic and certificate leaf[subject.CN] = "Mac Developer: Antony Smith (78SRS3FAA6)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
+			<string>identifier fileop and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = Y5J3K52DNA</string>
 		</dict>
 		<key>Resources/AppIcon.icns</key>
 		<dict>

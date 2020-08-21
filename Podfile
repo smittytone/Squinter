@@ -11,6 +11,10 @@ target 'Squinter' do
 
 end
 
+target 'SquirrelPreviewer' do
+    pod 'Highlightr'
+end
+
 post_install do |installer|
 	# Sign the Sparkle helper binaries to pass App Notarization.
 	system("codesign --force -o runtime -s 'Developer ID Application: Antony Smith (Y5J3K52DNA)' Pods/Sparkle/Sparkle.framework/Resources/Autoupdate.app/Contents/MacOS/Autoupdate")
