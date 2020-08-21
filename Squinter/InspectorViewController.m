@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith
-//  Copyright (c) 2017-19 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import "InspectorViewController.h"

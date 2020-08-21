@@ -1,11 +1,12 @@
 
 //  Created by Tony Smith on 11/20/17.
-//  Copyright (c) 2017-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 #import "CommitTableCellView.h"
 #import "Devicegroup.h"
+#import "ConstantsPrivate.h"
 
 
 // This view controller manages the panel we present to present a downloaded

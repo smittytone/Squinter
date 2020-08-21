@@ -1,6 +1,6 @@
 
 //  Created by Tony Smith on 11/20/17.
-//  Copyright (c) 2017-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 //
 
 #import "CommitWindowViewController.h"
@@ -111,7 +111,7 @@
 
 - (IBAction)showWebHelp:(id)sender
 {
-    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#polite"]];
+    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:[kSquinterHelpURL stringByAppendingString:@"#polite"]]];
 }
 
 

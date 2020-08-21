@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/05/2018.
-//  Copyright (c) 2018-19 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import "LoginToolbarItem.h"

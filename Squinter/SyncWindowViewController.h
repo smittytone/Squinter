@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 11/03/2019.
-//  Copyright (c) 20119 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import <Cocoa/Cocoa.h>

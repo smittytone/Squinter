@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/05/2015.
-//  Copyright (c) 2015-19 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import "SquinterToolbarItem.h"

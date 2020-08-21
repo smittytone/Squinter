@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		195C065FC8B79874FBF05605 /* libPods-Squinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9470FB833A59D9C952E82 /* libPods-Squinter.a */; };
+		223A0BC3A2AF28166012D48C /* libPods-SquirrelPreviewer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB7893D99D155061853A873 /* libPods-SquirrelPreviewer.a */; };
 		3B05B25A1D05C91F00AA89F4 /* StreamToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */; };
 		3B077B2E2111846100C17D25 /* LogView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B077B2C2111846000C17D25 /* LogView.m */; };
 		3B077B3121118A5E00C17D25 /* InspectorLinkButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B077B3021118A5E00C17D25 /* InspectorLinkButton.m */; };
@@ -103,7 +104,9 @@
 
 /* Begin PBXFileReference section */
 		08A885A53D3FD2441B2836EF /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Squinter.release.xcconfig"; path = "Pods/Target Support Files/Pods-Squinter/Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
+		0CB7893D99D155061853A873 /* libPods-SquirrelPreviewer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SquirrelPreviewer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		29F9470FB833A59D9C952E82 /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2E78CBFD770C37D3624DD647 /* Pods-SquirrelPreviewer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SquirrelPreviewer.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SquirrelPreviewer/Pods-SquirrelPreviewer.debug.xcconfig"; sourceTree = "<group>"; };
 		3B05B2581D05C91F00AA89F4 /* StreamToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = StreamToolbarItem.h; sourceTree = "<group>"; usesTabs = 0; };
 		3B05B2591D05C91F00AA89F4 /* StreamToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = StreamToolbarItem.m; sourceTree = "<group>"; usesTabs = 0; };
 		3B06F88B1F8BBE930072A898 /* docpic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = docpic.png; path = ../../OneDrive/Programming/Squinter/Images.xcassets/docpic.imageset/docpic.png; sourceTree = SOURCE_ROOT; };
@@ -207,6 +210,7 @@
 		3BF464111CF87C720094EF59 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Squinter.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Squinter/Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
 		8E33BEB63E05FCF7A4BBAEDA /* libPods-SquinterTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SquinterTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B32AF8F42586F97AC05EE346 /* Pods-SquirrelPreviewer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SquirrelPreviewer.release.xcconfig"; path = "Pods/Target Support Files/Pods-SquirrelPreviewer/Pods-SquirrelPreviewer.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,6 +236,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B7503A023757F0B00564CCD /* Quartz.framework in Frameworks */,
+				223A0BC3A2AF28166012D48C /* libPods-SquirrelPreviewer.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -461,6 +466,7 @@
 				29F9470FB833A59D9C952E82 /* libPods-Squinter.a */,
 				8E33BEB63E05FCF7A4BBAEDA /* libPods-SquinterTests.a */,
 				3B75039F23757F0B00564CCD /* Quartz.framework */,
+				0CB7893D99D155061853A873 /* libPods-SquirrelPreviewer.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -470,6 +476,8 @@
 			children = (
 				72F138D3FFADBD0D95906F3D /* Pods-Squinter.debug.xcconfig */,
 				08A885A53D3FD2441B2836EF /* Pods-Squinter.release.xcconfig */,
+				2E78CBFD770C37D3624DD647 /* Pods-SquirrelPreviewer.debug.xcconfig */,
+				B32AF8F42586F97AC05EE346 /* Pods-SquirrelPreviewer.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -522,9 +530,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B7503AE23757F0B00564CCD /* Build configuration list for PBXNativeTarget "SquirrelPreviewer" */;
 			buildPhases = (
+				B5663CE83F6CFCADC57A28BB /* [CP] Check Pods Manifest.lock */,
 				3B75039A23757F0B00564CCD /* Sources */,
 				3B75039B23757F0B00564CCD /* Frameworks */,
 				3B75039C23757F0B00564CCD /* Resources */,
+				ECFE80ACB6E8C6BF33404107 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -635,6 +645,28 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nbuildNum=$(/usr/libexec/PlistBuddy -c \"Print SQBuildVersion\" \"${PRODUCT_SETTINGS_PATH}\")\nbuildNum=$(($buildNum + 1))\n/usr/libexec/PlistBuddy -c \"Set :SQBuildVersion $buildNum\" \"${PRODUCT_SETTINGS_PATH}\"\n";
 		};
+		B5663CE83F6CFCADC57A28BB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SquirrelPreviewer-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		C83F9CF4AD6FBA83DF807D0E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -671,6 +703,202 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Squinter/Pods-Squinter-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ECFE80ACB6E8C6BF33404107 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SquirrelPreviewer/Pods-SquirrelPreviewer-resources.sh",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/Highlighter/highlight.min.js",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/a11y-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/a11y-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/agate.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/an-old-hope.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/androidstudio.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/arduino-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/arta.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/ascetic.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-cave-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-cave-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-dune-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-dune-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-estuary-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-estuary-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-forest-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-forest-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-heath-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-heath-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-lakeside-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-lakeside-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-plateau-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-plateau-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-savanna-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-savanna-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-seaside-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-seaside-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-sulphurpool-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atelier-sulphurpool-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atom-one-dark-reasonable.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atom-one-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/atom-one-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/brown-paper.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/codepen-embed.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/color-brewer.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/darcula.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/darkula.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/default.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/docco.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/dracula.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/far.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/foundation.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/github-gist.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/github.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/gml.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/googlecode.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/grayscale.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/gruvbox-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/gruvbox-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/hopscotch.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/hybrid.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/idea.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/ir-black.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/isbl-editor-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/isbl-editor-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/kimbie.dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/kimbie.light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/lightfair.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/magula.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/mono-blue.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/monokai-sublime.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/monokai.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/nord.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/obsidian.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/ocean.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/paraiso-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/paraiso-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/pojoaque.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/purebasic.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/qtcreator_dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/qtcreator_light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/railscasts.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/rainbow.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/routeros.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/school-book.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/shades-of-purple.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/solarized-dark.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/solarized-light.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/sunburst.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/tomorrow-night-blue.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/tomorrow-night-bright.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/tomorrow-night-eighties.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/tomorrow-night.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/tomorrow.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/vs.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/vs2015.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/xcode.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/xt256.min.css",
+				"${PODS_ROOT}/Highlightr/Pod/Assets/styles/zenburn.min.css",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/highlight.min.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/a11y-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/a11y-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/agate.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/an-old-hope.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/androidstudio.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/arduino-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/arta.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ascetic.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-cave-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-cave-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-dune-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-dune-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-estuary-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-estuary-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-forest-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-forest-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-heath-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-heath-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-lakeside-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-lakeside-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-plateau-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-plateau-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-savanna-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-savanna-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-seaside-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-seaside-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-sulphurpool-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atelier-sulphurpool-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atom-one-dark-reasonable.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atom-one-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/atom-one-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/brown-paper.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/codepen-embed.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/color-brewer.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/darcula.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/darkula.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/default.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/docco.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/dracula.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/far.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/foundation.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/github-gist.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/github.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gml.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/googlecode.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/grayscale.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gruvbox-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gruvbox-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/hopscotch.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/hybrid.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/idea.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ir-black.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/isbl-editor-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/isbl-editor-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/kimbie.dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/kimbie.light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/lightfair.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/magula.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/mono-blue.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/monokai-sublime.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/monokai.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/nord.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/obsidian.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ocean.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/paraiso-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/paraiso-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/pojoaque.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/purebasic.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/qtcreator_dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/qtcreator_light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/railscasts.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/rainbow.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/routeros.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/school-book.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/shades-of-purple.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/solarized-dark.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/solarized-light.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/sunburst.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/tomorrow-night-blue.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/tomorrow-night-bright.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/tomorrow-night-eighties.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/tomorrow-night.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/tomorrow.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/vs.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/vs2015.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/xcode.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/xt256.min.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/zenburn.min.css",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SquirrelPreviewer/Pods-SquirrelPreviewer-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1021,6 +1249,7 @@
 		};
 		3B7503AC23757F0B00564CCD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2E78CBFD770C37D3624DD647 /* Pods-SquirrelPreviewer.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1054,6 +1283,7 @@
 		};
 		3B7503AD23757F0B00564CCD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B32AF8F42586F97AC05EE346 /* Pods-SquirrelPreviewer.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;

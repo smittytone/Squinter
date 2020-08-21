@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 09/02/2015.
-//  Copyright (c) 2015-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import "AppDelegate.h"
@@ -7168,7 +7168,7 @@
 {
     // Open the Squinter Release Notes page from 'Help > Show Squinter Release Notes'
 
-    [self launchWebSite:@"https://smittytone.github.io/squinter/releases.html"];
+    [self launchWebSite:kSquinterReleasesURL];
 }
 
 
@@ -7261,7 +7261,7 @@
     // Open the Squinter web site and jump to the specified anchor
     // NOTE Pass in an empty string to just view the page
     
-    [self launchWebSite:[@"https://smittytone.github.io/squinter/index.html" stringByAppendingString:anchor]];
+    [self launchWebSite:[kSquinterHelpURL stringByAppendingString:anchor]];
 }
 
 

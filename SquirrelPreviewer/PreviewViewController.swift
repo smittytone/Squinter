@@ -3,11 +3,12 @@
 //  SquirrelPreviewer
 //
 //  Created by Tony Smith on 08/11/2019.
-//  Copyright © 2019-20 Tony Smith. All rights reserved.
+//  Copyright © 2020 Tony Smith. All rights reserved.
 
 
 import Cocoa
 import Quartz
+import Highlightr
 
 
 class PreviewViewController: NSViewController, QLPreviewingController {
@@ -80,8 +81,8 @@ class PreviewViewController: NSViewController, QLPreviewingController {
                     self.setFont()
 
                     // Read in the markdown from the specified file
-                    var nutString: String = try String(contentsOf: intent.url, encoding: String.Encoding.utf8)
-                    nutString = "\(self.fontIndex)\n\(nutString)"
+                    let nutString: String = try String(contentsOf: intent.url, encoding: String.Encoding.utf8)
+                    //nutString = "\(self.fontIndex)\n\(nutString)"
 
                     // Make an NSTextView to display the code
                     //let tv: NSTextView = NSTextView.init(frame: self.view.bounds)
@@ -90,24 +91,29 @@ class PreviewViewController: NSViewController, QLPreviewingController {
                     //tv.backgroundColor = NSColor.textBackgroundColor
 
                     if let textViewStorage: NSTextStorage = self.renderTextView.textStorage {
-                        // Set the NSTextView's NSTextStorage font
-                        var font: NSFont
-                        
-                        if self.fontName != nil {
-                            // Use the Squinter log font preference
-                            font = NSFont.init(name: self.fontName!, size: 12.0) ?? NSFont.systemFont(ofSize: 12.0)
+
+                        if let highlightr = Highlightr() {
+                            highlightr.setTheme(to: "qtcreator_dark")
+                            let highlightedCode = highlightr.highlight(nutString, as: "squirrel")
+                            textViewStorage.setAttributedString(highlightedCode!)
                         } else {
-                            // Just use a generic (but guaranteed) font
-                            font = NSFont.init(name: "SourceCodePro-Regular", size: 12.0) ?? NSFont.systemFont(ofSize: 12.0)
+                            // Set the NSTextView's NSTextStorage font
+                            var font: NSFont
+
+                            if self.fontName != nil {
+                                // Use the Squinter log font preference
+                                font = NSFont.init(name: self.fontName!, size: 13.0) ?? NSFont.systemFont(ofSize: 13.0)
+                            } else {
+                                // Just use a generic (but guaranteed) font
+                                font = NSFont.init(name: "SourceCodePro-Regular", size: 13.0) ?? NSFont.systemFont(ofSize: 13.0)
+                            }
+
+                            // Convert the program text into an NSAtrributedString for display...
+                            let nas = NSAttributedString.init(string: nutString, attributes: [NSAttributedString.Key.font : font, NSAttributedString.Key.foregroundColor : NSColor.labelColor])
+
+                            // ...and add the NSAtrributedString to the
+                            textViewStorage.setAttributedString(nas)
                         }
-                        
-                        // Convert the program text into an NSAtrributedString for display...
-                        let nas = NSAttributedString.init(string: nutString,
-                                                          attributes: [NSAttributedString.Key.font : font, NSAttributedString.Key.foregroundColor : NSColor.labelColor])
-
-
-                        // ...and add the NSAtrributedString to the NSTextStorage
-                        textViewStorage.setAttributedString(nas)
                     }
                     
                     // Draw the NSTextView and its contents

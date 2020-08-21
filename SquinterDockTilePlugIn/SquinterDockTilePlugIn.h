@@ -5,6 +5,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
+#import "ConstantsPrivate.h"
 
 
 @interface SquinterDockTilePlugIn : NSObject <NSDockTilePlugIn>

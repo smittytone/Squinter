@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 09/02/2015.
-//  Copyright (c) 2015-18 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import "AppDelegateUtilities.h"

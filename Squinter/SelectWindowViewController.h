@@ -1,11 +1,12 @@
 
 
 //  Created by Tony Smith on 15/05/2017.
-//  Copyright (c) 2017-19 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import <Cocoa/Cocoa.h>
 #import "Constants.h"
+#import "ConstantsPrivate.h"
 #import "CommitTableCellView.h"
 #import "Devicegroup.h"
 #import "Project.h"

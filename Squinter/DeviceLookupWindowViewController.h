@@ -1,11 +1,13 @@
 
 
 //  Created by Tony Smith on 27/02/2019.
-//  Copyright (c) 2017-19 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import <Cocoa/Cocoa.h>
 #import "CommitTableCellView.h"
+#import "ConstantsPrivate.h"
+
 
 NS_ASSUME_NONNULL_BEGIN
 

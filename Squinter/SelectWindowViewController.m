@@ -1,7 +1,7 @@
 
 
 //  Created by Tony Smith on 15/05/2018.
-//  Copyright (c) 2017-19 Tony Smith. All rights reserved.
+//  Copyright (c) 2020 Tony Smith. All rights reserved.
 
 
 #import "SelectWindowViewController.h"
@@ -141,7 +141,7 @@
 
 - (IBAction)showWebHelp:(id)sender
 {
-    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"https://smittytone.github.io/squinter/index.html#targets"]];
+    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:[kSquinterHelpURL stringByAppendingString:@"#targets"]]];
 }
 
 
