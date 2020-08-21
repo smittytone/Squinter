@@ -20,12 +20,21 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		03F8B0D031A5CE47DDB6F860E911812A /* PDKeychainBindingsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 926E104B0E0D341BFDCA82C1993ADC62 /* PDKeychainBindingsController.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		27DAFEE8D6FDB620C57D8765802A57D4 /* PDKeychainBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = 97E29F3186865A5DAC046FA7BF324EBB /* PDKeychainBindings.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
-		27F785493EA04DB036271469EDDC263A /* PDKeychainBindingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A3719163CF07F37CFCA510AAFB4505 /* PDKeychainBindingsController.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
-		AF55E4E9C3784E25490D095E5B0DE37A /* PDKeychainBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = 99F0837DEC5BC75B54B445729F36D32B /* PDKeychainBindings.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		D0790226FD27F52B29A3B530FC420F76 /* PDKeychainBindingsController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D896631BA06683804955C440CD6EE952 /* PDKeychainBindingsController-dummy.m */; };
-		FB239A046DE5BD3D2CF75764F65D999F /* Pods-Squinter-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 51EC3A4CE82229987FE8D7D32CE448ED /* Pods-Squinter-dummy.m */; };
+		03F8B0D031A5CE47DDB6F860E911812A /* PDKeychainBindingsController.h in Headers */ = {isa = PBXBuildFile; fileRef = FD7DD81C1F2759D61621B6C810708123 /* PDKeychainBindingsController.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		27DAFEE8D6FDB620C57D8765802A57D4 /* PDKeychainBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = 39BEC966DF246FE6228D9D219DF14CAF /* PDKeychainBindings.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		27F785493EA04DB036271469EDDC263A /* PDKeychainBindingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4AD877C5504B23BD159CBED94384654 /* PDKeychainBindingsController.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		3571F706D44D6FEFE0D683C5E729CB32 /* HTMLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A467CCAB35BA6E1816112041FAE7132 /* HTMLUtils.swift */; };
+		35C5753FC1B3D99844EBD4370F0BA4AF /* CodeAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08ECBA684796F6BDA8DE65BD274416D /* CodeAttributedString.swift */; };
+		45F0C366D6F77F0CFC90FB03C2CB33C1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA7AC4C7C7582FA32E563F453E502CA /* Theme.swift */; };
+		6C92A05DEB52DAD23656298AA8BE5644 /* Pods-SquirrelPreviewer-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E7B04ECD0ECD01A4E65308EA51D5F14 /* Pods-SquirrelPreviewer-dummy.m */; };
+		6D07B65B3DAB8AB661FEF3E93F808531 /* Highlightr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AA72C0B20C7DB332135662DDB37977 /* Highlightr.swift */; };
+		AF55E4E9C3784E25490D095E5B0DE37A /* PDKeychainBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = EB5674B3B6D0552782ED8F72A67174F6 /* PDKeychainBindings.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		C7CCEA9753A64968FE970DF97E1EE02C /* Highlightr-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6113C9B1A4F2ED0F022567A90F3670 /* Highlightr-dummy.m */; };
+		C9E472E2B7A6EBBB6986F429BDC6A8C2 /* Shims.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA3127C96861992AE0932865D1CF089 /* Shims.swift */; };
+		D0790226FD27F52B29A3B530FC420F76 /* PDKeychainBindingsController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = FEBFECBBD60FAD236CD4DDE73ED9DD0B /* PDKeychainBindingsController-dummy.m */; };
+		DEF03A115ED70C6D56BD1E804EB118B9 /* Pods-SquirrelPreviewer-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 21AFE2676048DBB58BA2C58456C3BC26 /* Pods-SquirrelPreviewer-umbrella.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		F061B7CC911EAB10CDFE9DBB7088CFB3 /* Highlightr-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A672CE1C7BF37546AD842657F2A7E359 /* Highlightr-umbrella.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		FB239A046DE5BD3D2CF75764F65D999F /* Pods-Squinter-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B24E81734747B49A2024044EEDD1641 /* Pods-Squinter-dummy.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +44,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 7187F375D61CBC433EFA5307C831BAF6;
 			remoteInfo = PDKeychainBindingsController;
+		};
+		A0EC0386A8D9A935A91F33D4F76626D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B0DFE582E64AE7298C59241B7B610B04;
+			remoteInfo = Highlightr;
 		};
 		F98AB5DE5590C52F58741BF56751DA10 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -46,44 +62,155 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00C3BDC50A454EA963150454A7F30824 /* PDKeychainBindingsController.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PDKeychainBindingsController.release.xcconfig; sourceTree = "<group>"; };
-		0673A2BB556CEFF2518FA0FA5E36D683 /* SUStandardVersionComparator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUStandardVersionComparator.h; path = Sparkle.framework/Versions/A/Headers/SUStandardVersionComparator.h; sourceTree = "<group>"; };
-		0CC6D178CEAB44C81C961C81B0CA73DD /* SPUDownloaderDeprecated.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDeprecated.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDeprecated.h; sourceTree = "<group>"; };
-		141B7EE50300A135F78610284A042EF6 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
-		1B54B389AE90C079343514A91B1162B1 /* SUVersionComparisonProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionComparisonProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionComparisonProtocol.h; sourceTree = "<group>"; };
-		21A3719163CF07F37CFCA510AAFB4505 /* PDKeychainBindingsController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindingsController.m; path = PDKeychainBindingsController/PDKeychainBindingsController.m; sourceTree = "<group>"; };
-		2DE0BF705B5065A9EE57ED1990DB17DC /* Pods-Squinter-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-frameworks.sh"; sourceTree = "<group>"; };
-		32C8DDB23019E219E26077CED395E1AA /* SUExport.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUExport.h; path = Sparkle.framework/Versions/A/Headers/SUExport.h; sourceTree = "<group>"; };
-		3B3E61C1C866F114DA12692A6424B963 /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
-		51EC3A4CE82229987FE8D7D32CE448ED /* Pods-Squinter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Squinter-dummy.m"; sourceTree = "<group>"; };
-		57C5E4CE8D69D9424B57D027308C0CB9 /* SPUDownloaderProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderProtocol.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderProtocol.h; sourceTree = "<group>"; };
-		6769842D9E4411EA37BA934CC5B8B905 /* PDKeychainBindingsController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PDKeychainBindingsController.debug.xcconfig; sourceTree = "<group>"; };
-		702D92C42554731E02E4C2BA066FBB32 /* SPUDownloader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloader.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloader.h; sourceTree = "<group>"; };
-		76CDB4B88F480F7D451249B740BAC0AF /* SUAppcast.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcast.h; path = Sparkle.framework/Versions/A/Headers/SUAppcast.h; sourceTree = "<group>"; };
-		7E85B2917ADC4CFE81DBB2CD461AA675 /* Sparkle.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Sparkle.debug.xcconfig; sourceTree = "<group>"; };
-		8205BF74E695F181164ACD1B0F712D2D /* Sparkle.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Sparkle.release.xcconfig; sourceTree = "<group>"; };
-		8E354FC26625330AE6CE77CE4E8B94FB /* SUCodeSigningVerifier.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUCodeSigningVerifier.h; path = Sparkle.framework/Versions/A/Headers/SUCodeSigningVerifier.h; sourceTree = "<group>"; };
-		8E62B01B1CB81EDB77D325CE71E2C6FC /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdaterDelegate.h; path = Sparkle.framework/Versions/A/Headers/SUUpdaterDelegate.h; sourceTree = "<group>"; };
-		926E104B0E0D341BFDCA82C1993ADC62 /* PDKeychainBindingsController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindingsController.h; path = PDKeychainBindingsController/PDKeychainBindingsController.h; sourceTree = "<group>"; };
+		02A25B2983A33C1F11D5AC651E9B0166 /* SUAppcastItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcastItem.h; path = Sparkle.framework/Versions/A/Headers/SUAppcastItem.h; sourceTree = "<group>"; };
+		04AEAE7A19C55041057D8B1C2CF4E490 /* libPods-SquirrelPreviewer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SquirrelPreviewer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04E479A61AA42A7794F993AAA3046CDB /* monokai.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = monokai.min.css; path = Pod/Assets/styles/monokai.min.css; sourceTree = "<group>"; };
+		0723C41521E53B60355C3855B4AF4450 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		07B28BA640C6B5A356C3C609656C5E21 /* Sparkle.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Sparkle.debug.xcconfig; sourceTree = "<group>"; };
+		09F092C20BB4D16548AA0331171EEAFA /* hopscotch.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = hopscotch.min.css; path = Pod/Assets/styles/hopscotch.min.css; sourceTree = "<group>"; };
+		0AB520E96A92795B6A3E3C30147261FA /* darcula.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = darcula.min.css; path = Pod/Assets/styles/darcula.min.css; sourceTree = "<group>"; };
+		0B1A8F84011002FD9750263E5A6C0F26 /* SUUpdater.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdater.h; path = Sparkle.framework/Versions/A/Headers/SUUpdater.h; sourceTree = "<group>"; };
+		0BAADFB01A420D5028AF99728E798D49 /* foundation.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = foundation.min.css; path = Pod/Assets/styles/foundation.min.css; sourceTree = "<group>"; };
+		0BF0C88619C54A3A5B86EA87A71A3D4B /* solarized-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "solarized-light.min.css"; path = "Pod/Assets/styles/solarized-light.min.css"; sourceTree = "<group>"; };
+		0DBE7801CB1640136812FA3EB43C8724 /* Sparkle.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Sparkle.release.xcconfig; sourceTree = "<group>"; };
+		0E9945098C4E1BD6B250C4379FDCD117 /* far.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = far.min.css; path = Pod/Assets/styles/far.min.css; sourceTree = "<group>"; };
+		0F43B3AA80674AE2E65293F358265338 /* shades-of-purple.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "shades-of-purple.min.css"; path = "Pod/Assets/styles/shades-of-purple.min.css"; sourceTree = "<group>"; };
+		11643A8FF261DA6B6F7F67234F902544 /* magula.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = magula.min.css; path = Pod/Assets/styles/magula.min.css; sourceTree = "<group>"; };
+		11FEBEA06ECE82CC3071FEC21FC175FF /* Pods-Squinter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Squinter-acknowledgements.plist"; sourceTree = "<group>"; };
+		12B832B4AA7FB1FDF1C11398C73246FC /* school-book.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "school-book.min.css"; path = "Pod/Assets/styles/school-book.min.css"; sourceTree = "<group>"; };
+		1306B5C43D62ACD158ED35A38D71F95C /* kimbie.dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = kimbie.dark.min.css; path = Pod/Assets/styles/kimbie.dark.min.css; sourceTree = "<group>"; };
+		162EBC653F7F8ADF2D5DD27F84F2052C /* SUExport.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUExport.h; path = Sparkle.framework/Versions/A/Headers/SUExport.h; sourceTree = "<group>"; };
+		172C2200501BCC92E08C1E0687DA4F20 /* atelier-cave-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-cave-light.min.css"; path = "Pod/Assets/styles/atelier-cave-light.min.css"; sourceTree = "<group>"; };
+		174F2FD7A04C4CD7B5564F44EF1F747A /* darkula.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = darkula.min.css; path = Pod/Assets/styles/darkula.min.css; sourceTree = "<group>"; };
+		1906BDFB73BDB3A53D93EF9C00507196 /* solarized-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "solarized-dark.min.css"; path = "Pod/Assets/styles/solarized-dark.min.css"; sourceTree = "<group>"; };
+		1A467CCAB35BA6E1816112041FAE7132 /* HTMLUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HTMLUtils.swift; path = Pod/Classes/HTMLUtils.swift; sourceTree = "<group>"; };
+		21AFE2676048DBB58BA2C58456C3BC26 /* Pods-SquirrelPreviewer-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SquirrelPreviewer-umbrella.h"; sourceTree = "<group>"; };
+		2662769C91AF288C9514E2C2285C948D /* xcode.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = xcode.min.css; path = Pod/Assets/styles/xcode.min.css; sourceTree = "<group>"; };
+		276915B8647443D9892069C3BCFC9677 /* atelier-sulphurpool-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-sulphurpool-light.min.css"; path = "Pod/Assets/styles/atelier-sulphurpool-light.min.css"; sourceTree = "<group>"; };
+		27CFE74A2569763AA3EA719A48C5674F /* xt256.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = xt256.min.css; path = Pod/Assets/styles/xt256.min.css; sourceTree = "<group>"; };
+		2D0B978F19E94206442E12C4DED51BBF /* isbl-editor-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "isbl-editor-light.min.css"; path = "Pod/Assets/styles/isbl-editor-light.min.css"; sourceTree = "<group>"; };
+		2DA7AC4C7C7582FA32E563F453E502CA /* Theme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Theme.swift; path = Pod/Classes/Theme.swift; sourceTree = "<group>"; };
+		2EF70CE3FBB98D6E73240511F4044B7C /* ascetic.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = ascetic.min.css; path = Pod/Assets/styles/ascetic.min.css; sourceTree = "<group>"; };
+		2FBF1BFA88717E5CD0682833EE4F70E4 /* Pods-SquirrelPreviewer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SquirrelPreviewer.release.xcconfig"; sourceTree = "<group>"; };
+		3132CB7F3CC93176F91C0C5395A465E4 /* dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = dark.min.css; path = Pod/Assets/styles/dark.min.css; sourceTree = "<group>"; };
+		35493E82DB2E9E13F907FADB5027F45A /* atelier-dune-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-dune-dark.min.css"; path = "Pod/Assets/styles/atelier-dune-dark.min.css"; sourceTree = "<group>"; };
+		36BB3505650FEED7B3B655B14E98BA99 /* arta.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = arta.min.css; path = Pod/Assets/styles/arta.min.css; sourceTree = "<group>"; };
+		38560149FF043AA168408967CA8DD360 /* a11y-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "a11y-dark.min.css"; path = "Pod/Assets/styles/a11y-dark.min.css"; sourceTree = "<group>"; };
+		3975CF8B7F1E783F7E5EF0175617B1D9 /* atelier-lakeside-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-lakeside-dark.min.css"; path = "Pod/Assets/styles/atelier-lakeside-dark.min.css"; sourceTree = "<group>"; };
+		39BEC966DF246FE6228D9D219DF14CAF /* PDKeychainBindings.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindings.m; path = PDKeychainBindingsController/PDKeychainBindings.m; sourceTree = "<group>"; };
+		3AFD78F7872448DAEEDA27E0A23C2A26 /* atelier-heath-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-heath-light.min.css"; path = "Pod/Assets/styles/atelier-heath-light.min.css"; sourceTree = "<group>"; };
+		3D6163F99A5FC6573725BE264CDB956C /* github.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = github.min.css; path = Pod/Assets/styles/github.min.css; sourceTree = "<group>"; };
+		3DD7CE3D85948CEF461CE0CBD944BB06 /* SUErrors.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUErrors.h; path = Sparkle.framework/Versions/A/Headers/SUErrors.h; sourceTree = "<group>"; };
+		3FBB6FD030A374DEC4DCF482613D1630 /* brown-paper.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "brown-paper.min.css"; path = "Pod/Assets/styles/brown-paper.min.css"; sourceTree = "<group>"; };
+		417907D5ADB170A1020D544F94585CC9 /* isbl-editor-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "isbl-editor-dark.min.css"; path = "Pod/Assets/styles/isbl-editor-dark.min.css"; sourceTree = "<group>"; };
+		419942477DBF35775351154B260884C1 /* Pods-Squinter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.release.xcconfig"; sourceTree = "<group>"; };
+		4380491E0C1DCEB02BF16CB5A3A1257A /* SUAppcast.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcast.h; path = Sparkle.framework/Versions/A/Headers/SUAppcast.h; sourceTree = "<group>"; };
+		45514DAEFBE3E4BA12B57C09954B25FC /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionDisplayProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
+		486BE5A5B292102FD1DD1B81CDDA96FF /* railscasts.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = railscasts.min.css; path = Pod/Assets/styles/railscasts.min.css; sourceTree = "<group>"; };
+		48A997A3C8AA92DB6EAFC85170D9DA7D /* vs2015.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = vs2015.min.css; path = Pod/Assets/styles/vs2015.min.css; sourceTree = "<group>"; };
+		4B9AD86455743AB0446274AF99EACC56 /* atelier-cave-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-cave-dark.min.css"; path = "Pod/Assets/styles/atelier-cave-dark.min.css"; sourceTree = "<group>"; };
+		4D73877939B36E5FB6741D8CCBBC0659 /* hybrid.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = hybrid.min.css; path = Pod/Assets/styles/hybrid.min.css; sourceTree = "<group>"; };
+		510363501820B4A14DE304DA5A07CA96 /* androidstudio.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = androidstudio.min.css; path = Pod/Assets/styles/androidstudio.min.css; sourceTree = "<group>"; };
+		512950DA2582FF9BA1EF0006387F93E3 /* SPUDownloadData.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloadData.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloadData.h; sourceTree = "<group>"; };
+		51E4B0E3ECDD1F4714FC8BFC01D70267 /* Highlightr.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Highlightr.modulemap; sourceTree = "<group>"; };
+		53CF5B72F2FB0F6E37787B2C00771BB0 /* ocean.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = ocean.min.css; path = Pod/Assets/styles/ocean.min.css; sourceTree = "<group>"; };
+		5C2457E27F7D5D2C9EBA72AD01835521 /* SUStandardVersionComparator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUStandardVersionComparator.h; path = Sparkle.framework/Versions/A/Headers/SUStandardVersionComparator.h; sourceTree = "<group>"; };
+		5F95062194EB67B5BD463BC16CE5F38F /* tomorrow-night-bright.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "tomorrow-night-bright.min.css"; path = "Pod/Assets/styles/tomorrow-night-bright.min.css"; sourceTree = "<group>"; };
+		5FDECC2F61BB116523FCD4C64807B2DC /* Pods-Squinter-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Squinter-frameworks.sh"; sourceTree = "<group>"; };
+		60F974C00FE409E615CCD00164D3910A /* lightfair.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = lightfair.min.css; path = Pod/Assets/styles/lightfair.min.css; sourceTree = "<group>"; };
+		63615476D4D022E34682DB62973D82DE /* dracula.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = dracula.min.css; path = Pod/Assets/styles/dracula.min.css; sourceTree = "<group>"; };
+		636A2532E090A5A8CC2C366CA05AA2E8 /* qtcreator_light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = qtcreator_light.min.css; path = Pod/Assets/styles/qtcreator_light.min.css; sourceTree = "<group>"; };
+		6456D733045956B63533D4E54AA0DE89 /* monokai-sublime.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "monokai-sublime.min.css"; path = "Pod/Assets/styles/monokai-sublime.min.css"; sourceTree = "<group>"; };
+		67174093F4C6EE507E09CB4CA0C8C2C2 /* kimbie.light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = kimbie.light.min.css; path = Pod/Assets/styles/kimbie.light.min.css; sourceTree = "<group>"; };
+		6874B5E28C74AE7A54DE549468EBA8AC /* SPUDownloaderSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderSession.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderSession.h; sourceTree = "<group>"; };
+		688920BC38EEF1B380081CC0957120C7 /* obsidian.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = obsidian.min.css; path = Pod/Assets/styles/obsidian.min.css; sourceTree = "<group>"; };
+		696E4AF200BB35A5A4C71ECE2EF12A44 /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDelegate.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDelegate.h; sourceTree = "<group>"; };
+		6AA5726C0A7F7CE58A9CFB2C7725C0EA /* pojoaque.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = pojoaque.min.css; path = Pod/Assets/styles/pojoaque.min.css; sourceTree = "<group>"; };
+		6ABB5531A8408C761BE7176CC4C0A130 /* atelier-lakeside-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-lakeside-light.min.css"; path = "Pod/Assets/styles/atelier-lakeside-light.min.css"; sourceTree = "<group>"; };
+		6B24E81734747B49A2024044EEDD1641 /* Pods-Squinter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Squinter-dummy.m"; sourceTree = "<group>"; };
+		6BF0A951BDB71FFDCDCE29417A0104CE /* gruvbox-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "gruvbox-light.min.css"; path = "Pod/Assets/styles/gruvbox-light.min.css"; sourceTree = "<group>"; };
+		6D7B635410B926CAAE5AA1302DBEFD67 /* purebasic.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = purebasic.min.css; path = Pod/Assets/styles/purebasic.min.css; sourceTree = "<group>"; };
+		714A4A90B341CB9528FADF31ABC8DC13 /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
+		773C94EB8147AD95C6A87FBC1E8D86AD /* zenburn.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = zenburn.min.css; path = Pod/Assets/styles/zenburn.min.css; sourceTree = "<group>"; };
+		78E34CDFB5EBCF72A61581236E688093 /* qtcreator_dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = qtcreator_dark.min.css; path = Pod/Assets/styles/qtcreator_dark.min.css; sourceTree = "<group>"; };
+		79012F39796760899BC056F944373477 /* atelier-seaside-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-seaside-light.min.css"; path = "Pod/Assets/styles/atelier-seaside-light.min.css"; sourceTree = "<group>"; };
+		7B98767159DCF36BC1E34589579995CC /* an-old-hope.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "an-old-hope.min.css"; path = "Pod/Assets/styles/an-old-hope.min.css"; sourceTree = "<group>"; };
+		7D9DDAC4F52D976A1DCDE26C6C72CDA0 /* PDKeychainBindingsController.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PDKeychainBindingsController.release.xcconfig; sourceTree = "<group>"; };
+		7DB3C8BAA3D78E532F17CD75C7EC3704 /* libHighlightr.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHighlightr.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E7B04ECD0ECD01A4E65308EA51D5F14 /* Pods-SquirrelPreviewer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SquirrelPreviewer-dummy.m"; sourceTree = "<group>"; };
+		7F6113C9B1A4F2ED0F022567A90F3670 /* Highlightr-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Highlightr-dummy.m"; sourceTree = "<group>"; };
+		818974F0439A0289736A7BC69E6A2398 /* PDKeychainBindingsController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PDKeychainBindingsController.debug.xcconfig; sourceTree = "<group>"; };
+		81BED87DD8D976B868489661356BFBA8 /* sunburst.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = sunburst.min.css; path = Pod/Assets/styles/sunburst.min.css; sourceTree = "<group>"; };
+		8720E6C6B1BE4BFFC9224476ABE3A89A /* rainbow.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = rainbow.min.css; path = Pod/Assets/styles/rainbow.min.css; sourceTree = "<group>"; };
+		877419AAB2184EB81B100031A4F19620 /* Pods-SquirrelPreviewer-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SquirrelPreviewer-resources.sh"; sourceTree = "<group>"; };
+		8B3C2663AB896C991CB1AE0F6469689C /* atelier-sulphurpool-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-sulphurpool-dark.min.css"; path = "Pod/Assets/styles/atelier-sulphurpool-dark.min.css"; sourceTree = "<group>"; };
+		8B626F8B4C4293AEFCAD719DC353262A /* routeros.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = routeros.min.css; path = Pod/Assets/styles/routeros.min.css; sourceTree = "<group>"; };
+		8D1C1AE9E789515B69D0BF99C485ECEE /* gml.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = gml.min.css; path = Pod/Assets/styles/gml.min.css; sourceTree = "<group>"; };
+		8EC4D77DD5E0159949DB37CF794F071F /* googlecode.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = googlecode.min.css; path = Pod/Assets/styles/googlecode.min.css; sourceTree = "<group>"; };
+		8F06458DB022EBBAED139EA682036792 /* color-brewer.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "color-brewer.min.css"; path = "Pod/Assets/styles/color-brewer.min.css"; sourceTree = "<group>"; };
+		90D1543B3015E6AA6E0BEBA4C1CB1DF2 /* Pods-SquirrelPreviewer.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-SquirrelPreviewer.modulemap"; sourceTree = "<group>"; };
+		93CC5EB099CDF49FF5565A25553A9C07 /* tomorrow-night.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "tomorrow-night.min.css"; path = "Pod/Assets/styles/tomorrow-night.min.css"; sourceTree = "<group>"; };
+		94037B5C2E8E36E280A430F2C879E875 /* gruvbox-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "gruvbox-dark.min.css"; path = "Pod/Assets/styles/gruvbox-dark.min.css"; sourceTree = "<group>"; };
+		94CAB16243823B62D557C7EF48530C45 /* Pods-Squinter-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Squinter-acknowledgements.markdown"; sourceTree = "<group>"; };
+		950B144125AB979B64141863D44163B7 /* atelier-savanna-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-savanna-dark.min.css"; path = "Pod/Assets/styles/atelier-savanna-dark.min.css"; sourceTree = "<group>"; };
 		96CAD938894115E0803B26314A58BEB8 /* libPods-Squinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Squinter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		97E29F3186865A5DAC046FA7BF324EBB /* PDKeychainBindings.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindings.m; path = PDKeychainBindingsController/PDKeychainBindings.m; sourceTree = "<group>"; };
-		99F0837DEC5BC75B54B445729F36D32B /* PDKeychainBindings.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindings.h; path = PDKeychainBindingsController/PDKeychainBindings.h; sourceTree = "<group>"; };
+		99AA72C0B20C7DB332135662DDB37977 /* Highlightr.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Highlightr.swift; path = Pod/Classes/Highlightr.swift; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		A6FA1D908ED720959B66BF1BDF9716B4 /* Pods-Squinter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Squinter-acknowledgements.plist"; sourceTree = "<group>"; };
-		ABCF668468469BACC1AE06FD7AE20DFF /* SPUDownloadData.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloadData.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloadData.h; sourceTree = "<group>"; };
-		AD518A5FB5AE111071A5868721E6A57A /* SPUDownloaderSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderSession.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderSession.h; sourceTree = "<group>"; };
-		AE71F116B12A550020125AE1FDB2F9B4 /* Sparkle.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Sparkle.h; path = Sparkle.framework/Versions/A/Headers/Sparkle.h; sourceTree = "<group>"; };
-		B3696356980FEC4DC595F204DD8BDE50 /* Pods-Squinter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Squinter.debug.xcconfig"; sourceTree = "<group>"; };
-		B36BDC172264AC689D9293406712E561 /* SUErrors.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUErrors.h; path = Sparkle.framework/Versions/A/Headers/SUErrors.h; sourceTree = "<group>"; };
-		BADB9F65DD0BFEC7490D9884476EFFB5 /* SUUpdater.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdater.h; path = Sparkle.framework/Versions/A/Headers/SUUpdater.h; sourceTree = "<group>"; };
-		C2585B7F2D02903B96A890D7B826CD56 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionDisplayProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
-		C93125B00AEF5C4FDACC5C0A396CA69E /* PDKeychainBindingsController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PDKeychainBindingsController-prefix.pch"; sourceTree = "<group>"; };
-		D896631BA06683804955C440CD6EE952 /* PDKeychainBindingsController-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PDKeychainBindingsController-dummy.m"; sourceTree = "<group>"; };
-		E10778B827B8F76B3FE329BCD6C66FB8 /* Pods-Squinter-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Squinter-acknowledgements.markdown"; sourceTree = "<group>"; };
-		E1AE828750C0383658C71B675E4236F2 /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDelegate.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDelegate.h; sourceTree = "<group>"; };
-		F30467979CC0CA877D7E490EAC33A455 /* SPUURLRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUURLRequest.h; path = Sparkle.framework/Versions/A/Headers/SPUURLRequest.h; sourceTree = "<group>"; };
+		A08ECBA684796F6BDA8DE65BD274416D /* CodeAttributedString.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CodeAttributedString.swift; path = Pod/Classes/CodeAttributedString.swift; sourceTree = "<group>"; };
+		A160D523A72DAD2618EEB587AB2052E9 /* atom-one-dark-reasonable.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atom-one-dark-reasonable.min.css"; path = "Pod/Assets/styles/atom-one-dark-reasonable.min.css"; sourceTree = "<group>"; };
+		A376E1419B4BF529625D038C15B65769 /* atelier-estuary-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-estuary-dark.min.css"; path = "Pod/Assets/styles/atelier-estuary-dark.min.css"; sourceTree = "<group>"; };
+		A672CE1C7BF37546AD842657F2A7E359 /* Highlightr-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Highlightr-umbrella.h"; sourceTree = "<group>"; };
+		AB05F69CC5DD00613E7766274F4F64A7 /* Pods-SquirrelPreviewer-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SquirrelPreviewer-acknowledgements.markdown"; sourceTree = "<group>"; };
+		ABAF71EB74A2D215534E4D746C75B73E /* codepen-embed.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "codepen-embed.min.css"; path = "Pod/Assets/styles/codepen-embed.min.css"; sourceTree = "<group>"; };
+		AEA545101A17B986F3AB5115580AB105 /* paraiso-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "paraiso-dark.min.css"; path = "Pod/Assets/styles/paraiso-dark.min.css"; sourceTree = "<group>"; };
+		B01701BA178B97DAE070928B65E8561E /* SUVersionComparisonProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUVersionComparisonProtocol.h; path = Sparkle.framework/Versions/A/Headers/SUVersionComparisonProtocol.h; sourceTree = "<group>"; };
+		B05380011762C61D933B717AED3DCAD2 /* agate.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = agate.min.css; path = Pod/Assets/styles/agate.min.css; sourceTree = "<group>"; };
+		B05F7383556579505970E5EA9270B6D3 /* idea.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = idea.min.css; path = Pod/Assets/styles/idea.min.css; sourceTree = "<group>"; };
+		B387A4A9287C5C6A50C3EB3F4833F2C1 /* github-gist.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "github-gist.min.css"; path = "Pod/Assets/styles/github-gist.min.css"; sourceTree = "<group>"; };
+		B45A7A3EA61406F4C0672FF79793E0DF /* SPUDownloader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloader.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloader.h; sourceTree = "<group>"; };
+		B5DFD20D702EF9A946FF5B8A2E2CDC01 /* atelier-dune-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-dune-light.min.css"; path = "Pod/Assets/styles/atelier-dune-light.min.css"; sourceTree = "<group>"; };
+		B739FF882AE81EE1AD4D39647956FC44 /* atelier-heath-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-heath-dark.min.css"; path = "Pod/Assets/styles/atelier-heath-dark.min.css"; sourceTree = "<group>"; };
+		B88206C7774DFDD44D91EFEB70F031BF /* atom-one-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atom-one-dark.min.css"; path = "Pod/Assets/styles/atom-one-dark.min.css"; sourceTree = "<group>"; };
+		BAC5E33864EA8F16F55A839BC4A48501 /* Pods-SquirrelPreviewer-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SquirrelPreviewer-acknowledgements.plist"; sourceTree = "<group>"; };
+		BB2A606FF3CB3476F1FFE3F0812F5B8D /* atelier-savanna-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-savanna-light.min.css"; path = "Pod/Assets/styles/atelier-savanna-light.min.css"; sourceTree = "<group>"; };
+		BF5B3C59A9CACAD6AD486042EEBB7BE7 /* tomorrow-night-eighties.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "tomorrow-night-eighties.min.css"; path = "Pod/Assets/styles/tomorrow-night-eighties.min.css"; sourceTree = "<group>"; };
+		BFA3127C96861992AE0932865D1CF089 /* Shims.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Shims.swift; path = Pod/Classes/Shims.swift; sourceTree = "<group>"; };
+		C51E95ABF8D49D36388DDF63D8F5C003 /* Sparkle.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Sparkle.h; path = Sparkle.framework/Versions/A/Headers/Sparkle.h; sourceTree = "<group>"; };
+		C7F6DEC4B2FFE33754DE0383D1E63DB4 /* atelier-forest-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-forest-dark.min.css"; path = "Pod/Assets/styles/atelier-forest-dark.min.css"; sourceTree = "<group>"; };
+		C8EB311F252DE6932B305B1330104717 /* tomorrow-night-blue.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "tomorrow-night-blue.min.css"; path = "Pod/Assets/styles/tomorrow-night-blue.min.css"; sourceTree = "<group>"; };
+		C92F9633167A43755DD9AE41F3EDF97B /* arduino-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "arduino-light.min.css"; path = "Pod/Assets/styles/arduino-light.min.css"; sourceTree = "<group>"; };
+		C9AD78B545DD4024D74D76A771496460 /* ir-black.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "ir-black.min.css"; path = "Pod/Assets/styles/ir-black.min.css"; sourceTree = "<group>"; };
+		C9B23418C689CC383F2FD18380819A7B /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUUpdaterDelegate.h; path = Sparkle.framework/Versions/A/Headers/SUUpdaterDelegate.h; sourceTree = "<group>"; };
+		CEF03E421244749B28B1993251863FFF /* highlight.min.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = highlight.min.js; path = Pod/Assets/Highlighter/highlight.min.js; sourceTree = "<group>"; };
+		D09F0EB48A9601832FB7AC71244D6841 /* SPUDownloaderDeprecated.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDeprecated.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderDeprecated.h; sourceTree = "<group>"; };
+		D28CCD480B5FFF6B4057CB9062BDC3B4 /* mono-blue.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "mono-blue.min.css"; path = "Pod/Assets/styles/mono-blue.min.css"; sourceTree = "<group>"; };
+		D458F334EC45BAEDE212F6BCE5D17826 /* tomorrow.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = tomorrow.min.css; path = Pod/Assets/styles/tomorrow.min.css; sourceTree = "<group>"; };
+		D51AD49E4312C79563AC78A6E5EA6DD7 /* atom-one-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atom-one-light.min.css"; path = "Pod/Assets/styles/atom-one-light.min.css"; sourceTree = "<group>"; };
+		D5DBB9C228EEBA01579D9760756D5F59 /* SPUDownloaderProtocol.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderProtocol.h; path = Sparkle.framework/Versions/A/Headers/SPUDownloaderProtocol.h; sourceTree = "<group>"; };
+		DB94BF5F09D01B931F5A95FF24A6C458 /* SUCodeSigningVerifier.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUCodeSigningVerifier.h; path = Sparkle.framework/Versions/A/Headers/SUCodeSigningVerifier.h; sourceTree = "<group>"; };
+		DB983A18E561FD5608DF19B44D724410 /* docco.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = docco.min.css; path = Pod/Assets/styles/docco.min.css; sourceTree = "<group>"; };
+		DBDC3C9146E636B38AA6BC0DBDAB4FF0 /* Pods-SquirrelPreviewer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SquirrelPreviewer.debug.xcconfig"; sourceTree = "<group>"; };
+		DD5013E4A8B3DAD75D113CF4D5CE7D29 /* atelier-seaside-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-seaside-dark.min.css"; path = "Pod/Assets/styles/atelier-seaside-dark.min.css"; sourceTree = "<group>"; };
+		DF5963B17ABE2AEBFDDC4779173B02D8 /* atelier-plateau-dark.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-plateau-dark.min.css"; path = "Pod/Assets/styles/atelier-plateau-dark.min.css"; sourceTree = "<group>"; };
+		E2C54C1F400559B8BC0FA2C97191E193 /* PDKeychainBindingsController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PDKeychainBindingsController-prefix.pch"; sourceTree = "<group>"; };
+		E3B03D5FA97B2E4ADDB0FAD0BB325F6E /* Highlightr-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Highlightr-prefix.pch"; sourceTree = "<group>"; };
+		E9E7A1EDD82284A1AB1390246476C1BB /* grayscale.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = grayscale.min.css; path = Pod/Assets/styles/grayscale.min.css; sourceTree = "<group>"; };
+		EA950412DD5B675B1322D2A749DDD6D1 /* paraiso-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "paraiso-light.min.css"; path = "Pod/Assets/styles/paraiso-light.min.css"; sourceTree = "<group>"; };
+		EAE1DE733036FDA12E9A5001C44E0E4A /* vs.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = vs.min.css; path = Pod/Assets/styles/vs.min.css; sourceTree = "<group>"; };
+		EB5674B3B6D0552782ED8F72A67174F6 /* PDKeychainBindings.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindings.h; path = PDKeychainBindingsController/PDKeychainBindings.h; sourceTree = "<group>"; };
+		EC22F878BE39C838778CB3A20F8A3834 /* nord.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = nord.min.css; path = Pod/Assets/styles/nord.min.css; sourceTree = "<group>"; };
+		ECBEBCE1629E8FBBEB6E0D4394175AE6 /* atelier-estuary-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-estuary-light.min.css"; path = "Pod/Assets/styles/atelier-estuary-light.min.css"; sourceTree = "<group>"; };
+		EF652D811179ADB2346CFD30D7F5034F /* atelier-forest-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-forest-light.min.css"; path = "Pod/Assets/styles/atelier-forest-light.min.css"; sourceTree = "<group>"; };
+		F0DC5357B5A4E6B070ADC2EC92B7A842 /* a11y-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "a11y-light.min.css"; path = "Pod/Assets/styles/a11y-light.min.css"; sourceTree = "<group>"; };
+		F4AD877C5504B23BD159CBED94384654 /* PDKeychainBindingsController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = PDKeychainBindingsController.m; path = PDKeychainBindingsController/PDKeychainBindingsController.m; sourceTree = "<group>"; };
 		F5608847909F53C2B87AE3929181EF4A /* libPDKeychainBindingsController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPDKeychainBindingsController.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		FB7A2E60EF65E501A06A68A933C700E5 /* SUAppcastItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SUAppcastItem.h; path = Sparkle.framework/Versions/A/Headers/SUAppcastItem.h; sourceTree = "<group>"; };
+		F5E509E71106613F9D34187CE73D878A /* Highlightr.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Highlightr.debug.xcconfig; sourceTree = "<group>"; };
+		F5F47A1997E2DDC9BA0C7F1B84B087F1 /* atelier-plateau-light.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = "atelier-plateau-light.min.css"; path = "Pod/Assets/styles/atelier-plateau-light.min.css"; sourceTree = "<group>"; };
+		F804DA8FBF6ED6BA64F8C01D206EABDF /* SPUURLRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPUURLRequest.h; path = Sparkle.framework/Versions/A/Headers/SPUURLRequest.h; sourceTree = "<group>"; };
+		FD7DD81C1F2759D61621B6C810708123 /* PDKeychainBindingsController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PDKeychainBindingsController.h; path = PDKeychainBindingsController/PDKeychainBindingsController.h; sourceTree = "<group>"; };
+		FE2F721CA12D3C9ABB37250715711CA0 /* default.min.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = default.min.css; path = Pod/Assets/styles/default.min.css; sourceTree = "<group>"; };
+		FE85EF06D16FB1AF9BCFA2C3B32FC411 /* Highlightr.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Highlightr.release.xcconfig; sourceTree = "<group>"; };
+		FEBFECBBD60FAD236CD4DDE73ED9DD0B /* PDKeychainBindingsController-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PDKeychainBindingsController-dummy.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,102 +228,226 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8BC398A4D1AA3939D93BF4AAAA478CEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A0D324F656DDC602F5A0F1AC21D7098C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1AEA3B3303D38CBBB1B7A0BBCD920559 /* Support Files */ = {
+		1AA2F519FDF4232523048BD812853DBE /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				D896631BA06683804955C440CD6EE952 /* PDKeychainBindingsController-dummy.m */,
-				C93125B00AEF5C4FDACC5C0A396CA69E /* PDKeychainBindingsController-prefix.pch */,
-				6769842D9E4411EA37BA934CC5B8B905 /* PDKeychainBindingsController.debug.xcconfig */,
-				00C3BDC50A454EA963150454A7F30824 /* PDKeychainBindingsController.release.xcconfig */,
+				07B28BA640C6B5A356C3C609656C5E21 /* Sparkle.debug.xcconfig */,
+				0DBE7801CB1640136812FA3EB43C8724 /* Sparkle.release.xcconfig */,
 			);
 			name = "Support Files";
-			path = "../Target Support Files/PDKeychainBindingsController";
+			path = "../Target Support Files/Sparkle";
 			sourceTree = "<group>";
 		};
-		2D21E8D6BAA8DBAFC3002746DA1AAAF8 /* Sparkle */ = {
+		46CA0D3D238E9A56958BA8AA56BFD61C /* PDKeychainBindingsController */ = {
 			isa = PBXGroup;
 			children = (
-				AE71F116B12A550020125AE1FDB2F9B4 /* Sparkle.h */,
-				ABCF668468469BACC1AE06FD7AE20DFF /* SPUDownloadData.h */,
-				702D92C42554731E02E4C2BA066FBB32 /* SPUDownloader.h */,
-				E1AE828750C0383658C71B675E4236F2 /* SPUDownloaderDelegate.h */,
-				0CC6D178CEAB44C81C961C81B0CA73DD /* SPUDownloaderDeprecated.h */,
-				57C5E4CE8D69D9424B57D027308C0CB9 /* SPUDownloaderProtocol.h */,
-				AD518A5FB5AE111071A5868721E6A57A /* SPUDownloaderSession.h */,
-				F30467979CC0CA877D7E490EAC33A455 /* SPUURLRequest.h */,
-				76CDB4B88F480F7D451249B740BAC0AF /* SUAppcast.h */,
-				FB7A2E60EF65E501A06A68A933C700E5 /* SUAppcastItem.h */,
-				8E354FC26625330AE6CE77CE4E8B94FB /* SUCodeSigningVerifier.h */,
-				B36BDC172264AC689D9293406712E561 /* SUErrors.h */,
-				32C8DDB23019E219E26077CED395E1AA /* SUExport.h */,
-				0673A2BB556CEFF2518FA0FA5E36D683 /* SUStandardVersionComparator.h */,
-				BADB9F65DD0BFEC7490D9884476EFFB5 /* SUUpdater.h */,
-				8E62B01B1CB81EDB77D325CE71E2C6FC /* SUUpdaterDelegate.h */,
-				1B54B389AE90C079343514A91B1162B1 /* SUVersionComparisonProtocol.h */,
-				C2585B7F2D02903B96A890D7B826CD56 /* SUVersionDisplayProtocol.h */,
-				55514A840A4AD0BBCBAE10C5304DB659 /* Frameworks */,
-				AFD14F51241299A49C1B9DE68F1B525D /* Support Files */,
-			);
-			path = Sparkle;
-			sourceTree = "<group>";
-		};
-		55514A840A4AD0BBCBAE10C5304DB659 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				141B7EE50300A135F78610284A042EF6 /* Sparkle.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		5F588252DA49613F03C2660EE691DB89 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				63E65C4B27717385766875EDFD463746 /* PDKeychainBindingsController */,
-				2D21E8D6BAA8DBAFC3002746DA1AAAF8 /* Sparkle */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		63E65C4B27717385766875EDFD463746 /* PDKeychainBindingsController */ = {
-			isa = PBXGroup;
-			children = (
-				99F0837DEC5BC75B54B445729F36D32B /* PDKeychainBindings.h */,
-				97E29F3186865A5DAC046FA7BF324EBB /* PDKeychainBindings.m */,
-				926E104B0E0D341BFDCA82C1993ADC62 /* PDKeychainBindingsController.h */,
-				21A3719163CF07F37CFCA510AAFB4505 /* PDKeychainBindingsController.m */,
-				1AEA3B3303D38CBBB1B7A0BBCD920559 /* Support Files */,
+				EB5674B3B6D0552782ED8F72A67174F6 /* PDKeychainBindings.h */,
+				39BEC966DF246FE6228D9D219DF14CAF /* PDKeychainBindings.m */,
+				FD7DD81C1F2759D61621B6C810708123 /* PDKeychainBindingsController.h */,
+				F4AD877C5504B23BD159CBED94384654 /* PDKeychainBindingsController.m */,
+				F24A8CB7080CCBBFFBEFCA890F5C633F /* Support Files */,
 			);
 			path = PDKeychainBindingsController;
 			sourceTree = "<group>";
 		};
-		713AB20E7275F720F35A1D89EDFE8D40 /* Products */ = {
+		50734DF96A53D53117DC3A03C0D937E3 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				C769D24757A1CF97D878A72CA9898307 /* Highlightr */,
+				46CA0D3D238E9A56958BA8AA56BFD61C /* PDKeychainBindingsController */,
+				9445DF0B0B5A8167D24804B4611611F8 /* Sparkle */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		9445DF0B0B5A8167D24804B4611611F8 /* Sparkle */ = {
+			isa = PBXGroup;
+			children = (
+				C51E95ABF8D49D36388DDF63D8F5C003 /* Sparkle.h */,
+				512950DA2582FF9BA1EF0006387F93E3 /* SPUDownloadData.h */,
+				B45A7A3EA61406F4C0672FF79793E0DF /* SPUDownloader.h */,
+				696E4AF200BB35A5A4C71ECE2EF12A44 /* SPUDownloaderDelegate.h */,
+				D09F0EB48A9601832FB7AC71244D6841 /* SPUDownloaderDeprecated.h */,
+				D5DBB9C228EEBA01579D9760756D5F59 /* SPUDownloaderProtocol.h */,
+				6874B5E28C74AE7A54DE549468EBA8AC /* SPUDownloaderSession.h */,
+				F804DA8FBF6ED6BA64F8C01D206EABDF /* SPUURLRequest.h */,
+				4380491E0C1DCEB02BF16CB5A3A1257A /* SUAppcast.h */,
+				02A25B2983A33C1F11D5AC651E9B0166 /* SUAppcastItem.h */,
+				DB94BF5F09D01B931F5A95FF24A6C458 /* SUCodeSigningVerifier.h */,
+				3DD7CE3D85948CEF461CE0CBD944BB06 /* SUErrors.h */,
+				162EBC653F7F8ADF2D5DD27F84F2052C /* SUExport.h */,
+				5C2457E27F7D5D2C9EBA72AD01835521 /* SUStandardVersionComparator.h */,
+				0B1A8F84011002FD9750263E5A6C0F26 /* SUUpdater.h */,
+				C9B23418C689CC383F2FD18380819A7B /* SUUpdaterDelegate.h */,
+				B01701BA178B97DAE070928B65E8561E /* SUVersionComparisonProtocol.h */,
+				45514DAEFBE3E4BA12B57C09954B25FC /* SUVersionDisplayProtocol.h */,
+				C866A15B541821DDF5D4F4E2F36C33BC /* Frameworks */,
+				1AA2F519FDF4232523048BD812853DBE /* Support Files */,
+			);
+			path = Sparkle;
+			sourceTree = "<group>";
+		};
+		AD5168798946B712D2F23545E27A2893 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				38560149FF043AA168408967CA8DD360 /* a11y-dark.min.css */,
+				F0DC5357B5A4E6B070ADC2EC92B7A842 /* a11y-light.min.css */,
+				B05380011762C61D933B717AED3DCAD2 /* agate.min.css */,
+				7B98767159DCF36BC1E34589579995CC /* an-old-hope.min.css */,
+				510363501820B4A14DE304DA5A07CA96 /* androidstudio.min.css */,
+				C92F9633167A43755DD9AE41F3EDF97B /* arduino-light.min.css */,
+				36BB3505650FEED7B3B655B14E98BA99 /* arta.min.css */,
+				2EF70CE3FBB98D6E73240511F4044B7C /* ascetic.min.css */,
+				4B9AD86455743AB0446274AF99EACC56 /* atelier-cave-dark.min.css */,
+				172C2200501BCC92E08C1E0687DA4F20 /* atelier-cave-light.min.css */,
+				35493E82DB2E9E13F907FADB5027F45A /* atelier-dune-dark.min.css */,
+				B5DFD20D702EF9A946FF5B8A2E2CDC01 /* atelier-dune-light.min.css */,
+				A376E1419B4BF529625D038C15B65769 /* atelier-estuary-dark.min.css */,
+				ECBEBCE1629E8FBBEB6E0D4394175AE6 /* atelier-estuary-light.min.css */,
+				C7F6DEC4B2FFE33754DE0383D1E63DB4 /* atelier-forest-dark.min.css */,
+				EF652D811179ADB2346CFD30D7F5034F /* atelier-forest-light.min.css */,
+				B739FF882AE81EE1AD4D39647956FC44 /* atelier-heath-dark.min.css */,
+				3AFD78F7872448DAEEDA27E0A23C2A26 /* atelier-heath-light.min.css */,
+				3975CF8B7F1E783F7E5EF0175617B1D9 /* atelier-lakeside-dark.min.css */,
+				6ABB5531A8408C761BE7176CC4C0A130 /* atelier-lakeside-light.min.css */,
+				DF5963B17ABE2AEBFDDC4779173B02D8 /* atelier-plateau-dark.min.css */,
+				F5F47A1997E2DDC9BA0C7F1B84B087F1 /* atelier-plateau-light.min.css */,
+				950B144125AB979B64141863D44163B7 /* atelier-savanna-dark.min.css */,
+				BB2A606FF3CB3476F1FFE3F0812F5B8D /* atelier-savanna-light.min.css */,
+				DD5013E4A8B3DAD75D113CF4D5CE7D29 /* atelier-seaside-dark.min.css */,
+				79012F39796760899BC056F944373477 /* atelier-seaside-light.min.css */,
+				8B3C2663AB896C991CB1AE0F6469689C /* atelier-sulphurpool-dark.min.css */,
+				276915B8647443D9892069C3BCFC9677 /* atelier-sulphurpool-light.min.css */,
+				A160D523A72DAD2618EEB587AB2052E9 /* atom-one-dark-reasonable.min.css */,
+				B88206C7774DFDD44D91EFEB70F031BF /* atom-one-dark.min.css */,
+				D51AD49E4312C79563AC78A6E5EA6DD7 /* atom-one-light.min.css */,
+				3FBB6FD030A374DEC4DCF482613D1630 /* brown-paper.min.css */,
+				ABAF71EB74A2D215534E4D746C75B73E /* codepen-embed.min.css */,
+				8F06458DB022EBBAED139EA682036792 /* color-brewer.min.css */,
+				0AB520E96A92795B6A3E3C30147261FA /* darcula.min.css */,
+				3132CB7F3CC93176F91C0C5395A465E4 /* dark.min.css */,
+				174F2FD7A04C4CD7B5564F44EF1F747A /* darkula.min.css */,
+				FE2F721CA12D3C9ABB37250715711CA0 /* default.min.css */,
+				DB983A18E561FD5608DF19B44D724410 /* docco.min.css */,
+				63615476D4D022E34682DB62973D82DE /* dracula.min.css */,
+				0E9945098C4E1BD6B250C4379FDCD117 /* far.min.css */,
+				0BAADFB01A420D5028AF99728E798D49 /* foundation.min.css */,
+				B387A4A9287C5C6A50C3EB3F4833F2C1 /* github-gist.min.css */,
+				3D6163F99A5FC6573725BE264CDB956C /* github.min.css */,
+				8D1C1AE9E789515B69D0BF99C485ECEE /* gml.min.css */,
+				8EC4D77DD5E0159949DB37CF794F071F /* googlecode.min.css */,
+				E9E7A1EDD82284A1AB1390246476C1BB /* grayscale.min.css */,
+				94037B5C2E8E36E280A430F2C879E875 /* gruvbox-dark.min.css */,
+				6BF0A951BDB71FFDCDCE29417A0104CE /* gruvbox-light.min.css */,
+				CEF03E421244749B28B1993251863FFF /* highlight.min.js */,
+				09F092C20BB4D16548AA0331171EEAFA /* hopscotch.min.css */,
+				4D73877939B36E5FB6741D8CCBBC0659 /* hybrid.min.css */,
+				B05F7383556579505970E5EA9270B6D3 /* idea.min.css */,
+				C9AD78B545DD4024D74D76A771496460 /* ir-black.min.css */,
+				417907D5ADB170A1020D544F94585CC9 /* isbl-editor-dark.min.css */,
+				2D0B978F19E94206442E12C4DED51BBF /* isbl-editor-light.min.css */,
+				1306B5C43D62ACD158ED35A38D71F95C /* kimbie.dark.min.css */,
+				67174093F4C6EE507E09CB4CA0C8C2C2 /* kimbie.light.min.css */,
+				60F974C00FE409E615CCD00164D3910A /* lightfair.min.css */,
+				11643A8FF261DA6B6F7F67234F902544 /* magula.min.css */,
+				D28CCD480B5FFF6B4057CB9062BDC3B4 /* mono-blue.min.css */,
+				6456D733045956B63533D4E54AA0DE89 /* monokai-sublime.min.css */,
+				04E479A61AA42A7794F993AAA3046CDB /* monokai.min.css */,
+				EC22F878BE39C838778CB3A20F8A3834 /* nord.min.css */,
+				688920BC38EEF1B380081CC0957120C7 /* obsidian.min.css */,
+				53CF5B72F2FB0F6E37787B2C00771BB0 /* ocean.min.css */,
+				AEA545101A17B986F3AB5115580AB105 /* paraiso-dark.min.css */,
+				EA950412DD5B675B1322D2A749DDD6D1 /* paraiso-light.min.css */,
+				6AA5726C0A7F7CE58A9CFB2C7725C0EA /* pojoaque.min.css */,
+				6D7B635410B926CAAE5AA1302DBEFD67 /* purebasic.min.css */,
+				78E34CDFB5EBCF72A61581236E688093 /* qtcreator_dark.min.css */,
+				636A2532E090A5A8CC2C366CA05AA2E8 /* qtcreator_light.min.css */,
+				486BE5A5B292102FD1DD1B81CDDA96FF /* railscasts.min.css */,
+				8720E6C6B1BE4BFFC9224476ABE3A89A /* rainbow.min.css */,
+				8B626F8B4C4293AEFCAD719DC353262A /* routeros.min.css */,
+				12B832B4AA7FB1FDF1C11398C73246FC /* school-book.min.css */,
+				0F43B3AA80674AE2E65293F358265338 /* shades-of-purple.min.css */,
+				1906BDFB73BDB3A53D93EF9C00507196 /* solarized-dark.min.css */,
+				0BF0C88619C54A3A5B86EA87A71A3D4B /* solarized-light.min.css */,
+				81BED87DD8D976B868489661356BFBA8 /* sunburst.min.css */,
+				C8EB311F252DE6932B305B1330104717 /* tomorrow-night-blue.min.css */,
+				5F95062194EB67B5BD463BC16CE5F38F /* tomorrow-night-bright.min.css */,
+				BF5B3C59A9CACAD6AD486042EEBB7BE7 /* tomorrow-night-eighties.min.css */,
+				93CC5EB099CDF49FF5565A25553A9C07 /* tomorrow-night.min.css */,
+				D458F334EC45BAEDE212F6BCE5D17826 /* tomorrow.min.css */,
+				EAE1DE733036FDA12E9A5001C44E0E4A /* vs.min.css */,
+				48A997A3C8AA92DB6EAFC85170D9DA7D /* vs2015.min.css */,
+				2662769C91AF288C9514E2C2285C948D /* xcode.min.css */,
+				27CFE74A2569763AA3EA719A48C5674F /* xt256.min.css */,
+				773C94EB8147AD95C6A87FBC1E8D86AD /* zenburn.min.css */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		C769D24757A1CF97D878A72CA9898307 /* Highlightr */ = {
+			isa = PBXGroup;
+			children = (
+				A08ECBA684796F6BDA8DE65BD274416D /* CodeAttributedString.swift */,
+				99AA72C0B20C7DB332135662DDB37977 /* Highlightr.swift */,
+				1A467CCAB35BA6E1816112041FAE7132 /* HTMLUtils.swift */,
+				BFA3127C96861992AE0932865D1CF089 /* Shims.swift */,
+				2DA7AC4C7C7582FA32E563F453E502CA /* Theme.swift */,
+				AD5168798946B712D2F23545E27A2893 /* Resources */,
+				D013B45DAB414E35AB24A07B2145041D /* Support Files */,
+			);
+			path = Highlightr;
+			sourceTree = "<group>";
+		};
+		C7D01B2E10E2D4693BF6EB71ADC056DB /* Pods-SquirrelPreviewer */ = {
+			isa = PBXGroup;
+			children = (
+				90D1543B3015E6AA6E0BEBA4C1CB1DF2 /* Pods-SquirrelPreviewer.modulemap */,
+				AB05F69CC5DD00613E7766274F4F64A7 /* Pods-SquirrelPreviewer-acknowledgements.markdown */,
+				BAC5E33864EA8F16F55A839BC4A48501 /* Pods-SquirrelPreviewer-acknowledgements.plist */,
+				7E7B04ECD0ECD01A4E65308EA51D5F14 /* Pods-SquirrelPreviewer-dummy.m */,
+				877419AAB2184EB81B100031A4F19620 /* Pods-SquirrelPreviewer-resources.sh */,
+				21AFE2676048DBB58BA2C58456C3BC26 /* Pods-SquirrelPreviewer-umbrella.h */,
+				DBDC3C9146E636B38AA6BC0DBDAB4FF0 /* Pods-SquirrelPreviewer.debug.xcconfig */,
+				2FBF1BFA88717E5CD0682833EE4F70E4 /* Pods-SquirrelPreviewer.release.xcconfig */,
+			);
+			name = "Pods-SquirrelPreviewer";
+			path = "Target Support Files/Pods-SquirrelPreviewer";
+			sourceTree = "<group>";
+		};
+		C866A15B541821DDF5D4F4E2F36C33BC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0723C41521E53B60355C3855B4AF4450 /* Sparkle.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CBD04297B1E234EA7B1D2ECEDCC9A4EC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7DB3C8BAA3D78E532F17CD75C7EC3704 /* libHighlightr.a */,
 				F5608847909F53C2B87AE3929181EF4A /* libPDKeychainBindingsController.a */,
 				96CAD938894115E0803B26314A58BEB8 /* libPods-Squinter.a */,
+				04AEAE7A19C55041057D8B1C2CF4E490 /* libPods-SquirrelPreviewer.a */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		722D335400C47C723F6289C45BF0D2B6 /* Targets Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				D88E66AC2F37988284D627B812AC1080 /* Pods-Squinter */,
-			);
-			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		AFD14F51241299A49C1B9DE68F1B525D /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				7E85B2917ADC4CFE81DBB2CD461AA675 /* Sparkle.debug.xcconfig */,
-				8205BF74E695F181164ACD1B0F712D2D /* Sparkle.release.xcconfig */,
-			);
-			name = "Support Files";
-			path = "../Target Support Files/Sparkle";
 			sourceTree = "<group>";
 		};
 		CF1408CF629C7361332E53B88F7BD30C = {
@@ -204,24 +455,24 @@
 			children = (
 				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
 				D89477F20FB1DE18A04690586D7808C4 /* Frameworks */,
-				5F588252DA49613F03C2660EE691DB89 /* Pods */,
-				713AB20E7275F720F35A1D89EDFE8D40 /* Products */,
-				722D335400C47C723F6289C45BF0D2B6 /* Targets Support Files */,
+				50734DF96A53D53117DC3A03C0D937E3 /* Pods */,
+				CBD04297B1E234EA7B1D2ECEDCC9A4EC /* Products */,
+				EB4BF9E294FDD45AB74360DDA6415D14 /* Targets Support Files */,
 			);
 			sourceTree = "<group>";
 		};
-		D88E66AC2F37988284D627B812AC1080 /* Pods-Squinter */ = {
+		D013B45DAB414E35AB24A07B2145041D /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				E10778B827B8F76B3FE329BCD6C66FB8 /* Pods-Squinter-acknowledgements.markdown */,
-				A6FA1D908ED720959B66BF1BDF9716B4 /* Pods-Squinter-acknowledgements.plist */,
-				51EC3A4CE82229987FE8D7D32CE448ED /* Pods-Squinter-dummy.m */,
-				2DE0BF705B5065A9EE57ED1990DB17DC /* Pods-Squinter-frameworks.sh */,
-				B3696356980FEC4DC595F204DD8BDE50 /* Pods-Squinter.debug.xcconfig */,
-				3B3E61C1C866F114DA12692A6424B963 /* Pods-Squinter.release.xcconfig */,
+				51E4B0E3ECDD1F4714FC8BFC01D70267 /* Highlightr.modulemap */,
+				7F6113C9B1A4F2ED0F022567A90F3670 /* Highlightr-dummy.m */,
+				E3B03D5FA97B2E4ADDB0FAD0BB325F6E /* Highlightr-prefix.pch */,
+				A672CE1C7BF37546AD842657F2A7E359 /* Highlightr-umbrella.h */,
+				F5E509E71106613F9D34187CE73D878A /* Highlightr.debug.xcconfig */,
+				FE85EF06D16FB1AF9BCFA2C3B32FC411 /* Highlightr.release.xcconfig */,
 			);
-			name = "Pods-Squinter";
-			path = "Target Support Files/Pods-Squinter";
+			name = "Support Files";
+			path = "../Target Support Files/Highlightr";
 			sourceTree = "<group>";
 		};
 		D89477F20FB1DE18A04690586D7808C4 /* Frameworks */ = {
@@ -231,15 +482,66 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		EB4BF9E294FDD45AB74360DDA6415D14 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				F4F5377A35D5BC9E5581DC78019A55C1 /* Pods-Squinter */,
+				C7D01B2E10E2D4693BF6EB71ADC056DB /* Pods-SquirrelPreviewer */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		F24A8CB7080CCBBFFBEFCA890F5C633F /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				FEBFECBBD60FAD236CD4DDE73ED9DD0B /* PDKeychainBindingsController-dummy.m */,
+				E2C54C1F400559B8BC0FA2C97191E193 /* PDKeychainBindingsController-prefix.pch */,
+				818974F0439A0289736A7BC69E6A2398 /* PDKeychainBindingsController.debug.xcconfig */,
+				7D9DDAC4F52D976A1DCDE26C6C72CDA0 /* PDKeychainBindingsController.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/PDKeychainBindingsController";
+			sourceTree = "<group>";
+		};
+		F4F5377A35D5BC9E5581DC78019A55C1 /* Pods-Squinter */ = {
+			isa = PBXGroup;
+			children = (
+				94CAB16243823B62D557C7EF48530C45 /* Pods-Squinter-acknowledgements.markdown */,
+				11FEBEA06ECE82CC3071FEC21FC175FF /* Pods-Squinter-acknowledgements.plist */,
+				6B24E81734747B49A2024044EEDD1641 /* Pods-Squinter-dummy.m */,
+				5FDECC2F61BB116523FCD4C64807B2DC /* Pods-Squinter-frameworks.sh */,
+				714A4A90B341CB9528FADF31ABC8DC13 /* Pods-Squinter.debug.xcconfig */,
+				419942477DBF35775351154B260884C1 /* Pods-Squinter.release.xcconfig */,
+			);
+			name = "Pods-Squinter";
+			path = "Target Support Files/Pods-Squinter";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		1A3DAB4E91384BE53796644246BB1AD1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DEF03A115ED70C6D56BD1E804EB118B9 /* Pods-SquirrelPreviewer-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6D84028BC96CB7E2BC2616403181F354 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				AF55E4E9C3784E25490D095E5B0DE37A /* PDKeychainBindings.h in Headers */,
 				03F8B0D031A5CE47DDB6F860E911812A /* PDKeychainBindingsController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B41948CEABDCCF047273B42274AE7652 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F061B7CC911EAB10CDFE9DBB7088CFB3 /* Highlightr-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +555,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		2415407B5E634BEC334AED852EC7A87C /* Pods-SquirrelPreviewer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3D124B7E201920DB9715E49AC58B5B1D /* Build configuration list for PBXNativeTarget "Pods-SquirrelPreviewer" */;
+			buildPhases = (
+				1A3DAB4E91384BE53796644246BB1AD1 /* Headers */,
+				6FDFE971EBC85E0E70F0ED00BF464EBF /* Sources */,
+				A0D324F656DDC602F5A0F1AC21D7098C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1BE890E101B2446AB8445817C772F5C9 /* PBXTargetDependency */,
+			);
+			name = "Pods-SquirrelPreviewer";
+			productName = "Pods-SquirrelPreviewer";
+			productReference = 04AEAE7A19C55041057D8B1C2CF4E490 /* libPods-SquirrelPreviewer.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		56166300B00DD737AE7E32AEA665AC50 /* Pods-Squinter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5B48F56B4D720C7D07ABA9919D82ED7F /* Build configuration list for PBXNativeTarget "Pods-Squinter" */;
@@ -289,6 +609,24 @@
 			productReference = F5608847909F53C2B87AE3929181EF4A /* libPDKeychainBindingsController.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		B0DFE582E64AE7298C59241B7B610B04 /* Highlightr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 875F468B3046A0F4D3A6BDC40117C889 /* Build configuration list for PBXNativeTarget "Highlightr" */;
+			buildPhases = (
+				B41948CEABDCCF047273B42274AE7652 /* Headers */,
+				CDF49DCAA1491A8D675500416599D5DD /* Sources */,
+				8BC398A4D1AA3939D93BF4AAAA478CEE /* Frameworks */,
+				5C367B8B92EB3DC948D869450E7A54FA /* Copy generated compatibility header */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Highlightr;
+			productName = Highlightr;
+			productReference = 7DB3C8BAA3D78E532F17CD75C7EC3704 /* libHighlightr.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -307,16 +645,45 @@
 				Base,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
-			productRefGroup = 713AB20E7275F720F35A1D89EDFE8D40 /* Products */;
+			productRefGroup = CBD04297B1E234EA7B1D2ECEDCC9A4EC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				B0DFE582E64AE7298C59241B7B610B04 /* Highlightr */,
 				7187F375D61CBC433EFA5307C831BAF6 /* PDKeychainBindingsController */,
 				56166300B00DD737AE7E32AEA665AC50 /* Pods-Squinter */,
+				2415407B5E634BEC334AED852EC7A87C /* Pods-SquirrelPreviewer */,
 				ED77B4B88587C894E85C361023D67C53 /* Sparkle */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5C367B8B92EB3DC948D869450E7A54FA /* Copy generated compatibility header */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DERIVED_SOURCES_DIR}/${PRODUCT_MODULE_NAME}-Swift.h",
+				"${PODS_ROOT}/Headers/Public/Highlightr/Highlightr.modulemap",
+				"${PODS_ROOT}/Headers/Public/Highlightr/Highlightr-umbrella.h",
+			);
+			name = "Copy generated compatibility header";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${BUILT_PRODUCTS_DIR}/${PRODUCT_MODULE_NAME}.modulemap",
+				"${BUILT_PRODUCTS_DIR}/Highlightr-umbrella.h",
+				"${BUILT_PRODUCTS_DIR}/Swift Compatibility Header/${PRODUCT_MODULE_NAME}-Swift.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "COMPATIBILITY_HEADER_PATH=\"${BUILT_PRODUCTS_DIR}/Swift Compatibility Header/${PRODUCT_MODULE_NAME}-Swift.h\"\nMODULE_MAP_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_MODULE_NAME}.modulemap\"\n\nditto \"${DERIVED_SOURCES_DIR}/${PRODUCT_MODULE_NAME}-Swift.h\" \"${COMPATIBILITY_HEADER_PATH}\"\nditto \"${PODS_ROOT}/Headers/Public/Highlightr/Highlightr.modulemap\" \"${MODULE_MAP_PATH}\"\nditto \"${PODS_ROOT}/Headers/Public/Highlightr/Highlightr-umbrella.h\" \"${BUILT_PRODUCTS_DIR}\"\nprintf \"\\n\\nmodule ${PRODUCT_MODULE_NAME}.Swift {\\n  header \\\"${COMPATIBILITY_HEADER_PATH}\\\"\\n  requires objc\\n}\\n\" >> \"${MODULE_MAP_PATH}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2D79BE9EB1970CCD689F24D83199061C /* Sources */ = {
@@ -329,6 +696,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6FDFE971EBC85E0E70F0ED00BF464EBF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6C92A05DEB52DAD23656298AA8BE5644 /* Pods-SquirrelPreviewer-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C39F7934004B3C58969B8896FE90135F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -337,9 +712,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CDF49DCAA1491A8D675500416599D5DD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				35C5753FC1B3D99844EBD4370F0BA4AF /* CodeAttributedString.swift in Sources */,
+				C7CCEA9753A64968FE970DF97E1EE02C /* Highlightr-dummy.m in Sources */,
+				6D07B65B3DAB8AB661FEF3E93F808531 /* Highlightr.swift in Sources */,
+				3571F706D44D6FEFE0D683C5E729CB32 /* HTMLUtils.swift in Sources */,
+				C9E472E2B7A6EBBB6986F429BDC6A8C2 /* Shims.swift in Sources */,
+				45F0C366D6F77F0CFC90FB03C2CB33C1 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1BE890E101B2446AB8445817C772F5C9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Highlightr;
+			target = B0DFE582E64AE7298C59241B7B610B04 /* Highlightr */;
+			targetProxy = A0EC0386A8D9A935A91F33D4F76626D7 /* PBXContainerItemProxy */;
+		};
 		A85F801D1073EDC88602F3E65B979B48 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Sparkle;
@@ -357,7 +751,7 @@
 /* Begin XCBuildConfiguration section */
 		09211318CEF66522F234D3BC3F874C07 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6769842D9E4411EA37BA934CC5B8B905 /* PDKeychainBindingsController.debug.xcconfig */;
+			baseConfigurationReference = 818974F0439A0289736A7BC69E6A2398 /* PDKeychainBindingsController.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "-";
@@ -381,7 +775,7 @@
 		};
 		1E9062C27D3F6656C02F7A7C9BB823A9 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 00C3BDC50A454EA963150454A7F30824 /* PDKeychainBindingsController.release.xcconfig */;
+			baseConfigurationReference = 7D9DDAC4F52D976A1DCDE26C6C72CDA0 /* PDKeychainBindingsController.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "-";
@@ -463,9 +857,58 @@
 			};
 			name = Release;
 		};
+		352520F7E6F7C7D8BA16C243CC458E2C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE85EF06D16FB1AF9BCFA2C3B32FC411 /* Highlightr.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREFIX_HEADER = "Target Support Files/Highlightr/Highlightr-prefix.pch";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MODULEMAP_FILE = Headers/Public/Highlightr/Highlightr.modulemap;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Highlightr;
+				PRODUCT_NAME = Highlightr;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		460246EAD0D624B6286B68632488E279 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2FBF1BFA88717E5CD0682833EE4F70E4 /* Pods-SquirrelPreviewer.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				EXECUTABLE_PREFIX = lib;
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MODULEMAP_FILE = "Target Support Files/Pods-SquirrelPreviewer/Pods-SquirrelPreviewer.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		53119FED25D50CAD8C89D980B8FCB179 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8205BF74E695F181164ACD1B0F712D2D /* Sparkle.release.xcconfig */;
+			baseConfigurationReference = 0DBE7801CB1640136812FA3EB43C8724 /* Sparkle.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
@@ -543,7 +986,7 @@
 		};
 		9003BC2A027F66E656C2DAE1D4300E1F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B3696356980FEC4DC595F204DD8BDE50 /* Pods-Squinter.debug.xcconfig */;
+			baseConfigurationReference = 714A4A90B341CB9528FADF31ABC8DC13 /* Pods-Squinter.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -563,9 +1006,32 @@
 			};
 			name = Debug;
 		};
+		A8DB4455A67E61DBF153C2D49CA885B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DBDC3C9146E636B38AA6BC0DBDAB4FF0 /* Pods-SquirrelPreviewer.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				EXECUTABLE_PREFIX = lib;
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MODULEMAP_FILE = "Target Support Files/Pods-SquirrelPreviewer/Pods-SquirrelPreviewer.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
 		D24DE9D59732B3D89F58ACD78EB5F326 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7E85B2917ADC4CFE81DBB2CD461AA675 /* Sparkle.debug.xcconfig */;
+			baseConfigurationReference = 07B28BA640C6B5A356C3C609656C5E21 /* Sparkle.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
@@ -576,9 +1042,35 @@
 			};
 			name = Debug;
 		};
+		E5E5C4BEAB20E9E26E7E23E5773011D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F5E509E71106613F9D34187CE73D878A /* Highlightr.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREFIX_HEADER = "Target Support Files/Highlightr/Highlightr-prefix.pch";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MODULEMAP_FILE = Headers/Public/Highlightr/Highlightr.modulemap;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Highlightr;
+				PRODUCT_NAME = Highlightr;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
 		F5C803FAB16BD75DE5A9B5CC763F4B35 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B3E61C1C866F114DA12692A6424B963 /* Pods-Squinter.release.xcconfig */;
+			baseConfigurationReference = 419942477DBF35775351154B260884C1 /* Pods-Squinter.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -610,6 +1102,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		3D124B7E201920DB9715E49AC58B5B1D /* Build configuration list for PBXNativeTarget "Pods-SquirrelPreviewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8DB4455A67E61DBF153C2D49CA885B3 /* Debug */,
+				460246EAD0D624B6286B68632488E279 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -624,6 +1125,15 @@
 			buildConfigurations = (
 				9003BC2A027F66E656C2DAE1D4300E1F /* Debug */,
 				F5C803FAB16BD75DE5A9B5CC763F4B35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		875F468B3046A0F4D3A6BDC40117C889 /* Build configuration list for PBXNativeTarget "Highlightr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E5E5C4BEAB20E9E26E7E23E5773011D7 /* Debug */,
+				352520F7E6F7C7D8BA16C243CC458E2C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
