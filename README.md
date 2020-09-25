@@ -2,7 +2,7 @@
 
 Squinter is a macOS GUI application for managing Squirrel programming projects targeting the [Electric Imp Platform](https://devloper.electricimp.com).
 
-A binary download and much more information is available at the [Squinter web site](https://smittytone.github.io/squinter/index.html).
+A binary download and much more information is available at the [Squinter web site](https://smittytone.net/squinter/index.html).
 
 ## Copyright Notice ##
 
