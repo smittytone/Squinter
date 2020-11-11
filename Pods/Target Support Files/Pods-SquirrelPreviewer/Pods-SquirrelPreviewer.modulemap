@@ -1,6 +1,0 @@
-module Pods_SquirrelPreviewer {
-  umbrella header "Pods-SquirrelPreviewer-umbrella.h"
-
-  export *
-  module * { export * }
-}

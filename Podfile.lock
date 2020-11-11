@@ -1,24 +1,20 @@
 PODS:
-  - Highlightr (2.1.0)
   - PDKeychainBindingsController (0.0.1)
   - Sparkle (1.23.0)
 
 DEPENDENCIES:
-  - Highlightr
   - PDKeychainBindingsController (~> 0.0)
   - Sparkle (> 1.22)
 
 SPEC REPOS:
   trunk:
-    - Highlightr
     - PDKeychainBindingsController
     - Sparkle
 
 SPEC CHECKSUMS:
-  Highlightr: 595f3e100737c8de41113385da8bd0b5b65212c6
   PDKeychainBindingsController: fa8cb3cf99f2ea9240d61066ed0549f34e2cec3c
   Sparkle: 55b1a87ba69d56913375a281546b7c82dec95bb0
 
-PODFILE CHECKSUM: ed8c56baff84ce68e602fd45487b7b3ea7ab1c2e
+PODFILE CHECKSUM: 666d4cf7f6823d1e2b976541f65de56b3a644798
 
 COCOAPODS: 1.9.3
