@@ -23,49 +23,6 @@ class PreviewViewController: NSViewController, QLPreviewingController {
     }
     
 
-    // MARK:- View Lifecycle Functions
-
-    override func viewWillAppear() {
-        
-        super.viewWillAppear()
-
-        setFont()
-    }
-    
-
-    func setFont() {
-        // Get the font name preference
-        //CFPreferencesAppSynchronize(("com.bps.Squinter" as CFString))
-        if let suiteDefaults = UserDefaults.init(suiteName: "com.bps.suite.squinter") {
-            suiteDefaults.synchronize()
-            if let object = suiteDefaults.object(forKey: "com.bps.suite.squinter.fontNameIndex") {
-                let indexData: NSNumber = object as! NSNumber
-                let index: Int = indexData.intValue
-                self.fontIndex = index
-                switch(index) {
-                    case 0:
-                        self.fontName = "AndaleMono"
-                    case 1:
-                        self.fontName = "Courier"
-                    case 2:
-                        self.fontName = "Menlo-Regular"
-                    case 3:
-                        self.fontName = "Monaco"
-                    case 4:
-                        self.fontName = "SourceCodePro-Regular"
-                    default:
-                        self.fontName = "Menlo-Regular"
-                }
-            } else {
-                self.fontIndex = -3
-            }
-        } else {
-            self.fontName = "Menlo-Regular"
-            self.fontIndex = -2
-        }
-    }
-
-
     // MARK:- QLPreviewingController Required Functions
 
     func preparePreviewOfFile(at url: URL, completionHandler handler: @escaping (Error?) -> Void) {
@@ -157,5 +114,41 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         NSLayoutConstraint(item: view, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0.0).isActive = true
         NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0.0).isActive = true
     }
+
+
+    func setFont() {
+        // Get the font name preference
+        //CFPreferencesAppSynchronize(("com.bps.Squinter" as CFString))
+        if let suiteDefaults = UserDefaults.init(suiteName: "com.bps.suite.squinter") {
+            suiteDefaults.synchronize()
+            if let object = suiteDefaults.object(forKey: "com.bps.suite.squinter.fontNameIndex") {
+                let indexData: NSNumber = object as! NSNumber
+                let index: Int = indexData.intValue
+                self.fontIndex = index
+                switch(index) {
+                    case 0:
+                        self.fontName = "AndaleMono"
+                    case 1:
+                        self.fontName = "Courier"
+                    case 2:
+                        self.fontName = "Menlo-Regular"
+                    case 3:
+                        self.fontName = "Monaco"
+                    case 4:
+                        self.fontName = "SourceCodePro-Regular"
+                    default:
+                        self.fontName = "Menlo-Regular"
+                }
+            } else {
+                self.fontIndex = -3
+            }
+        } else {
+            self.fontName = "Menlo-Regular"
+            self.fontIndex = -2
+        }
+    }
+
+
+    
     
 }
