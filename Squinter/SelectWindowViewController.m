@@ -127,12 +127,12 @@
 
 		if (theSender != cellView.minimumCheckbox)
 		{
-			cellView.minimumCheckbox.state = NSOffState;
+			cellView.minimumCheckbox.state = NSControlStateValueOff;
             count++;
 		}
 		else
 		{
-            theSelectedTarget = cellView.minimumCheckbox.state == NSOnState ? [groups objectAtIndex:i] : nil;
+            theSelectedTarget = cellView.minimumCheckbox.state == NSControlStateValueOn ? [groups objectAtIndex:i] : nil;
 		}
 	}
 }
@@ -175,12 +175,12 @@
         
         if (currentTargetID != nil && [currentTargetID compare:dg.did] == NSOrderedSame)
         {
-            cell.minimumCheckbox.state = NSOnState;
+            cell.minimumCheckbox.state = NSControlStateValueOn;
             theSelectedTarget = dg;
         }
         else
         {
-            cell.minimumCheckbox.state = NSOffState;
+            cell.minimumCheckbox.state = NSControlStateValueOff;
         }
 	}
 

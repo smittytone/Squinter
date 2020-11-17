@@ -958,7 +958,7 @@
     {
         // We don't have a password or a username, so we'll need to show the login window anyway
 
-        saveDetailsCheckbox.state = NSOnState;
+        saveDetailsCheckbox.state = NSControlStateValueOn;
 
         [_window beginSheet:loginSheet completionHandler:nil];
     }
@@ -966,7 +966,7 @@
     {
         // We've got the credentials so bypass the sheet and log straight in
 
-        saveDetailsCheckbox.state = NSOffState;
+        saveDetailsCheckbox.state = NSControlStateValueOff;
 
         [self writeStringToLog:@"Logging you into the impCloud. Automatic login can be disabled in Preferences." :YES];
         [self login:nil];
@@ -979,7 +979,7 @@
 {
     // Present the login sheet
 
-    saveDetailsCheckbox.state = NSOnState;
+    saveDetailsCheckbox.state = NSControlStateValueOn;
 
     // Set the credentials for reading
 
@@ -1055,7 +1055,7 @@
 
     NSButton *checkbox = (NSButton *)sender;
 
-    if (checkbox.state == NSOnState && switchingAccount)
+    if (checkbox.state == NSControlStateValueOn && switchingAccount)
     {
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = @"Caution";
@@ -1064,7 +1064,7 @@
         [alert addButtonWithTitle:@"No"];
 
         [alert beginSheetModalForWindow:loginSheet completionHandler:^(NSModalResponse returnCode) {
-            if (returnCode != NSAlertFirstButtonReturn) checkbox.state = NSOffState;
+            if (returnCode != NSAlertFirstButtonReturn) checkbox.state = NSControlStateValueOff;
         }];
     }
 }
@@ -1137,7 +1137,7 @@
 {
     // EXPERIMENTAL — switches the password entry field between secure and non-secure mode
 
-    if (showPassCheckbox.state == NSOnState)
+    if (showPassCheckbox.state == NSControlStateValueOn)
     {
         NSString *text = passwordTextField.stringValue;
         passwordTextField.cell = [[NSTextFieldCell alloc] init];
@@ -1167,7 +1167,7 @@
 
         // Show the login sheet empty and with 'save credentials' switched off
 
-        saveDetailsCheckbox.state = NSOffState;
+        saveDetailsCheckbox.state = NSControlStateValueOff;
         usernameTextField.stringValue = @"";
         passwordTextField.stringValue = @"";
         
@@ -1295,14 +1295,14 @@
 
     // Set the associate product default state to unchecked
 
-    newProjectAssociateCheckbox.state = NSOffState;
+    newProjectAssociateCheckbox.state = NSControlStateValueOff;
 
     if (ide.isLoggedIn)
     {
         // If we are logged in, we can offer to create a product, which we'll set as the default...
 
         newProjectNewProductCheckbox.enabled = YES;
-        newProjectNewProductCheckbox.state = NSOnState;
+        newProjectNewProductCheckbox.state = NSControlStateValueOn;
 
         // Get the list of products if we don't have it already
         // This will be later used to check the new project's name
@@ -1314,7 +1314,7 @@
         // ...otherwise we can't
 
         newProjectNewProductCheckbox.enabled = NO;
-        newProjectNewProductCheckbox.state = NSOffState;
+        newProjectNewProductCheckbox.state = NSControlStateValueOff;
 
         // TODO - Add warning here and suggest the user log in
     }
@@ -1564,14 +1564,14 @@
     {
         // If user is checking the associate product box, we can't have the new product box checked
 
-        if (newProjectAssociateCheckbox.state == NSOnState) newProjectNewProductCheckbox.state = NSOffState;
+        if (newProjectAssociateCheckbox.state == NSControlStateValueOn) newProjectNewProductCheckbox.state = NSControlStateValueOff;
     }
 
     if (sender == newProjectNewProductCheckbox)
     {
         // If user is checking the new product box, we can't have the associate product box checked
 
-        if (newProjectNewProductCheckbox.state == NSOnState) newProjectAssociateCheckbox.state = NSOffState;
+        if (newProjectNewProductCheckbox.state == NSControlStateValueOn) newProjectAssociateCheckbox.state = NSControlStateValueOff;
     }
 }
 
@@ -1754,7 +1754,7 @@
 
     // Set the panel's accessory view checkbox to OFF
 
-    accessoryViewNewProjectCheckbox.state = NSOffState;
+    accessoryViewNewProjectCheckbox.state = NSControlStateValueOff;
 
     // Hide the accessory view - though it's not shown, openFileHandler: checks its state
 
@@ -1987,7 +1987,7 @@
         renameProjectHintField.stringValue = @"If this checkbox is greyed out, the device group isn’t associated with a device group in the impCloud, or you are not logged in to your account.";
     }
 
-    renameProjectLinkCheckbox.state = (renameProjectLinkCheckbox.enabled) ? NSOnState : NSOffState;
+    renameProjectLinkCheckbox.state = (renameProjectLinkCheckbox.enabled) ? NSControlStateValueOn : NSControlStateValueOff;
 
     if (desc.length > 0)
     {
@@ -2054,7 +2054,7 @@
             return;
         }
 
-        if (renameProjectLinkCheckbox.state == NSOnState)
+        if (renameProjectLinkCheckbox.state == NSControlStateValueOn)
         {
             // Update the source product before doing anything else, so that if there is an
             // error, we don't affect the local version either
@@ -2145,7 +2145,7 @@
             return;
         }
 
-        if (renameProjectLinkCheckbox.state == NSOnState)
+        if (renameProjectLinkCheckbox.state == NSControlStateValueOn)
         {
             // Update the source device group before doing anything else, so that if there is an
             // error, we don't affect the local version either
@@ -3261,12 +3261,12 @@
 
     if (newDevicegroupFlag)
     {
-        newDevicegroupCheckbox.state = NSOffState;
+        newDevicegroupCheckbox.state = NSControlStateValueOff;
         newDevicegroupCheckbox.enabled = NO;
     }
     else
     {
-        newDevicegroupCheckbox.state = NSOnState;
+        newDevicegroupCheckbox.state = NSControlStateValueOn;
         newDevicegroupCheckbox.enabled = YES;
     }
     
@@ -3790,12 +3790,12 @@
     if ([filetype compare:@"agent"] == NSOrderedSame)
     {
         saveProjectDialog.accessoryView = saveDevicegroupFilesAccessoryView;
-        saveDevicegroupFilesAccessoryViewCheckbox.state = NSOnState;
+        saveDevicegroupFilesAccessoryViewCheckbox.state = NSControlStateValueOn;
     }
     else
     {
         saveProjectDialog.accessoryView = nil;
-        saveDevicegroupFilesAccessoryViewCheckbox.state = NSOffState;
+        saveDevicegroupFilesAccessoryViewCheckbox.state = NSControlStateValueOff;
     }
 
     [saveProjectDialog beginSheetModalForWindow:_window
@@ -3807,9 +3807,9 @@
          [NSApp endSheet:saveProjectDialog];
          [saveProjectDialog orderOut:self];
 
-         if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
          {
-             if (saveDevicegroupFilesAccessoryViewCheckbox.state == NSOnState)
+             if (saveDevicegroupFilesAccessoryViewCheckbox.state == NSControlStateValueOn)
              {
                  [self saveDevicegroupfiles:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]: kActionNewDGBothFiles];
              }
@@ -3941,9 +3941,9 @@
 
             if (parent == currentProject) iwvc.project = currentProject;
         }
-#ifdef DEBUG
+
         if (!added) NSLog(@"[ERROR] Some files couldn't be watched in saveDevicegroupfiles:");
-#endif
+
     }
     else
     {
@@ -3979,7 +3979,7 @@
     {
         if (dgitem != item)
         {
-            dgitem.state = NSOffState;
+            dgitem.state = NSControlStateValueOff;
 
             if (dgitem.submenu != nil)
             {
@@ -3987,13 +3987,13 @@
 
                 for (NSMenuItem *sitem in dgitem.submenu.itemArray)
                 {
-                    sitem.state = NSOffState;
+                    sitem.state = NSControlStateValueOff;
                 }
             }
         }
         else
         {
-            dgitem.state = NSOnState;
+            dgitem.state = NSControlStateValueOn;
 
             // Use the flag to make sure we don't reselect the device
             // after coming here from 'chooseDevice:'
@@ -5124,7 +5124,7 @@
 
         [refreshTimer invalidate];
 
-        checkDeviceStatusMenuItem.state = NSOffState;
+        checkDeviceStatusMenuItem.state = NSControlStateValueOff;
         refreshTimer = nil;
         return;
     }
@@ -5133,7 +5133,7 @@
     {
         // If we are logged in to the impCloud, we can start to auto-refresh device info
 
-        checkDeviceStatusMenuItem.state = NSOnState;
+        checkDeviceStatusMenuItem.state = NSControlStateValueOn;
 
         // If there are no known devices yet, go and get the list
 
@@ -5670,7 +5670,7 @@
 
                 for (NSMenuItem *subMenuItem in menuitem.submenu.itemArray)
                 {
-                    subMenuItem.state = NSOffState;
+                    subMenuItem.state = NSControlStateValueOff;
 
                     if (subMenuItem.representedObject == selectedDevice)
                     {
@@ -7384,16 +7384,16 @@
 
     // Set checkboxes
 
-    preserveCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.preservews"]) ? NSOnState : NSOffState;
-    autoCompileCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocompile"]) ? NSOnState : NSOffState;
-    loadModelsCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoload"]) ? NSOnState : NSOffState;
-    autoLoadListsCheckbox.state =  ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) ? NSOnState : NSOffState;
-    autoUpdateCheckCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) ? NSOnState : NSOffState;
-    boldTestCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.showboldtext"]) ? NSOnState : NSOffState;
-    loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSOnState : NSOffState;
-    updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSOnState : NSOffState;
-    showDeviceWarnigCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"]) ? NSOnState : NSOffState;
-    //showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSOnState : NSOffState;
+    preserveCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.preservews"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    autoCompileCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocompile"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    loadModelsCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoload"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    autoLoadListsCheckbox.state =  ([defaults boolForKey:@"com.bps.squinter.autoloadlists"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    autoUpdateCheckCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autocheckupdates"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    boldTestCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.showboldtext"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    loadDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoloaddevlists"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    updateDevicesCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.updatedevs"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    showDeviceWarnigCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.autoselectdevice"]) ? NSControlStateValueOn : NSControlStateValueOff;
+    //showInspectorCheckbox.state = ([defaults boolForKey:@"com.bps.squinter.show.inspector"]) ? NSControlStateValueOn : NSControlStateValueOff;
     
     // Set file location display mode menu
 
@@ -7431,13 +7431,13 @@
     workingDirectory = workingDirectoryField.stringValue;
     BOOL textChange = NO;
 
-    [defaults setBool:(autoLoadListsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoloadlists"];
-    [defaults setBool:(preserveCheckbox.state == NSOnState) forKey:@"com.bps.squinter.preservews"];
-    [defaults setBool:(autoCompileCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autocompile"];
-    [defaults setBool:(loadDevicesCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoloaddevlists"];
-    [defaults setBool:(autoUpdateCheckCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autocheckupdates"];
-    [defaults setBool:(loadModelsCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoload"];
-    //[defaults setBool:(showInspectorCheckbox.state == NSOnState) forKey:@"com.bps.squinter.show.inspector"];
+    [defaults setBool:(autoLoadListsCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.autoloadlists"];
+    [defaults setBool:(preserveCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.preservews"];
+    [defaults setBool:(autoCompileCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.autocompile"];
+    [defaults setBool:(loadDevicesCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.autoloaddevlists"];
+    [defaults setBool:(autoUpdateCheckCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.autocheckupdates"];
+    [defaults setBool:(loadModelsCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.autoload"];
+    //[defaults setBool:(showInspectorCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.show.inspector"];
 
     float r = (float)textColour.redComponent;
     float b = (float)textColour.blueComponent;
@@ -7524,7 +7524,7 @@
     if (fontSize != num.integerValue) textChange = YES;
 
     BOOL isBold = [defaults boolForKey:@"com.bps.squinter.showboldtext"];
-    BOOL shouldBeBold = boldTestCheckbox.state == NSOnState ? YES : NO;
+    BOOL shouldBeBold = boldTestCheckbox.state == NSControlStateValueOn ? YES : NO;
 
     if (isBold != shouldBeBold) textChange = YES;
 
@@ -7539,8 +7539,8 @@
     [defaults setObject:[NSNumber numberWithInteger:fontsMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.fontNameIndex"];
     [defaults setObject:[NSNumber numberWithInteger:fontSize] forKey:@"com.bps.squinter.fontSizeIndex"];
     [defaults setObject:[NSNumber numberWithInteger:locationMenu.indexOfSelectedItem] forKey:@"com.bps.squinter.displaypath"];
-    [defaults setBool:(boldTestCheckbox.state == NSOnState) forKey:@"com.bps.squinter.showboldtext"];
-    [defaults setBool:(showDeviceWarnigCheckbox.state == NSOnState) forKey:@"com.bps.squinter.autoselectdevice"];
+    [defaults setBool:(boldTestCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.showboldtext"];
+    [defaults setBool:(showDeviceWarnigCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.autoselectdevice"];
 
     // FROM 2.3.128
 
@@ -7569,9 +7569,9 @@
     [defaults setObject:[NSNumber numberWithInteger:count] forKey:@"com.bps.squinter.logListCount"];
 
     // Start or stop auto-updating the device list
-    if ([defaults boolForKey:@"com.bps.squinter.updatedevs"] != updateDevicesCheckbox.state == NSOnState)
+    if ([defaults boolForKey:@"com.bps.squinter.updatedevs"] != updateDevicesCheckbox.state == NSControlStateValueOn)
     {
-        [defaults setBool:(updateDevicesCheckbox.state == NSOnState) forKey:@"com.bps.squinter.updatedevs"];
+        [defaults setBool:(updateDevicesCheckbox.state == NSControlStateValueOn) forKey:@"com.bps.squinter.updatedevs"];
         [self keepDevicesStatusUpdated:nil];
     }
 
@@ -7618,7 +7618,7 @@
          [NSApp endSheet:choosePanel];
          [choosePanel orderOut:self];
 
-         if (result == NSFileHandlingPanelOKButton) [self setWorkingDirectory:[choosePanel URLs]];
+        if (result == NSModalResponseOK) [self setWorkingDirectory:[choosePanel URLs]];
      }
      ];
 
@@ -7975,9 +7975,9 @@
         // Set up the pasteboard, and add the URL string to it
 
         NSPasteboard *pb = [NSPasteboard generalPasteboard];
-        NSArray *ptypes = [NSArray arrayWithObjects:NSStringPboardType, nil];
+        NSArray *ptypes = [NSArray arrayWithObjects:NSPasteboardTypeString, nil];
         [pb declareTypes:ptypes owner:self];
-        [pb setString:urlstring forType:NSStringPboardType];
+        [pb setString:urlstring forType:NSPasteboardTypeString];
 
         [self writeStringToLog:[NSString stringWithFormat:@"The agent URL of device \"%@\" has been copied to the clipboard.", [self getValueFrom:selectedDevice withKey:@"name"]] :YES];
     }
@@ -8037,10 +8037,10 @@
         // Set up the pasteboard and write the code to it
 
         NSPasteboard *pb = [NSPasteboard generalPasteboard];
-        NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+        NSArray *types = [NSArray arrayWithObjects:NSPasteboardTypeString, nil];
         
         [pb declareTypes:types owner:self];
-        [pb setString:code forType:NSStringPboardType];
+        [pb setString:code forType:NSPasteboardTypeString];
         [self writeStringToLog:[NSString stringWithFormat:@"Compiled %@ code copied to clipboard.", type] :YES];
     }
     else

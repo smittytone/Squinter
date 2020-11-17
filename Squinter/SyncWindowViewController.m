@@ -56,7 +56,7 @@
 
         if (theSender == cellView.minimumCheckbox)
         {
-            if (cellView.minimumCheckbox.state == NSOnState)
+            if (cellView.minimumCheckbox.state == NSControlStateValueOn)
             {
                 // Item is checked so add its index to 'selectedGroup'
 
@@ -139,7 +139,7 @@
         if (cell != nil)
         {
             cell.minimumCheckbox.title = @"";
-            cell.minimumCheckbox.state = NSOffState;
+            cell.minimumCheckbox.state = NSControlStateValueOff;
             cell.minimumCheckbox.action = @selector(checkSyncTarget:);
             return cell;
         }

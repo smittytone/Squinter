@@ -135,13 +135,13 @@
             {
                 if (anItem == selected)
                 {
-                    anItem.state = NSOnState;
+                    anItem.state = NSControlStateValueOn;
                     [projectsPopUp selectItemWithTitle:selected.title];
                     projectsPopUp.selectedItem.title = [NSString stringWithFormat:@"%@/%@", currentProject.name, (currentDevicegroup != nil ? currentDevicegroup.name : @"None")];
                 }
                 else
                 {
-                    anItem.state = NSOffState;
+                    anItem.state = NSControlStateValueOff;
                 }
             }
         }
@@ -156,7 +156,7 @@
                                           action:@selector(newProject:)
                                    keyEquivalent:@""];
         item.enabled = YES;
-        item.state = NSOffState;
+        item.state = NSControlStateValueOff;
         [openProjectsMenu addItem:item];
 
         [projectsPopUp addItemWithTitle:@"None"];
@@ -184,7 +184,7 @@
                                           action:@selector(getProductsFromServer:)
                                    keyEquivalent:@""];
         item.enabled = YES;
-        item.state = NSOffState;
+        item.state = NSControlStateValueOff;
         [productsMenu addItem:item];
         return;
     }
@@ -197,7 +197,7 @@
                                           action:nil
                                    keyEquivalent:@""];
         item.enabled = NO;
-        item.state = NSOffState;
+        item.state = NSControlStateValueOff;
         [productsMenu addItem:item];
         return;
     }
@@ -218,7 +218,7 @@
                                               action:@selector(chooseProduct:)
                                        keyEquivalent:@""];
             item.representedObject = aProduct;
-            item.state = NSOffState;
+            item.state = NSControlStateValueOff;
             [productsMenu addItem:item];
         }
         else
@@ -278,7 +278,7 @@
             NSMenuItem *aitem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Account: %@", name]
                                                            action:nil
                                                     keyEquivalent:@""];
-            aitem.state = NSOffState;
+            aitem.state = NSControlStateValueOff;
             aitem.enabled = NO;
             [sharedMenu addItem:aitem];
 
@@ -299,7 +299,7 @@
                                                            action:@selector(chooseProduct:)
                                                     keyEquivalent:@""];
                         aitem.representedObject = aProduct;
-                        aitem.state = NSOffState;
+                        aitem.state = NSControlStateValueOff;
                         [sharedMenu addItem:aitem];
                     }
                 }
@@ -324,7 +324,7 @@
                                       action:@selector(getProductsFromServer:)
                                keyEquivalent:@""];
     item.enabled = YES;
-    item.state = NSOffState;
+    item.state = NSControlStateValueOff;
     item.representedObject = nil;
     [productsMenu addItem:item];
 
@@ -353,24 +353,24 @@
                 {
                     if (sitem.representedObject == selectedProduct)
                     {
-                        sitem.state = NSOnState;
+                        sitem.state = NSControlStateValueOn;
 
                         // Highlight the submenu title so the user knows a subsdiiary Product has been selected
 
-                        item.state = NSMixedState;
+                        item.state = NSControlStateValueMixed;
                         shouldClear = NO;
                     }
                     else
                     {
-                        sitem.state = NSOffState;
+                        sitem.state = NSControlStateValueOff;
                     }
                 }
 
-                if (shouldClear) item.state = NSOffState;
+                if (shouldClear) item.state = NSControlStateValueOff;
             }
             else
             {
-                item.state = item.representedObject == selectedProduct ? NSOnState : NSOffState;
+                item.state = item.representedObject == selectedProduct ? NSControlStateValueOn : NSControlStateValueOff;
             }
         }
     }
@@ -394,7 +394,7 @@
 
                         if (item.representedObject == product)
                         {
-                            item.state = NSOnState;
+                            item.state = NSControlStateValueOn;
                             done = YES;
                             break;
                         }
@@ -405,7 +405,7 @@
                             {
                                 if (sitem.representedObject == product)
                                 {
-                                    sitem.state = NSOnState;
+                                    sitem.state = NSControlStateValueOn;
                                     done = YES;
                                     break;
                                 }
@@ -424,7 +424,7 @@
             // Choose first item on the list - if there is something to choose
 
             NSMenuItem *item = [productsMenu.itemArray objectAtIndex:0];
-            item.state = NSOnState;
+            item.state = NSControlStateValueOn;
             selectedProduct = item.representedObject;
         }
     }
@@ -475,7 +475,7 @@
     {
         for (NSMenuItem *item in openProjectsMenu.itemArray)
         {
-            if (item.state == NSOnState) item.state = NSOffState;
+            if (item.state == NSControlStateValueOn) item.state = NSControlStateValueOff;
         }
     }
 
@@ -483,7 +483,7 @@
 
     NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chooseProject:) keyEquivalent:@""];
     item.representedObject = aProject;
-    item.state = NSOnState;
+    item.state = NSControlStateValueOn;
     [openProjectsMenu addItem:item];
 
     // ...and add it to the popup and select it
@@ -531,7 +531,7 @@
                                           action:@selector(newDevicegroup:)
                                    keyEquivalent:@""];
         item.enabled = YES;
-        item.state = NSOffState;
+        item.state = NSControlStateValueOff;
         [deviceGroupsMenu addItem:item];
     }
     else
@@ -550,7 +550,7 @@
                                           action:@selector(newDevicegroup:)
                                    keyEquivalent:@""];
         item.enabled = YES;
-        item.state = NSOffState;
+        item.state = NSControlStateValueOff;
         [deviceGroupsMenu addItem:item];
 
         // If we won't have a device group selected, so pick the first one on the list
@@ -558,7 +558,7 @@
         if (currentDevicegroup == nil)
         {
             item = [deviceGroupsMenu.itemArray objectAtIndex:0];
-            item.state = NSOnState;
+            item.state = NSControlStateValueOn;
             currentDevicegroup = item.representedObject;
             currentProject.devicegroupIndex = [currentProject.devicegroups indexOfObject:currentDevicegroup];
         }
@@ -597,7 +597,7 @@
                                                   action:@selector(chooseDevicegroup:)
                                            keyEquivalent:@""];
                 item.representedObject = nil;
-                item.state = NSOffState;
+                item.state = NSControlStateValueOff;
                 item.enabled = NO;
 
                 [deviceGroupsMenu addItem:item];
@@ -607,7 +607,7 @@
                                               action:@selector(chooseDevicegroup:)
                                        keyEquivalent:@""];
             item.representedObject = dg;
-            item.state = (dg == currentDevicegroup) ? NSOnState : NSOffState;
+            item.state = (dg == currentDevicegroup) ? NSControlStateValueOn : NSControlStateValueOff;
             [deviceGroupsMenu addItem:item];
         }
     }
@@ -857,7 +857,7 @@
 
                             [submenu addItem:ditem];
                             ditem.enabled = YES;
-                            ditem.state = NSOffState;
+                            ditem.state = NSControlStateValueOff;
                             ditem.representedObject = device;
                             ditem.image = [self menuImage:device];
 
@@ -921,13 +921,13 @@
                 {
                     if (subMenuItem.representedObject == selectedDevice)
                     {
-                        subMenuItem.state = NSOnState;
+                        subMenuItem.state = NSControlStateValueOn;
                         flag = YES;
                         break;
                     }
                     else
                     {
-                        subMenuItem.state = NSOffState;
+                        subMenuItem.state = NSControlStateValueOff;
                     }
                 }
             }
@@ -1466,7 +1466,7 @@
             NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:device action:@selector(chooseDevice:) keyEquivalent:@""];
             NSMutableDictionary *representedObject = [representedObjects objectAtIndex:i];
             item.representedObject = representedObject;
-            item.state = selectedDevice == representedObject ? NSOnState : NSOffState;
+            item.state = selectedDevice == representedObject ? NSControlStateValueOn : NSControlStateValueOff;
             item.image = [self menuImage:representedObject];
             [unassignedDevicesMenu addItem:item];
         }
@@ -1492,7 +1492,7 @@
 
     for (NSMenuItem *unassignedDeviceitem in unassignedDevicesMenu.itemArray)
     {
-        unassignedDeviceitem.state = (selectedDevice != nil && unassignedDeviceitem.representedObject == selectedDevice) ? NSOnState : NSOffState;
+        unassignedDeviceitem.state = (selectedDevice != nil && unassignedDeviceitem.representedObject == selectedDevice) ? NSControlStateValueOn : NSControlStateValueOff;
     }
 }
 

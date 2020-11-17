@@ -58,8 +58,8 @@
     //panelSelector.selectedSegment = 0;
     tabIndex = 0;
     
-    deviceViewButton.state = NSOffState;
-    projectViewButton.state = NSOnState;
+    deviceViewButton.state = NSControlStateValueOff;
+    projectViewButton.state = NSControlStateValueOn;
 
     [self setNilProject];
     
@@ -537,7 +537,7 @@
         // the NSOutlineView to reflect the new project
 
         [deviceOutlineView reloadData];
-        [deviceOutlineView setNeedsDisplay];
+        deviceOutlineView.needsDisplay = YES;
         
         if (projectData.count > 0)
         {
@@ -850,7 +850,7 @@
         // the NSOutlineView to reflect the new device
 
         [deviceOutlineView reloadData];
-        [deviceOutlineView setNeedsDisplay];
+        deviceOutlineView.needsDisplay = YES;
 
         if (oDevice != nil && aDevice != nil && deviceOutlineView.isHidden)
         {
@@ -905,15 +905,15 @@
         if (tabIndex == 1) {
             // Clicking on the already selected 'tab', so just put the button back on
             
-            deviceViewButton.state = NSOnState;
+            deviceViewButton.state = NSControlStateValueOn;
             return;
         } else {
             // Was previously on the project 'tab', so switch in the new images, etc.
             
             projectViewButton.image = [NSImage imageNamed:@"pap_u"];
-            projectViewButton.state = NSOffState;
+            projectViewButton.state = NSControlStateValueOff;
             deviceViewButton.image = [NSImage imageNamed:@"pad_s"];
-            deviceViewButton.state = NSOnState;
+            deviceViewButton.state = NSControlStateValueOn;
             tabIndex = 1;
         }
     } else {
@@ -921,15 +921,15 @@
         if (tabIndex == 0) {
             // Clicking on the already selected 'tab', so just put the button back on
             
-            projectViewButton.state = NSOnState;
+            projectViewButton.state = NSControlStateValueOn;
             return;
         } else {
             // Was previously on the device 'tab', so switch in the new images, etc.
             
             projectViewButton.image = [NSImage imageNamed:@"pap_s"];
-            projectViewButton.state = NSOnState;
+            projectViewButton.state = NSControlStateValueOn;
             deviceViewButton.image = [NSImage imageNamed:@"pad_u"];
-            deviceViewButton.state = NSOffState;
+            deviceViewButton.state = NSControlStateValueOff;
             tabIndex = 0;
         }
     }
@@ -948,7 +948,7 @@
         else
         {
             [deviceOutlineView reloadData];
-            [deviceOutlineView setNeedsDisplay];
+            deviceOutlineView.needsDisplay = YES;
 
             for (TreeNode *node in projectData)
             {
@@ -981,8 +981,8 @@
         else
         {
             [deviceOutlineView reloadData];
-            [deviceOutlineView setNeedsDisplay];
 
+            deviceOutlineView.needsDisplay = YES;
             deviceOutlineView.hidden = NO;
 
             [self showNilItems:NO];

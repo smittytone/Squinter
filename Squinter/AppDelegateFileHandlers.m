@@ -36,7 +36,7 @@
          [NSApp endSheet:openDialog];
          [openDialog orderOut:self];
          
-         if (result == NSFileHandlingPanelOKButton) [self openFileHandler:[openDialog URLs] :openActionType];
+        if (result == NSModalResponseOK) [self openFileHandler:[openDialog URLs] :openActionType];
      }
      ];
     
@@ -79,7 +79,7 @@
             return;
         }
         
-        if (accessoryViewNewProjectCheckbox.state == NSOnState)
+        if (accessoryViewNewProjectCheckbox.state == NSControlStateValueOn)
         {
             // This will be set if we have one or two source code files from which the user wants to make a device group.
             // NOTE this should only be possible if we have a current project, ie. we can assume 'currentProject' != nil
@@ -1012,12 +1012,12 @@
     
     if (currentDevicegroup != nil)
     {
-        accessoryViewNewProjectCheckbox.state = NSOffState;
+        accessoryViewNewProjectCheckbox.state = NSControlStateValueOff;
         accessoryViewNewProjectCheckbox.title = [NSString stringWithFormat:@"Create a new device group with the file(s) – or uncheck to add the file(s) to group \"%@\"", currentDevicegroup.name];
     }
     else
     {
-        accessoryViewNewProjectCheckbox.state = NSOnState;
+        accessoryViewNewProjectCheckbox.state = NSControlStateValueOn;
         accessoryViewNewProjectCheckbox.title = @"Create a new device group with the file(s)";
     }
     
@@ -1037,7 +1037,7 @@
 {
     // This is called if the state of 'accessoryViewNewProjectCheckbox' changes
     
-    if (accessoryViewNewProjectCheckbox.state == NSOffState && currentDevicegroup == nil)
+    if (accessoryViewNewProjectCheckbox.state == NSControlStateValueOff && currentDevicegroup == nil)
     {
         // There's no point adding files to a non-existent and non-created device group
         
@@ -1047,7 +1047,7 @@
         [alert beginSheetModalForWindow:openDialog
                       completionHandler:^(NSModalResponse response)
          {
-             accessoryViewNewProjectCheckbox.state = NSOnState;
+             accessoryViewNewProjectCheckbox.state = NSControlStateValueOn;
          }
          ];
     }
@@ -1095,7 +1095,7 @@
     {
         // All the selected files have been processed - what do we do now?
         
-        if (accessoryViewNewProjectCheckbox.state == NSOnState && !newDevicegroupFlag)
+        if (accessoryViewNewProjectCheckbox.state == NSControlStateValueOn && !newDevicegroupFlag)
         {
             // User asked to create a new device group for the added files so we handle that first
             // NOTE We only do this once, by checking 'newDevicegroupFlag' = NO
@@ -1375,7 +1375,7 @@
          
          // Check what button was clicked - was it 'Save'?
          
-         if (result == NSFileHandlingPanelOKButton) [self savePrep:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]];
+        if (result == NSModalResponseOK) [self savePrep:[saveProjectDialog directoryURL] :[saveProjectDialog nameFieldStringValue]];
          
          // NOTE A click on 'Cancel' just ends the dialog run loop
      }
@@ -1810,7 +1810,7 @@
          [NSApp endSheet:saveProjectDialog];
          [saveProjectDialog orderOut:self];
          
-         if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
          {
              // Update the current file (ie. the first one in the list)
              // with its name name/location

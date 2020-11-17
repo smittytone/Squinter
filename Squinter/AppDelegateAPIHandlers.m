@@ -278,7 +278,7 @@
     
     BOOL flag = NO;
     
-    if (saveDetailsCheckbox.state == NSOnState)
+    if (saveDetailsCheckbox.state == NSControlStateValueOn)
     {
         // User has indicated they want the credentials saved for next time
         // NOTE this should not happen if we auto-log in
@@ -2732,7 +2732,7 @@
         
         BOOL flag = NO;
         
-        if (saveDetailsCheckbox.state == NSOnState && errorCode == kErrorNetworkError)
+        if (saveDetailsCheckbox.state == NSControlStateValueOn && errorCode == kErrorNetworkError)
         {
             // User has indicated they want the credentials saved for next time
             // NOTE only save the credentials if we were unable to connect, ie. ignore rejected credentials

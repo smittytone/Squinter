@@ -96,7 +96,7 @@
         {
             // Uncheck the checkbox
             
-            cellView.minimumCheckbox.state = NSOffState;
+            cellView.minimumCheckbox.state = NSControlStateValueOff;
         }
         else
         {
@@ -142,7 +142,7 @@
 		if (cell != nil)
 		{
 			cell.minimumCheckbox.title = @"";
-			cell.minimumCheckbox.state = row == minIndex ? NSOnState : NSOffState;
+			cell.minimumCheckbox.state = row == minIndex ? NSControlStateValueOn : NSControlStateValueOff;
 			cell.minimumCheckbox.action = @selector(checkMinimum:);
 			cell.minimumCheckbox.enabled = row > minIndex ? NO : YES;
 			return cell;
