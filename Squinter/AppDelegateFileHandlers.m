@@ -132,6 +132,7 @@
     
     filePath = [url path];
     aProject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+    //aProject = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     
     if (aProject != nil)
     {
